@@ -1,0 +1,68 @@
+<!--<div style="clear:both"></div>-->
+<style>
+    .li-side {
+        list-style:none;
+        width:100%;
+        padding: 0 5px;
+    }
+
+.bannerfont {
+    font-size:14px;
+}
+.sidebtn {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    padding:5px;
+    border:1px solid darkgrey;
+}
+.btn {
+    width:95%;
+}
+.btn:hover {
+    background-color: #cad4f7 !important;
+}
+.card-body {
+    padding:10px;
+}
+</style>
+<br>
+<div class="card" style="width:100%;margin:0; padding:0;" style="border:1px solid pink;">
+    <div class="card-body" >
+        <ul style="padding-left:5px">
+<!--                <li><a type="button" class="btn btn-outline-primary bannerfont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
+            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm bannerfont" href="{% url 'orchidlist:advanced' %}"><b>Advanced Search</b></a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm" href="{% url 'documents:instructionupload' %}">Upload Guideline</a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm" href="{% url 'donation:donateapp' %}">Donate</a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:photosubmissionguideline' %}">Photo submission</a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:changes' %}">Release history</a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:list' %}">Documentation</a></li>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:privacy_policy' %}">Privacy policy</a></li>
+            {% if user.tier.tier > 3 %}
+                <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm border" href="{% url 'documents:migration' %}">Deployment</a></li>
+                <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm border" href="{% url 'documents:future_development' %}">Future Development</a></li>
+            {% endif %}
+        </ul>
+<hr>
+        <ul style="padding-left:20px; font-size:13px;">
+           <span style="font-size:16px;font-weight:600;">Other resources</span>
+           <li class="li-side"><a href="https://http://apps.kew.org/wcsp/home.do" target="_blank">WCSP</a></li>
+           <li class="li-side"><a href="https://www.ipni.org/" target="_blank">IPNI</a></li>
+           <li class="li-side"><a href="http://apps.rhs.org.uk/horticulturaldatabase/orchidregister/orchidregister.asp" target="_blank">RHS</a></li>
+           <li class="li-side"><a href="https://www.rhs.org.uk/about-the-rhs/publications/orchid-hybrid-lists" target="_blank">RHS Hybrid Lists</a></li>
+           <li class="li-side"><a href="http://www.vdof.de/eng/descriptions.htm" target="_blank">Orchideen Journal</a></li>
+           <li class="li-side"><a href="http://www.orchidsnewguinea.com/orchid-genera-and-species-list/" target="_blank">Orchids of New Guinea</a></li>
+           <li class="li-side"><a href="https://orchid.unibas.ch/index.php/en/database-search/advanced-search" target="_blank">Unibas</a></li>
+           <li class="li-side"><a href="http://legacy.tropicos.org/NameSearch.aspx" target="_blank">Tropicos</a></li>
+           <li class="li-side"><a href="http://www.efloras.org/browse.aspx?flora_id=2&start_taxon_id=10638" target="_blank">Flora of China</a></li>
+           <li class="li-side"><a href="http://www.orchidspecies.com/" target="_blank">IOSPE</a></li>
+           <li class="li-side"><a href="https://www.uniprot.org/taxonomy/4747" target="_blank">UniProt</a></li>
+           <li class="li-side"><a href="http://www.catalogueoflife.org/col/browse/tree/id/ca5523e7c617383a409f4179601ffa1c" target="_blank">Catalog of Life</a></li>
+           <li class="li-side"><a href="https://itol.embl.de/itol.cgi" target="_blank">iTOL Tree of Life</a></li>
+           <li class="li-side"><a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=4747" target="_blank">NCBI Taxonomy Browser</a></li>
+           <li class="li-side"><a href="http://powo.science.kew.org/" target="_blank">Kewscience Plants of the World</a></li>
+
+        </ul>
+    </div>
+</div>

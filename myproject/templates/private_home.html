@@ -1,0 +1,35 @@
+<html>
+    <body>
+
+
+
+     <script>
+
+      var num1 = 2;
+      document.write("Value of number 1 is " + num1 + ". (Global scope)</br>");
+      function parentFunction(){ //global function
+        var num2 = 4;
+        num1 = 8;
+        document.write("Value of number 1 is " + num1 + ". (Inside global function)</br>");
+        document.write("Value of number 2 is " + num2 + ". (Inside parent function)</br>");
+        childFunction(); //child function called
+        document.write("Value of number 3 is " + num3 + ". (Inside parent function)</br>");
+        function childFunction(){ //nested function
+          var num3 = 0;
+          document.write("Value of number 2 is " + num2 + ". (Inside child function)</br>");
+          document.write("Value of number 3 is " + num3 + ". (Local scope)</br>");
+        }
+      }
+      parentFunction(); //parent function called
+
+
+
+
+         
+     </script>
+     <noscript>
+     Sorry, JavaScript not supported <img draggable="false" class="emoji" alt="🙁" src="https://s.w.org/images/core/emoji/11/svg/1f641.svg">
+     </noscript>
+
+    </body>
+</html>

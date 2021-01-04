@@ -1,0 +1,78 @@
+<style>
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+</style>
+<div style="width:100%;word-wrap: break-word;text-align:left;padding-left:5px;">
+    {% if not user.is_authenticated or user.tier.tier < 3 %}
+        {% if image.source_url %}
+            <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
+        {% else %}
+            {{image.imgname|safe}}
+        {% endif %}
+        <br>
+    {% endif %}
+    Photo:
+    {% if image.source_url %}
+        <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+    {% else %}
+        {{image.author.displayname }}
+    {% endif %}
+    <br>
+    {% if user.tier.tier > 2 and role == 'cur' %}
+    Rank:
+        {% if image.rank == 0 %}<span style="color:red">0</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="private" href='?rank=0&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>0</a>{% endif %} |
+        {% if image.rank == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="habitat" href='?rank=1&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>1</a>{% endif %} |
+        {% if image.rank == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="plant" href='?rank=2&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>2</a>{% endif %} |
+        {% if image.rank == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="inflorescences" href='?rank=3&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>3</a>{% endif %} |
+        {% if image.rank == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="group" href='?rank=4&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>4</a>{% endif %} |
+        {% if image.rank == 5 %}<span style="color:red">5</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="single flower" href='?rank=5&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>5</a>{% endif %} |
+<!--        {% if image.rank == 6 %}<span style="color:#7e1b86">6</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="selected" href='?rank=6&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>6</a>{% endif %} |-->
+        {% if image.rank == 7 %}<span style="color:red">7</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="closeup" href='?rank=7&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>7</a>{% endif %} |
+        {% if image.rank == 8 %}<span style="color:red">8</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="info" href='?rank=8&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>8</a>{% endif %}
+        <br>
+    quality:
+        {% if image.quality == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Top" href='?quality=1&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>1</a>{% endif %} |
+        {% if image.quality == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="High" href='?quality=2&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>2</a>{% endif %} |
+        {% if image.quality == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Average" href='?quality=3&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>3</a>{% endif %} |
+        {% if image.quality == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Low" href='?quality=4&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>4</a>{% endif %} |
+        <br>
+    {% endif %}
+    {% if user.get_author == image.author and user.tier.tier <= 2 %}
+        <a href='/detail/uploadweb/{{species.pid}}/{{image.id}}/?role={{role}}&tab={{tab}}'>Update</a> |
+        {% if image.rank == 0 %}
+            <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum" >Delete</a> |
+        {% endif %}
+    {% elif user.tier.tier > 2 %}
+        <a href='/detail/uploadweb/{{species.pid}}/{{image.id}}/?role={{role}}&tab={{tab}}'>Update</a> |
+        {% if image.rank == 0 %}
+            <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum" >Delete</a> |
+        {% endif %}
+        <a href='/detail/reidentify/{{image.id}}/{{species.pid}}/?role={{role}}&tab=sum&gen={{species.gen.pid}}'>Reidentify</a>
+    {% endif %}
+</div>

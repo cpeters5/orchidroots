@@ -1,0 +1,68 @@
+{% load static %}
+{% include 'base.html' %}
+
+<style>
+    ul{
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:none;
+    }
+    li {
+            display: list-item;
+    }
+    .card-body {
+        font-size: 15px;
+    }
+</style>
+<br>
+
+<div class="container-fluid" style="min-height:200px;">
+    <div style="clear:both"></div>
+    <div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2 ">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9" style="margin-top:7px;">
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title" style="margin-bottom: 0">Public inspection requirements</h6>
+                </div>
+
+                <div class="card-body" style="padding:10px;">
+
+                    "Tax-exempt organizations must make annual returns and exemption applications filed with
+                    the IRS available for public inspection and copying upon request..." [The IRS].<br>
+                    To conform with this reqirement, all relevant forms and publications are posted below.
+                    <br>
+
+                    <ul>
+                        <li>
+                            <a href="{% url 'documents:articles' %}" target="_blank">Article Of Incorporation</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'documents:bylaws' %}" target="_blank">Bylaws</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'documents:req501c3' %}" target="_blank">Application for Recognition of Exemption Under 501(c)(3) of the Internal Revenue Code</a>
+                        </li>
+                       <li>
+                             Maryland Association of Nonprofit Organizations, Conflic of Interest
+                        </li>
+                    </ul>
+                </div>
+    <!--                <div style="margin:0 auto;border:1px solid lightgrey;">-->
+    <!--                    <div class="btn" href="">Tax (Form 990-PF)</div>-->
+    <!--                    <div class="btn" href="">2019</div>-->
+    <!--                    <div class="btn" href="">2020</div>-->
+    <!--                    <div class="btn" href="">2021</div>-->
+    <!--                    <div class="btn" href="">2022</div>-->
+    <!--                    <div class="btn" href="">2023</div>-->
+    <!--                </div>-->
+
+
+            </div>
+        </div>
+    </div>
+</div>

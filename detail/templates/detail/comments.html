@@ -1,0 +1,108 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+
+div.container {
+    width: 100%;
+    padding: 0 0 0 1px;
+    border: 0 solid blue;
+}
+
+.container_img:hover .overlay {
+  opacity: 0.8;
+
+}
+
+@media only screen and (max-width: 400px) {
+    /* For mobile phones: */
+    [class*="col-sm-"] {
+        width: 100%;
+    }
+    .hidden-xs {
+        display: none;
+    }
+}
+
+a {
+        text-decoration: none;
+    color: blue;
+}
+
+a:hover {
+    /*text-decoration: none;*/
+    color: darkblue;
+}
+
+.border-lb {
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+}
+.border-rb {
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 0;
+}
+
+</style>
+
+
+<br><br><br>
+<!--Title-->
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center;">
+
+    <div class="container" style="font-size: 20px; margin:0 auto">
+        <strong>Comments</strong>
+    </div>
+
+
+</div>
+
+
+<!--Main table-->
+<div style="clear:both;background-color: #f5f9f9;min-height: 1800px; margin:0 auto; width:90%; padding: 10px 0 0 0">
+    <div style="margin:10px 0 0 0; width: 100%">
+
+        <!--main table-->
+        <div class="table mytable">
+            <table class="table mytable table-condensed table-hover" id="myTable">
+                <thead>
+                    <tr class="center" bgcolor="#e3e3e3">
+                        <th class="border-lb">
+                            {% if sort == 'name' %}
+                                <a href="?sort=-name&prev_sort={{ sort }}">Species<i class="material-icons" style="font-size:16px;">arrow_upward</i></a>
+                            {%  elif sort == '-name' %}
+                                <a href="?sort=name&prev_sort={{ sort }}">Species<i class="material-icons" style="font-size:16px;">arrow_downward</i></a>
+                            {%  else %}
+                                <a href="?sort=name&prev_sort={{ sort }}">Species</a>
+                            {% endif %}
+                        </th>
+                        <th class="border-lb">comments</th>
+                        <th class="border-rb">
+                            {% if sort == 'latest' %}
+                                <a href="?sort=-latest&prev_sort={{ sort }}">Date<i class="material-icons" style="font-size:16px;">arrow_upward</i></a>
+                            {%  elif sort == '-latest' %}
+                                <a href="?sort=latest&prev_sort={{ sort }}">Date<i class="material-icons" style="font-size:16px;">arrow_downward</i></a>
+                            {%  else %}
+                                <a href="?sort=latest&prev_sort={{ sort }}">Date</a>
+                            {% endif %}
+                        </th>
+                    </tr>
+
+
+
+                </thead>
+                {% if comment_list %}
+                    {% for x in comment_list %}
+                    <tr>
+                        <td class="border-lb"><a href="{{ x.3 }}">{{x.0.name|safe}}</a></td>
+                        <td class="border-lb">{{ x.2|safe }}</td>
+                        <td class="border-rb">{{x.1|safe}}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

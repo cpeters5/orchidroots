@@ -1,0 +1,53 @@
+<style>
+.alphalist {
+    font-size:11px;
+    padding:2px 6px;
+    margin-top: 5px;
+    margin-block-end: 2px;
+}
+.alphalist a{
+    padding:2px 6px;
+    margin: 0;
+}
+.alphalist a.hover {
+    background-color: #f5f9f9;
+}
+
+.alphalist a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.alphalist ul {
+    margin: 0;
+    padding: 0 !important;
+    list-style-type: none;
+    list-style-image: none;
+}
+
+.alphalist li
+{
+    float: left;
+    display:inline-block;
+    /*margin: 20px 0;*/
+}
+
+
+</style>
+    <div style="width:100%">
+    <ul class="alphalist text-n" style="display:inline-block !important">
+            <!--Alphabetical-->
+                {% for opt in alpha_list %}
+                    {% if alpha == opt %}
+                        <li class="page-item active"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}" >{{opt}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if not alpha or alpha == "ALL" %}
+        <li class="page-item active"><a class="page-link" href="#">All </a></li>
+                {% else %}
+        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&gen={{genus.pid}}&display={{display}}">All </a></li>
+                {% endif %}
+    </ul>
+    </div>

@@ -1,0 +1,77 @@
+{% load static %}
+{% include "base.html" %}
+<style>
+
+    ul{
+        padding-left:15px;
+        font-size: 13px;
+        line-height: 30px;
+    }
+
+</style>
+<div style="clear:both"></div>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <br><br>
+    <div style="clear:both"></div>
+	<div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+            <div class="container" style="text-align:center;border:0 solid blue">
+                        <h3>Disclaimer</h3>
+                        <div class="container" style="margin:0 auto;width:100%;text-align:left;border:0 solid green;font-size:13px;">
+                            Welcome to OrchidRoots website.  If you continue to browse and use this website you are agreeing to comply with and be bound by teh following disclaimer, together with our
+                            <a href="{% url 'documents:termsofuse' %}">terms and conditions of use</a>.
+                            The content of the website is provided by OrchidRoots Corp, a non-profit organization registered Maryland, USA.
+                            All content in the website is purely informational in nature and for educational purposes only.
+                            <br>
+                            <br>
+                            <h3>Data</h3>
+                            <ul>
+                                <li>Taxonomy data: WCSP is the primary source of taxonomy data.
+                                    Other sources such as IPNI, peer reviewed publications, or academic publications are added when a taxon does not exist in WCSP or when there are differences that cannot be rectified.
+                                    All species naming follows International Code of Nomenclature for algae, fungi, and plants (ICN).
+                                    The name of species and natural hybrids is uniquely defined by the combination of Genus, species, infraspecific, and author.</li>
+                                <li>Man-made hybrid name: In OrchidRoots, a man-made hybrid is uniquely defined by their formula and its name follows the International Code of Nomenclature
+                                    for Cultivated Plants (ICNCP).  Our primary source of hybrid is the Royal Horticulture Society registration (RHS).
+                                    In addition, unregistered hybrids are also included in OrchidRoots based on parentage given by users on the condition that the given parentage does not exist or is not a synonym of any
+                                    registered parenage in RHS.</li>
+                            </ul>
+                            All data sources are given credit as due.
+                            In most cases names are displayed with a link to their original source if available.        While we have taken precautions to ensure that the data contained in OrchidRoots website has been obtained from reliable sources
+                            and is both current and accurate, errors may happen from time to time.
+                            <br>
+                            <br>
+
+                            <h3>Images</h3>
+                            OrchidRoots website contains photos that have been specifically authorized by the copyright owner.
+                            These photos are made available to public to educate and advance understanding of orchids.
+                            We believe that this constitute a "fair use" of these photos in accordcance with Title 17 U.S.C. Section 107.
+                            <ul>
+                                <li>Species: We seek guidance from our team of curators for photos of orchid species and natural hybrids identification.
+                                    Any photo that has not been verified shall be tagged as "unverified".</li>
+                                <li>Man-made Hybrid: On the other hand, man-made hybrid is not easy to identify due to the absence of formal description or photos of the original plant registered with the RTS.
+                                    variations of parents used in the crossing and genetic variation among siblings also contribute to the uncertainties.
+                                    These factors added to the identification inaccuracies.  The higher complex a hybrid is, the more difficult it is to identify.
+                                    Therefore all hybrid photos in this website is provided "as-is".  OrchidRoots makes no implications or guarantee about the accuracy or correctness of photo identification.
+                                    It is the responsibility of photo owner to provide the name of the grex with contributions of experts provided as a suggestion.</li>
+                            </ul>
+
+                            Most photos displayed in OrchidRoots link to external website which are not under control of OrchidRoots. We have no control over the nature, content and availability of those websites.  The inclusion of these links does not necessarily imply a recommendation or endorsement of the views expressed within them.
+                            <br>
+                            <br>
+                            <h3>Website Availability</h3>
+                            Every effort is made to keep the website up and running smoothly. However, we take no responsibility for and will not be liable for the website being temporarily unavailable due to technical issues beyond our control.
+                            <br>
+                            <br>
+                            COPYRIGHT NOTICE
+                            The website, the software code and its contents are the copyright of OrchidRoots Corp. © 2019-{% now 'Y' %}. All rights reserved.
+
+                        </div>
+                    </div>
+        </div>
+    </div>
+</div>

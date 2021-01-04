@@ -1,0 +1,61 @@
+<style>
+.pagination a{
+    font-size:12px;
+    padding:5px 10px;
+}
+.pagination a.hover {
+    background-color: #f5f9f9;
+}
+
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+</style>
+<div class="container-fluid" style="margin:0 auto">
+    <ul class="pagination pagination-xs">
+        {% if page > 1 %}
+            <li class="page-item"><a class="page-link" href="?page=1&alpha={{alpha}}&type={{type}}&tab={{tab}}"><span class="fa fa-angle-double-left" ></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
+        {% endif %}
+
+        {% if page > 1 %}
+            <li class="page-item"><a class="page-link" href="?page={{prev_page}}&alpha={{alpha}}&type={{type}}&tab={{tab}}"><span class="fa fa-angle-left"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
+        {% endif %}
+
+        {% for pg in page_range %}
+            {% if pg == page %}
+                <li class="page-item active"><a class="page-link" href="?page={{pg}}&alpha={{alpha}}&type={{type}}&tab={{tab}}">{{pg}}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{pg}}&alpha={{alpha}}&type={{type}}&tab={{tab}}">{{pg}}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page == last_page %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{next_page}}&alpha={{alpha}}&type={{type}}&tab={{tab}}"><span class="fa fa-angle-right"></span></a></li>
+        {% endif %}
+
+        {% if page == last_page %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{last_page}}&alpha={{alpha}}&type={{type}}&tab={{tab}}"><span class="fa fa-angle-double-right"></span></a></li>
+        {% endif %}
+
+
+
+
+  </ul>
+</div>
+
+
+
+
+
+

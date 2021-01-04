@@ -1,0 +1,47 @@
+{% include "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+<br>
+<div style="dixplay:inline; text-align:center; margin:0 auto">
+    <h4>Register</h4>
+    <div class="container" style="width:70%;text-align:left;font-size:13px;">
+        <form method='POST'>
+        {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-4 mb-0">
+                    {{ user_form.username|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ user_form.password|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-4 mb-0">
+                    {{ user_form.password2|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6 mb-0">
+                    {{ user_form.fullname|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6 mb-0">
+                    {{ user_form.email|as_crispy_field }}
+                </div>
+            </div>
+
+                    {{ profile_form.photo_credit_name|as_crispy_field }}
+                    {{ profile_form.current_credit_name|as_crispy_field }}
+
+            {{ profile_form.specialty|as_crispy_field }}
+
+            <div class="form-row">
+                <div class="form-group col-md-9 mb-0">
+                    {{ profile_form.country |as_crispy_field }}
+                </div>
+                <div class="form-group col-md-3 mb-0">
+                    <button type='submit' class='button button-default' style="margin-top:33px;height:38px;">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

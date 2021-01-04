@@ -1,0 +1,41 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+  table.center {
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+      font-size:13px;
+  }
+</style>
+<br><br><br>
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center; border:0 solid grey">
+    <div class="container" style="text-align:center;">
+        <h4><b>Series</b></h4>
+        series_list = {{series_list.count}}
+    </div>
+</div>
+
+ {% if series_list %}
+    <div>
+        <table class="table table-bordered table-sm table-condensed table-hover center">
+            <tr>
+                <th>Series </th><th>year</th><th> Description</th>
+            {% for ser in series_list %}
+            <tr>
+                <td><a href="{% url 'orchidlist:species' %}?series={{ser}}&type=species">
+                    {{ ser.series}}
+                    {% if ser.author %}<i>{{ ser.author }}</i>{% endif %}</a></td>
+                <td align=center>{% if ser.year %}{{ser.year}}{% endif %}</td>
+                <td>{% if ser.description %}{{ser.description}}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+     </div>
+ {% else %}
+     <p>None</p>
+ {% endif %}
+{% endblock %}

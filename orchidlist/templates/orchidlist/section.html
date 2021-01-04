@@ -1,0 +1,40 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+  table.center {
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+      font-size:13px;
+  }
+</style>
+<br><br><br>
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center; border:0 solid grey">
+    <div class="container" style="text-align:center;">
+        <h4><b>Section</b></h4>
+        section_list = {{section_list.count}}
+    </div>
+</div>
+
+ {% if section_list %}
+    <div>
+        <table class="table table-bordered table-sm table-condensed table-hover center">
+            <tr>
+                <th>Section </th><th>year</th><th> Description</th>
+            {% for sec in section_list %}
+            <tr>
+                <td><a href="{% url 'orchidlist:species' %}?section={{sec}}&type=species">
+                    {{ sec.section}} {% if sec.author %}<i>{{ sec.author }}</i>{% endif %}</a></td>
+                <td align=center>{% if sec.year %}{{sec.year}}{% endif %}</td>
+                <td>{% if sec.description %}{{sec.description}}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+     </div>
+ {% else %}
+     <p>None</p>
+ {% endif %}
+{% endblock %}

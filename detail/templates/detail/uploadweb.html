@@ -1,0 +1,115 @@
+{% load static %}
+{% include "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+{% include "detail/detail-title.html" %}
+{{ form.media.css }}
+{{ form.media.js }}
+<style>
+    .django-select2 {
+        width: 300px;
+    }
+</style>
+
+<div style="width:95%;margin:0 auto;padding:0;">
+        <!--main section-->
+    {% include 'detail/detail-nav.html' %}
+    {% if myphotos > user.tier.max_upload %}
+        <div class="container">
+            <br><br>
+            <h5><small>You have exceeded the number of allowed uploads for this species.  {{myphotos}} You must delete some of your private photos before adding a new one.</small></h5>
+        </div>
+    {% else %}
+         <div class="tab-content clearfix" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;min-height:1000px">
+             <div class="container" style="width:90%;font-size:13px;">
+                 <br>
+                 {% if img %}
+                     <form method="post" action="{% url 'detail:uploadweb' species.pid img.id %}">
+                     {% csrf_token %}
+                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                 {% else %}
+                     <form method="post" action="{% url 'detail:uploadweb' species.pid %}">
+                     {% csrf_token %}
+                     <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+<!--                     {% if user.tier.tier > 3 %}-->
+<!--                         <a href="{% url 'detail:uploadweb' species.pid %}?tab=sum&role={{role}}&next=cont">&nbsp;&nbsp;&nbsp;Save and add another</a>-->
+<!--                     {% endif %}-->
+                 {% endif %}
+                     <input type="hidden" name="role" value="{{role}}" />
+                     <input type="hidden" name="image_file" value="{{img.image_file }}" />
+                     <a href="{% url 'detail:photos' species.pid %}?role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+
+                     {{form.author|as_crispy_field}}
+                     {{form.credit_to|as_crispy_field}}
+
+                     <hr>
+                     <h5>{{species.name|safe}}</h5>
+                     <div class="form-row">
+                         <div class="form-group col-md-5 mb-0">
+                            {{form.source_url|as_crispy_field}}
+                         </div>
+                         {% if sender == 'web' %}
+                             <div class="form-group col-md-5 mb-0">
+                                {{form.image_url|as_crispy_field}}
+                             </div>
+                         {% else %}
+                             <input type="hidden" name="image_url" value="{{img.image_url }}" />
+                         {% endif %}
+                         <div class="form-group col-md-2 mb-0">
+                            {{form.rank|as_crispy_field}}
+                         </div>
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group col-md-4 mb-0">
+                            {{form.source_file_name|as_crispy_field}}
+                         </div>
+                         <div class="form-group col-md-4 mb-0">
+                            {{form.name|as_crispy_field}}
+                         </div>
+                         <div class="form-group col-md-2 mb-0">
+                            {{form.awards|as_crispy_field}}
+                         </div>
+                         {% if user.tier.tier > 2 %}
+                         <div class="form-group col-md-2 mb-0">
+                            {{form.quality|as_crispy_field}}
+                         </div>
+                         {% endif %}
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group col-md-4 mb-0">
+                            {{form.variation|as_crispy_field}}
+                         </div>
+                         <div class="form-group col-md-4 mb-0">
+                            {{form.form|as_crispy_field}}
+                         </div>
+                       <div class="form-group col-md-2 mb-0">
+                           {{form.certainty|as_crispy_field}}
+                        </div>
+                       <div class="form-group col-md-2 mb-0">
+                           {{form.is_private|as_crispy_field}}
+                        </div>
+                     </div>
+                    {{form.description|as_crispy_field}}
+                    {{form.text_data|as_crispy_field}}
+
+                     <span style="font-size:16px;">
+                        <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                        <a href="{% url 'detail:photos' species.pid %}?role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                     </span>
+                     <input type="hidden" name="role" value="{{ role }}" />
+                 </form>
+             </div>
+         </div>
+    {% endif %}
+</div>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+$(document).ready(function() {
+    $("#id_author").select2();
+});
+
+</script>
+{% endblock %}
+

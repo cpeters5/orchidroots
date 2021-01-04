@@ -1,0 +1,75 @@
+<style>
+
+/*  .btn-group-xs > .btn, .btn-xs {*/
+/*    padding  : 8px 30px;*/
+/*    !*padding  : .5rem .5rem;*!*/
+/*    font-size  : .8rem;*/
+/*    line-height  : .65;*/
+/*    border-radius : .2rem;*/
+/*  }*/
+
+.nav2 {
+    font-size: 13px;
+}
+.nav-link {
+    color: black !important;
+}
+@media only screen and (max-width: 600px) {
+    .nav2 {
+        font-size: 11px;
+        /*height: 20px;*/
+        /*margin-bottom:30px;*/
+    }
+}
+</style>
+    <div class="nav2">
+        <ul class="nav nav-tabs navbar-expand-lg" >
+            {% if species %}
+                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'detail:information' %}?pid={{species.pid}}&gen={{species.gen.pid}}&type={{type}}&role={{role}}">Summary<br></a></li>
+                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'detail:photos' species.pid %}?gen={{species.gen.pid}}&pid={{species.pid}}&type={{type}}&role={{role}}">Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'detail:compare' %}?pid={{species.pid}}&role={{role}}">Compare<br></a></li>
+                {% if user.tier.tier > 2 %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{loc}} {{web}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            {% if loc == 'active' %}Upload URL{% elif web == 'active' %}Upload FIle{% else %}Upload{% endif %}
+                        </a>
+                        <div class="nav2 dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?role={{role}}"><span style="color:#575757;;">upload url</span></a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}"><span style="color:#575757;">upload file</span></a>
+                        </div>
+                    </li>
+                {% elif user.tier.tier > 1 %}
+                    <li class="nav-item"><a class="nav-link {{loc}}" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}"><span style="color:#575757;">upload file</span></a></li>
+                {% endif %}
+               <li class="nav-item dropdown">
+                    <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
+                    </a>
+                    <div class="nav2 dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'orchidlist:progeny' species.pid %}?role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
+                        <a class="dropdown-item" href="{% url 'orchidlist:progenyimg' species.pid %}?role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
+                    </div>
+                </li>
+            {% if species.type == 'hybrid' %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
+                    </a>
+                    <div class="nav2 dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'detail:ancestor' %}?pid={{species.pid}}&role={{role}}&tab=anc"><span style="color:#575757;;">Ancestry list</span></a>
+                        <a class="dropdown-item" href="{% url 'detail:ancestrytree' %}?pid={{species.pid}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
+                    </div>
+
+                </li>
+            {% endif %}
+            {% endif %}
+            {% if brwspc == 'active' %}
+                <li class="nav-item"><div class="nav-link active"><span style="color:#575757;">My Species</span></div></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_hyb' %}?role=pri&tab=brwhyb&author={{author.author_id}}"><span style="color:#575757;">My Hybrid</span></a></li>
+            {% elif brwhyb == 'active' %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_spc' %}?role=pri&tab=brwspc&author={{author.author_id}}"><span style="color:#575757;">My Species</span></a></li>
+                <li class="nav-item"><div class="nav-link active"><span style="color:#575757;">My Hybrid</span></div></li>
+            {% endif %}
+
+        </ul>
+    </div>

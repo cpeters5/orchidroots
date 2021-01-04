@@ -1,0 +1,110 @@
+{% include "base.html" %}
+{% block body %}
+<style>
+
+.portlet {
+    background-color: white;
+}
+@media only screen and (max-width: 2200px) {
+}
+
+@media only screen and (max-width: 1500px) {
+}
+
+@media only screen and (max-width: 1200px) {
+}
+
+
+@media only screen and (max-width: 800px) {
+}
+
+@media only screen and (max-width: 580px) {
+}
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding:2px;
+}
+
+img{
+    width:100%;
+}
+.widget {
+    min-height: 100px;
+    background-color: white;
+    margin:10px;
+    padding:10px;
+}
+    h6 {
+        color: #878787;
+    }
+</style>
+<br>
+<br>
+<br>
+
+<div class="container-fluid">
+    <div id="notice">
+        Note: Try to add a new div with class="col" inside the row class - this will create four equal-width columns.
+    </div>
+    <div class="row">
+        <div class="col-sm-4" style="">
+            <div class="widget public">
+                <h6>Classification</h6>
+
+
+            </div>
+            <div class="widget private">
+                <h6>Genus</h6>
+
+
+            </div>
+            <div class="widget curate">
+                <h6>Intrageneric</h6>
+
+            </div>
+        </div>
+
+        <div class="col-sm-4" style="">
+            <div class="widget public">
+                <h6>Species</h6>
+
+
+            </div>
+            <div class="widget private">
+                <h6>New Uploadded Photos</h6>
+
+
+            </div>
+            <div class="widget curate">
+                <h6>New comments</h6>
+
+            </div>
+        </div>
+
+        <div class="col-sm-4" style="">
+            <div class="widget public">
+                <h6>Hybrid</h6>
+
+
+            </div>
+            <div class="widget private">
+                <h6>Ancestry</h6>
+
+
+            </div>
+            <div class="widget curate">
+                <h6>Progeny</h6>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% load static %}
+{% include "base.html" %}
+<style>
+
+    ul{
+        padding-left:15px;
+        font-size: 13px;
+        line-height: 30px;
+    }
+
+</style>
+<div style="clear:both"></div>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <br><br>
+    <div style="clear:both"></div>
+	<div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+            <div class="card mt-3">
+                <div class="card-header" style="font-size:13px">
+                    <h4>Rest Framework</h4>
+                </div>
+                <div class="card-body" style="font-size:13px">
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header" style="font-size:13px">
+                    <h4>React-Redux</h4>
+                </div>
+                <div class="card-body" style="font-size:13px">
+                    <p>React is a single page application (typically index.html), which could be a
+                    complex object with multiple components, each dynamically changing in response to user's request.
+                        React handles asynchronous and mutations.
+                    </p>
+                    <p>Redux is a predictable container for javascript applications. Redux is a middletier between
+                        React (frontend) and API. React generates asynchronous and mutations requests.  Redux handles the state of data.
+                        It puts restrictions on how and when mutations (to each component).
+                        It sends requests to backend in a consistent fashion and receive data responses from API which is
+                        then handed back to React.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header" style="font-size:13px">
+                    <h4>Django-Rest - React</h4>
+                </div>
+                <div class="card-body" style="font-size:13px">
+                <a href=https://www.loom.com/share/ffeb6e706b7a4485bec809e87db17cac">Demo 1</a>
+                <br>
+                <a href="https://www.loom.com/share/eca4d3fd24a540dbafeab59e1e1963e7">Demo 2</a>
+                </div>
+            </div>
+
+
+            <!-- Data -->
+            <div class="card mt-3">
+                <div class="card-header" style="font-size:13px">
+                    <h4>TODO</h4>
+                </div>
+                <div class="card-body" style="font-size:13px">
+                    <ul>
+                        <li>Add confirmed checkbox to public photos</li>
+                        <li>Add a disclaimer statement to hybrid detail page</li>
+                        <li>Add terms of use during first login</li>
+                        <li>Change "DoNotExist: error to redirect to search page</li>
+                        <li>Add list of locations in species list.  The list should be filtered by genus</li>
+                        <li>Correct RHS grex name to include (yyyy).  Use script.  Fetch page from
+                        "http://apps.rhs.org.uk/horticulturaldatabase/orchidregister/orchidresults.asp?grex=(19&page=12"
+                            and extract id, then rename Species.species
+                        </li>
+                        <li>Get _next parameter</li>
+                        <li>Create a FAQ</li>
+                        <li>Allow to include name to new unregistered cross</li>
+                        <li>Add some interesting statistics to home page</li>
+                        <li>How to acknowledge donors???</li>
+                        <li>Rewrite Kew update in python</li>
+                        <li>Rewrite RHS update in Python</li>
+                    </ul>
+                </div>
+            </div>
+
+
+
+
+         </div>
+    </div>
+</div>

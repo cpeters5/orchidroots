@@ -1,0 +1,134 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail/detail-title.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+
+<style>
+    .mybtn {
+        font-size:13px;
+        width:200px;
+        background-color: white;
+        border: 1px solid grey;
+        margin: 3px;
+    }
+    .mymenu {
+        max-height:400px;
+        overflow-y: auto;
+        font-size:12px;
+    }
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 12vw;
+   width : 12vw;
+   padding:2px 1px 3px 1px;
+}
+
+div.text-c {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+}
+
+.left-p {
+    width:100%;
+    min-width:200px;
+    border: 0 solid lightgrey;
+    max-height:600px;
+    font-size: 13px;
+    overflow-y:auto;
+}
+
+@media only screen and (max-width: 830px) {
+    .left-p {
+        width:100%;
+        min-width:80px;
+        max-height:400px;
+        font-size: 12px;
+        overflow-y:auto;
+    }
+
+    div.text-c {
+        font-size: 10px;
+    }
+    .thumbnails {
+       height: 22vw;
+       width : 22vw;
+       padding:2px 1px 3px 1px;
+    }
+}
+
+@media only screen and (max-width: 580px) {
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 0;
+}
+
+img{
+    width:100%;
+}
+
+.mybtn{
+    border:1px solid lightblue;
+    font-size:13px;
+    height:30px;
+}
+</style>
+<div style="width:95%;margin:0 auto;">
+    {% include "detail/detail-nav.html" %}
+
+    <div class="tab-content clearfix" style="background-color: white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+        <div class="d-flex flex-row bd-highlight mb-3">
+            <div class="p-2" style="width:100%">
+                <div style="margin:0 auto; text-align: center;min-height:200px;">
+                    <br>
+                    <br>
+                    {% if file_list %}
+                        {% if last_page > 1 %}
+                            {% include "detail/paginator_upl.html" %}
+                        {% endif %}
+                        {% for image in file_list %}
+                            <div style="display:inline-block">
+                                <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
+                                        <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                </a>
+                                <div style="font-size:12px">
+                                    <a href="{% url 'detail:photos' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.namecasual|safe}}</a>
+                                    <br>{{image.created_date.date}}
+                                    <br>
+                                    {% if image.approved %}
+                                        <b>Approved</b>
+                                    {% else %}
+                                        <a href="{% url 'detail:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
+                                    {% endif %}
+                                    <a href="{% url 'detail:deletephoto' image.id %}?pid={{image.pid_id}}&role={{role}}&tab={{tab}}&page={{page}}&area=curate_newupload" >Delete</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <span style="font-size:12px;">
+                        None
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

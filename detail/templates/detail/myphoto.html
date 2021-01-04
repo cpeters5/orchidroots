@@ -1,0 +1,362 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% include "detail/detail-title.html" %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+
+<style>
+.mybtn {
+    font-size:13px;
+    width:200px;
+    background-color: white;
+    border: 1px solid grey;
+    margin: 3px;
+}
+
+.imageitem {
+    display:inline-block;
+    border:1px solid lightgrey;
+    margin:0 2px;
+    width : 18vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 0 auto;
+    width:100%;
+}
+
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding:2px;
+    margin:0 auto;
+}
+
+.imgcaption {
+    font-size: 10px;
+    text-align: center;
+    height:70px;
+    /*overflow: hidden;*/
+}
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+
+@media only screen and (max-width: 800px){
+   .imageitem {
+        width: 30vw;
+        height : 250px;
+    }
+    .imgcaption {
+        font-size: 10px;
+        /*height: 0px;*/
+    }
+   .box {
+        /*width: 35vw;*/
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 190px !important;
+       width : 95% !important;
+    }
+
+    div.text {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .imageitem {
+        width: 36vw;
+        height : 170px;
+    }
+    .box {
+        width: 35vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 110px !important;
+       width : 95% !important;
+    }
+
+    .imgcaption {
+       width : 34vw;
+        font-size: 9px;
+        height: 59px;
+    }
+    div.text {
+        font-size: 10px;
+    }
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 5px;
+    width: 147px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+    .subtitle {
+        font-size: 13px;
+    }
+</style>
+
+<!--My species and my hybrids-->
+<div style="clear:both"></div>
+
+
+<div style="width:95%;margin:0 auto;">
+    <div class="d-flex flex-row flex-wrap justify-content-center">
+        <div class="p-2 dropdown" >
+            <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Species List</button>
+            {% if myspecies_list %}
+                <div class="dropdown-menu  scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                    {% for spc in myspecies_list %}
+                        <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="p-2 dropdown">
+            <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Hybrids List</button>
+            {% if myhybrid_list %}
+                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                    {% for spc in myhybrid_list %}
+                        <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="p-2 dropdown" >
+            <a class="btn dropdown-toggle btn-xs btn-outline-primary" href="{% url 'detail:myphoto_browse_spc' %}?role={{role}}">My Species Photos</a>
+        </div>
+
+        <div class="p-2 dropdown" >
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:myphoto_browse_hyb' %}?role={{role}}">My Hybrid Photos</a>
+        </div>
+
+        {% if author.author_id == 'anonymous' %}
+        <div style="text-align:center; width:100%;padding:0 20%; font-size:14px;">
+            <br>
+            <b>Alert!</b>
+            {{user}}, your profile is not synchronized with the current credit attribution name.
+            If this is the first time you upload your photo, please contact 'admion@orchidroots.org' to create an author id for you.
+            Otherwise, if your credit attribution author name already exists, please click on the link "update profile" in the dropdown menu under your user name and select your attribute the name we use to attribute your photos from the drop down menu in the update profile form"
+            to <a href="https://www.facebook.com/Orchidrootscom-306266603228487/inbox/?mailbox_id=306266603228487&selected_item_id=631912977">OrchidRoots In-Box</a>
+        </div>
+        {% else %}
+        <div class="p-2 dropdown" >
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}">upload file</a>
+        </div>
+        {% endif %}
+
+
+        <!--                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadweb' species.pid %}?role={{role}}&tab=web">Upload url</a>-->
+        </div>
+    <br>
+    <br>
+    {% if user.is_authenticated and user.tier.tier > 2 %}
+        <form class="form-inline justify-content-center" action="{% url 'detail:photos' species.pid %}" id="filter">
+        <input type="hidden" name="genus" value="{{genus}}" />
+        <input type="hidden" name="role" value="pri" />
+        <select form='filter' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
+            {% if author %}
+                <option selected disabled>{{author}}</option>
+            {% else %}
+                <option selected disabled>Select an author</option>
+           {% endif %}
+            <option></option>
+            {% for author in author_list %}
+                {% if author == author.author_id %}
+                    <option selected="selected" disabled>{{author.displayname}}</option>
+                {% else %}
+                    <option value="{{author.author_id}}">{{author.displayname}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+        </form>
+    {% endif %}
+
+</div>
+
+       <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
+            {% for image in public_list %}
+                <div class="imageitem">
+                    {% if image.image_file %}
+                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                                <h6><small>
+                                {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                {{image.get_displayname}}
+                                {% if image.text_data %}<br>{{image.text_data|safe}}{% endif %} </small></h6>">
+                            <div class="box">
+                                    <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                            </div>
+                        </a>
+                        <br>
+                    {% else %}
+                        <a href="#">
+                        <dev class="box">
+                            <img class="thumbnails" alt="" src="{{image.image_url}}">
+                            <div class="text text-br">{{image.id}}</div>
+                        </dev>
+                        </a>
+                    {% endif %}
+                    <div class="imgcaption">
+                        <div style="width:100%;word-wrap: break-word;">
+                            {% if role == 'cur' %}
+                                {% include 'detail/curate_links.html' %}
+                            {% else %}
+                                {% if image.source_url %}
+                                    <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
+                                {% else %}
+                                    {{image.imgname|safe}}
+                                {% endif %}
+                                {% if image.source_url %}
+                                    <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                {% else %}
+                                    {{image.author.displayname }}
+                                {% endif %}
+                            {% endif %}
+                            - <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+       </div>
+
+    {% if upload_list or msg %}
+    <div class="p-2 border" style="background:white; margin-top:10px;">
+        <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
+            <div class="font-weight-bold text-center text-info" ><h4>New Uploaded Files</h4></div>
+            {% if msg %}<h6>{{msg}}</h6>{% endif %}
+            <br><br>
+            {% for image in upload_list %}
+                 <div class="imageitem" style="display:inline-block">
+                     {% if image.image_file_path %}
+                          <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                                   {{image.id}}: {{image.imgname}}
+                                   <br> {{image.get_displayname}}
+                                   <br>{% if image.text_data %}{{image.text_data|safe}}{% endif %}">
+                              <div class="box">
+                                  <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}" style="border: 0 solid red;">
+                                  <div class="text text-br">{{image.id}}</div>
+                                </div>
+                           </a>
+                     {% else %}
+<!--                                    <div class="box">-->
+<!--                                        <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">-->
+<!--                                        <div class="text">{{image.id}}</div>-->
+<!--                                    </div>-->
+                        Requested file does not exist
+                     {% endif %}
+                     <div style="font-size:10px">
+                        <a href="{{image.source_url}}">{{image.author}}</a>
+<!--                            Private and curate role may delete photos-->
+                        {% if role == "cur" or role == "pri" %}
+                            <br>
+                            {% if image.approved %}
+                                <b>Approved</b>
+                            {% elif role == 'cur' %}
+                                <a href="{% url 'detail:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                            {% endif %}
+                            <a href="{% url 'detail:deletephoto' image.id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                        {% endif %}
+                     </div>
+
+                 </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
+<!--<script>-->
+
+<!--$(document).on('click', '[data-toggle="lightbox"]', function(event) {-->
+<!--                event.preventDefault();-->
+<!--                $(this).ekkoLightbox();-->
+<!--            });-->
+
+<!--</script>-->
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+
+// Thumbnail rendering
+document.addEventListener("DOMContentLoaded", function(event) {
+  var addImageOrientationClass = function(img) {
+    if(img.naturalHeight > img.naturalWidth) {
+      img.classList.add("portrait");
+    }
+  }
+
+  // Add "portrait" class to thumbnail images that are portrait orientation
+  var images = document.querySelectorAll(".thumbnails img");
+  for(var i=0; i<images.length; i++) {
+    if(images[i].complete) {
+      addImageOrientationClass(images[i]);
+    } else {
+      images[i].addEventListener("load", function(evt) {
+        addImageOrientationClass(evt.target);
+      });
+    }
+  }
+
+});
+
+</script>
+
+{% endblock %}

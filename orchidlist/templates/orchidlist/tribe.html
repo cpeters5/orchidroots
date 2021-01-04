@@ -1,0 +1,57 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+  table.center {
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+      font-size:13px;
+  }
+</style>
+<br><br><br>
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center; border:0 solid grey">
+    <div class="container" style="text-align:center;">
+        <h4><b>Tribe</b></h4>
+    </div>
+    <div style="display:inline-block;">
+      <label>Subfamily</label>
+
+        <button class="dropdown-toggle" type="button" data-toggle="dropdown" style="height:27px; font-size:12px;text-align:left;background-color: white;border:1px solid #ccc">
+                {% if sf %}{{sf}}{% else %}<span class="txt" style="font-size:12px; color:#bdaec6">Subfamily</span>{% endif %}
+        </button>
+        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;padding:0;width:80px;">
+            <a class="dropdown-item" href="{%url 'orchidlist:tribe' %}?sf=">&nbsp;</a>
+            {% for x in sf_list %}
+            <a class="dropdown-item" href="{%url 'orchidlist:tribe' %}?sf={{x}}">{{x}}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if tribe_list %}
+    <div>
+        <table class="table table-bordered table-sm table-condensed table-hover center">
+            <tr>
+				<th>Subfamily</th></th><th>Tribe </th><th>author</th><th>year</th><th> Description</th>
+			</tr>
+			{% for tribe in tribe_list %}
+			<tr >
+				<td><a href="{% url 'orchidlist:genera' %}?sf={{tribe.subfamily}}&t={{tribe.tribe}}&genustype=species">{{tribe.subfamily}}</a></td>
+				<td><a href="{% url 'orchidlist:genera' %}?t={{tribe.tribe}}&genustype=species">{{tribe.tribe}}</a></td>
+				<td>{{ tribe.author }}</td>
+				<td align=center>{{tribe.year}}</td>
+				<td align=center>{% if tribe.description %}{{tribe.description}}{% endif %}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% else %}
+   <div style="text-align: center">None</div>
+{% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,470 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail/detail-title.html" %}
+{% block body %}
+
+<style>
+
+.border-lb {
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+}
+.border-rb {
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 1px;
+}
+
+
+.table {
+    width: 70%;
+}
+
+@media only screen and (max-width: 800px) {
+    /* For mobile phones: */
+    .table {
+        width:100%;
+    }
+
+}
+
+.btn-tree {
+    text-decoration: none;
+}
+
+/*Style for tree*/
+.container-tree {
+    width: 1400px;
+}
+.tree {
+    width:100%;
+    overflow-x: hidden;
+    font-size:10px;
+    text-align: center;
+    border: 0 solid green;
+}
+.tree ul {
+	padding-top: 20px; position: relative;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+
+.tree li {
+	float: left; text-align: center;
+	list-style-type: none;
+	position: relative;
+	padding: 20px 0 0 0;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+
+/*We will use ::before and ::after to draw the connectors*/
+
+.tree li::before, .tree li::after{
+	content: '';
+	position: absolute; top: 0; right: 50%;
+	border-top: 1px solid #ccc;
+	width: 50%; height: 20px;
+}
+.tree li::after{
+	right: auto;
+    left: 50%;
+	border-left: 1px solid #ccc;
+}
+
+/*We need to remove left-right connectors from elements without
+any siblings*/
+.tree li:only-child::after, .tree li:only-child::before {
+	display: none;
+}
+
+/*Remove space from the top of single children*/
+.tree li:only-child{ padding-top: 0;}
+
+/*Remove left connector from first child and
+right connector from last child*/
+.tree li:first-child::before, .tree li:last-child::after{
+	border: 0 none;
+}
+/*Adding back the vertical connector to the last nodes*/
+.tree li:last-child::before{
+	border-right: 1px solid #ccc;
+	border-radius: 0 5px 0 0;
+	/*-webkit-border-radius: 0 5px 0 0;*/
+	/*-moz-border-radius: 0 5px 0 0;*/
+}
+.tree li:first-child::after{
+	border-radius: 5px 0 0 0;
+	/*-webkit-border-radius: 5px 0 0 0;*/
+	/*-moz-border-radius: 5px 0 0 0;*/
+}
+
+/*add downward connectors from parents*/
+.tree ul ul::before{
+	content: '';
+	position: absolute;
+    top: 0;
+    left: 50%;
+	border-left: 1px solid #ccc;
+	width: 0; height: 20px;
+}
+
+.tree li a{
+	border: 1px solid #ccc;
+	padding: 0px 0px;
+	text-decoration: none;
+	color: #666;
+	font-family: arial, verdana, tahoma;
+	font-size: 11px;
+	display: inline-block;
+
+	border-radius: 25px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+.tree li img {
+   object-fit: cover;
+   overflow: hidden;
+   height: 14vw;
+   width : 14vw;
+   padding:0;
+
+}
+
+/*Time for some hover effects*/
+/*We will apply the hover effect the the lineage of the element also*/
+.tree li a:hover, .tree li a:hover+ul li a {
+	background: #c8e4f8;
+    color: #000;
+    border: 1px solid #94a0b4;
+}
+/*Connector styles on hover*/
+.tree li a:hover+ul li::after,
+.tree li a:hover+ul li::before,
+.tree li a:hover+ul::before,
+.tree li a:hover+ul ul::before{
+	border-color:  #94a0b4 !important;
+}
+
+       /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 12vw;
+   width : 12vw;
+   padding:2px;
+}
+.thumbnails1 {
+   height: 16vw;
+   width : 16vw;
+}
+.thumbnails2 {
+   height: 11vw !important;
+   width : 11vw !important;
+}
+.thumbnails3 {
+   height: 8vw !important;
+   width : 8vw !important;
+    border:1px solid lightgrey;
+    padding:0 !important;
+    margin:0 !important;
+}
+/*.thumbnails4 {*/
+/*   height: 5vw !important;*/
+/*   width : 5vw !important;*/
+/*    border:1px solid lightgrey;*/
+/*    padding:0 !important;*/
+/*    margin:0 !important;*/
+/*}*/
+
+
+@media only screen and (max-width: 800px) {
+    .container-tree {
+        width: 1000px;
+    }
+    .thumbnails3 {
+       height: 9vw !important;
+       width : 9vw !important;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .container-tree {
+        width: 1000px;
+    }
+    .thumbnails3 {
+       height: 9vw !important;
+       width : 9vw !important;
+    }
+}
+
+</style>
+
+
+<div style="margin:0 auto;padding:0;width:100%;">
+        <!--main section-->
+    <br>
+    {% include 'detail/detail-nav.html' %}
+    <div class="tab-content clearfix" style="min-width:2000px;overflow-x:auto;padding:0;background-color:white; margin:0 auto;;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+        {% if species.type == 'hybrid' %}
+        <div class="card m-2">
+            <div class="card-header"><h5><span style=" margin-left:100px;">Family Tree</span></h5></div>
+            <br>
+            <div class="card-body" style="margin:0; text-align:center">
+
+    <!--        Tree here-->
+                <div class="tree" style="margin: 0; padding:0;">
+                    <div style="margin: 0 auto;">
+                        <ul style="display:inline-block;float:left;padding:0;margin:0;">
+                            <li style="display:inline-block;">
+                                <img class="thumbnails thumbnails3" alt="" src="{% static species.img %}" >
+                                <div>{{species.abrevname|safe}}<br>{% if species.year %}{{species.year}}{% else %}<br>{%endif %}</div>
+                                <ul>
+                                    <!--Seed branch-->
+                                    <li>
+                                        {% if s %}
+                                            <a class="fam" href="{% if s.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{s.pid.pid}}&role={{role}}">
+                                                <img  class="thumbnails thumbnails3" src="{% static s.img %}" >
+                                            </a>
+                                            <div>
+                                                <a class="fam" href="{% url 'detail:information' %}?pid={{s.pid.pid}}&role={{role}}" style="border:0">
+                                                    {{s.pid.abrevname|safe}}<br>{% if s.year %}{{s.year}}{% else %}<br>{%endif %}
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                        {% endif %}
+                                        {% if s.type == 'hybrid' %}
+                                            <ul>
+                                                <li>
+                                                    {% if ss %}
+                                                        <a class="fam" href="{% if ss.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ss.pid.pid}}&role={{role}}">
+                                                                    <img class="thumbnails thumbnails3" src="{% static ss.img %}" >
+                                                        </a>
+                                                        <div>
+                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{ss.pid.pid}}&role={{role}}">
+                                                                {{ss.pid.abrevname|safe}}<br>{% if ss.year %}{{ss.year}}{% else %}<br>{% endif %}
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                                <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                    {% endif %}
+                                                    {% if ss.type == 'hybrid' %}
+                                                        <ul>
+                                                            <li>
+                                                                {% if sss %}
+                                                                    <a href="{% if sss.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{sss.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static sss.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{sss.pid.pid}}&role={{role}}">
+                                                                            <div>{{sss.pid.abrevname|safe}}<br>{% if sss.year %}{{sss.year}}{% else %}<br>{% endif %}</br></div>
+                                                                        </a>
+                                                                        </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                                                {% endif %}
+                                                            </li>
+                                                            <li>
+                                                                {% if ssp %}
+                                                                    <a href="{% if ssp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ssp.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static ssp.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{ssp.pid.pid}}&role={{role}}">
+                                                                            {{ssp.pid.abrevname|safe}}<br>{% if ssp.year %}{{ssp.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                                                {% endif %}
+                                                            </li>
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                                <li>
+                                                    {% if sp %}
+                                                        <a href="{% if sp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{sp.pid.pid}}&role={{role}}">
+                                                                    <img class="thumbnails thumbnails3" src="{% static sp.img %}">
+                                                        </a>
+                                                        <div>
+                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{sp.pid.pid}}&role={{role}}" style="border:0">
+                                                                {{sp.pid.abrevname|safe}}<br>{% if sp.year %}{{sp.year}}{% else %}<br>{% endif %}
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                                <img class="thumbnails thumbnails3"  src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                    {% endif %}
+                                                    {% if sp.type == 'hybrid' %}
+                                                        <ul>
+                                                            <li>
+                                                                {% if sps %}
+                                                                    <a href="{% if sps.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{sps.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static sps.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{sps.pid.pid}}&role={{role}}">
+                                                                            {{sps.pid.abrevname|safe}}<br>{% if sps.year %}{{sps.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+                                                            <li>
+                                                                {% if spp %}
+                                                                    <a href="{% if spp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{spp.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static spp.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{spp.pid.pid}}&role={{role}}">
+                                                                            {{spp.pid.abrevname|safe}}<br>{% if spp.year %}{{spp.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        {% endif %}
+                                    </li>
+
+                                   <!--Pollen branch-->
+                                    <li>
+                                        {% if p %}
+                                            <a href="{% if p.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{p.pid.pid}}&role={{role}}">
+                                                        <img class="thumbnails thumbnails3" src="{% static p.img %}">
+                                            </a>
+                                            <div>
+                                                <a class="fam" href="{% url 'detail:information' %}?pid={{p.pid.pid}}&role={{role}}">
+                                                   {{p.pid.abrevname|safe}}<br>{% if p.pid.year %}{{p.pid.year}}{% else %}<br>{% endif %}
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                                    <img class="thumbnails thumbnails3"  src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                        {% endif %}
+                                        {% if p.type == 'hybrid' %}
+                                            <ul>
+                                                <li>
+                                                    {% if ps %}
+                                                        <a href="{% if ps.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ps.pid.pid}}&role={{role}}">
+                                                                    <img class="thumbnails thumbnails3" src="{% static ps.img %}">
+                                                        </a>
+                                                        <div>
+                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{ps.pid.pid}}&role={{role}}">
+                                                                {{ps.pid.abrevname|safe}}<br>{% if ps.year %}{{ps.year}}{% else %}<br>{% endif %}
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                                <img class="thumbnails thumbnails3"  src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                    {% endif %}
+                                                    {% if ps.type == 'hybrid' %}
+                                                        <ul>
+                                                            <li>
+                                                                {% if pss %}
+                                                                    <a href="{% if pss.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{pss.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static pss.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{pss.pid.pid}}&role={{role}}">
+                                                                            {{pss.pid.abrevname|safe}}<br>{% if pss.year %}{{pss.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+
+                                                            <li>
+                                                                {% if psp %}
+                                                                    <a href="{% if psp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{psp.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static psp.img %}" >
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{psp.pid.pid}}&role={{role}}">
+                                                                            {{psp.pid.abrevname|safe}}<br>{% if psp.year %}{{psp.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+
+                                                <li>
+                                                    {% if pp %}
+                                                        <a href="{% if pp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{pp.pid.pid}}&role={{role}}">
+                                                                    <img class="thumbnails thumbnails3" src="{% static pp.img %}">
+                                                        </a>
+                                                        <div>
+                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{pp.pid.pid}}&role={{role}}">
+                                                                {{pp.pid.abrevname|safe}}<br>{% if pp.year %}{{pp.year}}{% else %}<br>{% endif %}
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                                <img class="thumbnails thumbnails3"  src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                    {% endif %}
+                                                    {% if pp.type == 'hybrid' %}
+                                                        <ul>
+                                                            <li>
+                                                                {% if pps %}
+                                                                    <a href="{% if pps.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{pps.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static pps.img %}">
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{pps.pid.pid}}&role={{role}}">
+                                                                            {{pps.pid.abrevname|safe}}<br>{% if pss.year %}{{pps.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+
+                                                            <li>
+                                                                {% if ppp %}
+                                                                    <a href="{% if ppp.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ppp.pid.pid}}&role={{role}}">
+                                                                                <img class="thumbnails thumbnails3" src="{% static ppp.img %}" >
+                                                                    </a>
+                                                                    <div>
+                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{ppp.pid.pid}}&role={{role}}">
+                                                                            {{ppp.pid.abrevname|safe}}<br>{% if ppp.year %}{{ppp.year}}{% else %}<br>{% endif %}
+                                                                        </a>
+                                                                    </div>
+                                                                {% else %}
+                                                                            <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}"/>
+                                                                {% endif %}
+                                                            </li>
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="clear:left"></div>
+        {% else %}
+            <h6>{{species.name|safe}} is not a hybrid</h6>
+        {% endif %}   <!--    If it is a hybrid-->
+    </div>
+</div>
+{% endblock %}
+

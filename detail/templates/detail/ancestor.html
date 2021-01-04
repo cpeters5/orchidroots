@@ -1,0 +1,110 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail/detail-title.html" %}
+{% block body %}
+<style>
+
+.border-lb {
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+}
+.border-rb {
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 1px;
+}
+
+
+.table {
+    width: 70%;
+    margin:0 auto;
+}
+
+.table-anc {
+    width:600px;
+    font-size: 13px;
+    clear:left ;
+    margin:10px;
+}
+
+@media only screen and (max-width: 800px) {
+    .table {
+        width:100%;
+    }
+    .table-anc {
+        width: 500px;
+        font-size: 11px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .table-anc {
+        font-size:10px;
+        width: 350px;
+    }
+}
+
+</style>
+
+
+<div style="margin:0 auto;padding:0;width:100%;">
+        <!--main section-->
+    <br>
+    {% include 'detail/detail-nav.html' %}
+    <div class="tab-content clearfix" style="overflow-x:auto;padding:0;background-color:white; margin:0 auto;;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+        {% if species.type == 'hybrid' %}
+            <br>
+            {% if anc_list %}
+                <table class="table table-sm table-hover table-condensed table-border table-anc" style="margin-left:auto;margin-right:auto;">
+                    <tr  style="background-color: #f2f2f2">
+                        <th class="border-lb text-left">
+                        {% if sort == 'name' %}
+                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_upward</i></a>
+                        {% elif sort == '-name' %}
+                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_downward</i></a>
+                        {% else %}
+                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors </a>
+                        {% endif %}
+                        <span> (total {{anc_list.count}})</span>
+                        </th>
+                        {% if sort == 'pct' %}
+                        <th class="border-rb text-center">
+                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
+                        {% elif sort == '-pct' %}
+                        <th class="border-rb text-center">
+                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
+                        {% else %}
+                        <th class="border-rb text-center">
+                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% </a></th>
+                        {% endif %}
+                        {% if sort == 'img' %}
+                        <th class="border-lb text-center">
+                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
+                        {% elif sort == '-img' %}
+                        <th class="border-lb text-center">
+                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
+                        {% else %}
+                        <th class="border-rb text-center">
+                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img </a></th>
+                        {% endif %}
+                    </tr>
+                    {% for anc in anc_list %}
+                    <tr class="center">
+                        <td class="border-rb" style="text-align: left"><a href="{% url 'detail:information' %}?pid={{anc.aid.pid}}&role={{role}}">{{anc.aid.name|safe}}</a></td>
+                        <td class="border-rb" style="text-align: right">{{anc.prettypct}}%</td>
+                        <td class="border-rb " style="text-align: center">
+                        {% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        {% else %}
+        <div style="margin:20px 0 20px 20px;">
+        <h6>{{species.name|safe}} is not a hybrid</h6>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+

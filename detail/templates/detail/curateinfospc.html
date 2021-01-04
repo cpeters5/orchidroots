@@ -1,0 +1,96 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% load crispy_forms_tags %}
+{% include "detail/detail-title.html" %}
+
+<style>
+    /*Styles for Top Descendants*/
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+label {
+    display: inline-block;
+    width: 40%;
+    margi: 0;
+}
+
+input:checked {
+    height: 20px;
+    width: 20px;
+}
+
+
+.tab-content {
+    min-height: 200px !important;
+}
+
+</style>
+
+<div style="clear:both"></div>
+
+    <!--Main sections-->
+<div style="width:95%;margin:0 auto;padding:0;">
+    {% include "./detail-nav.html" %}
+        <!-- Main -->
+
+    <div class="tab-content clearfix" style="background:white; margin:0 auto; ">
+        <div class="" style="margin:0 auto;padding:0; width:90%;border: 0 solid blue;">
+            <br>
+            <b>Note:</b> To add an external link, please only use single quote, and use the following format:
+            <br>
+            &lt;a href='url' target='_blank'&gt;Name of the link&lt;/a&gt;
+            <br>
+            <br>
+            <form method="post" action="{% url 'detail:curateinfospc' species.pid %}">
+                {% csrf_token %}
+                <input type="hidden" name="pid" value="{{ species.pid }}" />
+                <input type="hidden" name="role" value="{{ role }}" />
+                <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                &nbsp;&nbsp;&nbsp;<a href="{% url 'detail:photos' species.pid %}?role={{role}}">Cancel</a>
+                {{form|crispy}}
+                {% if redirect_field_value %}
+                   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <input type="hidden" name="role" value="{{ role }}" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--<footer>Copyright &copy; OrchidRoots.com</footer>-->
+
+
+
+{# TODO: Add sort image by - RANDOM, DISTANCE, DATE #}
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+</script>
+
+
+
+{% endblock %}
+
+
+

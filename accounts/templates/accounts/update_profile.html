@@ -1,0 +1,94 @@
+{% include "base.html" %}
+{% load crispy_forms_tags  i18n%}
+{% block body %}
+<br>
+<div style="display:inline; text-align:center; margin:0 auto">
+    <br>
+    <h4>Update Profile</h4>
+    <div class="container" style="width:70%;text-align:left;font-size:13px;">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title" style="margin-bottom: 0">Update Profile</h6>
+            </div>
+            <div class="card-body">
+                <form method='POST'>
+                {% csrf_token %}
+        <!--        <div class="form-row">-->
+                    {{ form.photo_credit_name|as_crispy_field }}
+                    {% if user.is_authenticated and not form.current_credit_name.value %}
+                        {{ form.current_credit_name|as_crispy_field }}
+                    {% endif %}
+        {#            {{ form.confirm_email|as_crispy_field }}#}
+
+                    {{ form.specialty|as_crispy_field }}
+
+                    <div class="form-row">
+                        <div class="form-group col-md-5 mb-0">
+                            {{ form.country |as_crispy_field }}
+                        </div>
+                        <div class="form-group col-md-12 mb-0">
+                            <button type='submit' class='btn btn-success' style="margin-top:33px;height:38px;">Submit</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title">Change Email</h6>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'change_email' %}" class="add_email" method="POST">
+                    {% csrf_token %}
+                    <p><strong>{% trans 'Note:'%}</strong> {% trans "A verification email will be sent to this email." %}</p>
+                    <p>Current Email: {{ user.email }}</p>
+                    <div class="form-group">
+                        <label for="id_email" class="">Change Email</label>
+                        <input type="email" id="id_email" name="email" class="form-control" >
+
+                    </div>
+                    <div class="form-group col-md-12 mb-0">
+                        <button type='submit' class='btn btn-success' style="margin-top:33px;height:38px;">Submit</button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+        <div class="card mt-3 mb-6">
+            <div class="card-header">
+                <h6 class="card-title">Change Password</h6>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'account_change_password' %} " method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_oldpassword">Current Password*</label>
+                        <input type="password" id="id_oldpassword" name="oldpassword" class="textinput textInput form-control">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password1">New Password*</label>
+                        <input type="password" id="id_password1" name="password1" class="textinput textInput form-control">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password2">New Password (again)*</label>
+                        <input type="password" id="id_password2" name="password2" class="textinput textInput form-control">
+
+                    </div>
+                    <button class="btn btn-success" type="submit" name="action">Change Passwords</button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

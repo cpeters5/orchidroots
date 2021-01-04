@@ -1,0 +1,187 @@
+{% include "base.html" %}
+{% block body %}
+<style>
+
+div.text-c {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+}
+.btn-side {
+    width:150px;
+    margin:3px;
+}
+.mytext {
+    font-size: 13px;
+}
+.imgcaption {
+    font-size: 10px;
+    height: 20px;
+    overflow: hidden;
+}
+.imgcaption_top {
+    font-size: 16px;
+    height: 20px;
+    overflow: hidden;
+}
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 14vw;
+   width : 14vw;
+   padding:2px;
+}
+.intro {
+    clear:left;
+    width:80%;
+    font-size:14px;
+
+}
+@media only screen and (max-width: 800px) {
+    .mytext {
+        font-size: 11px;
+    }
+    .imgcaption_top {
+        font-size: 14px;
+        /*height: 20px;*/
+        /*overflow: hidden;*/
+    }
+    .thumbnails {
+       height: 20vw;
+       width : 20vw;
+    }
+    div.text-c {
+        font-size: 11px;
+    }
+    .intro {
+        font-size:12px;
+
+    }
+}
+
+@media only screen and (max-width: 580px) {
+    .imgcaption_top {
+        font-size: 14px;
+        /*height: 20px;*/
+        /*overflow: hidden;*/
+    }
+    .intro {
+        font-size:12px;
+
+    }
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 4px 4px;
+}
+
+img{
+    width:100%;
+}
+
+.btn {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    padding:5px 0;
+    background-color: white;
+    border:1px solid #c6c0c0;
+    border-radius: .15rem;
+}
+.btn:hover {
+    background-color: #cad4f7;
+}
+
+    ul{
+        padding-left:15px;
+        font-size: 13px;
+        line-height: 30px;
+    }
+    .partner {
+        /*height:50px;*/
+        width:120px;
+        margin:5px;
+        padding: 5px;
+        line-height: 15px;
+        text-align:center;
+        padding:5px;
+    }
+
+</style>
+
+<div style="clear:both"></div>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div class="row">
+        <div class="col-sm-2 hidden-xs" style="padding:0; border:1px solid lightgrey">
+            <br><br>
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-xs-12 col-sm-10">
+<!--   Orchid Roots Business-->
+            <br><br>
+            <div class="intro" style="clear:left; width:80%">
+                <h5>OrchidRoots overview</h5>
+            <p>OrchidRoots is freely available under our terms and conditions of use.  We are non-profit that survives on donations.
+                If you like what we have to offer, please consider a <a href="{% url 'donation:donateapp' %}">donation</a> to support our work.</p>
+            </div>
+            <br><br>
+
+            <hr>
+            <br><br>
+<!-- Orchid Browser -->
+            <div class="intro">
+                <br>
+                <div style="display:inline-block;">
+                    {% for image in randimagesspc %}
+                        <div style="display:inline-block;">
+                        <div class="imgcaption_top">
+                            <a href="{% url 'orchidlist:browse' %}?type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked"><i>{{image.pid.gen}}</i></a>
+                        </div>
+                        <a href="{% url 'detail:information' %}?pid={{image.pid.pid_id}}&role={{role}}">
+                            <div class="box">
+                                <img class="thumbnails" alt="" src="/static/utils/images/species/{{image.image_file}}">
+                                <div class="text-c">{{image.pid.pid.speciesname|safe}}</div>
+                            </div>
+
+
+
+                        </a>
+                        </div>
+                    {% endfor %}
+                    {% for image in randimageshyb %}
+                        <div style="display:inline-block;">
+                        <div class="imgcaption_top">
+                            <i>{{image.pid.gen}}</i>
+                        </div>
+                        <a href="{% url 'detail:information' %}?pid={{image.pid.pid_id}}&role={{role}}">
+                            <div class="box">
+                                <img class="thumbnails" alt="" src="/static/utils/images/hybrid/{{image.image_file}}">
+                                <div class="text-c">{{image.pid.pid.speciesname|safe}}</div>
+                            </div>
+                        </a>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <hr>
+            <br><br>
+         </div>
+    </div>
+</div> <!--Summary-->
+
+
+
+
+
+
+{% endblock %}

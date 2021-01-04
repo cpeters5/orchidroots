@@ -1,0 +1,57 @@
+{% include "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+<style>
+    .loginform {
+        width:300px;
+        text-align:left;
+        font-size:12px;
+    }
+    @media only screen and (max-width: 500px) {
+        .loginform {
+            width: 300px;
+            font-size: 12px;
+        }
+    }
+
+</style>
+<br>
+<div style="dixplay:inline; text-align:center; margin:0 auto">
+    <h3>Login</h3>
+
+    <div class="container loginform">
+        <form method='POST'>
+            {% csrf_token %}
+                {{ form.username|as_crispy_field }}
+                {{ form.password|as_crispy_field }}
+            <button type='submit' class='button'>Submit</button>
+            <input type="hidden" name="g-recaptcha-response" id='recaptcha'>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+        // 1
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
+        // 2
+        <script src="https://www.google.com/recaptcha/api.js?render=reCAPTCHA_site_key"></script>
+        <script>
+          // 3
+          grecaptcha.ready(function() {
+              // 4
+              $('#contactform').submit(function(e){
+                  var form = this;
+                  // 5
+                  e.preventDefault()
+                  grecaptcha.execute('reCAPTCHA_site_key', {action: 'contactform'}).then(function(token) {
+                      // 6
+                      $('#recaptcha').val(token)
+                      // 7
+                      form.submit()
+                  });
+              })
+
+          });
+         </script>

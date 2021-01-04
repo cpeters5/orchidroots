@@ -1,0 +1,81 @@
+{% load static %}
+{% include "base.html" %}
+{% load crispy_forms_tags %}
+{% include "detail/detail-title.html" %}
+{% block body %}
+{{ form.media.css }}
+{{ form.media.js }}
+    <!--Main sections-->
+
+<div style="width:95%;margin:0 auto;padding:0;">
+             <!--main section-->
+    {% include 'detail/detail-nav.html' %}
+    <br>
+    {% if myphotos > user.tier.max_upload %}
+        <div class="container">
+            <br><br>
+            <h5><small>You have exceeded the number of allowed uploads for this species.  You must delete some of your private photos before adding a new one.</small></h5>
+        </div>
+    {% else %}
+        <div class="tab-content clearfix" style="width:100%;background-color:white;margin:0 auto;border-left:0 solid lightgrey;border-right:0 solid lightgrey;border-bottom:1px solid lightgrey">
+            <div class="container" style="width:90%;font-size:13px;">
+                <form method="post" action="{% url 'detail:uploadfile' species.pid %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <input type="hidden" name="role" value="{{role}}" />
+                        <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                        <a href="{% url 'detail:photos' species.pid %}?role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        {{form.author|as_crispy_field}}
+                        {{form.originator|as_crispy_field}}
+
+        <!--                <hr  class="my-4">-->
+                        <div class="form-row">
+                            <div class="form-group col-md-6 mb-0">
+                               <br><h5>{{species.name|safe}}</h5>
+                            </div>
+                            <div class="form-group col-md-6 mb-0">
+                                {{form.image_file_path|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6 mb-0">
+                                 {{form.variation|as_crispy_field}}
+                            </div>
+                            <div class="form-group col-md-6 mb-0">
+                                {{form.forma|as_crispy_field}}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-4 mb-0">
+                                {{form.name|as_crispy_field}}
+                            </div>
+                            <div class="form-group col-md-4 mb-0">
+                                 {{form.awards|as_crispy_field}}
+                            </div>
+                            <div class="form-group col-md-4 mb-0">
+                                {{form.location|as_crispy_field}}
+                            </div>
+                         </div>
+
+                        {{form.description|as_crispy_field}}
+                        {{form.text_data|as_crispy_field}}
+                        <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                        <a href="{% url 'detail:photos' species.pid %}?role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+
+                        {% if redirect_field_value %}
+                           <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                           <input type="hidden" name="role" value="{{ role }}" />
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+    {% endif %}
+</div>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+</script>
+{% endblock %}

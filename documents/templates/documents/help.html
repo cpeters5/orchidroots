@@ -1,0 +1,63 @@
+{% load static %}
+{% include 'base.html' %}
+
+<style>
+.doc {
+    overflow-wrap: break-word;
+    font-size: 14px;
+    padding:10px;
+    margin:0 auto;
+    border:1px solid lightgrey;
+}
+.btn {
+    margin:2px 0;
+    width: 95%;
+    font-size:11px;
+    color: #272ba3;
+    padding:5px 0;
+    background-color: white;
+    border:1px solid #c6c0c0;
+    border-radius: .15rem;
+}
+.btn:hover {
+    background-color: #cad4f7;
+}
+
+</style>
+<br>
+<div style="clear:both"></div>
+<br>
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div style="clear:both"></div>
+	<div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+
+            <div style="margin:0 auto; width:70%;">
+
+                <div style="font-size: 14px; padding:10px; margin:0 auto; border:1px solid lightgrey; ">
+                    <a href="{% url 'documents:articles' %}" target="_blank">Article Of Incorporation</a>
+                </div>
+                <br>
+                <div style="font-size: 14px; padding:10px; margin:0 auto; border:1px solid lightgrey; ">
+                    <a href="{% url 'documents:bylaws' %}" target="_blank">Bylaws</a>
+                </div>
+                <br>
+                <div style="font-size: 14px; padding:10px; margin:0 auto; border:1px solid lightgrey; ">
+                    <a href="{% url 'documents:req501c3' %}" target="_blank">Application for Recognition of Exemption Under 501(c)(3) of the Internal Revenue Code</a>
+                </div>
+                <br>
+
+                <div style="font-size: 14px; padding:10px; margin:0 auto; border:1px solid lightgrey; ">
+                     Maryland Association of Nonprofit Organizations, Conflic of Interest
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+

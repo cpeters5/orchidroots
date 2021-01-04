@@ -1,0 +1,39 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+  table.center {
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+      font-size:13px;
+  }
+</style>
+<br><br><br>
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center; border:0 solid grey">
+    <div class="container" style="text-align:center;">
+        <h4><b>Families</b></h4>
+    </div>
+</div>
+
+ {% if family_list %}
+    <div>
+        <table class="table table-bordered table-sm table-condensed table-hover center">
+            <tr>
+                <th>Family </th><th>year</th><th> Description</th>
+            {% for family in family_list %}
+            <tr>
+                <td><a href="{% url 'orchidlist:subfamily' %}?sf={{family.family}}&genustype=species">
+                    {{ family.family}} {% if family.author %}{{ family.author }}{% endif %}</a></td>
+                <td align=center>{% if family.year %}{{family.year}}{% endif %}</td>
+                <td>{% if family.description %}{{family.description}}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+     </div>
+ {% else %}
+     <p>None</p>
+ {% endif %}
+{% endblock %}

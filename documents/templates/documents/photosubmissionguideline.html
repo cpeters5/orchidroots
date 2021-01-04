@@ -1,0 +1,59 @@
+{% load static %}
+{% include 'base.html' %}
+
+<style>
+    ul{
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:none;
+    }
+    li {
+            display: list-item;
+    }
+    .card-body {
+        font-size: 15px;
+    }
+</style>
+<br>
+
+<div class="container-fluid" style="min-height:200px;">
+    <div style="clear:both"></div>
+    <div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2 ">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9" style="margin-top:7px;">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title" style="margin-bottom: 0">Guideline for Photo Submission<br>
+                    </h6>
+                </div>
+                <div class="card-body" style="padding:10px;">
+
+                    <ul>
+                        <li>Must be correctly identified</li>
+                        <li>Public photos are chosen based on the quality of the photo. What considered good photography:
+                            <ul>
+                                <li>In focus, good Lighting and brightnerss and natural color</li>
+                                <li>Easch photo should showcase the unique character of the orchid. E.g. flower, florescences, closeup of parts, leaf, plant or habitat.</li>
+                                <li>The photo should be void of added text such as orchid name or date. If you must add copyright credit,
+                                    it should be in small font placed in the lower right corner.
+                                <li>Plain Simple background, preferable solid dark color.</li>
+                            </ul>
+                            Photos following these guidelines will be chosen for public display over those that are not.
+                        </li>
+                        <li>
+
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

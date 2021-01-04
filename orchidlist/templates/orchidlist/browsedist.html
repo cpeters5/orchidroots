@@ -1,0 +1,123 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+.list-group{
+    /*max-height: 300px;*/
+    /*margin-bottom: 10px;*/
+    /*padding:5px 50px !important;*/
+    margin: 2px;
+    overflow:auto;
+    /*max-height: 200px;*/
+    /*-webkit-overflow-scrolling: touch;*/
+    font-size:13px;
+    border-bottom: 0 solid lightgrey;
+}
+ul {
+    list-style-type:none;
+    padding-left:0px;
+}
+
+.info-collapse {
+    text-align: left;
+    padding-left: 15px;
+    width: 200px;
+}
+.btn-group-xs > .btn, .btn-xs {
+    font-size: 12px;
+    line-height: .85;
+}
+
+    .panel-group .panel-heading a:after {
+      content: '-';
+      position: absolute;
+      right: 20px;
+      top:5px;
+    }
+    .panel-group .panel-heading a.collapsed:after {
+      content: '+';
+    }
+
+</style>
+<br>
+<br>
+<br>
+<div class="d-flex p-2 justify-content-center" style="width:100%;margin:0 auto;">
+    <div class="p-2 list-group bg-light border" style="">
+        <h6>Distribution</h6>
+        <div id="accordion">
+        {% for x in dist_list %}
+            {% if x.continent_name != x.prevcon %}
+                {% if forloop.counter > 1 %}
+                    </ul></div></div>
+                {% endif %}
+                <div class="card">
+                    <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#{{x.concard}}">{{x.continent_name}}</button>
+                    <div id="{{x.concard}}" class="collapse" data-parent="#accordion">
+                        <ul>
+                            <li>NEW CONTINENT</li>
+                            <li><a href="{% url 'orchidlist:browse' %}">{{x.continent_name}}</a></li>
+                            <li><a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>
+            {% else %}
+                {% if x.region_name != x.prevreg %}
+                        </ul></div></div>
+                    <div id="accordion-reg">
+                        <div class="card">
+                            <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#{{x.regcard}}">{{x.region_name}}</button>
+                            <div id="{{x.regcard}}" class="collapse" data-parent="#accordion-reg">
+                                <ul>
+
+                                    <li>NEW REGION</li>
+<!--                        <li style="list-style-type:none;padding: 0 2px; margin-bottom: 10px;">-->
+<!--                            <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" href="#{{x.regcard}}">{{x.region_name}}</button></li>-->
+<!--                            </ul><ul><li><div id="{{x.regcard}}" class="collapse" data-parent="#accordion">-->
+<!--                            <a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>-->
+<!--                            <ul>-->
+                                    <li><a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>
+                {% else %}
+                                    <li><a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+                                    </ul>
+                            </li>
+    </div>
+
+    </div>
+    </div>
+    </div>
+
+    <div class="p-2 list-group bg-light border">
+        <h6>Distribution</h6>
+        <div id="accordion2">
+        {% for x in dist_list %}
+            {% if x.continent_name != x.prevcon %}
+                {% if forloop.counter > 1 %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+                {% endif %}
+                    <div class="card">
+
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#{{x.concard}}">{{x.continent_name}}</button>
+                        <div id="{{x.concard}}" class="collapse" data-parent="#accordion2">
+                        <div class="card-body">
+                        <ul style="list-style-type:none;padding: 0 2px; margin-bottom: 10px;">
+                            <li><a href="{% url 'orchidlist:browse' %}">{{x.continent_name}}</a></li>
+                            <li><a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>
+            {% else %}
+                            <li><a href="{% url 'orchidlist:browse' %}">{{x.name}}, {{x.region_name}}</a></li>
+            {% endif %}
+
+
+        {% endfor %}
+                        </ul>
+                        </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

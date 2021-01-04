@@ -1,0 +1,35 @@
+{% load static %}
+{% include 'base.html' %}
+<style>
+.myimage {
+    position: relative;
+    text-align: center;
+    color: white;
+    width: 70%;
+}
+
+.thumbnails {
+    width:90%;
+    height:auto;
+}
+</style>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div style="clear:both"></div>
+	<div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+            <br>
+            <h5>Application for Recognition of <br>Exemption Under 501(c)(3) of the IRS</h5>
+            <br>
+            <div class="myimage">
+                <img class="thumbnails" alt="" src="/static/utils/images/corp/IRS-501c3_2.jpg" class="img-fluid fullimg">
+                <img class="thumbnails" alt="" src="/static/utils/images/corp/IRS-501c3_1.jpg" class="img-fluid fullimg">
+            </div>
+        <br>
+        </div>
+    </div>
+</div>

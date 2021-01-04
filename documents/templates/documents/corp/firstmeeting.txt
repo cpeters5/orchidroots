@@ -1,0 +1,168 @@
+
+George
+Thank you for 
+what will happen if one day, I walked into the woods and never come out?  What wil happen to OrchidRoots?
+
+1) maintain the current practice.  Low cost, small committees
+2) Move OR up to SaaS.  Higher cost, need funding (paid members have access to more features, my album, upload and manage theor own photos)
+
+=====================================
+First Board Meeting:
+1) 	To appoint the initial board 
+2)	Elect officers (President, VP, Secretary, Treasurer)
+3) 	To adopt the organization bylaws
+4)	501(c)(3) status
+5)	Financial
+6)	adopt board manual/conflict of interest/code of conduct and other policies.
+7)	To appoint committees and to assign roles to each committee
+8)	Any other agenda
+=====================================
+Town Hall Meeting:
+1)  Call to Order: Let's start the meetin.   Today is Sunday, March 24, 2019 at 6:00pm Eastern time.
+2)  Introduction
+
+The purpose of this first meeting is to get to know each other and to know what orchidroots is about and what it's potential.  And also to setup the organization.
+
+
+Before we start, lets go around the room and introduce yourself.  Lets start with me, my name is chariya punyanitya. Some of you may know me as ChariPete on Facebook or as someone put it, "Bluenanta Ladies".  Pim Little and I founded OrchidRoots back in around 2014.  We turned it into a private foundation in 2017.  And as of the jan 1st this year.  OrchidRoots is converted to publicly operated organization.  With this new status, I am stepping down and invitged George Hatrfield (whoi needs no introduction by the way) to become the new president. I am sure he will make lots of good things happen for OrchidRoots.
+
+
+  I believe most of you already know what OrchidRoots is.  Some my have used it regularly or hjave been a long contributor such as Emrys.
+
+For those of you who is not familiar with OrchidRoots.  In the earlier days 2013-14, we are called Bluenanta.  We developed a website that provides a database of integrated taxonomy and registration namefor orchids. 
+
+
+
+  
+
+
+
+Goal:
+Education for all
+
+
+Mission:
+I hope everyone who is enjoying our page realizes how much work some of our member-growers & hybridizers put into preparing their photos & posts for inclusion on our page. I am forever grateful for their posts and comments spanning culture to hybridizing and hope it helps expand your knowledge and appreciation of what's going on in the world of Phalaenopsis today. Please take a moment to thank them all for the extra effort they put in to keep this page a special one to visit for finding the roots of your orchids.
+
+International presence.  
+
+
+
+
+Content:
+There are several components of orchid data, sucha s taxonomy, registration, author, culture, geological location, cultures...  We woul dlike to bring them together to make the worl of corid more connected.  So that we can trace from one orchid to another if they are in any way related.  The database is getting larger and larger but it is organized to allow us to slice and dice it in ways that will help us understand the world of orchid.
+
+Database - slice and dice in different ways to get any hidden information
+
+Its hard to see connection among different hybrids unless you are an expert in the area.
+
+We are trying to make it easy for the majority users, general orchid person to quickly and easily see grasp 
+
+from finding correct spelling (believe me, I am using OR for this purpose all hte time), or find 43evidences that will help identifying your orchid, 
+to finding potential mate for your orchid stud.
+So everying tabout OR is to educate 
+
+
+Intro to OrchidRoots:
+
+
+
+- Mission
+- Classification: One of the functionalities is to provide ways for users to determine identity of their orchids.  
+-- Accuracy of photos-- Comparison among related species, i.e. among the same infra generic
+
+
+Website:
+1)  public section:
+	- Free of charge. Only small number of photos for each species or varieties and hybrid, approved by Quality Control Committee.
+2)	users section:
+	- Paid members uploaded a limited number of photos for each species/varieties or hybrid.
+	
+
+
+
+IT
+
+infrastructure and software to collect data, photos, and other information relatd to orchidroots.
+- Approve photos identification
+- Software design, development
+- QA & Testing team
+- Acquisition and curation Committee
+
+We are still at the eraly stage of web services 
+
+
+Effort:
+
+
+
+Organization:
+Affiliated with a stronger organization such as AOS
+
+
+Funding:
+We dont want to get rich, we are out to organize a piece of the world.
+OrchidRFoots preferred membership with access to additional features
+Amazon.com affiliate
+Facebook donation
+goods - tshirts, hats.
+
+
+
+Future of OR:
+Where do we go from here.
+I saw a few different futures
+Several opportunities.
+
+We can continue as we are right now. 
+OR can grow.
+
+One of the  most important thing is to keep OrchidRoots politically neutral. Every committee should consist of members from different part of the world.
+Even nomenclaurture should not favor a particular taxonomy system.  Though we are not there yet, still relying heavily on Kew.  But we begin to accept multiple taxon 
+
+
+
+Photo upload
+A new feature that is exclusive for subscription members is user upload. Users can upload photos and view them in their personal album.  These albums wil have access to the underlying database, which they can fetch additional information from.  This feature is something that other social media such as PInterest doesn't have.  Selfuploaded photos must be approved by QA staff in order to be displayed in OrchidRoots public pages.
+
+Personal album. A new feature for paid members, where they may uploaded their own photos (limited number per speciews/varieties or hybrid).  These photos need approval from specialists in the Content control committee to be displayed in the main public pages.
+Users have a choice to view photos in their own album or mixed with the approved photos in the public album for comparison. 
+I am skepticle about this.  How do we maintain the quality?
+
+
+
+   
+
+Committee and staff
+Committee members should be well balance among different interest groups.
+
+Acquisition staff:
+	Find photos that fits the acceptance policy. We dont need a lot of photos to displayed in the identification pages (current detail pages), just enough to cover all key characteristics of the plants.  These photos should enough clarity to be usable. Photos in identification display pages will be replaced when a new and  more qualified photo is identified.
+
+	The main effort is to fill all speciea and hybrid with at least one photo.  This task is very time consuming.  It should be rotated among staff members for each alliance 
+
+
+Quality COntent Assurance
+	Maintain the quality of the content of public  
+	
+Identification specialist
+	Will maintain and update photo accepting policies
+	This subcommittee jobs is to approve or disapprove photos for display.  Photos are uploaded by paid members for their personal album.
+
+
+
+Phots:
+
+Orchidroots is not a photo archive.  Photos in OR are used as a reference in orchid identification.  Therefore ithey need to fit some criteria
+- Sharpness
+- must show distinct characteristic of the species/hybrids that set them apart form others.
+- Showcase the flower or parts.
+- If you wish to put your copyright signature it should be discrete and not overlap with the object of the photo.  Please put it in small font in the lower right hand corner of ht ephoto
+
+We will keep only aout 30 photos for each species and/or variety in order to not sacrificing the performance of the website.  Old photos that do not fit the above criteria will be replaced by new ones over time.
+
+If photos are limited to 30 per species/hybrid, then the total number could reach 6 millions if all species are completely filled.
+
+
+
+The next Board Of Directors meeting will be held in July, and currently devotes a full day meeting focusing on long range planning that will better serve WICA members. To that end, if you have suggestions on how WICA can better serve you or programs you would like considered please contact a WICA board member or staff person.

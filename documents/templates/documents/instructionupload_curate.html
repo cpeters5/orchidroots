@@ -1,0 +1,43 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+</style>
+
+<body>
+<br><br>
+<div class="container-fluid" style="margin:0 auto;">
+    <h3>Upload Instruction</h3>
+</div>
+
+
+<div class="container">
+<h5>Upload from Web</h5>
+
+<ul>
+    <li>To upload an orchid photo from the web make sure its owner is known and is a registered donor of OrchidRoots</li>
+    <li>Make sure you have the correct identity of hte the orchid in the photo</li>
+    <li>Search for the orchid in OrchidRoots and navigate to its detail page</li>
+    <li>Click on the "Access Area" button in the upper left hand corner of the page and select "Identification"</li>
+    <li>Click on "Upload" button to start an uppload form</li>
+    <li>Select author name from the dropdown menu.  If name does not exist, enter the author name in the next test box.  The photo will be in pending status until the new author is approved.
+        and added to the list.</li>
+    <li>Right click on the image of the web page you are uploading from and select "copy image address" and paste the address to the "Image URL" box</li>
+    <li>The default rank of new upload is 5 (averqge), adjust the rank as you see fit.  Larger number for higher quality.  Set rank to 3 or less for photos of plant, or part of plant or habitat.</li>
+    <li>Copy the address of the webpage from which you are uploading and paste it to the "Link to source" text area.</li>
+    <li>Fill in the rest of the form as appropriate</li>
+    <li>Add your comment. Enter the name of the author at the end of the comment (your own name if the comment is made by you.)</li>
+    <li>Click "Save" button to upload, or the "Cancel" link to discard and go back to Identification page.</li>
+    <li>Finally, if the image does not appear, it is likely that the value of "Image URL" is incorrect.  Either click on "delete" or "update" link below the missing photo and correct the mistake.</li>
+
+
+</ul>
+
+</div>
+
+</body>
+
+{% endblock %}
+
+

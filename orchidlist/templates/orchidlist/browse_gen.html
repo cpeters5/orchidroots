@@ -1,0 +1,224 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+    /*Styles for Top Descendants*/
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+[class*="col-"] {
+    float: left;
+    padding: 10px;
+    margin-left: 15px;
+    height: 100%;
+}
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+label {
+    display: inline-block;
+    /*float: left;*/
+    width: 250px;
+    margin-right: 5px;
+}
+
+.imgcaption {
+    font-size: 11px;
+    height: 40px;
+    overflow: hidden;
+    word-wrap: normal;
+    padding:0 3px;
+   width : 100%;
+}
+.imgcaption_top {
+    font-size: 15px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 17vw;
+   width : 17vw;
+   padding:2px;
+}
+div.text-n {
+    font-size: 13px;
+    font-weight:normal;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin:  3px 10px;
+}
+.imageitem {
+    display:inline-block;
+    border:1px solid grey;
+    margin:0 2px;
+    width : 19vw;
+    /*height : 22vw;*/
+    background-color: #eaeaea;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+img{
+    width:100%;
+}
+
+@media only screen and (max-width: 830px) {
+    div.text-n {
+        font-size: 10px;
+    }
+
+    .imageitem {
+        width : 22vw;
+    }
+    .thumbnails {
+       height: 19vw;
+       width : 19vw;
+    }
+    .imgcaption_top {
+        font-size: 12px;
+    }
+    .imgcaption {
+        font-size: 10px;
+        height: 52px;
+       width : 20vw;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    div.text-n {
+        font-size: 12px;
+    }
+
+    .thumbnails {
+       height: 32vw;
+       width : 32vw;
+       /*padding:2px 1px 3px 1px;*/
+    }
+    .imgcaption_top {
+        font-size: 12px;
+    }
+    .imgcaption {
+        font-size: 9px;
+        height: 40px;
+        width : 32vw;
+    }
+   .imageitem {
+        width: 36vw;
+       /*height: 170px;*/
+       /*border:1px solid red;*/
+    }
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 30px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+</style>
+<div class="form-check-inline m-2 text-n">
+    <form action="?" id="display">
+        <input type="hidden" name="type" value="{{type}}" />
+        <input type="hidden" name="role" value="{{role}}" />
+        <input type="hidden" name="alpha" value="{{alpha}}" />
+        <input type="hidden" name="page" value="{{page}}" />
+        {% if display %}
+            <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()">
+        {% else %}
+            <input form="display" type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()">
+        {% endif %}
+        Show {{type}} with images only?
+    </form>
+</div>
+<div class="row d-flex m-2 justify-content-center align-items-center">
+    <h4>Sample Images by Genera</h4>
+    <a class="btn btn-xs btn-primary m-2" data-toggle="collapse" href="#Instruction">Instruction</a>
+    <div id="Instruction" class="collapse" style="font-size:13px;width:90%">
+        This page samples random images of species or hybrids for each genus. Each image is a link to sample images of species of that genus.
+        <p>Two entry points to this page:
+        from a link provided in the Home page or from the 'All genera images' option in the genus dropdown list in the top navbar.
+        </p>
+        <p>You may select type of samplings: species or hybrid, or select to see the list of species or hybrid names instead of photos.
+        There also is a checkbox to display only species with images or to display all species with or whithout images.
+        </p>
+    </div>
+</div>
+
+<div class="container justify-content-center align-items-center" style="display:block; clear:left; margin: 0 auto; width: 95%">
+    <!--Main table-->
+    {% if type == 'species' %}
+        <a type="button" class="btn btn-secondary btn-xs" disabled href="#">Species</a>
+        <a type="button" class="btn btn-outline-secondary btn-xs" href="{% url 'orchidlist:browsegen' %}?type=hybrid&display={{display}}&alpha={{alpha}}">Hybrid</a>
+    {% else %}
+        <a type="button" class="btn btn-outline-secondary btn-xs" href="{% url 'orchidlist:browsegen' %}?type=species&display={{display}}&alpha={{alpha}}">Species</a>
+        <div type="button" class="btn btn-secondary btn-xs" disabled href="#">Hybrid</div>
+    {% endif %}
+
+
+    {% if page_list %}
+
+
+        {% include "orchidlist/alpha_list.html" %}
+        {% if last_page > 1 %}
+            {% include "orchidlist/paginator_brwgen.html" %}
+        {% else %}
+        {% endif %}
+        {% for x in page_list %}
+            <div class="imageitem m-1" style="display:inline-block; text-align:center;">
+                <a href="{% url 'orchidlist:browse' %}?type={{type}}&genus={{x.genus}}&role={{role}}&display=checked">
+                <div class="imgcaption_top">
+                    {{x.genus|safe}}
+                </div>
+                    <img class="thumbnails" alt="" src="{% static x.image_file %}" class="img-fluid fullimg">
+                </a>
+                <div class="imgcaption flex-wrap border" >
+                    {{x.namecasual|safe}},
+                    {{x.author}} {{x.year}}
+                    <br>{{x.imginfo }}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+    {% else %}
+        <div style="text-align: center;padding-top:20px">None</div>
+    {% endif %}
+</div>
+
+	<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+
+
+</script>
+
+
+{% endblock %}

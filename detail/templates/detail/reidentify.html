@@ -1,0 +1,38 @@
+{% load static %}
+{% include "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+{% include "detail/detail-title.html" %}
+
+    <!--Main sections-->
+<div style="width:95%;margin:0 auto;padding:0;">
+        <!--main section-->
+    {% include 'detail/detail-nav.html' %}
+
+     <div class="tab-content clearfix" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;min-height:1000px">
+        <br>
+         <div class="container" style="width:90%;font-size:13px;">
+             <form method="post" action="{% url 'detail:reidentify' orid=img.id pid=img.pid_id %}?role={{role}}&tab={{tab}}">
+                 {% csrf_token %}
+                 <span style="font-size:16px;">
+                     <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+                     <a href="{% url 'detail:photos' species.pid %}?role={{role}}&tab=sum&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                 </span>
+                 <br>
+                        {{form.genus|as_crispy_field}}
+                        {{form.species|as_crispy_field}}
+                        {{form.infraspr|as_crispy_field}}
+                        {{form.infraspe|as_crispy_field}}
+                        {{form.year|as_crispy_field}}
+                 <input type="hidden" name="role" value="{{ role }}" />
+             </form>
+         </div>
+     </div>
+</div>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}
+

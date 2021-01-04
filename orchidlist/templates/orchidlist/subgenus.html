@@ -1,0 +1,41 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+  table.center {
+      width:80%;
+      margin-left:auto;
+      margin-right:auto;
+      font-size:13px;
+  }
+</style>
+<br><br><br>
+
+<div style="margin:0 0 0 0; padding:5px 0 5px 0; text-align: center; border:0 solid grey">
+    <div class="container" style="text-align:center;">
+        <h4><b>Subgenus</b></h4>
+        subgenus_list = {{subgenus_list.count}}
+    </div>
+</div>
+
+ {% if subgenus_list %}
+    <div>
+        <table class="table table-bordered table-sm table-condensed table-hover center">
+            <tr>
+                <th>Subgenus </th><th>year</th><th> Description</th>
+            {% for subgen in subgenus_list %}
+            <tr>
+                <td><a href="{% url 'orchidlist:species' %}?subgenus={{subgen}}&type=species">
+                    {{ subgen.subgenus}}</a>
+                    {% if subgen.author %}<i>{{ subgen.author }}</i>{% endif %}</td>
+                <td align=center>{% if subgen.year %}{{subgen.year}}{% endif %}</td>
+                <td>{% if subgen.description %}{{subgen.description}}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+     </div>
+ {% else %}
+     <p>None</p>
+ {% endif %}
+{% endblock %}

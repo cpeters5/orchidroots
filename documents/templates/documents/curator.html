@@ -1,0 +1,59 @@
+{% load static %}
+{% include "base.html" %}
+<style>
+
+.btn {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    padding:5px 0;
+    background-color: white;
+    border:1px solid #c6c0c0;
+    border-radius: .15rem;
+}
+.btn:hover {
+    background-color: #cad4f7;
+}
+
+    ul{
+        padding-left:15px;
+        font-size: 13px;
+        line-height: 30px;
+    }
+    .partner {
+        /*height:50px;*/
+        width:120px;
+        margin:5px;
+        padding: 5px;
+        line-height: 15px;
+        text-align:center;
+        padding:5px;
+    }
+
+</style>
+<div style="clear:both"></div>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <br><br>
+    <div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+            <h3 style="text-align:center">Our Curators</h3>
+            <div class="container" style="text-align:left;border:0 solid blue">
+                <br>
+                <div style="text-aligh:left">
+                    <table class="table">
+                    {% for curator in curator_list %}
+                        <tr><td>{{curator.fullname}}</td><td>{{curator.profile.specialty}}</td></tr>
+                    {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

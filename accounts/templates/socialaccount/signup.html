@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1>{% trans "Complete Sign Up" %}</h1>
+
+            <p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
+            {{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</p>
+
+            <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+              {% csrf_token %}
+                <div class="form-group">
+                    <label for="">Email:</label>
+                    <input type="text" disabled class="form-control" value="{{ form.email.value }}">
+
+                </div>
+                <div class="form-group">
+                    <label for="">Username:</label>
+                    <input type="text" disabled class="form-control" value="{{ form.username.value }}">
+
+                </div>
+              {{ form.as_p }}
+              {% if redirect_field_value %}
+              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+              {% endif %}
+              <button type="submit" class="btn btn-success">{% trans "Sign Up" %} &raquo;</button>
+            </form>
+        </div>
+    </div>
+
+
+
+{% endblock %}

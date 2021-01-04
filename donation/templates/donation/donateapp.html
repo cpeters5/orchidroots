@@ -1,0 +1,288 @@
+{% load static %}
+{% include "base.html" %}
+
+{% block extra-head %}
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+    <style>
+       #donateamt{
+            width:80px;
+            align:center;
+           border: 0;
+        }
+        .li {
+            display:inline-block;
+            /*display:inline; !*IE7*!*/
+            /*zoom:1; !*IE7*!*/
+            /*background:white;*/
+            color:white;
+            margin-right:10px;
+        }
+        .paypal-buttons{
+            width: 300px;
+            margin: 15px auto;
+        }
+        .paypal-button-container {
+            min-width: 300px!important;
+            max-width: 500px!important;
+            font-size: 14px;
+        }
+        .paypal-button.paypal-button-layout-vertical {
+            margin-bottom: 14px;
+        }
+
+        .paypal-button.paypal-button-shape-rect {
+            border-radius: 4px;
+        }
+        .paypal-button {
+            height: 45px;
+            min-height: 30px;
+            max-height: 55px;
+        }
+
+    @media only screen and (max-width: 800px) {
+    }
+
+    @media only screen and (max-width: 580px) {
+    }
+
+    .btn {
+        margin:2px 0;
+        width: 95%;
+        font-size:13px;
+        color: #272ba3;
+        padding:5px 0;
+        background-color: white;
+        border:1px solid #c6c0c0;
+        border-radius: .15rem;
+    }
+    .btn:hover {
+        background-color: #cad4f7;
+    }
+
+    ul{
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:none;
+    }
+    li {
+            display: list-item;
+    }
+    .card-body {
+        font-size: 15px;
+    }
+        .name {
+            margin: 2px;
+            width: 250px !important;
+            height:40px;
+            border: 1px solid #c9c9ff;
+            text-align:center;
+        }
+        .amt {
+            margin: 1px !important;
+            width: 33px !important;
+            height:33px;
+            border: 1px solid #c9c9ff;
+            text-align:center;
+            font-size:11px;
+        }
+        .amt.active {
+            color: #fff!important;
+            background-color: #007bff!important;
+        }
+</style>
+{% endblock %}
+
+{% block body %}
+    <br>
+
+<div class="container-fluid" style="min-height:200px;">
+    <div style="clear:both"></div>
+    <div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-xs-12 col-sm-8 border p-4 m-2" style="margin-top:35px;">
+
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h6 class="card-title" style="margin-bottom: 0">Your donation, even a small amount, will make a difference.</h6>
+                </div>
+                <div class="container" style="width:100%; margin:0 auto;">
+                    OrchidRoots is a 501-(c)(3) non-profit organization.  We do not accept government funds in order to focus
+                    our time and energy in making OrchidRoots the best platform for any level of orchid reserch instead of forever
+                    keeping up with the exhaustive paper work required.
+                    Your support is vital for our progress.
+                    We are committed to constantly improving the website to be more complete,
+                    correct and available in formats that are more acceptable to our users.
+
+
+                    {% if error %}
+                        <div class="alert alert-warning">
+                            <span>An error occurred while trying to charge your card, please try again {{ error }}</span>
+
+                        </div>
+                    {% endif %}
+
+                    <div class="container" align="left" style="width:100% !important">
+                        <br>
+                        <h6>Full Name (Optional)</h6>
+                        <div class="form-group">
+                            <input type="text" name="donor-name" id="donor-name" class="form-control name" placeholder="Full Name or Organisation" >
+                        </div>
+
+                        <h6>Choose amount</h6>
+
+                        <div class="btn-toolbar" role="toolbar" aria-label="toolbar" style="font-size: 11px;padding:2px; justify-content: left">
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="100">$1</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="500">$5</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="1000">$10</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="1500">$15</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="2000">$20</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="5000">$50</button>
+                          </div>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="10000">$100</button>
+                          </div>
+                         <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="10000">$200</button>
+                          </div>
+                        </div>
+
+
+
+                        <br>
+                   </div>
+
+                    <div id="complete-donation" class="d-none">
+                        <h4 align="center">Thank you for your $<span id="selected-amount">0</span> contribution
+                        </h4>
+
+                       <form align="middle" action="{% url 'donation:donate' donateamt %}" method="post" id="stripe-form">
+                            {% csrf_token %}
+                <!--            <input type="hidden" name="donateamt" value="{{donateamt}}" />-->
+                           <input type="hidden" name="donor_display_name" id="added-donor-name">
+                            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                data-key="{{ key }}"
+                                data-description="Donation Charge"
+                                data-amount="{{donateamt}}"
+                                data-locale="auto">
+                            </script>
+
+                        </form>
+                        <div id="paypal-button" class="paypal-buttons">
+
+                        </div>
+                    </div>
+
+
+
+
+        <!--                        <div style="text-align:center; margin-top:10px;"><a href="/?role={{role}}">Cancel...</a></div>-->
+                </div>
+
+            </div>
+        </div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block extra-scripts %}
+
+    <script>
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+
+
+        $.ajaxSetup({
+          beforeSend: function (xhr, settings) {
+            // if not safe, set csrftoken
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+          }
+        })
+
+        $('.amt').click(function(e){
+            $('.amt').removeClass('active');
+            $(this).addClass('active');
+            $('.amt').prop('disabled', true);
+
+            var amount = $(this).attr('data-amt');
+            var actual_amount = parseInt(amount) / 100;
+            $('#selected-amount').text(actual_amount)
+            $('.stripe-button').attr({'data-amount': amount});
+            var stripe_url = `/donation/donate/${amount}/`;
+            $('#stripe-form').attr('action', stripe_url);
+            var donor_name = $('#donor-name').val();
+            $('#added-donor-name').val(donor_name);
+
+            console.log(donor_name)
+
+
+            paypal.Buttons({
+              style: {
+                  shape: 'rect',
+                  color: 'gold',
+                  layout: 'horizontal',
+                  label: 'pay',
+
+              },
+              createOrder: function(data, actions) {
+                  return actions.order.create({
+                      purchase_units: [{
+                          amount: {
+                              value: actual_amount
+                          }
+                      }]
+                  });
+              },
+              onApprove: function(data, actions) {
+                  return actions.order.capture().then(function(details) {
+                      details['added-donor-name'] = donor_name;
+
+                      $.ajax({
+                          url: "{%  url 'donation:paypal-done' %}",
+                          type: "POST",
+                          data: JSON.stringify(details),
+                          dataType: 'json',
+                          contentType: 'application/json; charset=utf-8',
+                          success: function(res){
+                              if (res.status === 'success'){
+                                  var url = `/donation/thank-you/${amount}`;
+                                    window.location.href = url;
+                              }
+                              else{
+                                  console.log(res.msg)
+                                  alert('An error occurred, please try again');
+                              }
+
+                          }
+                      })
+
+                  });
+              }
+          }).render('#paypal-button');
+
+          $('#complete-donation').removeClass('d-none')
+        })
+
+  </script>
+
+{% endblock %}

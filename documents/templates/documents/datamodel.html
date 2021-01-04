@@ -1,0 +1,85 @@
+{% include 'base.html' %}
+Hybrid : tracking ancestor and genetics components of hybridized orchid to make a better decision whether I can grow an orchid plant in my climate.
+
+Taxa rank:
+<ul>
+    <li>Isonym: When the same name, based on the same type, has been published independently at different times by different authors, then only the earliest of these "isonyms" has nomenclatural status.
+The name is always to be cited from its original place of valid publication, and later isonyms may be disregarded.
+    </li>
+    <li>Basionym is the original name on which a new name is based.  The authors citation of the new name should include the basionym authors in parenthesis. OrchidRoots will ignore basionym and only use the new name.
+    </li>
+
+
+</ul>
+
+<h3>Data Type</h3>
+<ul>
+    <li>Genus: cit_status is set to the status of citation: illegal (nom. illeg) or rejected (nom. rej) or invalid (nom. invalid).
+        If this is the case, the name of the genus name is appended with '-{{cit_status}}'
+        Test
+    </li>
+    <li>Species: Must be a single word. The blank space is reserved for citation status indicator (e.g. name illegal).  The citation status value is set to the status of citation: illegal (nom. illeg) or rejected (nom. rej) or invalid (nom. invalid).
+        If citation status has a value, then the name of the genus name is appended to species name separated by a blaqnk space.
+
+    </li>
+    <li>
+        Kew: TDO. Convert this to a script when ht eprocedure is stable.
+        1. If the citation of a species is illegal, invalid or rejected, ... Then assign cit_status to illeg., inval., and rej. respectively and append cit_status value to species name
+        2. If a species status is synopnym and its accepted name is "Unplaced Name" then change the status of the species to unplaced and add the species to Accepted
+        3. Run updatekewbyyesr.pl.  Output to files
+        0. Dont know how to efficiently identify deleted record yet!
+        1. newspecies:  Add new species to Species and Accepted (assumed no hybrids, if implementd hybrid, then add to Hybrid)
+            2. namechanged.  Reviewed records in Species and change name as indicated.  In case old name has cit_status extension, remove the value from cit_status column first, then make name change, and add value to cit_status.  The cit_status extension in the name change will be done automatically.
+                In case the status of citation has changed: if illeg or inval... is added, then update name first, and add new cit_status value afterward. Otherwise, remove ciit_status and make the name change.
+            3. status changes:  This is really tedius. You have to check each change record one by one and compare them with Kew database
+                Use get_species.sql script.  Create the list of all status changed pids and copy it to line 4 query. Copy the first pid in the list to @a and @b, and to the address of a Kew record.  The refresh Kew.
+                If status changed from accepted to synonym
+                    1.  Copy the accepted pid to @c and run the script.
+                    2.  Change status to synonym in #2 (Species).
+                    3.  Start at #10 and work your way back to #3, make correction as appropriated. Delete the changed pid from Accepted (#3)
+                If status changed from synonym to accepted (treat unplaced as accepted)
+                    1.  Copy pid to @c as well. Run SQL script
+                    2.  Change status to accepted in #2 (Species).
+                    3.  Add pid to #3 (Accepted)
+                    5.  Start at #10 and work your way back to #3, make correction as appropriated.
+                    4.  For #6, dheck Kew if there are synonyms, if so add them to #6.  Review each synonym since they may have changed status as well and may be a synonym of some other pid.  If a synonym changed its status, then remove it from hte list in #1.
+                Go to the next pid in #1
+    </li>
+
+    <li>
+        Hybrid:
+        - If seed or pollen parent is a synonym, then keep the parent's name as is, but put accepted pid as partent's pid.
+    </li>
+    <li>Suprageneric
+        Currently we only record Subfamily, Tribe and Subtribe
+    </li>
+
+    <li>
+        Clan:  A new classification ranks for genus created to group all species and hybrid that are connected through genealogy.
+        Technically a clan is a connected subgraph of the entire geanological graph of orchids.
+    </li>
+    <li>infrageneric:  We implement infrageneric repository, containing subgenus, section, subsection and series collected from various sources.
+    </li>
+
+
+
+
+    <li>Ranking and photo quality: How images are chosen for display in various pages depends on its rank (between 0 to 8) and teh quality attribute of the photo (1=highest, 2 = high, 3 = average and 4 = low).
+        <ul>
+            <li>Rank 0: Private photos. They are not visible to public.  Only curators and the owner of each photo can them.</li>
+            <li>Rank 1: Habitat or in situ photos</li>
+            <li>Rank 2: Entire or part of plants</li>
+            <li>Rank 3: Inflorescens or long range photos.</li>
+            <li>Rank 4: Group of flowers, or part of an inflorescence.</li>
+            <li>Rank 5: Protrait of single flower</li>
+            <li>Rank 6: (reserved)</li>
+            <li>Rank 7: Closeups</li>
+            <li>Rank 8: Diagrams, drawings, sections of a flower, or photos that show the size or other descriptive characteristic of the orchid.</li>
+        </ul>
+        <br>Images displayed in browse genus/browse species are selected randomly from highest quality photos of rank 5, 4 or 8 respectively.
+        <br>Images displayed in information page are selected randomly from highest quality photos of rank
+        <br>Images displayed in detailed pages are all photos of rank > 0.  Pagionation will be applied if # of photos is greater than 20.
+        <br>Images of parentage displayed in detailed pages are selected randomly from trank 8 or 5
+        <br>Images in family tree nodes are selected randomly from trank 8 or 5
+    </li>
+</ul>

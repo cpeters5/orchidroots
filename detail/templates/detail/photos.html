@@ -1,0 +1,530 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail/detail-title.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+<style>
+    /*Styles for Top Descendants*/
+[class*="col-"] {
+    float: left;
+    padding: 10px;
+    margin-left: 15px;
+    height: 100%;
+}
+
+.imageitem {
+    display:inline-block;
+    border:1px solid red;
+    margin:2px;
+    width : 17vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 5px auto;
+    width:100%;
+}
+        /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding:2px;
+    margin:0 auto;
+}
+
+.imgcaption {
+    font-size: 10px;
+    text-align: center;
+    height:70px;
+    /*overflow: hidden;*/
+}
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+div.text-bl a {
+    color: #2fffff;
+}
+
+
+
+@media only screen and (max-width: 800px){
+   .imageitem {
+        width: 30vw;
+        /*height : 250px;*/
+    }
+    .imgcaption {
+        font-size: 10px;
+    }
+   .box {
+        /*width: 35vw;*/
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 190px !important;
+       width : 95% !important;
+    }
+
+    div.text {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .imageitem {
+        width: 36vw;
+    }
+    .box {
+        width: 35vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 110px !important;
+       width : 95% !important;
+    }
+
+    .imgcaption {
+       width : 34vw;
+        font-size: 9px;
+        height: 59px;
+    }
+    div.text {
+        font-size: 10px;
+    }
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+div.panel {
+    padding: 0 ;
+    background-color: #f5f9f9;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+ul.b {list-style-type: disc;}
+
+
+label {
+    display: inline-block;
+    width: 250px;
+    margin-right: 5px;
+}
+
+.blink_me {
+  animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: .25;
+  }
+}
+
+
+.tab-content {
+    min-height: 200px !important;
+}
+
+a:hover {
+    color:darkblue;
+}
+
+
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+    /*min-height:400px;*/
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 5px;
+    width: 147px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+.btn-color {
+    background: #ececec;
+    margin: 2px;
+    border:1px solid grey;
+}
+
+.text-box {
+    background: white;
+    width:145px;
+    height:26px;
+    margin: 2px;
+    padding:0 10px;
+    border:1px solid grey;
+    border-radius : .2rem;
+    text-align:left;
+    font-size:12px;"
+}
+/*.litebox-overlay .litebox-close{*/
+/*    width: 36px;*/
+/*    height: 36px;*/
+/*    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAMAAADW3miqAAAABGdBT&hellip;vNcsmRuX4vc8d6dD9cGMVFL231VGoNUdfFRq2y/t8SS7NvNfRFXoyOLJ8AAAAASUVORK5CYII=) no-repeat center;*/
+/*    top: 20px;*/
+/*    right: 20px;*/
+/*}*/
+
+</style>
+
+<!--<div class="container">-->
+<!--    <div class="row justify-content-center align-items-center" style="border:0 solid blue;font-size:11px;">-->
+<!--        <button class="btn btn-xs btn-primary" type="button" data-toggle="collapse" data-target="#Instruction">Instruction</button>-->
+<!--        <div id="Instruction" class="collapse">-->
+<!--        Curator view is being simplified:-->
+<!--            <ul>-->
+<!--                <li>There are 3 sections in this page: public, private and new upload, partitioned by a horizontal line.</li>-->
+<!--                <li>To remove a photo from public view simply change its rank to 0</li>-->
+<!--                <li>When you approve or upload a new photo, look for a replacement, e.g. similar photo or photos of lower quality, remove it(them).  We try to keep public photo population low.</li>-->
+<!--                <li>When you add a new photo, select appropriate rank following the-->
+<!--                    <button type="button" data-toggle="collapse" data-target="#rank">Rank assignement guideline</button>-->
+<!--                    <div id="rank" class="collapse">-->
+<!--                        <ol start="0">-->
+<!--                            <li>Private photos visible only to their owner (and curators)</li>-->
+<!--                            <li>Habitat or in situ photos</li>-->
+<!--                            <li>Entire or part of plants</li>-->
+<!--                            <li>Inflorescent</li>-->
+<!--                            <li>Group of flowers</li>-->
+<!--                            <li>Portrait of single flower</li>-->
+<!--                            <li>reserved></li>-->
+<!--                            <li>Closeup</li>-->
+<!--                        </ol>-->
+<!--                    </div>-->
+<!--                </li>-->
+<!--                <li>Select an appropriate quality-->
+<!--                    <button type="button" data-toggle="collapse" data-target="#quality">Photo quality</button>-->
+<!--                    <div id="quality" class="collapse">-->
+<!--                        <ul start="0">-->
+<!--                            <li>High</li>-->
+<!--                            <li>Average</li>-->
+<!--                            <li>Low</li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<div style="width:95%;margin:0 auto;padding:0;">
+    {% include './detail-nav.html' %}
+    <!-- Main -->
+    <div class="tab-content clearfix p-2" style="background:white; padding:10px 0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;min-height:1000px">
+        <!--Author list-->
+        <div  class="row p-2 justify-content-center align-items-center">
+            {% if role == 'cur' %}
+                {% if user.tier.tier > 3 and role == 'cur' %}
+                    <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:curate_newapproved' %}">Recently approved</a>
+                    <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:curate_pending' %}?gen=&type={{species.type}}">All pending photos</a>
+                {% endif %}
+                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:curate_newupload' %}?gen=&type={{species.type}}">New uploaded photos</a>
+                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadweb' species.pid %}?role={{role}}&tab=web">Upload url</a>
+                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}&tab=loc">upload file</a>
+                <form class="form-inline justify-content-center" action="{% url 'detail:photos' species.pid %}" id="author">
+                <input type="hidden" name="genus" value="{{genus}}" />
+                <input type="hidden" name="role" value="{{role}}" />
+                <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
+                    {% if author %}
+                        <option selected disabled>{{author}}</option>
+                    {% else %}
+                        <option selected disabled>Select an author</option>
+                   {% endif %}
+                    <option></option>
+                    {% for author in author_list %}
+                        {% if author == author.author_id %}
+                            <option selected="selected" disabled value="{{author.author_id}}">{{author.displayname}}</option>
+                        {% else %}
+                            <option value="{{author.author_id}}">{{author.displayname}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+                </form>
+            {% elif role == 'pri' %}
+                <div class="p-2 dropdown" >
+                    <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Species List</button>
+                    {% if myspecies_list %}
+                        <div class="dropdown-menu  scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            {% for spc in myspecies_list %}
+                                <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-2 dropdown">
+                    <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Hybrids List</button>
+                    {% if myhybrid_list %}
+                        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            {% for spc in myhybrid_list %}
+                                <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-2 dropdown" >
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:myphoto_browse_spc' %}?role={{role}}">My Species Photos</a>
+                </div>
+
+                <div class="p-2 dropdown" >
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:myphoto_browse_hyb' %}?role={{role}}">My Hybrid Photos</a>
+                </div>
+                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadweb' species.pid %}?role={{role}}&tab=web">Upload url</a>
+                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}&tab=loc">upload file</a>
+            {% endif %}
+
+
+
+<!--            Anyone may filter by variety, form name, etc-->
+<!--            <form action="?" id="variety">-->
+                <!--Variety-->
+<!--                <input type="hidden" name="tab" value="sum" />-->
+<!--                <input type="hidden" name="gen" value="{{species.gen.pid}}" />-->
+<!--                <input type="hidden" name="pid" value="{{species.pid}}" />-->
+<!--                <input type="hidden" name="role" value="{{role}}" />-->
+<!--            <input form="variety" class="text-box" name="variety" onfocus="this.select()" value="{{variety}}" placeholder="Enter variety, form, name or synonym"/>-->
+            </form>
+
+
+        <!--        Curator may select any author id-->
+<!--        {% if user.is_authenticated and user.tier.tier > 2 %}-->
+<!--            <form class="form-inline justify-content-center" action="{% url 'detail:photos' species.pid %}" id="author">-->
+<!--            <input type="hidden" name="genus" value="{{genus}}" />-->
+<!--            <input type="hidden" name="role" value="{{role}}" />-->
+<!--            <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">-->
+<!--                {% if author %}-->
+<!--                    <option selected disabled>{{author}}</option>-->
+<!--                {% else %}-->
+<!--                    <option selected disabled>Select an author</option>-->
+<!--               {% endif %}-->
+<!--                <option></option>-->
+<!--                {% for author in author_list %}-->
+<!--                    {% if author == author.author_id %}-->
+<!--                        <option selected="selected" disabled value="{{author.author_id}}">{{author.displayname}}</option>-->
+<!--                    {% else %}-->
+<!--                        <option value="{{author.author_id}}">{{author.displayname}}</option>-->
+<!--                    {% endif %}-->
+<!--                {% endfor %}-->
+<!--            </select>-->
+<!--            <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
+<!--            </form>-->
+<!--        {% endif %}-->
+
+        </div>
+       <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
+            {% for image in public_list %}
+                <div class="imageitem">
+                    {% if image.image_file %}
+                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                                <h6><small>
+                                {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                {{image.get_displayname}}
+                                {% if image.text_data %}<br>{{image.text_data|safe}}{% endif %} </small></h6>">
+                            <div class="box">
+                                    <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                            </div>
+                        </a>
+                        <br>
+                    {% else %}
+                        <a href="#">
+                        <dev class="box">
+                            <img class="thumbnails" alt="" src="{{image.image_url}}">
+                            <div class="text text-br">{{image.id}}</div>
+                        </dev>
+                        </a>
+                    {% endif %}
+                    <div class="imgcaption">
+                        <div style="width:100%;word-wrap: break-word;">
+                            {% if role == 'cur' %}
+                                {% include 'detail/curate_links.html' %}
+                            {% else %}
+                                {% if image.source_url %}
+                                    <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
+                                    <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                {% else %}
+                                    {{image.imgname|safe}}
+                                    <br>{{image.author.displayname }}
+                                {% endif %}
+                            {% endif %}
+                            {% if role == 'pri' and image.rank == 0 %}
+                                (private <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>)
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+       </div>
+    </div>
+    {% if private_list and role == 'cur' %}
+    <div class="p-2 border" style="margin-top:10px;background:white;">
+        <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
+            <div class="font-weight-bold text-center text-info" ><h4>Private Photos</h4></div>
+            {% for image in private_list %}
+                <div class="imageitem p-1 justify-content-center align-items-center">
+                    {% if image.image_file %}
+                        <div class="box">
+                            <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                <h6><small>
+                                {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                {{image.get_displayname}}
+                                {% if image.text_data %}<br>{{image.text_data|safe}}{% endif %} </small></h6>">
+                                    <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                            </a>
+                        </div>
+                        <br>
+                    {% else %}
+                        <a href="#">
+                        <dev class="box">
+                            <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
+                            <div class="text text-br">{{image.id}}</div>
+                        </dev>
+                        </a>
+                    {% endif %}
+                    <div class="imgcaption">
+                        {% include 'detail/curate_links.html' %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if upload_list or msg %}
+    <div class="p-2 border" style="background:white; margin-top:10px;">
+        <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
+            <div class="font-weight-bold text-center text-info" ><h4>New Uploaded Files</h4></div>
+            {% if msg %}<h6>{{msg}}</h6>{% endif %}
+            <br><br>
+            {% for image in upload_list %}
+                 <div class="imageitem" style="display:inline-block">
+                     {% if image.image_file_path %}
+                          <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                                   {{image.id}}: {{image.imgname}}
+                                   <br> {{image.get_displayname}}
+                                   <br>{% if image.text_data %}{{image.text_data|safe}}{% endif %}">
+                              <div class="box">
+                                  <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}" style="border: 0 solid red;">
+                                  <div class="text text-br">{{image.id}}</div>
+                                </div>
+                           </a>
+                     {% else %}
+<!--                                    <div class="box">-->
+<!--                                        <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">-->
+<!--                                        <div class="text">{{image.id}}</div>-->
+<!--                                    </div>-->
+                        Requested file does not exist
+                     {% endif %}
+                     <div style="font-size:10px">
+                        <a href="{{image.source_url}}">{{image.author}}</a>
+<!--                            Private and curate role may delete photos-->
+                        {% if role == "cur" or role == "pri" %}
+                            <br>
+                            {% if image.approved %}
+                                <b>Approved</b>
+                            {% elif role == 'cur' %}
+                                <a href="{% url 'detail:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                            {% endif %}
+                            <a href="{% url 'detail:deletephoto' image.id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                        {% endif %}
+                     </div>
+
+                 </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!--<footer>Copyright &copy; OrchidRoots.com</footer>-->
+
+
+
+{# TODO: Add sort image by - RANDOM, DISTANCE, DATE #}
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+//
+// $(this).ekkoLightbox({
+//     alwaysShowClose: true
+// });
+
+// This function supposed to change position of lightbox close icon.
+// Lightbox.prototype.build = function() {
+//     var self = this;
+//     $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox">' +
+//         '<div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div>' +
+//         '<div class="lb-closeContainer"><a class="lb-close"></a></div></div></div><div class="lb-outerContainer"><div class="lb-container">' +
+//         '<img class="lb-image" src="/statics/utils/images/icon-close-512.png" />' +
+//         '<div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div>' +
+//         '<div class="lb-loader"><a class="lb-cancel"></a></div></div></div></div>').appendTo($('body'));
+// }
+</script>
+
+
+
+{% endblock %}
+
+
+

@@ -1,0 +1,541 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% include "detail/detail-title.html" %}
+
+<style>
+
+.button {
+    background-color: #cad6d0;
+    border: 2px solid #67928d;
+    border-radius: 3px;
+    color: #454545;
+    width: 120px;
+    font-size: 12px;
+    margin: 0 12px 0 12px;
+    padding: 3px 3px ;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+
+.parent {
+    min-height:190px;
+    background-color: #f4f4f6;
+    width: 100%;
+    border: 1px solid #aaa;
+    margin: 0 0 8px 0;
+    padding: 12px 5px 5px 3px;
+}
+
+.parent-text {
+    font-size:12px;
+}
+
+.s {
+    height:50px;
+    display:block;
+    float: left;
+    width:49.5%;
+    padding-left: 5px;
+    padding-right: 2px;
+    text-align: center;
+    border: 0 solid #aaa;
+}
+
+.ss {min-height:140px;max-height:180px;height:auto;float:left; text-align:center;width:48%; background-color: #f4f4f6; padding: 8px 8px 8px 8px; border:1px solid #aaa;}
+.sp {min-height:140px;max-height:180px;height:auto;float:right;text-align:center;width:48%; background-color: #f4f4f6; padding: 8px 8px 8px 8px; border:1px solid #aaa;}
+.sp-none {min-height:140px;}
+.ss-none {min-height:140px;}
+.anc {
+    margin:0 auto; text-align:center;padding: 10px 3px 3px 3px; border:1px solid #aaa; background-color: #f4f4f6;
+}
+
+.offsp {
+    font-size:12px;
+}
+.imgcaption {
+    font-size: 10px;
+    height: 45px;
+    overflow: hidden;
+}
+.imgcaption_cur {
+    font-size: 10px;
+    height: 50px;
+    overflow: hidden;
+}
+
+@media only screen and (max-width: 800px){
+    .imgcaption {
+        font-size: 10px;
+        height: 40px;
+    }
+    .imgcaption_cur {
+        font-size: 10px;
+        height: 45px;
+    }
+    .parent {
+        min-height:30px;
+        font-size:10px;
+    }
+    .parent-text {
+        font-size:12px;
+    }
+    .ss {min-height:40px;}
+    .sp {min-height:40px;}
+    .ps {min-height:40px;}
+    .pp{min-height:40px;}
+    .offsp {
+        font-size:11px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .imgcaption {
+        margin: 0 auto;
+        font-size: 10px;
+        height: 35px;
+        overflow: auto;
+        width: 100%;
+    }
+    .imgcaption_cur {
+        margin: 0 auto;
+        font-size: 10px;
+        height: 40px;
+        overflow: auto;
+        width: 100%;
+    }
+   .parent {
+        min-height:20px;
+        font-size:5px;
+    }
+    .parent-text {
+        font-size:10px;
+    }
+    .s {
+        height: 30px;
+    }
+    .ss {
+        min-height:40px;
+        font-size:6px;
+        height: 100px;
+    }
+    .sp {
+        min-height:40px;
+        font-size:6px;
+        height: 100px;
+    }
+    .anc {
+
+    }
+    .offsp {
+        font-size:9px;
+    }
+
+}
+* {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+}
+
+img {
+    border-radius: 0;
+    border: 0 solid #ccc;
+    border-shadow: None;
+}
+
+.tree ul {
+	padding-top: 20px; position: relative;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+
+.tree li {
+	float: left; text-align: center;
+	list-style-type: none;
+	position: relative;
+	padding: 20px 5px 0 5px;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+
+/*We will use ::before and ::after to draw the connectors*/
+
+.tree li::before, .tree li::after{
+	content: '';
+	position: absolute; top: 0; right: 50%;
+	border-top: 1px solid #ccc;
+	width: 50%; height: 20px;
+}
+.tree li::after{
+	right: auto;
+    left: 50%;
+	border-left: 1px solid #ccc;
+}
+
+/*We need to remove left-right connectors from elements without
+any siblings*/
+.tree li:only-child::after, .tree li:only-child::before {
+	display: none;
+}
+
+/*Remove space from the top of single children*/
+.tree li:only-child{ padding-top: 0;}
+
+/*Remove left connector from first child and
+right connector from last child*/
+.tree li:first-child::before, .tree li:last-child::after{
+	border: 0 none;
+}
+/*Adding back the vertical connector to the last nodes*/
+.tree li:last-child::before{
+	border-right: 1px solid #ccc;
+	border-radius: 0 5px 0 0;
+	/*-webkit-border-radius: 0 5px 0 0;*/
+	/*-moz-border-radius: 0 5px 0 0;*/
+}
+.tree li:first-child::after{
+	border-radius: 5px 0 0 0;
+	/*-webkit-border-radius: 5px 0 0 0;*/
+	/*-moz-border-radius: 5px 0 0 0;*/
+}
+
+/*add downward connectors from parents*/
+.tree ul ul::before{
+	content: '';
+	position: absolute;
+    top: 0;
+    left: 50%;
+	border-left: 1px solid #ccc;
+	width: 0; height: 20px;
+}
+
+.tree li a{
+	border: 1px solid #ccc;
+	padding: 0px 0px;
+	text-decoration: none;
+	color: #666;
+	font-family: arial, verdana, tahoma;
+	font-size: 11px;
+	display: inline-block;
+
+	border-radius: 25px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+
+	/*transition: all 0.5s;*/
+	/*-webkit-transition: all 0.5s;*/
+	/*-moz-transition: all 0.5s;*/
+}
+.tree li img {
+   object-fit: cover;
+   overflow: hidden;
+   height: 14vw;
+   width : 14vw;
+   padding:2px;
+
+}
+
+/*Time for some hover effects*/
+/*We will apply the hover effect the the lineage of the element also*/
+.tree li a:hover, .tree li a:hover+ul li a {
+	background: #c8e4f8;
+    color: #000;
+    border: 1px solid #94a0b4;
+}
+/*Connector styles on hover*/
+.tree li a:hover+ul li::after,
+.tree li a:hover+ul li::before,
+.tree li a:hover+ul::before,
+.tree li a:hover+ul ul::before{
+	border-color:  #94a0b4 !important;
+}
+
+.button {
+    background-color: black;
+    width: 250px;
+    height: 35px;
+    border: none;
+    color: white;
+    padding: 4px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline;
+    font-size: 13px;
+    margin: 0 2px 0 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button1 {
+    background-color: #eae6eb;
+    color: #334455;
+    border: 1px solid #acaf9c;
+}
+
+.button1:hover {
+    text-decoration: none;
+    background-color: #babbc1;
+    color: white;
+}
+
+
+.blink_me {
+  animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: .25;
+  }
+}
+
+a.fam {
+    border:0;
+    font-size: 9px !important;
+}
+
+#myselectbox {
+    float:left;
+    width:180px;
+    height: 25px;
+    background-color: #f7f7f7;
+    margin-right:2px;
+}
+.border-lb {
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+}
+.border-rb {
+    border: 1px solid #ccc;
+    border-width: 0 1px 1px 1px;
+}
+
+    /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 12vw;
+   width : 12vw;
+   padding:2px;
+}
+.thumbnails1 {
+   height: 16vw;
+   width : 16vw;
+}
+.thumbnails2 {
+   height: 11vw !important;
+   width : 11vw !important;
+}
+.thumbnails3 {
+   height: 8vw !important;
+   width : 8vw !important;
+    border:1px solid lightgrey;
+    padding:0 !important;
+    margin:0 !important;
+}
+@media only screen and (max-width: 850px) {
+    .thumbnails1 {
+       height: 35vw;
+       width : 35vw;
+    }
+    .thumbnails2 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+    .thumbnails3 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+
+}
+
+@media only screen and (max-width: 600px) {
+    .thumbnails1 {
+       height: 35vw;
+       width : 35vw;
+    }
+    .thumbnails2 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+    .thumbnails3 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+
+}
+.box {
+    position: relative;
+    display: inline-block;
+    background: lightgrey;
+    text-align: center;
+    color: white;
+    margin: 0;
+    padding:0;
+}
+
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+div.text-tl {
+    top: 2px;
+    left: 6px;
+}
+
+div.text-bl {
+    bottom: 2px;
+    left: 6px;
+}
+
+
+div.text-tr {
+    top: 2px;
+    right: 6px;
+}
+
+div.text-br {
+    position: absolute;
+    bottom: 2px;
+    right: 6px;
+}
+
+div.text-c {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+div.text-bl a {
+    color: #2fffff;
+}
+
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
+</style>
+
+    <div style="width:95%;margin:0 auto">
+        <!-- Main -->
+        <br>
+        {% include "detail/detail-nav.html" %}
+
+        <div class="tab-content clearfix" style="padding:20px;background-color: white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
+            <div class="tab-pane active" id="comm" >
+
+            <div style="margin-left: 5%; width: 85%; font-size: 13px" >
+                <p>
+                    You must login to add your comment.
+                    Tell us about your experience with this grex, its description, growing condition, flowering season,
+                    or other species it is easily mistaken for.
+                    If you see any photo that may have been misidentified please tell us. Be specific and
+                    include id of the photo(s) you address.
+                </p>
+                <form id="commentform" action="{% url 'detail:comment' %} " method="POST">
+                    <select id="myselectbox" name="reason" required>
+                        <option value="">Select reason</option>
+                        <option value="report">Report error</option>
+                        <option value="response">Response to error report</option>
+                        <option value="info">Information</option>
+                    </select>
+                    <a class="button button1" style="display:block;float:left;margin:0;padding:0;height:25px;width:180px;font-size: 14px" href="{% url 'detail:comments' %}?sort=-latest&prev_sort=latest">Go to full list</a>
+                    <textarea style="width: 100%; white-space: normal; poadding:5px; text-align: left; font-size: 13px; -moz-text-align-last: left;text-align-last: left;"  rows="6"  name="memo" form="commentform"></textarea>
+                    {% csrf_token %}
+                    <input type="hidden" name="type" value="hybrid" />
+                    <input type="hidden" name="id" value="{{id}}" />
+                    <input type="hidden" name="pid" value="{{species.pid}}" />
+                    <input type="submit" id="com_submit" >
+
+                </form>
+
+            </div>
+            {% if comment_list %}
+                <br>
+                <div align="center" style="width: 90%; margin:0 30px">
+
+                     <ul style="list-style-type:none">
+                        {% for com in comment_list %}
+                            <li>
+                                <div class="post-body" style="background-color: #f5f5f5;margin-bottom:10px;padding:2px 8px; font-size: 12px">
+                                    <div class="post-inner">
+                                        <p style="border: 0 solid lightgray; text-align: left;">
+                                            {%  if com.id_list %}[{{ com.id_list }}]: {% endif %}{{ com.memo|safe }}
+                                        </p>
+                                    </div>
+                                    <div style="text-align: right">
+                                        <span class="user-info">
+                                            {% if com.user.displayname %}
+                                                {{ com.user.displayname }}</span>
+                                            {% else %}
+                                                {{ com.user }}
+                                            {% endif %}
+                                        <span class="comment-date">:  {{ com.modified_date }}</span>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            </div>
+        <br>
+        </div>
+    </div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab2 a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
+$('.basicAutoSelect').autoComplete();
+
+
+</script>
+
+{% endblock %}
+
+

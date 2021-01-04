@@ -1,0 +1,57 @@
+{% include "base.html" %}
+{% load account socialaccount %}
+{% providers_media_js %}
+{% load crispy_forms_tags %}
+{% block body %}
+<style>
+    .loginform {
+        width:300px;
+        text-align:left;
+        font-size:14px;
+    }
+    .small{
+
+    }
+    @media only screen and (max-width: 500px) {
+        .loginform {
+            width: 300px;
+            font-size: 12px;
+        }
+    }
+
+</style>
+<br>
+<div style="dixplay:inline; text-align:center; margin:0 auto">
+    <h4>Login</h4>
+
+    <div class="container loginform">
+        <form method='POST'>
+            {% if form.non_field_errors %}
+                <ul class="has-error errorlist text-danger">
+                  {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% csrf_token %}
+             {{ form.username|as_crispy_field }}
+             {{ form.password|as_crispy_field }}
+
+          <button type='submit' class='btn btn-success'>Submit</button>
+        </form>
+        <hr>
+
+        <div class="text-center">
+            <a href="{% url 'account_reset_password' %}">Forgot Password?</a>
+        </div>
+        <div class="text-center">
+            <a  href="{% url 'register' %} ">Create an Account</a>
+        </div>
+        <div class="form-row text-justify text-center">
+                <a href="{% provider_login_url 'facebook' method='oauth2' %}" class="btn btn-block btn-social btn-facebook" style="background-color:#3b5998; color:#fff; text-align:center">
+                    <span class="fa fa-facebook"></span> Sign in with Facebook
+                </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

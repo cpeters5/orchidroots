@@ -1,0 +1,60 @@
+<style>
+    .nav-tabs {
+        font-size:13px;
+    }
+    @media only screen and (max-width: 500px) {
+        .nav-tabs {
+            font-size:9px
+        }
+        .nav-item {
+            width:70px;
+            /*min-height:70px;*/
+        }
+
+    }
+
+
+</style>
+
+
+
+<div style="font-size: 13px;width:100%;margin:0;padding:0;">
+
+    <div class="nav nav-tabs">
+        <ul class="nav nav-tabs navbar-expand-lg" >
+        {% if brwspc == 'active' %}
+            <li class="nav-item"><div class="nav-link active"><span style="color:#575757;">My Species</span></div></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_hyb' %}?role=pri&tab=brwhyb&author={{author.author_id}}"><span style="color:#575757;">My Hybrid</span></a></li>
+        {% elif brwhyb == 'active' %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_spc' %}?role=pri&tab=brwspc&author={{author.author_id}}"><span style="color:#575757;">My Species</span></a></li>
+            <li class="nav-item"><div class="nav-link active"><span style="color:#575757;">My Hybrid</span></div></li>
+        {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_spc'  %}?role=pri&tab=brwspc&author={{author.author_id}}"><span style="color:#575757;">My Species</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto_browse_hyb'  %}?role=pri&tab=brwhyb&author={{author.author_id}}"><span style="color:#575757;">My Hybrid</span></a></li>
+            {% if species.pid > 0 %}
+    <!--                If pid in request, can upload and update species info-->
+                {% if species.pid %}
+                    <li class="nav-item"><a class="nav-link {{pri}}" href="{% url 'detail:myphoto' species.pid %}?role=pri&tab=pri&gen={{species.gen.pid}}&author={{author.author_id}}"><span style="color:#575757;">Detail</span></a></li>
+<!--                    <li class="nav-item"><a class="nav-link {{loc}}" href="{% url 'detail:uploadfile' species.pid %}?role=pri&tab=loc&author={{author.author_id}}"><span style="color:#575757;">upload file</span></a></li>-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{loc}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Upload</a>
+                        <div class="dropdown-menu">
+<!--                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?role=pri&tab=loc&author={{author.author_id}}"><span style="color:#575757;">upload url</span></a>-->
+                            <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?role=pri&tab=loc&author={{author.author_id}}"><span style="color:#575757;">upload file</span></a>
+                        </div>
+                    </li>
+                {% else %}
+    <!--                If comes from page with no PID-->
+                    <li class="nav-item"><a class="nav-link" href="{% url 'detail:myphoto' 0 %}?role=pri&tab=sum&gen={{species.gen.pid}}&pid={{species.pid}}"><span style="color:#575757;">Detail</span></a></li>
+<!--                    <li class="nav-item"><a class="nav-link active" href="{% url 'detail:uploadweb' 0 %}?role=pri&tab=web"><span style="color:#575757;">upload url</span></a></li>-->
+                    <li class="nav-item"><a class="nav-link " href="{% url 'detail:uploadfile' 0 %}?role=pri&tab=loc"><span style="color:#575757;">upload file</span></a></li>
+
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+
+        </ul>
+    </div>
+</div>
+

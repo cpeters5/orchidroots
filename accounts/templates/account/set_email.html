@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Change Email" %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h2>{% trans "Add E-mail Address" %}</h2>
+            <p><strong>{% trans 'Warning:'%}</strong> {% trans "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %}</p>
+
+            <form method="post" action="{% url 'set_email' %}" class="add_email">
+                {% csrf_token %}
+                {{ form.email|as_crispy_field }}
+                <button name="action_add" type="submit" class="btn btn-success">{% trans "Add E-mail" %}</button>
+            </form>
+
+            <p></p>
+
+        </div>
+    </div>
+
+
+
+{% endblock %}

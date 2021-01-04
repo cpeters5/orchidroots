@@ -1,0 +1,176 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+
+<style>
+    .mybtn {
+        font-size:13px;
+        width:150px;
+        background-color: white;
+        border: 1px solid grey;
+        margin: 3px;
+    }
+    .mymenu {
+        max-height:400px;
+        overflow-y: auto;
+        font-size:12px;
+    }
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding:2px 1px 3px 1px;
+}
+
+div.text-c {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+}
+
+@media only screen and (max-width: 830px) {
+
+    div.text-c {
+        font-size: 10px;
+    }
+    .thumbnails {
+       height: 22vw;
+       width : 22vw;
+       padding:2px 1px 3px 1px;
+    }
+}
+
+@media only screen and (max-width: 580px) {
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 0;
+}
+
+img{
+    width:100%;
+}
+
+</style>
+<br>
+<br>
+<div style="width:95%;margin:0 auto;">
+
+    <div style="text-align:center"><h5>My Hybrid Photo Collection</h5></div>
+     <div class="d-flex flex-row justify-content-center">
+         {% if myspecies_list %}
+            <div class="dropdown" >
+                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My species list ({{myspecies_list.count}})</button>
+                <div class="dropdown-menu mymenu">
+                    {% for spc in myspecies_list %}
+                        <a class="dropdown-item" href="{% url 'detail:myphoto' spc.pid %}?type=species&author={{author.author_id}}&role={{role}}">{{spc.name|safe}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+         {% else %}
+            <div class="dropdown" >
+                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My Species List (empty)</button>
+            </div>
+         {% endif %}
+
+         {% if myhybrid_list %}
+             <div class="dropdown">
+                <button class="btn btn-default mybtn dropdown-toggle " type="button" data-toggle="dropdown">My hybrid list ({{myhybrid_list.count}})</button>
+                <div class="dropdown-menu mymenu">
+                    {% for spc in myhybrid_list %}
+                        <a class="dropdown-item" href="{% url 'detail:myphoto' spc.pid %}?type=hybrid&author={{author.author_id}}&role={{role}}">{{spc.name|safe}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="dropdown" >
+                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My Hybrids List (empty)</button>
+            </div>
+         {% endif %}
+     </div>
+     <div class="d-flex flex-row justify-content-center p-2">
+        {% if user.is_authenticated and user.tier.tier > 2 %}
+            <form class="form-inline justify-content-center" action="?" id="filter">
+            <input type="hidden" name="genus" value="{{genus}}" />
+            <input type="hidden" name="role" value="cur" />
+            <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
+                {% if author %}
+                    <option selected disabled>{{author}}</option>
+                {% else %}
+                    <option selected disabled>Select an author</option>
+               {% endif %}
+                <option></option>
+                {% for author in author_list %}
+                    {% if author == author.author_id %}
+                        <option selected="selected" disabled>{{author.displayname}}</option>
+                    {% else %}
+                        <option value="{{author.author_id}}">{{author.displayname}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+            </form>
+        {% endif %}
+     </div>
+    {% include "detail/private-nav.html" %}
+
+    <div class="tab-content clearfix" style="background-color: white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+        <div class="d-flex flex-row bd-highlight mb-3">
+            <div class="p-2">
+                <div style="margin:10px; text-align: center;min-height:200px;">
+                    {% if my_list %}
+                    <br>
+                        {% if last_page > 1 %} {% include "detail/paginator_brw.html" %} {% endif %}
+                        {% for x in my_list %}
+                            <a href="{% url 'detail:myphoto' x.pid_id %}?role={{role}}&author={{author.author_id}}">
+                                <div class="box">
+                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
+                                    <div class="text-c">{{x.pid.pid.name|safe}}</div>
+                                </div>
+    <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
+
+                            <h5>Your photo collection is empty!</h5>
+                            To build your collection you may start uploading photos as follows:
+                            <ul>
+                                <li>Click on the "Private" button if it is not highlighted. This means you are now in your private view</li>
+                                <li>Under the title "My Photo Collection" there are two losts "My species List" and "My Hybrid List"  both should be empty if you do not have any photo uploaded yet. </li>
+                                <li>Underneath there are 4 tabs
+                                    <ul>
+                                        <li>My Collection:  Your collection of species/hybrid photos, again, should be empty if you haven't uyploaded any photo yet</li>
+                                        <li>Detail:  This page will show all photo of your selected species, if any</li>
+                                        <li>Upload url: Use this form to upload photos from a webpage.</li>
+                                        <li>Upload FIle: Use this form to upload photos from your computer or cellphone</li>
+                                    </ul>
+                                </li>
+                                <li>Determine the species or hybrid identity of your photo</li>
+                                <li>To start upload photos, click on Detail tab and select the genus and species (or hybrid) from dropdown lists in the top navigation bar. </li>
+                            </ul>
+
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>
+
+
+
+
+{% endblock %}
