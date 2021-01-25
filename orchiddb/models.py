@@ -16,6 +16,7 @@ from django.conf import settings
 
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
+from core.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
 import re
 import math
 RANK_CHOICES = [(i,str(i)) for i in range(0,10)]
@@ -29,86 +30,8 @@ QUALITY = (
 
 STATUS_CHOICES = [('accepted','accepted'),('registered','registered'),('nonregistered','nonregistered'),('unplaced','unplaced'),('published','published'),('trade','trade')]
 TYPE_CHOICES = [('species','species'),('hybrid','hybrid')]
-class Publisher(models.Model):
-    author_id = models.CharField(max_length=50, primary_key=True)
-    fullname = models.CharField(max_length=50)
-    affiliation = models.CharField(max_length=200, blank=True)
-    url = models.CharField(max_length=200, blank=True)
-    web = models.CharField(max_length=200, blank=True)
-    status = models.CharField(max_length=10, default='TBD')
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-    expertise = models.CharField(max_length=500, null=True)
-
-    @property
-    def __str__(self):
-        return self.fullname
 
 # Genera
-
-
-class Family(models.Model):
-    family = models.CharField(primary_key=True, default='', db_column='family', max_length=50)
-    author = models.CharField(max_length=200, null=True, blank=True)
-    year = models.IntegerField(null=True)
-    description = models.TextField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.family
-    class Meta:
-        ordering = ['family']
-
-
-class Subfamily(models.Model):
-    family = models.ForeignKey(Family, default='', db_column='family',on_delete=models.DO_NOTHING)
-    subfamily = models.CharField(primary_key=True,max_length=50,default='', db_column='subfamily')
-    author = models.CharField(max_length=200, blank=True)
-    year = models.IntegerField(null=True)
-    description = models.TextField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.subfamily
-    class Meta:
-        ordering = ['subfamily']
-
-
-class Tribe(models.Model):
-    tribe = models.CharField(primary_key=True, default='', db_column='tribe',max_length=50)
-    author = models.CharField(max_length=200, blank=True)
-    year = models.IntegerField(null=True)
-    subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily',on_delete=models.DO_NOTHING)
-    status = models.CharField(max_length=50, null=True)
-    description = models.TextField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.tribe
-    class Meta:
-        ordering = ['tribe']
-
-
-class Subtribe(models.Model):
-    subtribe = models.CharField(max_length=50,primary_key=True, default='', db_column='subtribe')
-    author = models.CharField(max_length=200, null=True, blank=True)
-    year = models.IntegerField(null=True)
-    subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily',on_delete=models.DO_NOTHING)
-    tribe  = models.ForeignKey(Tribe, null=True, default='', db_column='tribe',on_delete=models.DO_NOTHING)
-    status = models.CharField(max_length=50, null=True)
-    description = models.TextField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.subtribe
-    class Meta:
-        ordering = ['subtribe']
-
-
 class Genus(models.Model):
     pid = models.IntegerField(primary_key=True)
     is_hybrid = models.CharField(max_length=1, null=True)
@@ -214,123 +137,6 @@ class GenusRelation(models.Model):
     def get_parentlist(self):
         x = self.parentlist.split('|')
         return x
-
-
-class Genusacc(models.Model):
-    # pid = models.IntegerField(primary_key=True)
-    pid = models.OneToOneField(
-        Genus,
-        db_column='pid',
-        on_delete=models.CASCADE,
-        primary_key=True)
-    # pid = models.ForeignKey(Genus, verbose_name='genus', db_column='pid',related_name='gen_gen', primary_key=True,on_delete=models.DO_NOTHING)
-    is_hybrid = models.CharField(max_length=1, null=True)
-    genus = models.CharField(max_length=50, default='')
-    author = models.CharField(max_length=200, default='')
-    citation = models.CharField(max_length=200, default='')
-    alliance = models.CharField(max_length=50, default='')
-    family = models.ForeignKey(Family, null=True, default='', db_column='family',on_delete=models.DO_NOTHING)
-    subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily',on_delete=models.DO_NOTHING)
-    tribe  = models.ForeignKey(Tribe, null=True, default='', db_column='tribe',on_delete=models.DO_NOTHING)
-    subtribe  = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe',on_delete=models.DO_NOTHING)
-    status = models.CharField(max_length=20, default='')
-    type = models.CharField(max_length=20, default='')
-    description = models.TextField(null=True)
-    distribution = models.TextField(null=True)
-    text_data = models.TextField(null=True)
-    source = models.CharField(max_length=50, default='')
-    abrev = models.CharField(max_length=50, default='')
-    year = models.IntegerField(null=True)
-    num_species = models.IntegerField(null=True)
-    num_hybrid  = models.IntegerField(null=True)
-    num_synonym  = models.IntegerField(null=True)
-    num_spcimage = models.IntegerField(null=True, blank=True)
-    num_spc_with_image = models.IntegerField(null=True, blank=True)
-    pct_spc_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True, blank=True)
-    num_hybimage = models.IntegerField(null=True, blank=True)
-    num_hyb_with_image = models.IntegerField(null=True, blank=True)
-    pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True, blank=True)
-    notepad = models.CharField(max_length=500, default='')
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.pid
-
-    def fullname(self):
-        fname = self.genus
-        if self.author:
-            fname = fname + self.author
-        if self.year:
-            fname = fname + ' ' + self.year
-        return fname
-
-    def get_status(self):
-        return self.status
-
-    def get_description(self):
-        return self.description
-
-    def getAccepted(self):
-        if 'synonym' in self.status:
-            acc_id = Gensyn.objects.get(pid=self.pid).acc_id
-            gen = Genus.objects.get(pid=acc_id)
-            return "%s <i>%s</i>" % (gen.genus, gen.author)
-
-    def getAcc(self):
-        if 'synonym' in self.status:
-            acc_id = Gensyn.objects.get(pid=self.pid).acc_id
-            if acc_id:
-                gen = Genus.objects.get(pid=acc_id)
-                return gen.genus
-            else:
-                return "No accepted name found for this synonym."
-
-
-    def getGenid(self):
-        if 'synonym' in self.status:
-            syn = Gensyn.objects.get(pid=self.pid).acc_id
-            return "%s" % syn
-
-    def getSynAuth(self):
-        if 'synonym' in self.status:
-            syn = Gensyn.objects.get(pid=self.pid).acc_author
-            return "%s" % syn
-
-    def get_roundspcpct(self):
-        if self.pct_spc_with_image > 0:
-            return round(self.pct_spc_with_image)
-        else: return None
-
-    def get_roundhybpct(self):
-        if self.pct_hyb_with_image > 0:
-            return round(self.pct_hyb_with_image)
-        else: return None
-
-
-    class Meta:
-        # verbose_name_plural = "Anni"
-        ordering = ('genus',)
-
-
-class Genussyn(models.Model):
-    pid = models.IntegerField(primary_key=True)
-    acc = models.ForeignKey(Genus, verbose_name='genus', related_name='gen_syn', null=True,on_delete=models.CASCADE)
-    is_hybrid = models.CharField(max_length=1, null=True)
-    genus = models.CharField(max_length=50, default='')
-    author = models.CharField(max_length=200, default='')
-    citation = models.CharField(max_length=200, default='')
-    type = models.CharField(max_length=20, default='')
-    distribution = models.TextField(null=True)
-    text_data = models.TextField(null=True)
-    source = models.CharField(max_length=50, default='')
-    abrev = models.CharField(max_length=50, default='')
-    year = models.IntegerField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.genus
 
 
 class Gensyn(models.Model):
@@ -756,57 +562,6 @@ class Comment(models.Model):
         return self.pid
 
 
-class SpeciesDetail (models.Model):
-    pid = models.OneToOneField(
-        Species,
-        db_column='pid',
-        on_delete=models.CASCADE,
-        primary_key=True)
-    url = models.CharField(max_length=200, blank=True)
-    url_name = models.CharField(max_length=100, blank=True)
-    common_name = models.CharField(max_length=100, blank=True)
-    local_name = models.CharField(max_length=100, blank=True)
-    avg_size        = models.CharField(max_length=50, blank=True)
-    color = models.CharField(max_length=50, blank=True)
-    stem            = models.CharField(max_length=500, blank=True)
-    leaf            = models.CharField(max_length=500, blank=True)
-    inflorescence   = models.CharField(max_length=500, blank=True)
-    flower          = models.CharField(max_length=500, blank=True)
-    sepal           = models.CharField(max_length=500, blank=True)
-    mentum          = models.CharField(max_length=500, blank=True)
-    petal           = models.CharField(max_length=500, blank=True)
-    lip             = models.CharField(max_length=500, blank=True)
-    fragrance       = models.CharField(max_length=500, blank=True)
-    habitat         = models.CharField(max_length=500, blank=True)
-    altitude = models.CharField(max_length=500, blank=True)
-    bloom_period    = models.CharField(max_length=50, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return '%s %s %s %s' % (self.genus, self.species,
-                                self.infraspr, self.infraspe)
-
-
-class Culture (models.Model):
-    pid = models.OneToOneField(
-        Species,
-        db_column='pid',
-        on_delete=models.CASCADE,
-        primary_key=True)
-    temperature     = models.CharField(max_length=100, blank=True)
-    light           = models.CharField(max_length=100, blank=True)
-    water           = models.CharField(max_length=100, blank=True)
-    winter_care     = models.CharField(max_length=100, blank=True)
-    bloom_month     = models.CharField(max_length=50, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return '%s %s %s %s' % (self.genus, self.species,
-                                self.infraspr, self.infraspe)
-
-
 class Similarity (models.Model):
     class Meta:
         unique_together = (("pid1", "pid2"),)
@@ -818,18 +573,13 @@ class Similarity (models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
 
-class NewAcceptedManager(models.Manager):
-    def get_queryset(self):
-        return super(NewAcceptedManager, self).get_queryset().filter(status='NEW')
-
-
 class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
         db_column='pid',
         on_delete=models.CASCADE,
         primary_key=True)
-    gen = models.ForeignKey(Genus, db_column='gen', null=True, blank=True,on_delete=models.DO_NOTHING)
+    gen = models.ForeignKey(Genus, db_column='gen', null=True, blank=True,on_delete=models.CASCADE)
     genus = models.CharField(max_length=50)
     species = models.CharField(max_length=50)
     infraspr = models.CharField(max_length=20, null=True)
@@ -869,31 +619,6 @@ class Accepted(models.Model):
 
     def __str__(self):
         return self.pid.name()
-
-# Collection of intrageneric placements from diverse sources. May contain naturakl hybrid
-class Infragenspc (models.Model):
-    class Meta:
-        unique_together = (("pid", "subgenus","section","subsection","series"),)
-    pid     = models.ForeignKey(Species,db_column='pid',on_delete=models.CASCADE)
-    author = models.CharField(max_length=200)
-    citation = models.CharField(max_length=200)
-    source = models.CharField(max_length=10)
-    gen     = models.ForeignKey(Genus,db_column='gen',on_delete=models.DO_NOTHING)
-    genus   = models.CharField(max_length=50, null=True, default=None)
-    species = models.CharField(max_length=50, null=True, default=None)
-    infraspr = models.CharField(max_length=20, null=True, default=None)
-    infraspe = models.CharField(max_length=50, null=True, default=None)
-    subgenus  = models.ForeignKey(Subgenus, null=True,db_column='subgenus',on_delete=models.DO_NOTHING)
-    section   = models.ForeignKey(Section, null=True,db_column='section',on_delete=models.DO_NOTHING)
-    subsection= models.ForeignKey(Subsection, null=True,db_column='subsection',on_delete=models.DO_NOTHING)
-    series   = models.ForeignKey(Series, null=True,db_column='series',on_delete=models.DO_NOTHING)
-    certainty = models.BooleanField(null=True, default=True)
-    # subgenus  = models.CharField(max_length=50, blank=True, default=None)
-    # section   = models.CharField(max_length=50, blank=True, default=None)
-    # subsection= models.CharField(max_length=50, blank=True, default=None)
-    # series   = models.CharField(max_length=50, blank=True, default=None)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
 
 
 class Synonym(models.Model):
@@ -1047,15 +772,14 @@ class Hybrid(models.Model):
     def registered_seed_name_long(self):
         name = self.seed_id.name()
         if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
+            name = self.seed_id.textname() + ' ' + '(syn ' + self.seed_genus + ' ' + self.seed_species + ')'
         return name
 
     def registered_pollen_name_long(self):
         name = self.pollen_id.name()
         if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
+            name = self.pollen_id.textname() + ' ' + '(syn ' + self.pollen_genus + ' ' + self.pollen_species + ')'
         return name
-
 
     # def registered_seed_name_long(self):
     #     name = self.seed_genus + ' ' + self.seed_species
@@ -1152,15 +876,6 @@ class AncestorDescendant(models.Model):
         return percent.strip("0").strip(".")
 
 
-class TestUploadFile(models.Model):
-    name = models.CharField(max_length=100, null=True, blank=True)
-    user_id    = models.ForeignKey(User, db_column='user_id', null=True, blank=True,on_delete=models.CASCADE)
-    image_file_path = models.ImageField(upload_to='images/', null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-
 class UploadFile(models.Model):
     pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid',on_delete=models.DO_NOTHING)
     author     = models.ForeignKey(Photographer, db_column='author', null=True, blank=True,on_delete=models.DO_NOTHING)
@@ -1190,13 +905,6 @@ class UploadFile(models.Model):
 
     def __str__(self):
         return self.pid.name()
-
-
-@receiver(post_save, sender=UploadFile, dispatch_uid="update_image_profile")
-def update_image(sender, instance, **kwargs):
-    if instance.image_file_path:
-        fullpath = settings.MEDIA_ROOT + '/' + str(instance.image_file_path)
-        rotate_image(fullpath)
 
 
 class SpcImages(models.Model):
@@ -1455,9 +1163,6 @@ class HybImages(models.Model):
     #
     #     return super(HybImages, self).save(*args, **kwargs)
 
-# @receiver(post_delete, sender=HybImages)
-# def submission_delete(sender, instance, **kwargs):
-#     instance.image_file.delete(False)
 
 class HybImgHistory(models.Model):
     pid = models.ForeignKey(Hybrid, db_column='pid', on_delete=models.CASCADE)
@@ -1494,102 +1199,6 @@ class ReidentifyHistory(models.Model):
 
     def __str__(self):
         return '%s %s %s %s' % (self.pid, self.user_id, self.created_date, self.modified_date)
-
-
-class Country(models.Model):
-    # class Meta:
-    #     unique_together = (("dist_code", "dist_num", "region"),)
-    #     ordering = ['country','region']
-    dist_code = models.CharField(max_length=3,primary_key=True)
-    dist_num  = models.IntegerField(null=True, blank=True)
-    country   = models.CharField(max_length=100,null=True, blank=True)
-    region    = models.CharField(max_length=100,null=True, blank=True)
-    orig_code = models.CharField(max_length=100,null=True, blank=True)
-    uncertainty = models.CharField(max_length=10,null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-
-class Continent(models.Model):
-    id            = models.IntegerField(primary_key=True)
-    name            = models.CharField(max_length=100,null=True, blank=True, unique=True)
-    note            = models.CharField(max_length=500,null=True, blank=True)
-    source          = models.CharField(max_length=10, null=True, blank=True)
-    created_date    = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date   = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Region(models.Model):
-    id              = models.IntegerField(primary_key=True)
-    continent       = models.ForeignKey(Continent,db_column='continent', on_delete=models.DO_NOTHING,null=True, blank=True)
-    name            = models.CharField(max_length=100,null=True, blank=True, unique=True)
-    note            = models.CharField(max_length=500,null=True, blank=True)
-    source          = models.CharField(max_length=10, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class SubRegion(models.Model):
-    continent       = models.ForeignKey(Continent, default=0,db_column='continent', on_delete=models.DO_NOTHING,null=True, blank=True)
-    region          = models.ForeignKey(Region,db_column='region', on_delete=models.DO_NOTHING,null=True, blank=True)
-    code            = models.CharField(primary_key=True,max_length=10, unique=True)
-    name            = models.CharField(max_length=100,null=True, blank=True, unique=True)
-    note            = models.CharField(max_length=500,null=True, blank=True)
-    source          = models.CharField(max_length=10, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class LocalRegion(models.Model):
-    id            = models.IntegerField(primary_key=True)
-    continent       = models.ForeignKey(Continent,null=True, blank=True,db_column='continent', on_delete=models.DO_NOTHING)
-    region          = models.ForeignKey(Region,null=True, blank=True,db_column='region', on_delete=models.DO_NOTHING)
-    subregion_code  = models.ForeignKey(SubRegion,null=True, blank=True,db_column='subregion_code', on_delete=models.DO_NOTHING)
-    continent_name  = models.CharField(max_length=100,null=True )
-    region_name     = models.CharField(max_length=100,null=True)
-    name            = models.CharField(max_length=100,null=True, unique=True)
-    code            = models.CharField(max_length=100,null=True, blank=True)
-    note            = models.CharField(max_length=500,null=True, blank=True)
-    source          = models.CharField(max_length=10, null=True, blank=True)
-    subregion       = models.CharField(max_length=10,null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class GeoLocation(MPTTModel):
-    name = models.CharField(max_length=50, unique=True,null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True,related_name='children')
-
-    class MPTTMeta:
-        level_attr = 'mptt_level'
-        order_insertion_by=['name']
-
-    def __str__(self):
-        return self.name
-
-
-class GeoLoc(models.Model):
-    geo_id            = models.CharField(max_length=10, unique=True, null=True, blank=True)
-    name              = models.CharField(max_length=100,null=True, blank=True, unique=True)
-    note            = models.CharField(max_length=500,null=True, blank=True)
-    source          = models.CharField(max_length=20, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Distribution(models.Model):
@@ -1641,17 +1250,6 @@ class Distribution(models.Model):
 
     def conname(self):
         return self.continent_id.name
-
-
-class TaxUpdate(models.Model):
-    id                  = models.AutoField(primary_key=True, default=10)
-    pid                 = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid',related_name='update_pid',null=True, blank=True)
-    source              = models.CharField(max_length=10, blank=True)
-    previous_name       = models.CharField(max_length=500, blank=True)
-    previous_status     = models.CharField(max_length=500, blank=True)
-    previous_dist       = models.CharField(max_length=500, blank=True)
-    created_date        = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date       = models.DateTimeField(auto_now=True, null=True)
 
 
 class Donation(models.Model):

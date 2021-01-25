@@ -19,7 +19,8 @@ from django.conf import settings
 
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
-from orchiddb.models import Family, Subfamily, Tribe, Subtribe, Subgenus, Section, Subsection, Series, Country, Region, Continent, SubRegion, LocalRegion
+from core.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
+# from orchiddb.models import Family, Subfamily, Tribe, Subtribe, Subgenus, Section, Subsection, Series, Country, Region, Continent, SubRegion, LocalRegion
 import re
 import math
 
@@ -388,7 +389,7 @@ class Distribution(models.Model):
     id = models.AutoField(primary_key=True, default=10)
     pid = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid',related_name='dist_pid')
     source = models.CharField(max_length=10, blank=True)
-    continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='nat_continent_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+    # continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='nat_continent_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     region_id = models.ForeignKey(Region, db_column='region_id',related_name='natregion_id',null=True, on_delete=models.DO_NOTHING)
     subregion_code = models.ForeignKey(SubRegion, db_column='subregion_code',related_name='natsubregion_id',null=True, on_delete=models.DO_NOTHING)
     dist_code = models.CharField(max_length=10, null=True)
@@ -556,7 +557,7 @@ class Hybrid(models.Model):
 
 
 class SpcImages(models.Model):
-    pid = models.ForeignKey(Accepted, null=False, db_column='pid', related_name='natpid',on_delete=models.DO_NOTHING)
+    pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='natpid',on_delete=models.DO_NOTHING)
     # pid = models.BigIntegerField(null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='natspcauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -581,7 +582,9 @@ class SpcImages(models.Model):
     # height = models.FloatField(default=1)
     image_file = models.CharField(max_length=100, null=True, blank=True)
     image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
+    family = models.ForeignKey(Family, db_column='family', related_name='brospcfamily', on_delete=models.DO_NOTHING)
     download_date = models.DateField(null=True, blank=True)
+    genus = models.CharField(max_length=50)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='natspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
     is_private = models.BooleanField(null=True, default=False)
     block_id = models.IntegerField(null=True, blank=True)
@@ -666,120 +669,121 @@ class SpcImages(models.Model):
         return author.user_id
 
 
-class HybImages(models.Model):
-    # pid = models.BigIntegerField(null=True, blank=True)
-    pid = models.ForeignKey(Hybrid, db_column='pid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
-    form = models.CharField(max_length=50, null=True, blank=True)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    rank = models.IntegerField(choices=RANK_CHOICES,default=5)
-    zoom = models.IntegerField(default=0)
-    certainty = models.CharField(max_length=20, null=True, blank=True)
-    source_file_name = models.CharField(max_length=100, null=True, blank=True)
-    awards = models.CharField(max_length=200, null=True, blank=True)
-    detail = models.CharField(max_length=20, null=True, blank=True)
-    cultivator = models.CharField(max_length=50, null=True, blank=True)
-    hybridizer = models.CharField(max_length=50, null=True, blank=True)
-    author = models.ForeignKey(Photographer, db_column='author',related_name='nathybauthor', on_delete=models.DO_NOTHING)
-    credit_to = models.CharField(max_length=100, null=True, blank=True)
-    status = models.CharField(max_length=10, default='TBD')
-    quality = models.IntegerField(choices=QUALITY, default=3,)
-    location = models.CharField(max_length=100, null=True, blank=True)
-    source_url = models.CharField(max_length=1000, null=True, blank=True)
-    image_url = models.CharField(max_length=500, null=True, blank=True)
-    text_data = models.TextField(null=True, blank=True)
-    description = models.CharField(max_length=400, null=True, blank=True)
-    variation = models.CharField(max_length=50, null=True, blank=True)
-    # width = models.FloatField(default=1)
-    # height = models.FloatField(default=1)
-    image_file = models.CharField(max_length=100, null=True, blank=True)
-    image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
-    download_date = models.DateField(null=True, blank=True)
-    spid = models.IntegerField(null=True, blank=True)
-    gen = models.ForeignKey(Genus, db_column='gen', related_name='nathybimggen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    is_private = models.BooleanField(null=True, default=False)
-    block_id = models.IntegerField(null=True, blank=True)
-    user_id = models.ForeignKey(User, db_column='user_id',related_name='nathybuser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
-    approved_by = models.ForeignKey(User, db_column='approved_by',  related_name='nathyb_approved_by', null=True, blank=True,on_delete=models.DO_NOTHING)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-    # upload_by = models.ForeignKey(User, db_column='upload_by', null=True, blank=True,on_delete=models.DO_NOTHING)
-
-    def __str__(self):
-        name = self.pid.pid.name()
-        if self.variation:
-            name = name + ' ' + self.variation
-        if self.form:
-            name = name + ' ' + self.form
-        if self.name:
-            name = name + ' ' + self.name
-        if self.awards:
-            name = name + ' ' + self.awards
-        # return '%s %s %s' % (self.author_id, str(self.pid), self.image_file)
-        return name
-
-    def imginfo(self):
-        myname = ''
-        if self.variation:
-            myname = '%s %s ' % (myname, self.variation)
-        if self.form:
-            myname = '%s %s form ' % (myname, self.form)
-        if self.certainty:
-            myname = '%s %s ' % (myname, self.certainty)
-        if self.name:
-            myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
-        return myname
-
-    def imgname(self):
-        if self.source_file_name:
-            myname = self.source_file_name
-        else:
-            myname = self.pid.pid.abrevname()
-        if self.variation:
-            myname = '%s %s ' % (myname, self.variation)
-        if self.form:
-            myname = '%s %s form ' % (myname, self.form)
-        if self.certainty:
-            myname = '%s %s ' % (myname, self.certainty)
-        if self.name:
-            myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
-        return myname
-
-    def fullimgname(self):
-        if self.source_file_name:
-            myname = self.source_file_name
-        else:
-            myname = self.pid.pid
-        if self.variation:
-            myname = '%s %s ' % (myname, self.variation)
-        if self.form:
-            myname = '%s %s form ' % (myname, self.form)
-        if self.certainty:
-            myname = '%s %s ' % (myname, self.certainty)
-        if self.name:
-            myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
-
-        return myname
-
-    def image_dir(self):
-        # return 'utils/images/hybrid/' + block_id + '/'
-        return 'utils/images/hybrid/'
-
-    def thumb_dir(self):
-        return 'utils/images/hybrid_thumb/'
-
-    def get_displayname(self):
-        if self.credit_to:
-            return self.credit_to
-        return self.author.displayname
-
-    def get_userid(self):
-        author = Photographer.objects.get(author=self.author_id)
-        return author.user_id
+# class HybImages(models.Model):
+#     # pid = models.BigIntegerField(null=True, blank=True)
+#     pid = models.ForeignKey(Hybrid, db_column='pid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+#     form = models.CharField(max_length=50, null=True, blank=True)
+#     name = models.CharField(max_length=100, null=True, blank=True)
+#     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
+#     zoom = models.IntegerField(default=0)
+#     certainty = models.CharField(max_length=20, null=True, blank=True)
+#     source_file_name = models.CharField(max_length=100, null=True, blank=True)
+#     awards = models.CharField(max_length=200, null=True, blank=True)
+#     detail = models.CharField(max_length=20, null=True, blank=True)
+#     cultivator = models.CharField(max_length=50, null=True, blank=True)
+#     hybridizer = models.CharField(max_length=50, null=True, blank=True)
+#     author = models.ForeignKey(Photographer, db_column='author',related_name='nathybauthor', on_delete=models.DO_NOTHING)
+#     credit_to = models.CharField(max_length=100, null=True, blank=True)
+#     status = models.CharField(max_length=10, default='TBD')
+#     quality = models.IntegerField(choices=QUALITY, default=3,)
+#     location = models.CharField(max_length=100, null=True, blank=True)
+#     source_url = models.CharField(max_length=1000, null=True, blank=True)
+#     image_url = models.CharField(max_length=500, null=True, blank=True)
+#     text_data = models.TextField(null=True, blank=True)
+#     description = models.CharField(max_length=400, null=True, blank=True)
+#     variation = models.CharField(max_length=50, null=True, blank=True)
+#     # width = models.FloatField(default=1)
+#     # height = models.FloatField(default=1)
+#     image_file = models.CharField(max_length=100, null=True, blank=True)
+#     image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
+#     family = models.ForeignKey(Family, db_column='family', related_name='brohybfamily', on_delete=models.DO_NOTHING)
+#     download_date = models.DateField(null=True, blank=True)
+#     spid = models.IntegerField(null=True, blank=True)
+#     gen = models.ForeignKey(Genus, db_column='gen', related_name='nathybimggen', null=True, blank=True,on_delete=models.DO_NOTHING)
+#     is_private = models.BooleanField(null=True, default=False)
+#     block_id = models.IntegerField(null=True, blank=True)
+#     user_id = models.ForeignKey(User, db_column='user_id',related_name='nathybuser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+#     approved_by = models.ForeignKey(User, db_column='approved_by',  related_name='nathyb_approved_by', null=True, blank=True,on_delete=models.DO_NOTHING)
+#     created_date = models.DateTimeField(auto_now_add=True, null=True)
+#     modified_date = models.DateTimeField(auto_now=True, null=True)
+#     # upload_by = models.ForeignKey(User, db_column='upload_by', null=True, blank=True,on_delete=models.DO_NOTHING)
+#
+#     def __str__(self):
+#         name = self.pid.pid.name()
+#         if self.variation:
+#             name = name + ' ' + self.variation
+#         if self.form:
+#             name = name + ' ' + self.form
+#         if self.name:
+#             name = name + ' ' + self.name
+#         if self.awards:
+#             name = name + ' ' + self.awards
+#         # return '%s %s %s' % (self.author_id, str(self.pid), self.image_file)
+#         return name
+#
+#     def imginfo(self):
+#         myname = ''
+#         if self.variation:
+#             myname = '%s %s ' % (myname, self.variation)
+#         if self.form:
+#             myname = '%s %s form ' % (myname, self.form)
+#         if self.certainty:
+#             myname = '%s %s ' % (myname, self.certainty)
+#         if self.name:
+#             myname = "%s '%s' " % (myname, self.name)
+#         if self.awards:
+#             myname = '%s %s' % (myname, self.awards)
+#         return myname
+#
+#     def imgname(self):
+#         if self.source_file_name:
+#             myname = self.source_file_name
+#         else:
+#             myname = self.pid.pid.abrevname()
+#         if self.variation:
+#             myname = '%s %s ' % (myname, self.variation)
+#         if self.form:
+#             myname = '%s %s form ' % (myname, self.form)
+#         if self.certainty:
+#             myname = '%s %s ' % (myname, self.certainty)
+#         if self.name:
+#             myname = "%s '%s' " % (myname, self.name)
+#         if self.awards:
+#             myname = '%s %s' % (myname, self.awards)
+#         return myname
+#
+#     def fullimgname(self):
+#         if self.source_file_name:
+#             myname = self.source_file_name
+#         else:
+#             myname = self.pid.pid
+#         if self.variation:
+#             myname = '%s %s ' % (myname, self.variation)
+#         if self.form:
+#             myname = '%s %s form ' % (myname, self.form)
+#         if self.certainty:
+#             myname = '%s %s ' % (myname, self.certainty)
+#         if self.name:
+#             myname = "%s '%s' " % (myname, self.name)
+#         if self.awards:
+#             myname = '%s %s' % (myname, self.awards)
+#
+#         return myname
+#
+#     def image_dir(self):
+#         # return 'utils/images/hybrid/' + block_id + '/'
+#         return 'utils/images/hybrid/'
+#
+#     def thumb_dir(self):
+#         return 'utils/images/hybrid_thumb/'
+#
+#     def get_displayname(self):
+#         if self.credit_to:
+#             return self.credit_to
+#         return self.author.displayname
+#
+#     def get_userid(self):
+#         author = Photographer.objects.get(author=self.author_id)
+#         return author.user_id
 
 

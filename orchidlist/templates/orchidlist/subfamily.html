@@ -22,12 +22,13 @@
     <div>
         <table class="table table-bordered table-sm table-condensed table-hover center">
             <tr>
-                <th>Subfamily </th><th>year</th><th> Description</th>
+                <th>Subfamily </th><th>year</th><th># genus</th><th> Description</th>
             {% for subfamily in subfamily_list %}
             <tr>
                 <td><a href="{% url 'orchidlist:genera' %}?sf={{subfamily.subfamily}}&genustype=species">
-                            {{ subfamily.subfamily}} {{ subfamily.author }}</td>
-                <td align=center>{{subfamily.year}}</td>
+                    <i>{{ subfamily.subfamily}}</i> {% if subfamily.author %}{{ subfamily.author }}{% endif %}</td>
+                <td align=center>{% if subfamily.year %}{{subfamily.year}}{% endif %}</td>
+                <td align="center">{% if subfamily.num_genus %}{{subfamily.num_genus}}{% endif %}</td>
                 <td>{% if subfamily.description %}{{subfamily.description}}{% endif %}</td>
             </tr>
             {% endfor %}

@@ -20,9 +20,17 @@ div.text-c {
 
 .thumbnails {
    object-fit: cover;
-   overflow: hidden;
+   /*overflow: hidden;*/
    height: 10vw;
    width : 10vw;
+   padding:2px;
+}
+
+.survey {
+   object-fit: cover;
+   overflow: hidden;
+   height: 80px;
+   width : 200px;
    padding:2px;
 }
 
@@ -61,6 +69,22 @@ img{
         list-style-type:none;
     }
 
+
+.btn-custom{
+    margin:0;
+    padding:0;
+    color: #100d0d;
+    width:100px !important;
+    height:25px;
+    font-size:14px;
+    display: inline-block;
+    display:inline-block;
+}
+
+.btn-custom:hover {
+    text-decoration: none;
+    color: darkblue;
+}
 </style>
 <br>
 <br>
@@ -70,22 +94,45 @@ img{
 <div class="container-fluid" style="min-height:200px;border:0 solid grey">
     <div style="clear:both"></div>
     <div class="row">
-        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0; border:1px solid lightgrey">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0;">
             {% include "side_home.html" %}
         </div>
 
         <div class="col-sm-8 col-lg-9">
             <div class="card mt-3">
                 <div class="card-body" style="font-size:15px">
-                    <h6 class="card-title">Welcome to OrchidRoots</h6>
+                    <h6 class="card-title d-inline-block">Welcome to OrchidRoots</h6>
+                    <div class="d-inline-block">
+                        OrchidRoots is a non-profit organization. Our goal is to provide a tool that will help
+                        our users search for and find the roots of their orchids.
+                        Though each member of our team works on a voluntary basis, there are ongoing costs for technology,
+                        operation and new development that would require some funding. Please make a donation to help our course
+                            <a class="btn btn-custom btn-outline-primary" href="{% url 'donation:donateapp' %}">HERE</a>.
+                        Your donation will allow us to deliver more value and to make the world of orchids more transparent.
 
-                    <p>OrchidRoots is a non-profit organization. Our goal is to provide a teaching tool that will help you
-                        search for and find the roots of your orchids.
-                        Even if the Orchidroots team works on a voluntary basis, there are ongoing costs for technology,
-                        operation and further development. If you like what we do please make a small
-                        <a class="" style="color:darkblue" href="{% url 'donation:donateapp' %}"><b>donation</b></a>
-                        so that Orchidroots can continue to exist in the future.
+                    </div>
+                    <br>
+                    <div style="margin-top:10px;">
+                    As a user of OrchidRoots website, we would like to invite you to participate in our short survey.
+                    Your responses will help us improve and expand new features and contents of the website.
+
+
+                    </div>
+                    <div style="text-align:center">
+                        <a href="https://survey.app.do/what-do-you-want-to-see" target="_blank">
+                        <img class="survey" src="/static/utils/images/survey.png">
+                        </a>
+                    </div>
+                    The survey will be open until February 28, 2021.
+                    Participants will have a chance to win the first prize: A brand new copy of
+                    "Flora of China volume 25: Orchidaceae" Missouri Botanical Press (September 28, 2009).
+                    There will be some consolation prizes as well.
+
+                    Thank you in advance for your time and effort in completing this short survey.  Your input will help
+                    shape future of OrchidRoots.
+
                     <p>
+
                     <form class="form-inline" action="{% url 'search:search_match' %}">
                         And now, start your journey by looking for an orchid:&nbsp;&nbsp;&nbsp;
                         <input type="hidden" name="role" value="">

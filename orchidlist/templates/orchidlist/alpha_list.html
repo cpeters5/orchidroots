@@ -41,13 +41,21 @@
                     {% if alpha == opt %}
                         <li class="page-item active"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
                     {% else %}
-                        <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}" >{{opt}}</a></li>
+                        {% if type == 'species' %}
+                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&status={{status}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&author={{author}}" >{{opt}}</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&status={{status}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}" >{{opt}}</a></li>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
                 {% if not alpha or alpha == "ALL" %}
-        <li class="page-item active"><a class="page-link" href="#">All </a></li>
+                        <li class="page-item active"><a class="page-link" href="#">All </a></li>
                 {% else %}
-        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&gen={{genus.pid}}&display={{display}}">All </a></li>
+                    {% if type == 'species' %}
+                        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&status={{status}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&gen={{genus.pid}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&author={{author}}">All </a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&status={{status}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&gen={{genus.pid}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}">All </a></li>
+                    {% endif %}
                 {% endif %}
     </ul>
     </div>

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.apps import apps
 from django.contrib.auth.decorators import login_required
 
-User       = apps.get_model('accounts', 'User')
+User = apps.get_model('accounts', 'User')
 
 # Create your views here.
 def list(request):

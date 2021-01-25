@@ -19,7 +19,8 @@ from django.conf import settings
 
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
-from orchiddb.models import Family, Subfamily, Tribe, Subtribe, Subgenus, Section, Subsection, Series, Country, Region, Continent, SubRegion, LocalRegion
+from core.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
+# from orchiddb.models import Family, Subfamily, Tribe, Subtribe, Subgenus, Section, Subsection, Series, Country, Region, Continent, SubRegion, LocalRegion
 import re
 import math
 
@@ -396,6 +397,7 @@ class Distribution(models.Model):
     localregion_code = models.CharField(max_length=10, null=True)
     localregion_id = models.ForeignKey(LocalRegion, db_column='localregion_id',related_name='caclocalregion_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     comment = models.CharField(max_length=500,blank=True)
+    full_name = models.CharField(max_length=500,blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
@@ -582,7 +584,9 @@ class SpcImages(models.Model):
     # height = models.FloatField(default=1)
     image_file = models.CharField(max_length=100, null=True, blank=True)
     image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
+    family = models.ForeignKey(Family, db_column='family', related_name='cacspcfamily', on_delete=models.DO_NOTHING)
     download_date = models.DateField(null=True, blank=True)
+    genus = models.CharField(max_length=50)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='cacspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
     is_private = models.BooleanField(null=True, default=False)
     block_id = models.IntegerField(null=True, blank=True)

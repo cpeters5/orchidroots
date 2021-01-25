@@ -61,12 +61,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.sitemaps',
     'django.contrib.humanize',
     'session_cleanup',
     'django_crontab',
+    'robots',
     # 'rest_framework',
 
     #local
+    'core',  # Contains all global objects
+    'other',
     'accounts',
     'utils',
     'orchiddb',
@@ -77,7 +81,7 @@ INSTALLED_APPS = [
     'documents',
     'donation',
     'bromeliaceae',
-    # 'cactaceae',
+    'cactaceae',
     # 'catalog',
     # 'distribution',
 
@@ -158,6 +162,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'orchiddev',
+        # 'PORT': env.str('PORT', default=''),
+        'HOST': 'localhost',
+        'USER': 'chariya',
+        'PASSWORD': 'Imh#r3r3',
+    },
+
+    'bluenanta': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bluenanta',
         # 'PORT': env.str('PORT', default=''),
         'HOST': 'localhost',
         'USER': 'chariya',

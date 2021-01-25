@@ -243,6 +243,34 @@ img{
     color: white;
 }
 
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
 </style>
 
 <div class="container justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 98%; text-align:left">
@@ -250,12 +278,36 @@ img{
     <br>
     <div class="card m-2">
         <div class="card-header">
-            {% if genus %} <span style="color:green; font-size:24px;"><b>Genus <i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}
+            <span style="color:darkgreen; font-size:24px;font-weight:bold">
+                Images of
+                {% if type == 'hybrid' %}
+                    {% if seed_genus or seed %}
+                        {{seed_genus}} {{seed}}
+                        {% if pollen_genus or pollen %}
+                            and
+                        {% endif %}
+                    {% endif %}
+                    {% if pollen_genus or pollen %}
+                        {{pollen_genus}} {{pollen}}
+                    {% endif %}
+                    {% if genus %}
+                        {{genus}}
+                    {% endif %}
+                {% else %}
+                    {{genus}}
+                {% endif %}
+
+                {{type}}
+
+            </span>
+        </div>
+        <div class="card-body">
+            Select a Genus
             <form action="?" autocomplete="off" style="display:inline-block">
                 <input type="hidden" name="role" value="{{ role }}" />
                 <input type="hidden" name="type" value="species" />
                 <input type="hidden" name="display" value="checked" />
-                <input list="genus_list" name="genus" onClick="this.setSelectionRange(0, this.value.length)" class="genus-select" placeholder="Select a different genus"/>
+                <input list="genus_list" name="genus" onClick="this.setSelectionRange(0, this.value.length)" value={{genus|title}} class="genus-select" data-toggle="tooltip" data-placement="top" title="Select a genus"/>
             </form>
             <datalist id="genus_list">
                 {% for g in genus_list %}
@@ -273,6 +325,10 @@ img{
             <input type="hidden" name="subsection" value="{{subsection_obj.subsection}}" />
             <input type="hidden" name="series" value="{{series_obj.series}}" />
             <input type="hidden" name="genus" value="{{genus}}" />
+            <input type="hidden" name="seed_genus" value="{{seed_genus}}" />
+            <input type="hidden" name="pollen_genus" value="{{pollen_genus}}" />
+            <input type="hidden" name="seed" value="{{seed}}" />
+            <input type="hidden" name="pollen" value="{{pollen}}" />
             {% if display %}
             <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Show images only?</span>
             {% else %}
@@ -283,10 +339,18 @@ img{
 
     <!--Filter-->
         <div class="btn-group">
-            <a class="btn custom-link m-1 {% if type == 'species' %}selected{% endif %}" href="{% url 'orchidlist:browse' %}?type=species&role={{role}}&genus={{genus}}&display={{display}}">Species images</a>
+            {% if genus %}
+                <a class="btn custom-link m-1 {% if type == 'species' %}selected{% endif %}" href="{% url 'orchidlist:browse' %}?type=species&role={{role}}&genus={{genus}}&display={{display}}">Species images</a>
+            {% else %}
+                <div class="btn custom-link m-1" data-toggle="tooltip" data-placement="top" title="Select genus first!">Species images</div>
+            {% endif %}
             <a class="btn custom-link m-1 {% if type == 'hybrid' %}selected{% endif %}" href="{% url 'orchidlist:browse' %}?type=hybrid&role={{role}}&genus={{genus}}&display={{display}}">Hybrid images</a>
             <a class="btn custom-link m-1" href="{% url 'orchidlist:species' %}?role={{role}}&genus={{genus}}">Species list</a>
-            <a class="btn custom-link m-1" href="{% url 'orchidlist:hybrid' %}?role={{role}}&genus={{genus}}">Hybrid list</a>
+            {% if seed_genus or pollen_genus or seed or pollen %}
+                <a class="btn custom-link m-1" href="{% url 'orchidlist:hybrid' %}?role={{role}}&genus={{genus}}&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Hybrid list</a>
+            {% else %}
+                <a class="btn custom-link m-1" href="{% url 'orchidlist:hybrid' %}?role={{role}}&genus={{genus}}">Hybrid list</a>
+            {% endif %}
         </div>
         <!--  Opions -->
         {% if type == 'species' %}
@@ -430,7 +494,7 @@ img{
                         <img class="thumbnails" alt="" src="{% static x.image_file %}" class="img-fluid fullimg">
                     </a>
                     {% endif %}
-                    <div class="imgcaption_top">{{x.namecasual|safe}}</div>
+                    <div class="imgcaption_top">{{x.name|safe}}</div>
                 </div>
             {% endfor %}
             </div>
@@ -460,6 +524,9 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
                 $(this).ekkoLightbox();
             });
 
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
 
 
 </script>

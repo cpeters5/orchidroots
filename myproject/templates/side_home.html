@@ -17,11 +17,22 @@
     padding:5px;
     border:1px solid darkgrey;
 }
+.family {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    background-color: #cbe5e5;
+    padding:5px;
+    border:1px solid darkgrey;
+}
+
 .btn {
     width:95%;
 }
 .btn:hover {
     background-color: #cad4f7 !important;
+    font-weight: bold;
 }
 .card-body {
     padding:10px;
@@ -32,17 +43,14 @@
     <div class="card-body" >
         <ul style="padding-left:5px">
 <!--                <li><a type="button" class="btn btn-outline-primary bannerfont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
-            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm bannerfont" href="{% url 'orchidlist:advanced' %}"><b>Advanced Search</b></a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm" href="{% url 'documents:instructionupload' %}">Upload Guideline</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm" href="{% url 'donation:donateapp' %}">Donate</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:photosubmissionguideline' %}">Photo submission</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:changes' %}">Release history</a></li>
+            <li class="li-side"><span class="bannerfont" style="color:lightseagreen"><b>Plant Families</b></span></li>
+            <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'orchidlist:advanced' %}">Orchidaceae</a></li>
+            <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'bromeliaceae:advanced' %}">Bromeliaceae</a></li>
+            <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="#">Cactaceae</a></li>
+<hr>
+            <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm" href="{% url 'donation:donateapp' %}">Donate</a></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:list' %}">Documentation</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm" href="{% url 'documents:privacy_policy' %}">Privacy policy</a></li>
-            {% if user.tier.tier > 3 %}
-                <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm border" href="{% url 'documents:migration' %}">Deployment</a></li>
-                <li class="li-side"><a type="button" class="btn sidebtn btn-default btn-sm border" href="{% url 'documents:future_development' %}">Future Development</a></li>
-            {% endif %}
+
         </ul>
 <hr>
         <ul style="padding-left:20px; font-size:13px;">

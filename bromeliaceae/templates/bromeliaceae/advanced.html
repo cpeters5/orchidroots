@@ -80,6 +80,9 @@ form {
 .dropdown {
     display:inline-block;
 }
+.dropdown-item {
+    width: 180px;
+}
 </style>
 <br>
 
@@ -92,23 +95,42 @@ form {
 
         <div class="col-sm-8 col-lg-9 m-2 p-2" style="margin-top:8px;width:99%;text-align:left;font-size:13px;background-color:#495360;">
                     <div class="card m-3 ">
-                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Taxonomic Rank Above Genus</h6></div>
+                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0; color:green; font-size:24px;"><b>Family <i>{{family|title}}</i></b></h6></div>
                         <div class="card-body border-top"  style="display:inline-block">
                             <div class="dropdown" style="display:inline-block;">
-                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">Families</button>
+                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">Subfamilies</button>
                                 <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                                    <a class="dropdown-item" href="{% url 'orchidlist:family' %}?role={{role}}"><b>Families</b></a>
-                                    {% for s in family_list %}
-                                        <a class="dropdown-item" href="{% url 'bromeliaceae:advanced' %}?role={{role}}&f={{s.family}}">{{s.family}}</a>
+                                    <a class="dropdown-item" href="{% url 'orchidlist:subfamily' %}?role={{role}}"><b>All subfamilies</b></a>
+                                    {% for s in subfamily_list %}
+                                        <a class="dropdown-item" href="{% url 'orchidlist:genera' %}?role={{role}}&sf={{s.subfamily}}&genustype=species">{{s.subfamily}}</a>
                                     {% endfor %}
                                 </div>
                             </div>
+                            <div class="dropdown" style="display:inline-block;">
+                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">Tribes</button>
+                                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                    <a class="dropdown-item" href="{% url 'orchidlist:tribe' %}?role={{role}}"><b>All tribes</b></a>
+                                    {% for s in tribe_list %}
+                                        <a class="dropdown-item" href="{% url 'orchidlist:genera' %}?role={{role}}&t={{s.tribe}}&genustype=species">{{s.tribe}}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="dropdown" style="display:inline-block;">
+                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">Subtribe</button>
+                                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                    <a class="dropdown-item" href="{% url 'orchidlist:subtribe' %}?role={{role}}"><b>All subtribes</b></a>
+                                    {% for s in subtribe_list %}
+                                        <a class="dropdown-item" href="{% url 'orchidlist:genera' %}?role={{role}}&st={{s.subtribe}}&genustype=species">{{s.subtribe}}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
             <!--            GENUS-->
                     <div class="card m-3">
-                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">{% if genus %} <span style="color:green; font-size:24px;"><b><i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}</h6></div>
+                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">{% if genus %} <span style="color:green; font-size:24px;"><b>Genus <i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}</h6></div>
                         <div class="card-body">
                              <form action="{% url 'orchidlist:advanced' %}" id="genus" autocomplete="off">
                                 <input type="hidden" form="genus" name="role" value="{{ role }}" />

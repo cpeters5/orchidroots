@@ -1,0 +1,45 @@
+
+                    <h6 class="mb-0">User Accounts</h6>
+                    <ul>
+                        <li><b>Authentication</b>: User must sign in with unique user id and email.  A confirmation email will be sent after a successful registration or after an email change request.</li>
+                        <li><b>Password reset</b>: User can reset password</li>
+                        <li><b>Change email</b>: User can change and revalidate email</li>
+                        <li><b>Socialmedia login</b>: User can login with active Facebook account.</li>
+                    </ul>
+                    <br>
+
+                    <h6 class="mb-0">Search and Lists</h6>
+                    The dropdown list of genera, species and hybrids were removed from navbar at the top of eveery page.  These lists
+                    are moved to a new page "Advanced Search".  The move is necessary to
+                    improve page load speed.  The new Advanced Search view provides several options to make it navigate the site.
+                    you can select a specific species or hybrid and go directly to its detail page,
+
+                    <br>
+                    <br>
+                    <h6 class="mb-0">
+                        Three Access levels
+                    </h6>
+                        <ul>
+                            <li><b>Basic view</b>: Anonymous Users can access public pages, search, browse images and detail pages.</li>
+                            <li><b>Private view</b>: Registered Users can access all features in the basic level including ability to upload and manage their own photos in their private album.
+                                    Registered users can also view filtered lists of species and hybrids.</li>
+                            <li><b>Curate view</b>: Registered Curators can access all features in the private level including the ability to approve or reject private photos.  Curators can also
+                                reidentify a miss-identified photo and update information related to a species of hybrid.</li>
+                        </ul>
+                    <br>
+                    <h6 class="mb-0">Detail Page</h6>
+                    <ul>
+                        <li><b>Summary tab</b>:  This page shows a short selection of public photos that best represents the defining characteristics of the orchid. The page includes a summary of taxonomy,
+                            and other information related to the orchid.  Photos of parents and species ancestors are also shown for hybrid.
+                        <li><b>Photo tab</b>: This view combines public and private photos, where private photos are visible to their owner only.
+                        This simplifies navigation and allows users to view all public and private photos in the same page.  A number of control buttons in this view allow registered users
+                        to select species or hybrid containing their photos. Registered curators will see a different sets of control buttons that allow them to manage photos such as approving, setting status,
+                        or reidentifing.</li>
+                        <li><b>Compare tab</b>: Allow users to compare two species side by side and create a new hybrid if the cross between the two orchids does not exist in OrchidRoots.</li>
+                    </ul>
+                    <br>
+                    <h6 class="mb-0">Donate function</h6>
+                    We have registered for a donate function on Paypal to make it convenient for users to help with our cause. Please consider making a
+                    <a href="{% url 'donation:donateapp' %}">donation</a> today... thank you!
+
+

@@ -80,6 +80,9 @@ form {
 .dropdown {
     display:inline-block;
 }
+.dropdown-item {
+    width: 180px;
+}
 </style>
 <br>
 
@@ -92,7 +95,7 @@ form {
 
         <div class="col-sm-8 col-lg-9 m-2 p-2" style="margin-top:8px;width:99%;text-align:left;font-size:13px;background-color:#495360;">
                     <div class="card m-3 ">
-                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Taxonomic Rank Above Genus</h6></div>
+                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0; color:green; font-size:24px;"><b>Family <i>{{family|title}}</i></b></h6></div>
                         <div class="card-body border-top"  style="display:inline-block">
                             <div class="dropdown" style="display:inline-block;">
                                 <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">Subfamilies</button>
@@ -127,7 +130,7 @@ form {
 
             <!--            GENUS-->
                     <div class="card m-3">
-                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">{% if genus %} <span style="color:green; font-size:24px;"><b><i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}</h6></div>
+                        <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">{% if genus %} <span style="color:green; font-size:24px;"><b>Genus <i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}</h6></div>
                         <div class="card-body">
                              <form action="{% url 'orchidlist:advanced' %}" id="genus" autocomplete="off">
                                 <input type="hidden" form="genus" name="role" value="{{ role }}" />

@@ -13,6 +13,10 @@
     .card-body {
         font-size: 15px;
     }
+    .sidebtn {
+        text-align: left;
+        width: 200px;
+    }
 </style>
 <br>
 
@@ -23,7 +27,106 @@
             {% include "side_home.html" %}
         </div>
 
-        <div class="col-sm-8 col-lg-9" style="margin-top:7px;">
+        <div class="col-sm-7 col-lg-8" style="margin-top:7px;">
+            <div id="accordion">
+<!--                Privacy policy-->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title" style="margin-bottom: 0">Policies</h6>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Privacy">Privacy policy</button>
+                        <div id="Privacy" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/privacy_policy1.html' %}
+                            </div>
+                        </div>
+        <!--                Terms of Use-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#TermsofUse">Terms of Use</button>
+                        <div id="TermsofUse" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/termsofuse1.html' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title" style="margin-bottom: 0">Instruction</h6>
+                    </div>
+                    <div class="card-body">
+                <!--                Upload instruction-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Webupload">Upload from a webpage</button>
+                        <div id="Webupload" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/instructionupload1.html' %}
+                            </div>
+                        </div>
+
+<!--                Photo Submission Policy-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Submission">Photo submission policy</button>
+                        <div id="Submission" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/photosubmissionguideline1.html' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title" style="margin-bottom: 0">Release Notes</h6>
+                    </div>
+                    <div class="card-body" style="padding:10px;">
+
+    <!--                V. 3.0-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change2">OrchidRoots V.3 - 2019/06/01</button>
+                        <div id="Change2" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/changes2.html' %}
+                            </div>
+                        </div>
+
+    <!--                V. 3.1-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">OrchidRoots V.3.1 - 2020-10-01</button>
+                        <div id="Change1" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/changes1.html' %}
+                            </div>
+                        </div>
+
+    <!--                Bluenanta -->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2021-?-?</button>
+                        <div id="Change3" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                TBD
+                            </div>
+                        </div>
+
+
+                    {% if user.tier.tier > 3 %}
+    <!--                Bluenanta -->
+                            <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#migration">Deployment Procedures</button>
+                            <div id="migration" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    TBD
+                                </div>
+                            </div>
+
+    <!--                Bluenanta -->
+                            <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2021-?-?</button>
+                            <div id="Change3" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    TBD
+                                </div>
+                            </div>
+
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+
 
             <div class="card mt-3">
                 <div class="card-header">
@@ -52,6 +155,7 @@
                         </li>
                     </ul>
                 </div>
+
     <!--                <div style="margin:0 auto;border:1px solid lightgrey;">-->
     <!--                    <div class="btn" href="">Tax (Form 990-PF)</div>-->
     <!--                    <div class="btn" href="">2019</div>-->

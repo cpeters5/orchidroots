@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.apps import apps
 import random
 import string
+import logging
+logger = logging.getLogger(__name__)
 
 Genus = apps.get_model('orchiddb', 'Genus')
 Species = apps.get_model('orchiddb', 'Species')
@@ -37,6 +39,51 @@ def orchid_home(request):
         role = request.GET['role']
     context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'level': 'detail', 'tab': 'sum', }
     return render(request, 'orchid_home.html', context)
+
+
+def home(request):
+    randgenus = Genus.objects.exclude(status='synonym').extra(where=["num_spc_with_image + num_hyb_with_image > 0"]
+                                                              ).values_list('pid', flat=True).order_by('?')
+    # Number of visits to this view, as counted in the session variable.
+    # num_visits = request.session.get('num_visits', 0)
+    # request.session['num_visits'] = num_visits + 1
+    randimages = []
+    for e in randgenus:
+        if len(randimages) >= num_img:
+            break
+        if SpcImages.objects.filter(gen=e):
+            img = SpcImages.objects.filter(gen=e).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?'
+                                                                                                 )[0:1]
+            if img and len(img):
+                randimages.append(img[0])
+
+    random.shuffle(randimages)
+    role = 'pub'
+    if 'role' in request.GET:
+        role = request.GET['role']
+    context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'level': 'detail', 'tab': 'sum', }
+    return render(request, 'home.html', context)
+
+
+def deligate(request):
+    role = ''
+    pid = ''
+    send_url = ''
+    if 'role' in request.GET:
+        role = request.GET['role']
+    if 'pid' in request.GET:
+        pid = request.GET['pid']
+    if 'family' in request.GET:
+        family = request.GET['family']
+    if pid:
+        species = Species
+    if family == 'Orchidaceae':
+        send_url = '/detail/information/?pid=' + str(pid)
+    elif family == 'Bromeliaceae':
+        send_url = '/bromeliaceae/advanced/?role=' + role
+    logger.error("send_url = " + send_url + " - family = " + family)
+    return HttpResponseRedirect(send_url)
+
 
 
 def require_get(view_func):

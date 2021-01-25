@@ -1,0 +1,53 @@
+                    <h6 class="mb-0">Public vs Private Photos</h6>
+                    <div class="card-body">
+                        Uploaded photos are either public or private
+                        <ul>
+                            <li>Public photos are visible to all users. No login required. Private photos are visible to their owner.</li>
+                            <li>Uploaded photos will remain private until they are approved by a curator.  Once approved, they will be displayed in public view.</li>
+                            <li>Photo owners have an option to keep their photos private</li>
+                        </ul>
+                    </div>
+
+                    <h6 class="mb-0">
+                        Three Access levels
+                    </h6>
+                    <ul>
+                        <li><b>Basic view</b>: Anonymous Users can access public pages, search, browse images and detail pages.</li>
+                        <li><b>Private view</b>: Registered Users can access all features in the basic level including ability to upload and manage their own photos in their private album.
+                               Registered users can also view filtered lists of species and hybrids.</li>
+                        <li><b>Curate view</b>: Registered Curators can access all features in the private level including the ability to approve or reject private photos.  Curators can also
+                               reidentify a miss-identified photo and update information related to a species of hybrid.</li>
+                    </ul>
+
+                    <h6 class="mb-0">
+                          Improved Navigation
+                    </h6>
+                    <ul>
+                        <li>Home page: A number of random images that will jump directly to the detail page of the species or hybrids in the photo.  Useful for new users who just want to browse around.
+                        <li>Dropdown lists of genus, species and hybrids are now available in the navigation bar. From anywhere in the website, it is easy to find a species or hybrid and go directly
+                            to ites detail page using these dropdown lists.</li>
+                    </ul>
+
+                    <h6 class="mb-0">
+                        User Private Album
+                    </h6>
+                    User's private album shows all photos belonging users. To access private album, select "Private" button on the top of the page.  There are 5 different tabs in private album.
+                    <ul>
+                        <li>My collection tab: This tab contains random samples of each and every species/hybrid that has at least one photo submitted by the user</li>
+                        <li>Detail tab: Shows all photos of a species/hybrid submitted by the user.  Approved photos for public display are on the first half of the page.  Photos not approved are at the bottom half.
+                            We try to keep list short but large enough to cover all aspects of the orchid.
+                            Guidelines for photos acceptance will be available soon (?probably?) </li>
+                        <li>Private Photos: These photos were not approved for public access due to a number of factors, such as the quality of photo, incorrect or doubful identity,
+                            or there are already many photos submitted for the species. Photos can be approved pending for approval and photos uploaded by users.<br>
+                            This tab shows
+                            <ul>
+                                <li>The list of all species and hybrids on the right hand side of hte page.  The user has one or more photos in each orchid in hte list. Through thi slist,
+                                    user can access all of his/her photos in OrchidRoots</li>
+                                <li>Upload local file button:  Let user upload photos from phone or desktop.</li>
+                                <li>Upload from web button:  Let user upload photos from internet, including BlueNanta Group in Facebook</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    {% if user.tier.tier > 1 %}
+                        <a href="{% url 'documents:instructionupload' %}">How to upload a Photo</a>
+                    {% endif %}
