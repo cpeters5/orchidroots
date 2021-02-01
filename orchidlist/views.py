@@ -34,6 +34,7 @@ Intragen = apps.get_model('orchiddb', 'Intragen')
 Species = apps.get_model('orchiddb', 'Species')
 Hybrid = apps.get_model('orchiddb', 'Hybrid')
 Accepted = apps.get_model('orchiddb', 'Accepted')
+Synonym = apps.get_model('orchiddb', 'Synonym')
 
 Subgenus = apps.get_model('orchiddb', 'Subgenus')
 Section = apps.get_model('orchiddb', 'Section')
@@ -571,7 +572,7 @@ def species_list(request):
             status = 'accepted'
 
     if status == 'synonym':
-        mysubgenus, mysection, mysubsection, myseries, region, subregion = '', '', '', '', '', ''
+        mysubgenus, mysection, mysubsection, myseries = '', '', '', ''
 
     if request.GET.get('sort'):
         sort = request.GET['sort']
@@ -683,6 +684,7 @@ def species_list(request):
         year = int(year)
         this_species_list = this_species_list.filter(year=year)
 
+    pid_list = []
     if region_obj:
         pid_list = Distribution.objects.filter(region_id=region_obj.id).values_list('pid', flat=True).distinct()
         this_species_list = this_species_list.filter(pid__in=pid_list)
@@ -690,6 +692,10 @@ def species_list(request):
         pid_list = Distribution.objects.filter(subregion_code=subregion_obj.code). \
             values_list('pid', flat=True).distinct()
         this_species_list = this_species_list.filter(pid__in=pid_list)
+    if status == 'synonym':
+        pid_list = Synonym.objects.filter(acc_id__in=pid_list).values_list('spid', flat=True).distinct()
+        this_species_list = this_species_list.filter(pid__in=pid_list)
+
 
     if sort:
         if sort == 'classification':
@@ -704,14 +710,18 @@ def species_list(request):
 
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = \
         mypaginator(request, this_species_list, page_length, num_show)
+
+    region_list = Region.objects.exclude(id=0).order_by('name')
+    if region_obj:
+        subregion_list = Subregion.objects.filter(region=region_obj.id).order_by('name')
+    else:
+        subregion_list = Subregion.objects.all().order_by('name')
+
+
     if status == 'accepted':
-        region_list = Region.objects.exclude(id=0)
-        if region_obj:
-            subregion_list = Subregion.objects.filter(region=region_obj.id)
-        else:
-            subregion_list = Subregion.objects.all()
         subgenus_list = intragen_list.filter(subgenus__isnull=False).values_list('subgenus', 'subgenus'). \
             distinct().order_by('subgenus')
+
         if genus:
             subgenus_list = subgenus_list.filter(genus=genus)
         elif reqgenus:

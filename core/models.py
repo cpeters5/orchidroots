@@ -25,6 +25,7 @@ class Family(models.Model):
     author = models.CharField(max_length=200, null=True, blank=True)
     year = models.IntegerField(null=True)
     description = models.TextField(null=True)
+    source = models.CharField(max_length=20, null=True)
     active = models.BooleanField(null=True, default=False)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)

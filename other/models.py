@@ -305,6 +305,113 @@ class Species(models.Model):
         return None
 
 
+class Hybrid(models.Model):
+    pid = models.OneToOneField(
+        Species,
+        db_column='pid',
+        on_delete=models.DO_NOTHING,
+        primary_key=True)
+    gen = models.ForeignKey(Genus, db_column='gen', related_name='othhybgen', default=0, on_delete=models.DO_NOTHING)
+    source = models.CharField(max_length=10, null=True, blank=True)
+    genus = models.CharField(max_length=50, null=True, blank=True)
+    species = models.CharField(max_length=50, null=True, blank=True)
+    infraspr = models.CharField(max_length=20, null=True, blank=True)
+    is_hybrid = models.CharField(max_length=5, null=True, blank=True)
+    hybrid_type = models.CharField(max_length=20, null=True, blank=True)
+    infraspe = models.CharField(max_length=50, null=True, blank=True)
+    author = models.CharField(max_length=200, null=True, blank=True)
+    # seed_gen = models.BigIntegerField(null=True, blank=True)
+    seed_gen = models.ForeignKey(Genus, db_column='seedgen', related_name='othseedgen', null=True,
+                                 on_delete=models.DO_NOTHING)
+    seed_genus = models.CharField(max_length=50, null=True, blank=True)
+    seed_species = models.CharField(max_length=50, null=True, blank=True)
+    seed_type = models.CharField(max_length=10, null=True, blank=True)
+    seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='othseed_id', null=True, blank=True,
+                                on_delete=models.DO_NOTHING)
+    # pollen_gen = models.BigIntegerField(null=True, blank=True)
+    pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='othpollgen', null=True,
+                                   on_delete=models.DO_NOTHING)
+    pollen_genus = models.CharField(max_length=50, null=True, blank=True)
+    pollen_species = models.CharField(max_length=50, null=True, blank=True)
+    pollen_type = models.CharField(max_length=10, null=True, blank=True)
+    pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='othpollen_id', null=True, blank=True,
+                                  on_delete=models.DO_NOTHING)
+    year = models.IntegerField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, null=True, blank=True)
+    originator = models.CharField(max_length=100, null=True, blank=True)
+    user_id = models.ForeignKey(User, db_column='user_id', related_name='othuser_id', null=True, blank=True, on_delete=models.DO_NOTHING)
+
+    description = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    history = models.TextField(null=True, blank=True)
+    culture = models.TextField(null=True, blank=True)
+    etymology = models.TextField(null=True, blank=True)
+
+    num_image = models.IntegerField(null=True, blank=True)
+    num_ancestor = models.IntegerField(null=True, blank=True)
+    num_species_ancestor = models.IntegerField(null=True, blank=True)
+    num_descendant = models.IntegerField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.pid.name()
+
+    def registered_seed_name(self):
+        name = self.seed_id.name()
+        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+        return name
+
+    def registered_seed_name_short(self):
+        name = self.seed_id.abrevname()
+        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+        return name
+
+    # Used in hybrid-detail parents
+    def registered_pollen_name(self):
+        name = self.pollen_id.name()
+        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+        return name
+
+    def registered_pollen_name_short(self):
+        name = self.pollen_id.abrevname()
+        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+        return name
+
+    def registered_seed_name_long(self):
+        name = self.seed_id.name()
+        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
+        return name
+
+    def registered_pollen_name_long(self):
+        name = self.pollen_id.name()
+        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
+        return name
+
+    def seed_status(self):
+        if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
+            return 'syn'
+        return None
+
+    def pollen_status(self):
+        if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
+            return 'syn'
+        return None
+
+    def hybrid_type(self):
+        if self.is_hybrid:
+            return 'natural'
+        else:
+            return 'artificial'
+
+
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='poolpid',on_delete=models.DO_NOTHING)
     # pid = models.BigIntegerField(null=True, blank=True)

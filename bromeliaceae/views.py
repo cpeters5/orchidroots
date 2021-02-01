@@ -135,6 +135,16 @@ def genera(request):
         if valid_year(year):
             year_valid = 1
 
+    if 'genustype' in request.GET:
+        genustype = request.GET['genustype']
+    if not genustype:
+        genustype = 'ALL'
+
+    if 'formula1' in request.GET:
+        formula1 = request.GET['formula1']
+    if 'formula2' in request.GET:
+        formula2 = request.GET['formula2']
+
     # if 'formula1' in request.GET:
     #     formula1 = request.GET['formula1']
     # if 'formula2' in request.GET:
@@ -144,6 +154,8 @@ def genera(request):
         status = request.GET['status']
 
     genus_list = Genus.objects.all()
+    print(len(genus_list))
+
     if year_valid:
         year = int(year)
         genus_list = genus_list.filter(year=year)
@@ -153,6 +165,7 @@ def genera(request):
             genus_list = genus_list.filter(genus__icontains=genus)
         elif len(genus) < 2:
             genus_list = genus_list.filter(genus__istartswith=genus)
+    logger.error("genus = " + str(genus) + " genus lenght = " + str(len(genus_list)))
 
     if status == 'synonym':
         genus_list = genus_list.filter(status='synonym')
@@ -169,8 +182,9 @@ def genera(request):
             # If an intrageneric is chosen, start from beginning.
             genus_list = genus_list.filter(type='species').exclude(status='synonym')
     else:
-        if not genus:
-            genus_list = Genus.objects.none()
+        genustype = 'ALL'
+        #     genus_list = Genus.objects.none()
+    logger.error("year = " + str(year) + " genus lenght = " + str(len(genus_list)))
 
     if alpha and len(alpha) == 1:
         genus_list = genus_list.filter(genus__istartswith=alpha)
@@ -197,6 +211,7 @@ def genera(request):
     total = genus_list.count()
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
         = paginator(request, genus_list, page_length, num_show)
+    logger.error("genus = " + str(genus) + " page lenght = " + str(len(page_list)))
 
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
     context = {'my_list': page_list, 'total': total, 'genus_lookup': genus_lookup,

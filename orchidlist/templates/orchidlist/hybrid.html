@@ -144,7 +144,7 @@ td {
                 {% elif status == 'synonym' %} synonym only
                 {% endif%}
                 {{subtotal|intcomma}} of {{total|intcomma}})
-                <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:species' %}?role={{role}}&alpha=A&genus={{genus}}&status={{status}}">Go to Species List</a>
+                <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species List</a>
                 {% if subtotal > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
                     <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
                 {% endif %}
@@ -166,7 +166,6 @@ td {
                     <ul class="dropdown-menu scrollable-menu"  style="font-size: 11px;padding:5px;width:80px;">
                         <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=accepted&genus={{genus}}">Accepted</a></li>
                         <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=synonym&genus={{genus}}">Synonym</a></li>
-    <!--                    <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=&genus={{genus}}">All status</a></li>-->
                     </ul>
                 </div>
                 <button class="submit" form="genform">Submit</button>

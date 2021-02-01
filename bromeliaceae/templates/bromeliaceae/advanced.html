@@ -135,7 +135,7 @@ form {
                              <form action="{% url 'orchidlist:advanced' %}" id="genus" autocomplete="off">
                                 <input type="hidden" form="genus" name="role" value="{{ role }}" />
                                 <input list="genus_list" name="genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{genus|title}}" class="custom-select" placeholder="Enter a new genus" style="text-align:center">
-                                <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidlist:genera' %}?role={{role}}">List All Genera</a>
+                                <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'bromeliaceae:genera' %}?role={{role}}">List All Genera</a>
                                 <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidlist:browsegen' %}?role={{role}}&type=species&display=checked">Sample Images</a>
                             </form>
                             <datalist id="genus_list">

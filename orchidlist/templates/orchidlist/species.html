@@ -146,7 +146,7 @@ td {
                 {% if subsection_obj %}Subsection {{subsection_obj.subsection}}{% endif %}
                 {% if series_obj %}Series {{series_obj.series}}{% endif %}
                  ({% if status %}{{status}} species only {% endif %}{{subtotal|intcomma}} of {{total|intcomma}})
-                <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:hybrid' %}?role={{role}}&alpha=A&genus={{genus}}&status={{status}}">Go to Hybrid List</a>
+                <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid List</a>
                 {% if subtotal > 0 and genus %}
                     <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidlist:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
                 {% endif %}
@@ -259,7 +259,6 @@ td {
                             </div>
                        {% endif %}
 
-                       {% if region_obj %}
                         <div class="p-1 dropdown" data-toggle="tooltip" data-placement="top" title="Region">
                             <button class="dropdown-toggle button select-p2" type="button" data-toggle="dropdown">
                                 {% if region_obj and region_obj.region != 0 and region_obj.region != 1 %}<span style="color:black">{{region_obj.name}}</span>{% else %}Region{% endif %}
@@ -272,9 +271,7 @@ td {
                                 {% endfor %}
                             </ul>
                         </div>
-                        {% endif %}
 
-                        {% if subregion_obj %}
                         <div class="p-1 dropdown">
                             <button class="dropdown-toggle button select-p2" type="button" data-toggle="dropdown">
                                 {% if subregion_obj and subregion_obj.subregion != "All subregions" %}<span style="color:black">{{subregion_obj.name}}</span>{% else %}Subregion{% endif %}
@@ -287,7 +284,6 @@ td {
                                 {% endfor %}
                             </ul>
                         </div>
-                        {% endif %}
                        <!--Submit-->
                         <button class="submit" form="filter">Submit</button>
                     {% endif %}
@@ -303,7 +299,7 @@ td {
     <div class="card m-2">
 
     <!--Pagination        -->
-    {% if tota > 0 %}
+    {% if total > 0 %}
         {% include "orchidlist/alpha_list.html" %}
     {% endif %}
     {% if page_list %}

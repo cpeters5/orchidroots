@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 from django.apps import apps
 import random
 import string
@@ -15,6 +16,28 @@ SpcImages = apps.get_model('orchiddb', 'SpcImages')
 HybImages = apps.get_model('orchiddb', 'HybImages')
 Comment = apps.get_model('orchiddb', 'Comment')
 num_img = 20
+
+
+@require_GET
+def robots_txt(request):
+    lines = [
+        "User-Agent: *",
+        "Disallow: /accounts/",
+        "Disallow: /core/",
+        "Disallow: /documents/",
+        "Disallow: /detail/ancestor/",
+        "Disallow: /documents/",
+        "Disallow: /donations/",
+        "Disallow: /natural/",
+        "Disallow: /orchid/",
+        "Disallow: /orchidlite/",
+        "Disallow: /orchidlist/",
+        "Disallow: /orchiddb/",
+        "Disallow: /other/",
+        "Disallow: /search/",
+        "Disallow: /utils/",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 def orchid_home(request):
@@ -65,7 +88,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-def deligate(request):
+def dispatch(request):
     role = ''
     pid = ''
     send_url = ''
@@ -97,11 +120,3 @@ def require_get(view_func):
     return wrap
 
 
-@require_get
-def robots_txt(request):
-    lines = [
-        "User-Agent: *",
-        "Disallow: /private/",
-        "Disallow: /junk/",
-    ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")
