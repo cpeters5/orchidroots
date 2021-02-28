@@ -42,15 +42,18 @@
                       <td style="padding-left: 10px;"  class="text-left">
                           {% if species.0.status == 'synonym' %}
                               <i>{{species.0.genus}} {{species.0.species}}</i>{% if species.0.infraspr %} {{species.0.infraspr}} <i>{{species.0.infraspe}}</i>{% endif %}
-                                  ({% if species.0.year %}{{species.0.year}} {% endif %} syn.)
+                                  ({{species.0.source}} {{species.0.status}}  {{species.0.type }} {% if species.0.year %}{{species.0.year}} {% endif %})
                           {% elif species.0.type %}
                               {% if role == "cur" %}
                                   <a href="{% url 'detail:photos' species.0.pid %}?role={{role}}"><i>{{species.0.genus}} {{species.0.species}}</i>{% if species.0.infraspr %} {{species.0.infraspr}} <i>{{species.0.infraspe}}</i>{% endif %}</a>
                               {% else %}
                                   <a href="{% url 'detail:information' %}?pid={{species.0.pid}}&role={{role}}"><i>{{species.0.genus}} {{species.0.species}}</i>{% if species.0.infraspr %} {{species.0.infraspr}} <i>{{species.0.infraspe}}</i>{% endif %}</a>
                               {% endif %}
+                              ({{species.0.source}} {{species.0.status}}  {{species.0.type }}
                               {% if species.0.year %}
-                                  ({{species.0.year }})
+                                   {{species.0.year }})
+                              {% else %}
+                                    )
                               {% endif %}
                           {% endif %}
     <!--                      {{species.0.year}}-->

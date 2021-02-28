@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from orchiddb.models import UploadFile, Species, Accepted, Hybrid, SpcImages, HybImages, Genus
+from orchidaceae.models import UploadFile, Species, Accepted, Hybrid, SpcImages, HybImages, Genus
 from accounts.models import Photographer
 import copy
 

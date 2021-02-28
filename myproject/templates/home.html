@@ -144,7 +144,7 @@ img{
                     {% for image in randimagesspc %}
                         <div style="display:inline-block;">
                         <div class="imgcaption_top">
-                            <a href="{% url 'orchidlist:browse' %}?type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked"><i>{{image.pid.gen}}</i></a>
+                            <a href="{% url 'orchidaceae:browse' %}?type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked"><i>{{image.pid.gen}}</i></a>
                         </div>
                         <a href="{% url 'detail:information' %}?pid={{image.pid.pid_id}}&role={{role}}">
                             <div class="box">

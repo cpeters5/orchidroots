@@ -39,7 +39,7 @@ from utils.views import write_output
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
 from accounts.models import User, Profile
-# from orchidlist.views import mypaginator
+# from orchidaceae.views import mypaginator
 
 
 from django.apps import apps
@@ -50,28 +50,28 @@ Subtribe = apps.get_model('core', 'Subtribe')
 Region = apps.get_model('core', 'Region')
 Subregion = apps.get_model('core', 'Subregion')
 
-Genus = apps.get_model('orchiddb', 'Genus')
-GenusRelation = apps.get_model('orchiddb', 'GenusRelation')
-Intragen = apps.get_model('orchiddb', 'Intragen')
-Species = apps.get_model('orchiddb', 'Species')
-Hybrid = apps.get_model('orchiddb', 'Hybrid')
-Accepted = apps.get_model('orchiddb', 'Accepted')
-Synonym = apps.get_model('orchiddb', 'Synonym')
-Comment = apps.get_model('orchiddb', 'Comment')
+Genus = apps.get_model('orchidaceae', 'Genus')
+GenusRelation = apps.get_model('orchidaceae', 'GenusRelation')
+Intragen = apps.get_model('orchidaceae', 'Intragen')
+Species = apps.get_model('orchidaceae', 'Species')
+Hybrid = apps.get_model('orchidaceae', 'Hybrid')
+Accepted = apps.get_model('orchidaceae', 'Accepted')
+Synonym = apps.get_model('orchidaceae', 'Synonym')
+Comment = apps.get_model('orchidaceae', 'Comment')
 
-Subgenus = apps.get_model('orchiddb', 'Subgenus')
-Section = apps.get_model('orchiddb', 'Section')
-Subsection = apps.get_model('orchiddb', 'Subsection')
-Series = apps.get_model('orchiddb', 'Series')
-Distribution = apps.get_model('orchiddb', 'Distribution')
-SpcImages = apps.get_model('orchiddb', 'SpcImages')
-HybImages = apps.get_model('orchiddb', 'HybImages')
-UploadFile = apps.get_model('orchiddb', 'UploadFile')
-SpcImgHistory = apps.get_model('orchiddb', 'SpcImgHistory')
-HybImgHistory = apps.get_model('orchiddb', 'HybImgHistory')
+Subgenus = apps.get_model('orchidaceae', 'Subgenus')
+Section = apps.get_model('orchidaceae', 'Section')
+Subsection = apps.get_model('orchidaceae', 'Subsection')
+Series = apps.get_model('orchidaceae', 'Series')
+Distribution = apps.get_model('orchidaceae', 'Distribution')
+SpcImages = apps.get_model('orchidaceae', 'SpcImages')
+HybImages = apps.get_model('orchidaceae', 'HybImages')
+UploadFile = apps.get_model('orchidaceae', 'UploadFile')
+SpcImgHistory = apps.get_model('orchidaceae', 'SpcImgHistory')
+HybImgHistory = apps.get_model('orchidaceae', 'HybImgHistory')
 Photographer = apps.get_model('accounts', 'Photographer')
-AncestorDescendant = apps.get_model('orchiddb', 'AncestorDescendant')
-ReidentifyHistory = apps.get_model('orchiddb', 'ReidentifyHistory')
+AncestorDescendant = apps.get_model('orchidaceae', 'AncestorDescendant')
+ReidentifyHistory = apps.get_model('orchidaceae', 'ReidentifyHistory')
 MAX_HYB = 500
 imgdir = 'utils/images/'
 hybdir = imgdir + 'hybrid/'
@@ -81,8 +81,8 @@ logger = logging.getLogger(__name__)
 
 # Redirect to list or browse if species/hybrid does not exist.
 # TODO: Create a page for this
-redirect_message = "<br><br>Species does not exist! <br>You may try <a href='/orchidlist/species/'>" \
-                   "search species list</a> or <a href='/orchidlist/browsegen/?type=species'>browse species images.</a>"
+redirect_message = "<br><br>Species does not exist! <br>You may try <a href='/orchidaceae/species/'>" \
+                   "search species list</a> or <a href='/orchidaceae/browsegen/?type=species'>browse species images.</a>"
 
 
 @login_required
@@ -507,6 +507,19 @@ def quality_update(request, species):
     # return quality
 
 
+def getRole(request):
+    if request.user.is_authenticated:
+        if request.user.tier.tier < 2:
+            role = 'pub'
+        elif request.user.tier.tier == 2:
+            role = 'pri'
+        else:
+            role = 'cur'
+        if 'role' in request.GET:
+            role = request.GET['role']
+        return role
+
+
 def ancestor(request, pid=None):
     if not pid:
         if 'pid' in request.GET:
@@ -515,7 +528,7 @@ def ancestor(request, pid=None):
         else:
             pid = 0
 
-    role = 'pub'
+    role = getRole(request)
     if 'role' in request.GET:
         role = request.GET['role']
     sort = ''
@@ -564,7 +577,7 @@ def ancestor(request, pid=None):
             anc_list = anc_list.order_by('-aid__genus', '-aid__species')
 
     for x in anc_list:
-        x.anctype = "orchiddb:" + x.anctype
+        x.anctype = "orchidaceae:" + x.anctype
 
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
@@ -584,7 +597,7 @@ def ancestrytree(request, pid=None):
     else:
         pid = 0
 
-    role = 'pub'
+    role = getRole(request)
     if 'role' in request.GET:
         role = request.GET['role']
 
@@ -899,10 +912,7 @@ def requestlog(request, pid=None):
 def information(request, pid=None):
     distribution_list = ()
     ps_list = pp_list = ss_list = sp_list = seedimg_list = pollimg_list = ()
-    role = 'pub'
-    if request.user.is_authenticated:
-        if 'role' in request.GET:
-            role = request.GET['role']
+    role = getRole(request)
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
 
@@ -1244,7 +1254,7 @@ def progeny(request, pid):
         role = 'pri'
     try:
         species = Species.objects.get(pk=pid)
-        send_url = "/orchidlist/progeny/" + str(species.pid) + "/?role=" + role
+        send_url = "/orchidaceae/progeny/" + str(species.pid) + "/?role=" + role
         return HttpResponseRedirect(send_url)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
@@ -1258,14 +1268,13 @@ def progenyimg(request, pid):
         role = 'pri'
     try:
         species = Species.objects.get(pk=pid)
-        send_url = "/orchidlist/progenyimg/" + str(species.pid) + "/?role=" + role
+        send_url = "/orchidaceae/progenyimg/" + str(species.pid) + "/?role=" + role
         return HttpResponseRedirect(send_url)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
 
 
 def photos(request, pid=None):
-    role = ''
     author, author_list = get_author(request)
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
@@ -1278,6 +1287,7 @@ def photos(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
 
+    role = getRole(request)
     if 'role' in request.GET:
         role = request.GET['role']
     elif 'role' in request.POST:
@@ -1686,7 +1696,7 @@ def myphoto_browse_spc(request):
 @login_required
 def myphoto_browse_hyb(request):
     if not request.user.is_authenticated or request.user.tier.tier < 2:
-        send_url = "%s?tab=%s" % (reverse('orchidlist:browse'), 'sum')
+        send_url = "%s?tab=%s" % (reverse('orchidaceae:browse'), 'sum')
         return HttpResponseRedirect(send_url)
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
@@ -1879,7 +1889,10 @@ def approvemediaphoto(request, pid):
         species = Species.objects.get(pk=pid)
 
     # Only curator can approve
-    role = "cur"
+    role = getRole(request)
+    if role != "cur":
+        message = 'You do not have privilege to approve photos.'
+        return HttpResponse(message)
 
     if 'id' in request.GET:
         orid = request.GET['id']
@@ -1897,6 +1910,7 @@ def approvemediaphoto(request, pid):
         return HttpResponseRedirect(url)
 
     old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
 
     filename, ext = os.path.splitext(str(upl.image_file_path))
     # imgdir, filename = os.path.split(filename)
@@ -1922,6 +1936,7 @@ def approvemediaphoto(request, pid):
     new_name = os.path.join(newdir, image_file)
     if not os.path.exists(new_name + ext):
         try:
+            shutil.copy(old_name, tmp_name)
             shutil.move(old_name, new_name + ext)
         except shutil.Error:
             # upl.delete()
@@ -1936,6 +1951,7 @@ def approvemediaphoto(request, pid):
             x = os.path.join(newdir, image_file)
             if not os.path.exists(x):
                 try:
+                    shutil.copy(old_name, tmp_name)
                     shutil.move(old_name, x)
                 except shutil.Error:
                     upl.delete()

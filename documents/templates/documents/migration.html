@@ -26,7 +26,7 @@
 
             <div class="card mt-3">
                 <div class="card-header">
-                    <h6 class="card-title" style="margin-bottom: 0"><a href="{% url 'orchidlist:browse' %}?role={{role}}&type={{image.pid.pid.type}}&display=checked">OrchidRoots V.3.1 - 2020-10-01</a></h6>
+                    <h6 class="card-title" style="margin-bottom: 0"><a href="{% url 'orchidaceae:browse' %}?role={{role}}&type={{image.pid.pid.type}}&display=checked">OrchidRoots V.3.1 - 2020-10-01</a></h6>
                 </div>
 
                 <div class="card-body" style="padding:20px;">
@@ -35,7 +35,7 @@
                 The new development for R4 is accounts, allauth.account, and social media.
 
                 <ul>
-                    <li>Makesure the database is current. Compare and merge prod models file with beta model files for all apps (accounts and orchiddb).
+                    <li>Makesure the database is current. Compare and merge prod models file with beta model files for all apps (accounts and orchidaceae).
                         Then run makemigration and migrate to bring both schema to the same structure</li>
                     <li>Backup database and also Export to ~/db/yyyymmdd/</li>
                     <li>Restrore to a new database in new server</li>

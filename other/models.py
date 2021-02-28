@@ -11,7 +11,6 @@ from django.conf import settings
 
 from accounts.models import User, Photographer
 from core.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
-# from orchiddb.models import Family, Subfamily, Tribe, Subtribe, Subgenus, Section, Subsection, Series, Country, Region, Continent, SubRegion, LocalRegion
 import re
 import math
 

@@ -5,16 +5,17 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.apps import apps
+from detail.views import getRole
 import random
 import string
 import logging
 logger = logging.getLogger(__name__)
 
-Genus = apps.get_model('orchiddb', 'Genus')
-Species = apps.get_model('orchiddb', 'Species')
-SpcImages = apps.get_model('orchiddb', 'SpcImages')
-HybImages = apps.get_model('orchiddb', 'HybImages')
-Comment = apps.get_model('orchiddb', 'Comment')
+Genus = apps.get_model('orchidaceae', 'Genus')
+Species = apps.get_model('orchidaceae', 'Species')
+SpcImages = apps.get_model('orchidaceae', 'SpcImages')
+HybImages = apps.get_model('orchidaceae', 'HybImages')
+Comment = apps.get_model('orchidaceae', 'Comment')
 num_img = 20
 
 
@@ -28,13 +29,9 @@ def robots_txt(request):
         "Disallow: /detail/ancestor/",
         "Disallow: /documents/",
         "Disallow: /donations/",
-        "Disallow: /natural/",
-        "Disallow: /orchid/",
-        "Disallow: /orchidlite/",
-        "Disallow: /orchidlist/",
-        "Disallow: /orchiddb/",
         "Disallow: /other/",
         "Disallow: /search/",
+        "Disallow: /orchidaceae/",
         "Disallow: /utils/",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
@@ -57,7 +54,7 @@ def orchid_home(request):
                 randimages.append(img[0])
 
     random.shuffle(randimages)
-    role = 'pub'
+    role = getRole(request)
     if 'role' in request.GET:
         role = request.GET['role']
     context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'level': 'detail', 'tab': 'sum', }

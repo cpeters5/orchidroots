@@ -46,8 +46,8 @@
                         {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
                     </a>
                     <div class="nav2 dropdown-menu">
-                        <a class="dropdown-item" href="{% url 'orchidlist:progeny' species.pid %}?role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
-                        <a class="dropdown-item" href="{% url 'orchidlist:progenyimg' species.pid %}?role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
+                        <a class="dropdown-item" href="{% url 'orchidaceae:progeny' species.pid %}?role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
+                        <a class="dropdown-item" href="{% url 'orchidaceae:progenyimg' species.pid %}?role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
                     </div>
                 </li>
             {% if species.type == 'hybrid' %}

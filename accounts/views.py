@@ -18,6 +18,7 @@ from allauth.account.forms import UserTokenForm, SetPasswordForm
 from django.conf import settings
 from datetime import datetime
 from utils.views import write_output
+from detail.views import getRole
 
 from .forms import LoginForm, RegisterForm, GuestForm, ProfileForm, AddEmailForm 
 from .models import User, Profile, Photographer
@@ -39,9 +40,12 @@ def logout_page(request):
 
 # Will be replaced by the classbase LoginView when the bug is fixed
 def login_page(request):
+    logging.error(">>> " + request.get_host())
     if request.user.is_authenticated:
-        if request.user.tier.tier < 3:
+        if request.user.tier.tier == 2:
             return redirect("/?role=pri")
+        elif request.user.tier.tier < 2:
+            return redirect("/?role=pub")
         else:
             return redirect("/?role=cur")
 
@@ -58,7 +62,6 @@ def login_page(request):
         username = form.cleaned_data.get("username")
         password = form.cleaned_data.get("password")
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
             try:
                 del request.session['guest_email_id']
@@ -66,6 +69,8 @@ def login_page(request):
                 pass
             # update the redirect_path here
             if user.is_active:
+                role = user.tier.tier
+                write_output(request, role)
                 if user.email:
                     return perform_login(request, user, email_verification=settings.ACCOUNT_EMAIL_VERIFICATION,
                                          redirect_url=redirect_path)
@@ -74,13 +79,12 @@ def login_page(request):
                     return redirect('set_email')
 
             if is_safe_url(redirect_path, request.get_host()):
-                write_output(request)
+
             # if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
-                return redirect("/detail/myphoto_browse_spc/?role=pri&display=checked")
-                # return redirect(redirect_path)
+            #     return redirect("/detail/myphoto_browse_spc/?role=" + role + "&display=checked")
+                return redirect(redirect_path + "?role=" + role)
             else:
                 return redirect("/?role=pri")
-                # return redirect("dashboard/")
         else:
             message = "LOGIN FAIL:  Username: {} / password: {}".format(username, password)
             logger.error(message)

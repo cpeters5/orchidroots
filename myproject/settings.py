@@ -65,23 +65,24 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'session_cleanup',
     'django_crontab',
-    'robots',
     # 'rest_framework',
 
     #local
-    'core',  # Contains all global objects
-    'other',
-    'accounts',
-    'utils',
-    'orchiddb',
     'myproject',
-    'search',
-    'orchidlist',
-    'detail',
+    'accounts',
     'documents',
     'donation',
+    'search',
+    'utils',
+    'core',
+
     'bromeliaceae',
+    'detail',
+    'orchidaceae',
     'cactaceae',
+    'other',
+
+    # 'orchidlist',
     # 'catalog',
     # 'distribution',
 
@@ -92,6 +93,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'bootstrap_modal_forms',
     'crispy_forms',
+    'robots',
     'jquery',
 ]
 

@@ -25,7 +25,7 @@ Hybrid = apps.get_model('bromeliaceae', 'Hybrid')
 Accepted = apps.get_model('bromeliaceae', 'Accepted')
 SpcImages = apps.get_model('bromeliaceae', 'SpcImages')
 # HybImages = apps.get_model('bromeliaceae', 'HybImages')
-UploadFile = apps.get_model('orchiddb', 'UploadFile')
+UploadFile = apps.get_model('orchidaceae', 'UploadFile')
 User = get_user_model()
 alpha_list = config.alpha_list
 logger = logging.getLogger(__name__)
@@ -523,7 +523,7 @@ def species_list(request):
                'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
                'level': 'list', 'title': 'species_list', 'type': 'species'
                }
-    return render(request, 'orchidlist/species.html', context)
+    return render(request, 'bromeliaceae/species.html', context)
 
 
 @login_required
@@ -687,4 +687,4 @@ def hybrid_list(request):
                'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
                'level': 'list', 'title': 'hybrid_list',
                }
-    return render(request, 'orchidlist/hybrid.html', context)
+    return render(request, 'bromeliaceae/hybrid.html', context)

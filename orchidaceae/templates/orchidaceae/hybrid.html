@@ -1,0 +1,398 @@
+{% load static %}
+{% load humanize %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+
+@media only screen and (max-width: 1200px) {
+}
+
+@media only screen and (max-width: 400px) {
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;+
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+}
+
+a:hover {
+    /*text-decoration: none;*/
+    color: darkblue;
+}
+
+.button-a {
+    /*background-color: #eaeaea;*/
+    height:30px;
+    width: 150px;
+    border:1px solid #857f7f;
+    padding-top:3px;
+    color: #222d2d;
+    background-color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    margin: 4px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+  opacity: 1; /* Firefox */
+}
+
+
+::placeholder {
+  color: #bdaec6;
+  opacity: 1; /* Firefox */
+}
+
+.table-condensed{
+  font-size: 14px;
+}
+
+input {
+    text-align: center;
+    /*margin: 0 5px;*/
+    padding:0;
+    height:30px;
+    width: 150px;
+ }
+.scrollable-menu {
+    height: auto;
+    width:150px;
+    padding:5px;
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size:13px;
+    color: grey;
+    line-height:20px;
+}
+.p-2 {
+    /*padding:2px !important;*/
+}
+.submit {
+    height:30px;
+    width: 70px;
+    font-size:12px;
+    /*font-color:lightgrey;*/
+    text-align:center;
+    border:1px solid #ccc;
+    float: left;
+    margin: 4px;
+    background-color: #607951;
+    color:white;
+}
+
+.select-p2 {
+    font-size:13px;
+    color: #b9b9b9;
+    width:150px;
+    height:30px;
+    margin:0;
+    border:1px solid #768070;
+    padding:0;
+    background-color:white;
+}
+.card-body {
+    padding: 10px;
+}
+
+.dropdown {
+    display: inline-block;
+}
+td {
+    font-size: 13px;
+}
+</style>
+
+<br>
+<br>
+<div style="clear:both"></div>
+<div class="justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 95%; text-align:left">
+    <div class="card m-2">
+        <div class="card-header">
+            <h4>{{genus|title}} Hybrid (
+                {% if status == 'accepted' %} nonsynonym only
+                {% elif status == 'synonym' %} synonym only
+                {% endif%}
+                {{subtotal|intcomma}} of {{total|intcomma}})
+                <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species List</a>
+                {% if subtotal > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
+                    <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
+                {% endif %}
+            </h4>
+        </div>
+
+        <!--Filter-->
+        <div class="card-body d-flex flex-wrap">
+            <!--Genus-->
+            <form action="?" id="genform">
+                <input type="hidden" name="status" value="{{status}}" />
+                <input type="hidden" name="alpha" value="{{alpha}}" />
+                <input type="hidden" name="sort" value="{{sort}}" />
+                <input class="p-2 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard"/>
+                <div class="p-1 dropdown" data-toggle="tooltip" data-placement="top" title="status">
+                    <button class="dropdown-toggle button select-p2" type="button" data-toggle="dropdown">
+                        {% if status %}<span style="color:black">{{status}}</span>{% else %}Select status{% endif %}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu"  style="font-size: 11px;padding:5px;width:80px;">
+                        <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=accepted&genus={{genus}}">Accepted</a></li>
+                        <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=synonym&genus={{genus}}">Synonym</a></li>
+                    </ul>
+                </div>
+                <button class="submit" form="genform">Submit</button>
+            </form>
+        </div>
+
+        <div class="card-body d-flex flex-wrap">
+            {% if total > 0 %}
+            <!--            Others-->
+            <form action="?" id="filter">
+                <input type="hidden" name="alpha" value="{{alpha}}" />
+                <input type="hidden" name="sort" value="{{sort}}" />
+                <input type="hidden" name="genus" value="{{genus}}" />
+                <input type="hidden" name="status" value="{{status}}" />
+                 <!--Species-->
+                <input class="p-2 m-1" form="filter" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)"/>
+                <!--Year-->
+                <input class="p-2 m-1" form="filter" name="year" value='{{year}}' placeholder="Year" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="YYYY"/>
+                <!--Registrant-->
+                <input class="p-2 m-1" form="filter" name="author" value='{{author}}' placeholder="Registrant" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Registrant name match string"/>
+                <!--Originator-->
+                <input class="p-2 m-1" form="filter" name="originator" value='{{originator}}' placeholder="Originator" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Originator name match string"/>
+
+                <!--Seed genus-->
+                <select class="select-p2 m-1" form="filter" name="seed_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus from list">
+                    {% if not seed_genus %}
+                        <option selected disabled>Parent genus #1</option>
+                    {% endif %}
+                    <option>clear</option>
+
+                    {% for g in genus_list %}}
+                        {% if seed_genus == g %}
+                            <option selected="selected"><span style="color:red">{{g}}</span></option>
+                        {% else %}
+                            <option>{{g}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <!--Seed Parents-->
+                <input class="p-2 m-1" form="filter" name="seed" value='{{seed}}' data-toggle="tooltip" data-placement="bottom"  title="a parent species" placeholder="Parent sp. #1" onfocus="this.select()"/>
+
+                <!--Pollen Genus-->
+                <select class="select-p2 m-1" form="filter" name="pollen_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus from list">
+                    {% if not pollen_genus %}
+                    <option selected disabled><span style="color:grey">Parent genus #2</span></option>
+                    {% endif %}
+                    <option value="">clear</option>
+                    <option value="">clear</option>
+                    {% for g in genus_list %}
+                        {% if pollen_genus == g %}
+                            <option selected="selected" style="color:black">{{g}}</option>
+                        {% else %}
+                            <option>{{g}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <!--Pollen Parents-->
+                <input class="p-2 m-1" form="filter" name="pollen" value='{{pollen}}' data-toggle="tooltip" data-placement="bottom"  title="another parent species"  placeholder="Parent sp. #2" onfocus="this.select()"/>
+
+                <!--Submit-->
+                <button class="submit" form="filter" >Submit</button>
+            </form>
+            {% else %}
+                <div style="margin: 10px 0 0 10px;">No <i>{{genus|title}}</i> {{status}} hybrids! Please try {% if status == 'accepted' %}synonym{% else %}accepted{% endif %} status, or go to species, or select a different genus.</div>
+            {% endif %}
+        </div>
+
+        <!--Main table-->
+
+        <!--Pagination        -->
+        {% if my_list %}
+            {% include "orchidaceae/alpha_list.html" %}
+            {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
+            <!--main table-->
+            <div class="table mytable" style="">
+                <table class="table table-sm table-condensed table-bordered table-hover" id="myTable">
+                    <thead style="font-size:16px;">
+    {#                First column - All options#}
+                        <tr class="center" bgcolor="#e3e3e3">
+                            <td class="text-center">
+                            {% if sort == 'genus' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=genus&prev_sort={{sort}}"><b>Genus&uarr;</b></a>
+                            {% elif sort == '-genus' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=genus&prev_sort={{sort}}"><b>Genus&darr;</b></a>
+                            {% else %}
+                                <a data-toggle="tooltip" title="Click to sort by Genus" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=genus&prev_sort={{sort}}">Genus </a>
+                            {% endif %}
+                            -
+                            {% if sort == 'species' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=species&prev_sort={{sort}}"><b>Species&uarr;</b></a>
+                            {% elif sort == '-species' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=species&prev_sort={{sort}}"><b>Species&darr;</b></a>
+                            {% else %}
+                                <a data-toggle="tooltip" title="Click to sort by species" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=species&prev_sort={{sort}}">Species</a>
+                            {% endif %}
+                            -
+                            <i >registrant / originator</i>
+                            -
+                            {% if sort == 'year' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=year&prev_sort={{sort}}"><b>Year&uarr;</b></a>
+                            {% elif sort == '-year' %}
+                                <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=year&prev_sort={{sort}}"><b>Year&darr;</b></a>
+                            {% else %}
+                                <a data-toggle="tooltip" title="Click to sort by year" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=year&prev_sort={{sort}}">Year</a>
+                            {% endif %}
+                            </td>
+
+                            {%  if status == 'synonym' %}
+                                <th class="text-center">Accepted Name</th>
+                                {% if sort == 'num_image' %}
+                                    <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_image&prev_sort={{sort}}">#img&uarr;</a></th>
+                                {% elif sort == '-num_image' %}
+                                    <th class="d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_image&prev_sort={{sort}}">#img&darr;</a></th>
+                                {% else %}
+                                    <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of images" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=-num_image&prev_sort={{sort}}">#img</a></th>
+                                {% endif %}
+
+                            {% else %}
+                                <th class="text-center">Parentage</th>
+    <!--                            <th class="d-none d-sm-table-cell text-center">Combined ranks of ancestors</th>-->
+                                    {% if sort == 'num_ancestor' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_ancestor&prev_sort={{sort}}">Ancestors (sp.)&uarr;</a></th>
+                                    {% elif sort == '-num_ancestor' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_ancestor&prev_sort={{sort}}">Ancestors (sp.)&darr;</a></th>
+                                    {% else %}
+                                        <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of ancestors. Numbers in parenthesis are species type ancestors" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&year={{ year }}&sort=-num_ancestor&prev_sort={{sort}}">Ancestors (sp.)</a></th>
+                                    {% endif %}
+                                    {% if sort == 'num_descendant' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_descendant&prev_sort={{sort}}">Descen<br>dants&uarr;</a></th>
+                                    {% elif sort == '-num_descendant' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_descendant&prev_sort={{sort}}">Descen<br>dants&darr;</a></th>
+                                    {% else %}
+                                        <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of descendants" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=-num_descendant&prev_sort={{sort}}">Descen<br>dants</a></th>
+                                    {% endif %}
+                                    {% if sort == 'num_image' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_image&prev_sort={{sort}}">#img&uarr;</a></th>
+                                    {% elif sort == '-num_image' %}
+                                        <th class=" d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=num_image&prev_sort={{sort}}">#img&darr;</a></th>
+                                    {% else %}
+                                        <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of images" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&originator={{originator}}&parent={{parent}}&year={{ year }}&sort=-num_image&prev_sort={{sort}}">#img</a></th>
+                                    {% endif %}
+                            {% endif %}
+                        </tr>
+                    </thead>
+                        {% for spc in my_list %}
+                            <tr>
+                                <td align="left">
+                                    <a href="{% url 'detail:information' %}?pid={{spc.pid}}&role={{role}}"><i>{{spc.genus}}</i>
+                                        {% if spc.is_hybrid %}
+                                            <i>{{spc.get_species}}</i></a> {{spc.author}} {% if spc.originator %} / {{spc.originator}}{% endif %}</i>
+                                        {% else %}
+                                            {{spc.get_species}}</a> {{spc.author}} {% if spc.originator %} / {{spc.originator}}{% endif %}</i>
+                                        {% endif %}
+                                    {% if spc.year > 0 %}<span  style="font-size: 11px;">{{spc.year}}</span>{% endif %}
+                                </td>
+
+                                <td class="align-center">
+                                    {% if spc.status == 'synonym' %}
+                                    Synonym of <a href="{% url 'detail:information' %}?pid={{spc.getAccepted.pid}}&role={{role}}">{{spc.getAccepted.name|safe}}</a>
+                                    {% else %}
+                                        {% if spc.hybrid.seed_id.type == 'species' %}
+                                            {% if spc.hybrid.seed_id_id %}
+                                                <a href="{% url 'detail:information' %}?pid={{spc.hybrid.seed_id_id}}&role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
+                                            {% else %}
+                                                <a href="#">{{spc.hybrid.seed_id.abrevname|safe}}</a>
+                                            {% endif %}
+                                        {% elif spc.hybrid.seed_id.type == 'hybrid' %}
+                                            <a href="{% url 'detail:information' %}?pid={{spc.hybrid.seed_id_id}}&role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
+                                        {% else %}na
+                                        {% endif %}
+                                            ×
+                                        {% if spc.hybrid.pollen_id.type == 'species' %}
+                                            <a href="{% url 'detail:information' %}?pid={{spc.hybrid.pollen_id_id}}&role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
+                                        {% elif spc.hybrid.pollen_id.type == 'hybrid' %}
+                                            <a href="{% url 'detail:information' %}?pid={{spc.hybrid.pollen_id_id}}&role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
+                                        {% else %}na
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+
+                                    <!--<td class="d-none d-sm-table-cell ">{% if spc.intergenhybrid.subgenus %}{{spc.intergenhybrid.subgenus}}{% endif %}</td>-->
+    <!--                                <td class="d-none d-sm-table-cell ">-->
+    <!--                                    {% if spc.intergenhybrid.section %}{{spc.intergenhybrid.section}}{% endif %}</td>-->
+                                    <!--<td class="h d-none d-sm-table-cell">{% if spc.intergenhybrid.subsection %}{{spc.intergenhybrid.subsection}}{% endif %}</td>-->
+                                    <!--<td class="d-none d-sm-table-cell ">{% if spc.intergenhybrid.series %}{{spc.intergenhybrid.series}}{% endif %}</td>-->
+                                    <td class="d-none d-sm-table-cell text-center">
+                                        {% if spc.num_ancestor %}
+                                            <a href="{% url 'detail:ancestor' %}?pid={{spc.pid}}">{{spc.num_ancestor}}</a>
+                                        {% endif %}
+                                        {% if spc.num_species_ancestor %}({{spc.num_species_ancestor}}){% endif %}
+                                    </td>
+                                    <td class="d-none d-sm-table-cell text-center">
+                                        {% if spc.num_descendant %}
+                                        <a href="{% url 'orchidaceae:progeny' spc.pid %}">{{spc.num_descendant}}</a>
+                                        {% endif %}</td>
+                                    <td class="d-none d-sm-table-cell text-center">{% if spc.num_image %}{{spc.num_image}}{% endif %}</td>
+                                </tr>
+                        {% endfor %}
+                </table>
+            </div>
+            {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
+        {% endif %}
+</div>
+
+
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+
+<!--<script>-->
+<!--var acc = document.getElementsByClassName("accordion");-->
+<!--var i;-->
+
+<!--for (i = 0; i < acc.length; i++) {-->
+<!--  acc[i].onclick = function() {-->
+<!--    this.classList.toggle("active");-->
+<!--    var panel = this.nextElementSibling;-->
+<!--    if (panel.style.maxHeight){-->
+<!--      panel.style.maxHeight = null;-->
+<!--    } else {-->
+<!--      panel.style.maxHeight = panel.scrollHeight + "px";-->
+<!--    }-->
+<!--  }-->
+<!--}-->
+<!--</script>-->
+
+
+{% endblock %}

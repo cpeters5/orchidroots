@@ -50,8 +50,9 @@
                        {%  else %}
                            {{species.0.name}}
                        {% endif %}
+                       {{species.0.author}},
+                       {{species.0.source}} {{species.0.status}}
                        {% if species.0.year %}{{species.0.year}}{% endif %}
-                       ({{species.0.status}} {{species.0.type}})
                   </td>
 
                   <td>
@@ -76,7 +77,7 @@
                             {%  else %}
                                {{species.0.hybrid.seed_id.name}}
                            {%  endif %}
-                           x
+                           ×
                            {% if species.0.hybrid.pollen_id %}
                                {% if role == "cur" %}
                                    <a href="{% url 'detail:photos' species.0.hybrid.pollen_id.pid %}?role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>

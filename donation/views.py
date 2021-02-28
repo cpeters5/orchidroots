@@ -22,8 +22,8 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from accounts.models import User
 from detail.views import getmyphotos, get_random_img
-from orchidlist.views import mypaginator
-from orchiddb.models import Donation
+from orchidaceae.views import mypaginator
+from orchidaceae.models import Donation
 
 import stripe # new
 import json

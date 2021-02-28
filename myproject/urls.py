@@ -26,43 +26,49 @@ from accounts.views import  user_reset_password, login_page, register_page, Upda
 from myproject.views import orchid_home, home, robots_txt, dispatch
 
 urlpatterns = [
+    # Home page
     path('admin/', admin.site.urls),
     path("robots.txt", robots_txt),
-    path('', orchid_home, name='orchid_home'),
-    path('home/', home, name='home'),
-    path('dispatch', dispatch, name='dispatch'),
-
+    path('documents/', include('documents.urls')),
     # path('index/', index, name='index'),
+
+    # User accounts
+    path('accounts/', include('allauth.urls')),
     path('login/', login_page, name='login'),
     path('register/', register_page, name='register'),
     path('set_email/', SetEmailView.as_view(), name='set_email'),
     path('change_email/', ChangeEmailView.as_view(), name='change_email'),
     path('update_profile/', UpdateProfileView.as_view(), name='update_profile'),
     path('logout/', LogoutView.as_view(), {'next_page': '//'}, name='logout'),
+    path('donation/', include('donation.urls')),
     path('accounts/password/change/', PasswordChangeRedirect.as_view(), name="account_password_change"),
-    
     path('accounts/password/user_reset_password/', user_reset_password, name="user_account_reset_password"),
     re_path(
         r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
         CustomPasswordResetFromKeyView.as_view(),
         name="account_reset_password_from_key",
     ),
-    path('accounts/', include('allauth.urls')),
-    # path('password_reset/', include(password_reset.urls)),
 
+    # High level
+    path('', orchid_home, name='orchid_home'),
+    path('home/', home, name='home'),
+    path('dispatch', dispatch, name='dispatch'),
+    path('core/', include('core.urls')),
     path('search/', include('search.urls')),
-    path('orchidlist/', include('orchidlist.urls')),
-    path('detail/', include('detail.urls')),
-    path('documents/', include('documents.urls')),
-    path('donation/', include('donation.urls')),
-    path('bromeliaceae/', include('bromeliaceae.urls')),
+
+    # Family specific
     # path('cactaceae/', include('cactaceae.urls')),
+    path('bromeliaceae/', include('bromeliaceae.urls')),
+    path('orchidaceae/', include('orchidaceae.urls')),
+    path('detail/', include('detail.urls')),
 
-                  # old
-    path('natural/', include('natural.urls')),
-    path('orchid/', include('orchid.urls')),
-    path('orchidlite/', include('orchidlite.urls')),
+    # old
+    # path('orchidlist/', include('orchidlist.urls')),
+    # path('natural/', include('natural.urls')),
+    # path('orchid/', include('orchid.urls')),
+    # path('orchidlite/', include('orchidlite.urls')),
 
+    # Experiment
     # path('sendmail/', include('sendmail.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

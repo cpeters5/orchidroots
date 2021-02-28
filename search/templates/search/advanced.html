@@ -1,0 +1,459 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+.card {
+    background-color: white;
+}
+.card-header {
+    background-color:lightgrey;
+}
+
+.custom-select{
+    margin:1px 1px 1px 3px !important;
+    /*margin-right:200px;*/
+    /*background-color: #f9f9f9;*/
+    color: #100d0d;
+    /*margin-left:3px;*/
+    width:200px;
+    /*height:50px;*/
+    font-size:13px;
+    display: inline-block;
+}
+
+.card-subheader {
+    height: 40px;
+    margin: 20px 0;
+    background-color: #e9e9e9;
+}
+
+.custom-select:hover {
+    text-decoration: none;
+    /*background-color: #8887bd;*/
+    color: black;
+}
+
+.custom-select:active {
+    text-decoration: none;
+    background-color: #8887bd;
+    color: black;
+}
+
+.custom-link{
+    margin:1px 1px 1px 3px !important;
+    background-color: #f9f9f9;
+    color: #292929;
+    min-width:120px;
+    border: 1px solid lightgrey;
+    /*height:50px;*/
+    font-size:13px;
+    width: 200px !important;
+}
+
+.custom-link:hover {
+    padding:0;
+    margin:0 auto;
+    text-decoration: none;
+    background-color: #8887bd;
+    border: 1px solid lightgrey;
+}
+
+    @media only screen and (max-width: 600px) {
+    }
+    ul{
+        padding-left:15px;
+        /*font-size: 13px;*/
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:square;
+    }
+    li {
+            display: list-item;
+    }
+    .card-body {
+        font-size: 15px;
+        margin: 10px 5px;
+    }
+form {
+    display: inline-block; //Or display: inline;
+}
+.dropdown {
+    display:inline-block;
+}
+.dropdown-item {
+    width: 180px;
+}
+
+    .li-side {
+        list-style:none;
+        width:100%;
+        padding: 0 5px;
+    }
+
+.bannerfont {
+    font-size:14px;
+}
+.sidebtn {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    padding:5px;
+    border:1px solid darkgrey;
+}
+.family {
+    margin:2px 0;
+    width: 95%;
+    font-size:13px;
+    color: #272ba3;
+    background-color: #cbe5e5;
+    padding:5px;
+    border:1px solid darkgrey;
+}
+
+.btn {
+    width:95%;
+}
+.btn:hover {
+    background-color: #cad4f7 !important;
+    font-weight: bold;
+}
+.card-body {
+    padding:10px;
+}
+
+</style>
+<br>
+
+<div style="min-height:200px;background-color:white;">
+<!--<div style="min-height:200px;background-color:#495360;">-->
+   <div style="clear:both"></div>
+   <div class="row">
+        <div class="col-sm-8 col-lg-9 border" style="text-align:left;font-size:13px;">
+            <div class="card m-3 ">
+                <div class="card-header"><h6 class="card-title" style="margin-bottom: 0; color:green; font-size:24px;"><b>Family <i>{{f|title}}</i></b></h6></div>
+                <div class="card-body border-top"  style="display:inline-block">
+                    <div class="dropdown" style="display:inline-block;">
+                        <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{% if f %}<b>{{f}}</b>{% else %}Select a family{% endif %}</button>
+                        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            <a class="dropdown-item" href="{% url 'core:family' %}?role={{role}}"><b>All Families</b></a>
+                            {% for s in family_list %}
+                                <a class="dropdown-item" href="{% url 'search:advanced' %}?role={{role}}&f={{s.family}}">{{s.family}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dropdown" style="display:inline-block;">
+                        <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{% if sf %}<b>{{sf}}</b>{% else %}Select a subfamily{% endif %}</button>
+                        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            <a class="dropdown-item" href="{% url 'core:subfamily' %}?role={{role}}&f={{f}}"><b>All subfamilies</b></a>
+                            {% for s in subfamily_list %}
+                                <a class="dropdown-item" href="{% url 'search:advanced' %}?role={{role}}&f={{s.family}}&sf={{s.subfamily}}">{{s.family}} {{s.subfamily}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dropdown" style="display:inline-block;">
+                        <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{% if t %}<b>{{t}}</b>{% else %}Select a tribe{% endif %}</button>
+                        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            <a class="dropdown-item" href="{% url 'core:tribe' %}?role={{role}}&f={{f}}&sf={{sf}}"><b>All tribes</b></a>
+                            {% for s in tribe_list %}
+                                <a class="dropdown-item" href="{% url 'search:advanced' %}?role={{role}}&f={{s.family}}&sf={{s.subfamily}}&t={{s.tribe}}">{{s.subfamily}} {{s.tribe}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dropdown" style="display:inline-block;">
+                        <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{% if st %}<b>{{st}}</b>{% else %}Select a subtribe{% endif %}</button>
+                        <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                            <a class="dropdown-item" href="{% url 'core:subtribe' %}?role={{role}}&f={{f}}&sf={{sf}}&t={{t}}"><b>All subtribes</b></a>
+                            {% for s in subtribe_list %}
+                                <a class="dropdown-item" href="{% url 'search:advanced' %}?role={{role}}&f={{s.family}}&sf={{s.subfamily}}&t={{s.tribe}}&st={{s.subtribe}}">{{s.tribe}} {{s.subtribe}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dropdown" style="display:inline-block; width:100px;">
+                        {% if f %}
+                            {% if f == 'Orchidaceae' %}
+                                <a class="dropdown-item btn btn-outline-primary btn-xs select-p2" href="{% url 'orchidaceae:genera' %}?role={{role}}&genustype=species&sf={{sf}}&t={{t}}&st={{st}}">Genus list</a>
+                            {% elif f == 'Bromeliaceae' %}
+                                <a class="dropdown-item btn btn-outline-primary btn-xs select-p2" href="{% url 'bromeliaceae:genera' %}?role={{role}}&genustype=species&sf={{sf}}&t={{t}}&st={{st}}">Genus list</a>
+                            {% else %}
+                                <a class="dropdown-item btn btn-outline-primary btn-xs select-p2" href="#">Go to genus list</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+        <!--            GENUS-->
+            <div class="card m-3">
+                <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">{% if genus %} <span style="color:green; font-size:24px;"><b>Genus <i>{{genus|title}}</i></b></span>{% else %}Select a Genus{% endif %}</h6></div>
+                <div class="card-body">
+                     <form action="{% url 'search:advanced' %}" id="genus" autocomplete="off">
+                        <input type="hidden" form="genus" name="role" value="{{ role }}" />
+                        <input list="genus_list" name="genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{genus|title}}" class="custom-select" placeholder="Select a new genus" style="text-align:center">
+                    </form>
+                    <div class="custom-link" style="display:inline-block;">
+                        <form class="form-inline" action="{% url 'search:search_genus' %}">
+                            <input type="hidden" name="role" value="{{ role }}" />
+                            <input type="text" class="form-control border border-right-0 searchbox" style="width:200px;" name="search" value="" onfocus="this.select()" pattern=".{3,}" placeholder="Search for a genus" required title="Enter a keyword for genus.">
+                        </form>
+                    </div>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:genera' %}?role={{role}}">Genus List</a>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:browsegen' %}?role={{role}}&type=species&display=checked">Genus Images</a>
+                    <datalist id="genus_list">
+                        {% for g in genus_list %}
+                            <option value="{{g.genus}}">{{g.genus}}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                {% if genus and not species_list and not hybrid_list %}
+                    This genus has no species nor hybrid
+                {% elif genus %}
+                    {% if species_list %}
+                        <div class="card-header"><h7 class="card-title">{{genus}} Species / Hybrids</h7></div>
+                    {% endif %}
+                    <div class="card-body">
+                       {% if species_list %}
+                            <div class="dropdown" style="display:inline-block;">
+                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Species</button>
+                                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                    <a class="dropdown-item" href="{% url 'orchidaceae:species' %}?role={{role}}&genus={{genus}}"><span style="color:darkblue">All {{genus}} Species</span></a>
+                                    <a class="dropdown-item" href="{% url 'orchidaceae:browse' %}?role={{role}}&genus={{genus}}&type=species&display=checked"><span style="color:darkblue">Species Images</span></a>
+                                    <hr style="margin:0;padding:0;">
+                                    {% for s in species_list %}
+                                        <a class="dropdown-item" href="{% url 'detail:information' s.pid %}?role={{role}}">{{s.textname|safe}}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if hybrid_list %}
+                            <div class="dropdown" style="display:inline-block;">
+                                <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Hybrid</button>
+                                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                    <a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&genus={{genus}}"><span style="color:darkblue">All {{genus}} Hybrids</span></a>
+                                    <a class="dropdown-item" href="{% url 'orchidaceae:browse' %}?role={{role}}&genus={{genus}}&type=hybrid&display=checked"><span style="color:darkblue">Hybrid Images</span></a>
+                                    {% for s in hybrid_list %}
+                                        <a class="dropdown-item" href="{% url 'detail:information' s.pid %}?role={{role}}">{{s.textname|safe}}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if species_list %}
+                           <!-- Subgenus-->
+                            {% if subgenus_list.length > 1 %}
+                                <div class="dropdown" style="display:inline-block;">
+                                    <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Subgenera {{subgenus_list|length}}</button>
+                                    <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                        {% for s in subgenus_list %}
+                                            <a class="dropdown-item" href="{% url 'orchidaceae:species' %}?role={{role}}&subgenus={{s}}">{{s}}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if section_list %}
+                                <div class="dropdown" style="display:inline-block;">
+                                    <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Sections</button>
+                                    <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                        {% for s in section_list %}
+                                            <a class="dropdown-item" href="{% url 'orchidaceae:species' %}?role={{role}}&section={{s}}">{{s}}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if subsection_list.length > 1 %}
+                                <div class="dropdown" style="display:inline-block;">
+                                    <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Subections</button>
+                                    <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                        {% for s in subsection_list %}
+                                            <a class="dropdown-item" href="{% url 'orchidaceae:species' %}?role={{role}}&subsection={{s.subsection}}">{{s}}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if series_list.length > 1 %}
+                                <div class="dropdown" style="display:inline-block;">
+                                    <button class="custom-select btn-outline-primary btn-xs select-p2" data-toggle="dropdown">{{genus}} Series</button>
+                                    <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
+                                        {% for s in series_list %}
+                                            <a class="dropdown-item" href="{% url 'orchidaceae:species' %}?role={{role}}&series={{s.series}}">{{s}}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+               {% endif %}
+            </div>
+
+            <div class="card m-3">
+                <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Species</h6></div>
+                <div class="card-body border-top">
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?role={{role}}&type=species&display=checked"><i>{{genus}}</i> species images</a>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}">All Species</a>
+                </div>
+            </div>
+
+            <div class="card m-3">
+                <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Hybrids</h6></div>
+                <div class="card-body border-top">
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?role={{role}}&type=hybrid&display=checked"><i>{{genus}}</i> hybrid images</a>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}">All Hybrids</a>
+                </div>
+            </div>
+
+            {% if related_list %}
+                <div class="card m-3">
+                    <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Nothogenera Related to {{genus}}</h6></div>
+                    <div class="card-body border-top">
+                        {% for x in related_list %}
+                            <a class="btn btn-xs p-2 m-1 custom-link border" style="width:150px;" href="{% url 'search:advanced' %}?role={{role}}&genus={{x}}">{{x}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-none d-sm-block col-sm-4 col-lg-3" >
+            <div class="card" style="border:1px solid pink;">
+                <div class="card-body" >
+                    <ul style="padding-left:5px">
+            <!--                <li><a type="button" class="btn btn-outline-primary bannerfont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
+                        <li class="li-side"><span class="bannerfont" style="color:lightseagreen"><b>Plant Families</b></span></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'search:advanced' %}?family=orchidaceae">Orchidaceae</a></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'bromeliaceae:advanced' %}?family=bromeliaceae">Bromeliaceae</a></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="#">Cactaceae</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+   </div>
+</div>
+                <br>
+                <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

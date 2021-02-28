@@ -144,14 +144,11 @@ img{
             </div>
 
             <div class="card mt-3">
-<!--                <div class="card-header">-->
-<!--                    <h6 class="card-title" style="margin-bottom: 0"><a href="{% url 'orchidlist:browse' %}?role={{role}}&type={{image.pid.pid.type}}&display=checked">Browse Images</a></h6>-->
-<!--                </div>-->
                 <div class="card-body">
                     {% for image in randimages %}
                     {% if image.pid.pid.type == 'hybrid' %}
                         <div style="display:inline-block;">
-                        <a href="{% url 'orchidlist:browse' %}?role={{role}}&type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked">
+                        <a href="{% url 'orchidaceae:browse' %}?role={{role}}&type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="" src="/static/utils/images/hybrid/{{image.image_file}}">
 <!--                                <div class="text-c">{{image.pid.pid.speciesname|safe}}</div>-->
@@ -160,7 +157,7 @@ img{
                         </div>
                     {% else %}
                         <div style="display:inline-block;">
-                        <a href="{% url 'orchidlist:browse' %}?role={{role}}&type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked">
+                        <a href="{% url 'orchidaceae:browse' %}?role={{role}}&type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="" src="/static/utils/images/species/{{image.image_file}}">
                             </div>
