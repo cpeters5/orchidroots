@@ -149,6 +149,9 @@ td {
                     <a class="btn btn-xs btn-primary p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
                 {% endif %}
             </h4>
+            genus = {{genus}},
+            {% if seed_genus or seed %} parent #1 = {{seed_genus}} {{seed}}, {%endif %}
+            {% if pollen_genus or pollen %} parent #2 = {{pollen_genus}} {{pollen}} {%endif %}
         </div>
 
         <!--Filter-->
@@ -158,6 +161,8 @@ td {
                 <input type="hidden" name="status" value="{{status}}" />
                 <input type="hidden" name="alpha" value="{{alpha}}" />
                 <input type="hidden" name="sort" value="{{sort}}" />
+<!--                <input type="hidden" name="seed_genus" value="{{ seed_genus }}" />-->
+<!--                <input type="hidden" name="pollen_genus" value="{{ pollen_genus }}" />-->
                 <input class="p-2 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard"/>
                 <div class="p-1 dropdown" data-toggle="tooltip" data-placement="top" title="status">
                     <button class="dropdown-toggle button select-p2" type="button" data-toggle="dropdown">
@@ -180,6 +185,28 @@ td {
                 <input type="hidden" name="sort" value="{{sort}}" />
                 <input type="hidden" name="genus" value="{{genus}}" />
                 <input type="hidden" name="status" value="{{status}}" />
+                <input type="hidden" name="role" value="{{ role }}" />
+                <input type="hidden" name="seed_genus" value="{{ seed_genus }}" />
+                <input type="hidden" name="pollen_genus" value="{{ pollen_genus }}" />
+            </form>
+           <form action="?" id="seedgenus">
+                <input type="hidden" name="genus" value="{{genus}}" />
+                <input type="hidden" name="alpha" value="{{alpha}}" />
+                <input type="hidden" name="sort" value="{{sort}}" />
+                <input type="hidden" name="status" value="{{status}}" />
+                <input type="hidden" name="role" value="{{ role }}" />
+<!--                <input type="hidden" name="seed_genus" value="{{ seed_genus }}" />-->
+                <input type="hidden" name="pollen_genus" value="{{ pollen_genus }}" />
+            </form>
+           <form action="?" id="pollengenus">
+                <input type="hidden" name="genus" value="{{genus}}" />
+                <input type="hidden" name="alpha" value="{{alpha}}" />
+                <input type="hidden" name="sort" value="{{sort}}" />
+                <input type="hidden" name="status" value="{{status}}" />
+                <input type="hidden" name="role" value="{{ role }}" />
+                <input type="hidden" name="seed_genus" value="{{ seed_genus }}" />
+<!--                <input type="hidden" name="pollen_genus" value="{{ pollen_genus }}" />-->
+            </form>
                  <!--Species-->
                 <input class="p-2 m-1" form="filter" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)"/>
                 <!--Year-->
@@ -189,41 +216,56 @@ td {
                 <!--Originator-->
                 <input class="p-2 m-1" form="filter" name="originator" value='{{originator}}' placeholder="Originator" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Originator name match string"/>
 
-                <!--Seed genus-->
-                <select class="select-p2 m-1" form="filter" name="seed_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus from list">
-                    {% if not seed_genus %}
-                        <option selected disabled>Parent genus #1</option>
-                    {% endif %}
-                    <option>clear</option>
-
-                    {% for g in genus_list %}}
-                        {% if seed_genus == g %}
-                            <option selected="selected"><span style="color:red">{{g}}</span></option>
-                        {% else %}
-                            <option>{{g}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <!--Seed Parents-->
+                <input  class="p-2 m-1" form="seedgenus" list="genus_list" name="seed_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus">
+                    <datalist id="genus_list">
+                        {% for g in genus_list %}
+                            <option value="{{g}}">{{g}}</option>
+                        {% endfor %}
+                    </datalist>
                 <input class="p-2 m-1" form="filter" name="seed" value='{{seed}}' data-toggle="tooltip" data-placement="bottom"  title="a parent species" placeholder="Parent sp. #1" onfocus="this.select()"/>
 
+                <!--Seed genus-->
+<!--                <select class="select-p2 m-1" form="filter" name="seed_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus from list">-->
+<!--                    {% if not seed_genus %}-->
+<!--                        <option selected disabled>Parent genus #1</option>-->
+<!--                    {% endif %}-->
+<!--                    <option>clear</option>-->
+
+<!--                    {% for g in genus_list %}}-->
+<!--                        {% if seed_genus == g %}-->
+<!--                            <option selected="selected"><span style="color:red">{{g}}</span></option>-->
+<!--                        {% else %}-->
+<!--                            <option>{{g}}</option>-->
+<!--                        {% endif %}-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+                <!--Seed Parents-->
+
                 <!--Pollen Genus-->
-                <select class="select-p2 m-1" form="filter" name="pollen_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus from list">
-                    {% if not pollen_genus %}
-                    <option selected disabled><span style="color:grey">Parent genus #2</span></option>
-                    {% endif %}
-                    <option value="">clear</option>
-                    <option value="">clear</option>
-                    {% for g in genus_list %}
-                        {% if pollen_genus == g %}
-                            <option selected="selected" style="color:black">{{g}}</option>
-                        {% else %}
-                            <option>{{g}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <!--Pollen Parents-->
+                <input  class="p-2 m-1" form="pollengenus" list="genus_list" name="pollen_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus">
+                    <datalist id="genus_list">
+                        {% for g in genus_list %}
+                            <option value="{{g}}">{{g}}</option>
+                        {% endfor %}
+                    </datalist>
                 <input class="p-2 m-1" form="filter" name="pollen" value='{{pollen}}' data-toggle="tooltip" data-placement="bottom"  title="another parent species"  placeholder="Parent sp. #2" onfocus="this.select()"/>
+
+
+<!--                <select class="select-p2 m-1" form="filter" name="pollen_genus" class="form-control" tabindex="-1" aria-hidden="true" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus from list">-->
+<!--                    {% if not pollen_genus %}-->
+<!--                    <option selected disabled><span style="color:grey">Parent genus #2</span></option>-->
+<!--                    {% endif %}-->
+<!--                    <option value="">clear</option>-->
+<!--                    <option value="">clear</option>-->
+<!--                    {% for g in genus_list %}-->
+<!--                        {% if pollen_genus == g %}-->
+<!--                            <option selected="selected" style="color:black">{{g}}</option>-->
+<!--                        {% else %}-->
+<!--                            <option>{{g}}</option>-->
+<!--                        {% endif %}-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+                <!--Pollen Parents-->
 
                 <!--Submit-->
                 <button class="submit" form="filter" >Submit</button>
@@ -353,7 +395,7 @@ td {
                                     <!--<td class="d-none d-sm-table-cell ">{% if spc.intergenhybrid.series %}{{spc.intergenhybrid.series}}{% endif %}</td>-->
                                     <td class="d-none d-sm-table-cell text-center">
                                         {% if spc.num_ancestor %}
-                                            <a href="{% url 'detail:ancestor' %}?pid={{spc.pid}}">{{spc.num_ancestor}}</a>
+                                            <a href="{% url 'orchidaceae:ancestor' %}?pid={{spc.pid}}">{{spc.num_ancestor}}</a>
                                         {% endif %}
                                         {% if spc.num_species_ancestor %}({{spc.num_species_ancestor}}){% endif %}
                                     </td>
