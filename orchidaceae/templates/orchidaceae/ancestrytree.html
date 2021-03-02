@@ -172,10 +172,12 @@ right connector from last child*/
 .thumbnails3 {
    height: 8vw !important;
    width : 8vw !important;
-    border:1px solid lightgrey;
+    border:0 solid lightgrey;
     padding:0 !important;
     margin:0 !important;
 }
+
+
 /*.thumbnails4 {*/
 /*   height: 5vw !important;*/
 /*   width : 5vw !important;*/
@@ -230,11 +232,11 @@ right connector from last child*/
                                     <!--Seed branch-->
                                     <li>
                                         {% if s %}
-                                            <a class="fam" href="{% if s.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{s.pid.pid}}&role={{role}}">
+                                            <a href="{% if s.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{s.pid.pid}}&role={{role}}">
                                                 <img  class="thumbnails thumbnails3" src="{% static s.img %}" >
                                             </a>
                                             <div>
-                                                <a class="fam" href="{% url 'detail:information' %}?pid={{s.pid.pid}}&role={{role}}" style="border:0">
+                                                <a href="{% url 'detail:information' %}?pid={{s.pid.pid}}&role={{role}}" style="border:0">
                                                     {{s.pid.abrevname|safe}}<br>{% if s.year %}{{s.year}}{% else %}<br>{%endif %}
                                                 </a>
                                             </div>
@@ -245,11 +247,11 @@ right connector from last child*/
                                             <ul>
                                                 <li>
                                                     {% if ss %}
-                                                        <a class="fam" href="{% if ss.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ss.pid.pid}}&role={{role}}">
+                                                        <a href="{% if ss.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{ss.pid.pid}}&role={{role}}">
                                                                     <img class="thumbnails thumbnails3" src="{% static ss.img %}" >
                                                         </a>
                                                         <div>
-                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{ss.pid.pid}}&role={{role}}">
+                                                            <a href="{% url 'detail:information' %}?pid={{ss.pid.pid}}&role={{role}}" style="border:0">
                                                                 {{ss.pid.abrevname|safe}}<br>{% if ss.year %}{{ss.year}}{% else %}<br>{% endif %}
                                                             </a>
                                                         </div>
@@ -264,7 +266,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static sss.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{sss.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{sss.pid.pid}}&role={{role}}" style="border:0">
                                                                             <div>{{sss.pid.abrevname|safe}}<br>{% if sss.year %}{{sss.year}}{% else %}<br>{% endif %}</br></div>
                                                                         </a>
                                                                         </div>
@@ -278,7 +280,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static ssp.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{ssp.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{ssp.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{ssp.pid.abrevname|safe}}<br>{% if ssp.year %}{{ssp.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -295,7 +297,7 @@ right connector from last child*/
                                                                     <img class="thumbnails thumbnails3" src="{% static sp.img %}">
                                                         </a>
                                                         <div>
-                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{sp.pid.pid}}&role={{role}}" style="border:0">
+                                                            <a href="{% url 'detail:information' %}?pid={{sp.pid.pid}}&role={{role}}" style="border:0" style="border:0">
                                                                 {{sp.pid.abrevname|safe}}<br>{% if sp.year %}{{sp.year}}{% else %}<br>{% endif %}
                                                             </a>
                                                         </div>
@@ -310,7 +312,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static sps.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{sps.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{sps.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{sps.pid.abrevname|safe}}<br>{% if sps.year %}{{sps.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -324,7 +326,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static spp.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{spp.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{spp.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{spp.pid.abrevname|safe}}<br>{% if spp.year %}{{spp.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -343,10 +345,10 @@ right connector from last child*/
                                     <li>
                                         {% if p %}
                                             <a href="{% if p.type != 'hybrid' %}{% url 'detail:information' %}{% endif %}?pid={{p.pid.pid}}&role={{role}}">
-                                                        <img class="thumbnails thumbnails3" src="{% static p.img %}">
+                                                <img class="thumbnails thumbnails3" src="{% static p.img %}">
                                             </a>
                                             <div>
-                                                <a class="fam" href="{% url 'detail:information' %}?pid={{p.pid.pid}}&role={{role}}">
+                                                <a href="{% url 'detail:information' %}?pid={{p.pid.pid}}&role={{role}}" style="border:0">
                                                    {{p.pid.abrevname|safe}}<br>{% if p.pid.year %}{{p.pid.year}}{% else %}<br>{% endif %}
                                                 </a>
                                             </div>
@@ -361,7 +363,7 @@ right connector from last child*/
                                                                     <img class="thumbnails thumbnails3" src="{% static ps.img %}">
                                                         </a>
                                                         <div>
-                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{ps.pid.pid}}&role={{role}}">
+                                                            <a href="{% url 'detail:information' %}?pid={{ps.pid.pid}}&role={{role}}" style="border:0">
                                                                 {{ps.pid.abrevname|safe}}<br>{% if ps.year %}{{ps.year}}{% else %}<br>{% endif %}
                                                             </a>
                                                         </div>
@@ -376,7 +378,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static pss.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{pss.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{pss.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{pss.pid.abrevname|safe}}<br>{% if pss.year %}{{pss.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -391,7 +393,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static psp.img %}" >
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{psp.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{psp.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{psp.pid.abrevname|safe}}<br>{% if psp.year %}{{psp.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -409,7 +411,7 @@ right connector from last child*/
                                                                     <img class="thumbnails thumbnails3" src="{% static pp.img %}">
                                                         </a>
                                                         <div>
-                                                            <a class="fam" href="{% url 'detail:information' %}?pid={{pp.pid.pid}}&role={{role}}">
+                                                            <a href="{% url 'detail:information' %}?pid={{pp.pid.pid}}&role={{role}}" style="border:0">
                                                                 {{pp.pid.abrevname|safe}}<br>{% if pp.year %}{{pp.year}}{% else %}<br>{% endif %}
                                                             </a>
                                                         </div>
@@ -424,7 +426,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static pps.img %}">
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{pps.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{pps.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{pps.pid.abrevname|safe}}<br>{% if pss.year %}{{pps.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>
@@ -439,7 +441,7 @@ right connector from last child*/
                                                                                 <img class="thumbnails thumbnails3" src="{% static ppp.img %}" >
                                                                     </a>
                                                                     <div>
-                                                                        <a class="fam" href="{% url 'detail:information' %}?pid={{ppp.pid.pid}}&role={{role}}">
+                                                                        <a href="{% url 'detail:information' %}?pid={{ppp.pid.pid}}&role={{role}}" style="border:0">
                                                                             {{ppp.pid.abrevname|safe}}<br>{% if ppp.year %}{{ppp.year}}{% else %}<br>{% endif %}
                                                                         </a>
                                                                     </div>

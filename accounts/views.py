@@ -51,7 +51,7 @@ def login_page(request):
 
     form = LoginForm(request.POST or None)
     context = {
-        "form": form, 'namespace': 'accounts',
+        "form": form,
         # 'site_key': settings.RECAPTCHA_SITE_KEY,
     }
     next_ = request.GET.get('next')
@@ -121,7 +121,7 @@ def register_page(request):
         profile_form = ProfileForm()
 
     context = {
-        "user_form": user_form, "profile_form": profile_form, 'namespace': 'accounts',
+        "user_form": user_form, "profile_form": profile_form,
     }
     return render(request, "accounts/register.html", context)
 
@@ -145,7 +145,7 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'accounts/change_password.html', {
-        'form': form, 'namespace': 'accounts',
+        'form': form,
     })
 
 
@@ -224,7 +224,7 @@ class UpdateProfileView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) # this has all the form info
-        context.update({'namespace': 'accounts'})
+        context.update({})
 
         return context
 

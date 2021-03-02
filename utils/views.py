@@ -1,6 +1,8 @@
 from django.shortcuts import render
 import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +13,29 @@ def write_output(request, detail=None):
             message += ": " + detail
         logger.error(message)
         pass
+
+def imgdir():
+    imgdir = 'utils/images/'
+    hybdir = imgdir + 'hybrid/'
+    spcdir = imgdir + 'species/'
+    return imgdir, hybdir, spcdir
+
+# Return best image file for a species object
+def get_random_img(spcobj):
+    if spcobj.get_best_img():
+        spcobj.img = spcobj.get_best_img().image_file
+    else:
+        spcobj.img = 'noimage_light.jpg'
+    return spcobj.img
+
+
+def is_int(s):
+    try:
+        int(s)
+    except ValueError:
+        return False
+    return True
+
 
 def paginator(request, full_list, page_length, num_show):
     page_list = []
@@ -58,5 +83,34 @@ def paginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index: end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
+
+
+def getmyphotos(author, species):
+    # Get species and hybrid lists that the user has at least one photo
+    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
+    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+
+    upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    myspecies_list = myspecies_list.filter(Q(pid__in=upl_list) | Q(pid__in=spc_list)).order_by('genus', 'species')
+    myhybrid_list = myhybrid_list.filter(Q(pid__in=upl_list) | Q(pid__in=hyb_list)).order_by('genus', 'species')
+
+    if species:
+        upload_list = UploadFile.objects.filter(author=author).filter(pid=species.pid)  # Private photos
+        if species.type == 'species':
+            public_list = SpcImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
+        elif species.type == 'hybrid':
+            public_list = HybImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
+        else:
+            message = 'How did we get here???.'
+            return HttpResponse(message)
+
+        private_list = public_list.filter(rank=0)  # rejected photos
+        # public_list  = public_list.filter(rank__gt=0)    # rejected photos
+    else:
+        private_list = public_list = upload_list = []
+
+    return private_list, public_list, upload_list, myspecies_list, myhybrid_list
 
 # Create your views here.

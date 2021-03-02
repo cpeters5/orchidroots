@@ -31,7 +31,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output
+from utils.views import write_output, is_int, getmyphotos
 
 # import pytz
 # MPTT stuff
@@ -73,9 +73,6 @@ Photographer = apps.get_model('accounts', 'Photographer')
 AncestorDescendant = apps.get_model('orchidaceae', 'AncestorDescendant')
 ReidentifyHistory = apps.get_model('orchidaceae', 'ReidentifyHistory')
 MAX_HYB = 500
-imgdir = 'utils/images/'
-hybdir = imgdir + 'hybrid/'
-spcdir = imgdir + 'species/'
 list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
 
@@ -509,337 +506,17 @@ def quality_update(request, species):
 
 def getRole(request):
     if request.user.is_authenticated:
-        if request.user.tier.tier < 2:
-            role = 'pub'
-        elif request.user.tier.tier == 2:
-            role = 'pri'
-        else:
-            role = 'cur'
         if 'role' in request.GET:
             role = request.GET['role']
+        if not role:
+            if request.user.tier.tier < 2:
+                role = 'pub'
+            elif request.user.tier.tier == 2:
+                role = 'pri'
+            else:
+                role = 'cur'
         return role
-
-
-def ancestor(request, pid=None):
-    if not pid:
-        if 'pid' in request.GET:
-            pid = request.GET['pid']
-            pid = int(pid)
-        else:
-            pid = 0
-
-    role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
-    sort = ''
-    prev_sort = ''
-    state = ''
-    if request.GET.get('state'):
-        state = request.GET['state']
-        sort.lower()
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    genus = species.gen
-
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
-    # List of ancestors in the left panel
-    anc_list = AncestorDescendant.objects.filter(did=pid)
-
-    if sort:
-        if sort == 'pct':
-            anc_list = anc_list.order_by('-pct')
-        elif sort == '-pct':
-            anc_list = anc_list.order_by('pct')
-        elif sort == 'img':
-            anc_list = anc_list.order_by('-aid__num_image')
-        elif sort == '-img':
-            anc_list = anc_list.order_by('aid__num_image')
-        elif sort == 'name':
-            anc_list = anc_list.order_by('aid__genus', 'aid__species')
-        elif sort == '-name':
-            anc_list = anc_list.order_by('-aid__genus', '-aid__species')
-
-    for x in anc_list:
-        x.anctype = "orchidaceae:" + x.anctype
-
-    context = {'species': species, 'anc_list': anc_list,
-               'genus': genus,
-               'anc': 'active',
-               'sort': sort, 'prev_sort': prev_sort,
-               'level': 'detail', 'title': 'ancestor', 'role': role, 'namespace': 'detail', 'state': state,
-               }
-    write_output(request, species.textname())
-    return render(request, 'detail/ancestor.html', context)
-
-
-# All access - at least role = pub
-def ancestrytree(request, pid=None):
-    if not pid and 'pid' in request.GET:
-        pid = request.GET['pid']
-        pid = int(pid)
-    else:
-        pid = 0
-
-    role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    hybrid = species
-    s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = ssss = sssp = ssps = sspp = spss =\
-        spsp = spps = sppp = psss = pssp = psps = pspp = ppss = ppsp = ppps = pppp = None
-    spc = ''
-
-    if species.type == 'hybrid':
-        hybrid.img = hybdir + get_random_img(hybrid)
-
-        if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
-            s = Accepted.objects.get(pk=species.hybrid.seed_id)
-            s.type = 'species'
-            s.parent = 'seed'
-            s.year = s.pid.year
-            s.img = spcdir + get_random_img(s.pid)
-
-            # tree_list = tree_list + (s,)
-        elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
-            s = Hybrid.objects.get(pk=species.hybrid.seed_id)
-            s.type = 'hybrid'
-            s.parent = 'seed'
-            s.year = s.pid.year
-            img = s.pid.get_best_img()
-            if img:
-                s.img = hybdir + img.image_file
-            else:
-                s.img = imgdir + 'noimage_light.jpg'
-            # tree_list = tree_list + (s,)
-            # SS
-            if s and s.seed_id and s.seed_id.type == 'species':
-                ss = Accepted.objects.get(pk=s.seed_id)
-                ss.type = 'species'
-                ss.parent = 'seed'
-                ss.year = ss.pid.year
-                ss.img = spcdir + get_random_img(ss.pid)
-                # tree_list = tree_list + (ss,)
-            elif s.seed_id and s.seed_id.type == 'hybrid':
-                ss = Hybrid.objects.get(pk=s.seed_id)
-                ss.type = 'hybrid'
-                ss.parent = 'seed'
-                ss.year = s.pid.year
-                ss.img = hybdir + get_random_img(ss.pid)
-                # tree_list = tree_list + (ss,)
-                # SSS
-                if ss.seed_id and ss.seed_id.type == 'species':
-                    sss = Accepted.objects.get(pk=ss.seed_id)
-                    sss.type = 'species'
-                    sss.parent = 'seed'
-                    sss.year = sss.pid.year
-                    sss.img = spcdir + get_random_img(sss.pid)
-                    # tree_list = tree_list + (sss,)
-                elif ss.seed_id and ss.seed_id.type == 'hybrid':
-                    sss = Hybrid.objects.get(pk=ss.seed_id)
-                    sss.type = 'hybrid'
-                    sss.parent = 'seed'
-                    sss.year = sss.pid.year
-                    sss.img = hybdir + get_random_img(sss.pid)
-                else:
-                    s = None
-                # SSP
-                if ss.pollen_id and ss.pollen_id.type == 'species':
-                    ssp = Accepted.objects.get(pk=ss.pollen_id)
-                    ssp.type = 'species'
-                    ssp.parent = 'pollen'
-                    ssp.year = ssp.pid.year
-                    ssp.img = spcdir + get_random_img(ssp.pid)
-                    # tree_list = tree_list + (ssp,)
-                elif ss.pollen_id and ss.pollen_id.type == 'hybrid':
-                    ssp = Hybrid.objects.get(pk=ss.pollen_id)
-                    ssp.type = 'hybrid'
-                    ssp.parent = 'pollen'
-                    ssp.year = ssp.pid.year
-                    ssp.img = hybdir + get_random_img(ssp.pid)
-                    # tree_list = tree_list + (ssp,)
-                    # SSPS
-
-            if s and s.pollen_id and s.pollen_id.type == 'species':
-                sp = Accepted.objects.get(pk=s.pollen_id)
-                sp.type = 'species'
-                sp.parent = 'pollen'
-                sp.year = sp.pid.year
-                sp.img = spcdir + get_random_img(sp.pid)
-                # tree_list = tree_list + (sp,)
-            elif s and s.pollen_id and s.pollen_id.type == 'hybrid':
-                sp = Hybrid.objects.get(pk=s.pollen_id)
-                sp.type = 'hybrid'
-                sp.parent = 'seed'
-                sp.year = sp.pid.year
-                sp.year = sp.pid.year
-                sp.img = hybdir + get_random_img(sp.pid)
-                # tree_list = tree_list + (sp,)
-                if sp.seed_id and sp.seed_id.type == 'species':
-                    sps = Accepted.objects.get(pk=sp.seed_id)
-                    sps.type = 'species'
-                    sps.year = sps.pid.year
-                    sps.img = spcdir + get_random_img(sps.pid)
-                    # tree_list = tree_list + (sps,)
-                elif sp.seed_id and sp.seed_id.type == 'hybrid':
-                    sps = Hybrid.objects.get(pk=sp.seed_id)
-                    sps.type = 'hybrid'
-                    sps.year = sps.pid.year
-                    sps.img = hybdir + get_random_img(sps.pid)
-                    # tree_list = tree_list + (sps,)
-
-                if sp.pollen_id and sp.pollen_id.type == 'species':
-                    spp = Accepted.objects.get(pk=sp.pollen_id)
-                    spp.type = 'species'
-                    spp.year = spp.pid.year
-                    spp.img = spcdir + get_random_img(spp.pid)
-                    # tree_list = tree_list + (spp,)
-                elif sp.pollen_id and sp.pollen_id.type == 'hybrid':
-                    spp = Hybrid.objects.get(pk=sp.pollen_id)
-                    spp.type = 'hybrid'
-                    spp.year = spp.pid.year
-                    spp.img = hybdir + get_random_img(spp.pid)
-                    # tree_list = tree_list + (spp,)
-            # else:
-            #     s = ''
-        # P - pollenparent
-        if species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'species':
-            p = Accepted.objects.get(pk=species.hybrid.pollen_id)
-            p.type = p.pid.type
-            p.parent = 'pollen'
-            p.year = p.pid.year
-            p.img = spcdir + get_random_img(p.pid)
-            # tree_list = tree_list + (s,)
-        elif species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'hybrid':
-            p = Hybrid.objects.get(pk=species.hybrid.pollen_id)
-            p.type = 'hybrid'
-            p.parent = 'pollen'
-            p.year = p.pid.year
-            p.img = hybdir + get_random_img(p.pid)
-            # tree_list = tree_list + (s,)
-            # SS
-            if p.seed_id and p.seed_id.type == 'species':
-                ps = Accepted.objects.get(pk=p.seed_id)
-                ps.type = 'species'
-                ps.parent = 'seed'
-                ps.year = ps.pid.year
-                ps.img = spcdir + get_random_img(ps.pid)
-                # tree_list = tree_list + (ss,)
-            elif p.seed_id and p.seed_id.type == 'hybrid':
-                ps = Hybrid.objects.get(pk=p.seed_id)
-                ps.type = 'hybrid'
-                ps.parent = 'seed'
-                ps.year = ps.pid.year
-                ps.img = hybdir + get_random_img(ps.pid)
-                # tree_list = tree_list + (ss,)
-                # SSS
-                if ps.seed_id and ps.seed_id.type == 'species':
-                    pss = Accepted.objects.get(pk=ps.seed_id)
-                    pss.type = 'species'
-                    pss.parent = 'seed'
-                    pss.year = pss.pid.year
-                    pss.img = spcdir + get_random_img(pss.pid)
-                    # tree_list = tree_list + (sss,)
-                elif ps.seed_id and ps.seed_id.type == 'hybrid':
-                    pss = Hybrid.objects.get(pk=ps.seed_id)
-                    pss.type = 'hybrid'
-                    pss.parent = 'seed'
-                    pss.year = pss.pid.year
-                    pss.img = hybdir + get_random_img(pss.pid)
-                    # tree_list = tree_list + (sss,)
-                    # SSSS
-                # SSP
-                if ps.pollen_id and ps.pollen_id.type == 'species':
-                    psp = Accepted.objects.get(pk=ps.pollen_id)
-                    psp.type = 'species'
-                    psp.parent = 'pollen'
-                    psp.year = psp.pid.year
-                    psp.img = spcdir + get_random_img(psp.pid)
-                    # tree_list = tree_list + (ssp,)
-                elif ps.pollen_id and ps.pollen_id.type == 'hybrid':
-                    psp = Hybrid.objects.get(pk=ps.pollen_id)
-                    psp.type = 'hybrid'
-                    psp.parent = 'pollen'
-                    psp.year = psp.pid.year
-                    psp.img = hybdir + get_random_img(psp.pid)
-            # -- SP
-            if p.pollen_id and p.pollen_id.type == 'species':
-                pp = Accepted.objects.get(pk=p.pollen_id)
-                pp.type = 'species'
-                pp.parent = 'pollen'
-                pp.year = pp.pid.year
-                pp.img = spcdir + get_random_img(pp.pid)
-                # tree_list = tree_list + (sp,)
-            elif p.pollen_id and p.pollen_id.type == 'hybrid':
-                pp = Hybrid.objects.get(pk=p.pollen_id)
-                pp.type = 'hybrid'
-                pp.parent = 'pollen'
-                pp.year = pp.pid.year
-                pp.img = hybdir + get_random_img(pp.pid)
-                # tree_list = tree_list + (sp,)
-                if pp.seed_id and pp.seed_id.type == 'species':
-                    pps = Accepted.objects.get(pk=pp.seed_id)
-                    pps.type = 'species'
-                    pps.img = spcdir + get_random_img(pps.pid)
-                    pps.parent = 'seed'
-                    pps.year = pps.pid.year
-                    # tree_list = tree_list + (sps,)
-                elif pp.seed_id and pp.seed_id.type == 'hybrid':
-                    pps = Hybrid.objects.get(pk=pp.seed_id)
-                    pps.type = 'hybrid'
-                    pps.img = hybdir + get_random_img(pps.pid)
-                    pps.parent = 'seed'
-                    pps.year = pps.pid.year
-                    # tree_list = tree_list + (sps,)
-                if pp.pollen_id and pp.pollen_id.type == 'species':
-                    ppp = Accepted.objects.get(pk=pp.pollen_id)
-                    ppp.type = 'species'
-                    ppp.img = spcdir + get_random_img(ppp.pid)
-                    ppp.parent = 'pollen'
-                    ppp.year = ppp.pid.year
-                    # tree_list = tree_list + (spp,)
-                elif pp.pollen_id and pp.pollen_id.type == 'hybrid':
-                    ppp = Hybrid.objects.get(pk=pp.pollen_id)
-                    ppp.type = 'hybrid'
-                    ppp.img = hybdir + get_random_img(ppp.pid)
-                    ppp.parent = 'pollen'
-                    ppp.year = ppp.pid.year
-                    # tree_list = tree_list + (spp,)
-
-    context = {'species': species,
-               'spc': spc, 'tree': 'active',
-               's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
-               'ssss': ssss, 'sssp': sssp, 'ssps': ssps, 'sspp': sspp, 'spss': spss, 'spsp': spsp, 'spps': spps,
-               'sppp': sppp,
-               'p': p, 'ps': ps, 'pp': pp, 'pss': pss, 'psp': psp, 'pps': pps, 'ppp': ppp,
-               'psss': psss, 'pssp': pssp, 'psps': psps, 'pspp': pspp, 'ppss': ppss, 'ppsp': ppsp, 'ppps': ppps,
-               'pppp': pppp,
-               'level': 'detail', 'title': 'ancestrytree', 'role': role, 'namespace': 'detail',
-               }
-    write_output(request, species.textname())
-    return render(request, 'detail/ancestrytree.html', context)
+    return None
 
 
 def comment(request):
@@ -887,27 +564,19 @@ def comment(request):
         return HttpResponseRedirect('/')
 
 
-def is_int(s):
-    try:
-        int(s)
-    except ValueError:
-        return False
-    return True
-
-
-def requestlog(request, pid=None):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    print(request)
-
-    if pid:
-        logger.error(">>> pid = " + str(pid))
-    # logger.error(">>> method = " + request.method)
-    logger.error(">>> ip = " + ip + " - user = " + str(request.user) + " - url = " + request.build_absolute_uri())
-
+# def requestlog(request, pid=None):
+#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+#     if x_forwarded_for:
+#         ip = x_forwarded_for.split(',')[0]
+#     else:
+#         ip = request.META.get('REMOTE_ADDR')
+#     print(request)
+#
+#     if pid:
+#         logger.error(">>> pid = " + str(pid))
+#     # logger.error(">>> method = " + request.method)
+#     logger.error(">>> ip = " + ip + " - user = " + str(request.user) + " - url = " + request.build_absolute_uri())
+#
 
 def information(request, pid=None):
     distribution_list = ()
@@ -1046,7 +715,7 @@ def information(request, pid=None):
                'ancspc_list': ancspc_list, 'offspring_list': offspring_list, 'offspring_count': offspring_count,
                'offspring_test': offspring_test, 'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'level': 'detail', 'role': role, 'namespace': 'detail',
+               'level': 'detail', 'role': role,
                }
     return render(request, 'detail/information.html', context)
 
@@ -1090,17 +759,8 @@ def comments(request):
         role = 'pub'
 
     write_output(request)
-    context = {'comment_list': comment_list, 'sort': sort, 'role': role, 'namespace': 'detail', }
+    context = {'comment_list': comment_list, 'sort': sort, 'role': role,}
     return render(request, 'detail/comments.html', context)
-
-
-# Return best image file for a species object
-def get_random_img(spcobj):
-    if spcobj.get_best_img():
-        spcobj.img = spcobj.get_best_img().image_file
-    else:
-        spcobj.img = 'noimage_light.jpg'
-    return spcobj.img
 
 
 @login_required
@@ -1120,7 +780,7 @@ def curate_newupload(request):
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'level': 'detail', 'title': 'curate_newupload', 'section': 'Curator Corner', 'namespace': 'detail',
+               'level': 'detail', 'title': 'curate_newupload', 'section': 'Curator Corner',
                }
     return render(request, 'detail/curate_newupload.html', context)
 
@@ -1169,7 +829,7 @@ def curate_pending(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'level': 'detail', 'title': title, 'namespace': 'detail',
+               'level': 'detail', 'title': title,
                }
     return render(request, 'detail/curate_pending.html', context)
 
@@ -1231,47 +891,9 @@ def curate_newapproved(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'level': 'detail', 'title': 'curate_newapproved', 'namespace': 'detail',
+               'level': 'detail', 'title': 'curate_newapproved',
                }
     return render(request, 'detail/curate_newapproved.html', context)
-
-
-@login_required
-def curate(pid):
-    try:
-        species = Species.objects.get(pk=pid)
-        send_url = "/detail/photos/" + str(species.pid) + "/?role=cur"
-        return HttpResponseRedirect(send_url)
-    except Species.DoesNotExist:
-        return HttpResponse(redirect_message)
-
-
-@login_required
-def progeny(request, pid):
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        role = 'pri'
-    try:
-        species = Species.objects.get(pk=pid)
-        send_url = "/orchidaceae/progeny/" + str(species.pid) + "/?role=" + role
-        return HttpResponseRedirect(send_url)
-    except Species.DoesNotExist:
-        return HttpResponse(redirect_message)
-
-
-@login_required
-def progenyimg(request, pid):
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        role = 'pri'
-    try:
-        species = Species.objects.get(pk=pid)
-        send_url = "/orchidaceae/progenyimg/" + str(species.pid) + "/?role=" + role
-        return HttpResponseRedirect(send_url)
-    except Species.DoesNotExist:
-        return HttpResponse(redirect_message)
 
 
 def photos(request, pid=None):
@@ -1287,11 +909,10 @@ def photos(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
 
-    role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
-    elif 'role' in request.POST:
+    if 'role' in request.POST:
         role = request.POST['role']
+    else:
+        role = getRole(request)
 
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
@@ -1366,7 +987,7 @@ def photos(request, pid=None):
                    'variety': variety, 'pho': 'active', 'tab': 'pho',
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-                   'level': 'detail', 'role': role, 'title': 'photos', 'namespace': 'detail',
+                   'level': 'detail', 'role': role, 'title': 'photos',
                    }
 
         return render(request, 'detail/myphoto.html', context)
@@ -1375,7 +996,7 @@ def photos(request, pid=None):
                    'variety': variety, 'pho': 'active', 'tab': 'pho',
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-                   'level': 'detail', 'role': role, 'title': 'photos', 'namespace': 'detail',
+                   'level': 'detail', 'role': role, 'title': 'photos',
                    }
         return render(request, 'detail/photos.html', context)
 
@@ -1390,9 +1011,7 @@ def curateinfospc(request, pid):
     tab = 'ins'
     if 'tab' in request.GET:
         tab = request.GET['tab']
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     distribution_list = Distribution.objects.filter(pid=species.pid)
     if request.method == 'POST':
@@ -1438,7 +1057,7 @@ def curateinfospc(request, pid):
         form = AcceptedInfoForm(instance=accepted)
         context = {'form': form, 'genus': genus, 'species': species,
                    'title': 'curateinfo', 'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
-                   'level': 'detail', 'role': role, 'namespace': 'detail', }
+                   'level': 'detail', 'role': role,}
         return render(request, 'detail/curateinfospc.html', context)
 
 
@@ -1513,7 +1132,7 @@ def curateinfohyb(request, pid):
 
         context = {'form': form, 'spcform': spcform, 'genus': genus, 'species': species,
                    'tab': 'inh', tab: 'active', 'level': 'detail', 'title': 'curateinfo', 'role': role,
-                   'namespace': 'detail', }
+                   }
         return render(request, 'detail/curateinfohyb.html', context)
 
 
@@ -1613,7 +1232,7 @@ def reidentify(request, orid, pid):
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
             url = "%s?role=%s" % (reverse('detail:photos', args=(new_species.pid,)), role)
             return HttpResponseRedirect(url)
-    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'namespace': 'detail', }
+    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
     return render(request, 'detail/reidentify.html', context)
 
 
@@ -1644,7 +1263,7 @@ def myphoto(request, pid):
     context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
                'pri': 'active', 'role': 'pri', 'author': author,
-               'level': 'detail', 'title': 'myphoto', 'namespace': 'detail',
+               'level': 'detail', 'title': 'myphoto',
                }
     write_output(request, str(species.textname()))
     return render(request, 'detail/myphoto.html', context)
@@ -1687,7 +1306,7 @@ def myphoto_browse_spc(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,
-               'level': 'detail', 'title': 'myphoto_browse', 'namespace': 'detail',
+               'level': 'detail', 'title': 'myphoto_browse',
                }
     write_output(request)
     return render(request, 'detail/myphoto_browse_spc.html', context)
@@ -1735,39 +1354,10 @@ def myphoto_browse_hyb(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,
-               'level': 'detail', 'title': 'myphoto_browse', 'namespace': 'detail',
+               'level': 'detail', 'title': 'myphoto_browse',
                }
     write_output(request)
     return render(request, 'detail/myphoto_browse_hyb.html', context)
-
-
-def getmyphotos(author, species):
-    # Get species and hybrid lists that the user has at least one photo
-    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
-    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
-
-    upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    myspecies_list = myspecies_list.filter(Q(pid__in=upl_list) | Q(pid__in=spc_list)).order_by('genus', 'species')
-    myhybrid_list = myhybrid_list.filter(Q(pid__in=upl_list) | Q(pid__in=hyb_list)).order_by('genus', 'species')
-
-    if species:
-        upload_list = UploadFile.objects.filter(author=author).filter(pid=species.pid)  # Private photos
-        if species.type == 'species':
-            public_list = SpcImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
-        elif species.type == 'hybrid':
-            public_list = HybImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
-        else:
-            message = 'How did we get here???.'
-            return HttpResponse(message)
-
-        private_list = public_list.filter(rank=0)  # rejected photos
-        # public_list  = public_list.filter(rank__gt=0)    # rejected photos
-    else:
-        private_list = public_list = upload_list = []
-
-    return private_list, public_list, upload_list, myspecies_list, myhybrid_list
 
 
 @login_required
@@ -1913,7 +1503,6 @@ def approvemediaphoto(request, pid):
     tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
 
     filename, ext = os.path.splitext(str(upl.image_file_path))
-    # imgdir, filename = os.path.split(filename)
     if species.type == 'species':
         spc = SpcImages(pid=species.accepted, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                         source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
@@ -1990,11 +1579,12 @@ def uploadfile(request, pid):
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
-    role = 'pri'
-    if 'role' in request.GET:
-        role = request.GET['role']
-    elif 'role' in request.POST:
+    if 'role' in request.POST:
         role = request.POST['role']
+    else:
+        role = getRole(request)
+    if not role:
+        return HttpResponseRedirect('/')
 
     form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
 
@@ -2021,7 +1611,7 @@ def uploadfile(request, pid):
 
     context = {'form': form, 'species': species, 'web': 'active', 'level': 'detail',
                'author_list': author_list, 'author': author,
-               'role': role, 'namespace': 'detail', 'title': 'uploadfile'}
+               'role': role, 'title': 'uploadfile'}
     return render(request, 'detail/uploadfile.html', context)
 
 
@@ -2139,7 +1729,7 @@ def uploadweb(request, pid, orid=None):
 
     context = {'form': form, 'img': img, 'sender': sender,
                'species': species, 'loc': 'active',
-               'role': role, 'level': 'detail', 'namespace': 'detail', 'title': 'uploadweb'}
+               'role': role, 'level': 'detail', 'title': 'uploadweb'}
     return render(request, 'detail/uploadweb.html', context)
 
 

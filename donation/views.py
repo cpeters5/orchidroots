@@ -21,7 +21,7 @@ from itertools import chain
 from django.utils import timezone
 from datetime import datetime, timedelta
 from accounts.models import User
-from detail.views import getmyphotos, get_random_img
+from utils.views import get_random_img, getmyphotos
 from orchidaceae.views import mypaginator
 from orchidaceae.models import Donation
 
@@ -66,7 +66,7 @@ def charge(request): # new
             description='Donation Charge',
             source=request.POST['stripeToken']
         )
-        context = {'amount_display':amount_display,'namespace':'donation',}
+        context = {'amount_display':amount_display}
         return render(request, 'donation/charge.html',context)
 
     return HttpResponseRedirect('/')
@@ -116,7 +116,6 @@ class ThankYouView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['namespace'] = 'donation'
 
         donateamt = kwargs['donateamt']
         if donateamt:

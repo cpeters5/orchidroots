@@ -46,11 +46,10 @@
                           {% else %}
                                <a href="{% url 'detail:information' %}?pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
                           {% endif %}
-                            {% if species.author %}<i>{{species.author}}</i>{% endif %}
                        {%  else %}
                            {{species.0.name}}
                        {% endif %}
-                       {{species.0.author}},
+                       {% if species.0.author %}{{species.0.author}},{% endif %}
                        {{species.0.source}} {{species.0.status}}
                        {% if species.0.year %}{{species.0.year}}{% endif %}
                   </td>
