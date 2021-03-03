@@ -56,8 +56,8 @@
                         {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
                     </a>
                     <div class="nav2 dropdown-menu">
-                        <a class="dropdown-item" href="{% url 'orchidaceae:ancestor' %}?pid={{species.pid}}&role={{role}}&tab=anc"><span style="color:#575757;;">Ancestry list</span></a>
-                        <a class="dropdown-item" href="{% url 'orchidaceae:ancestrytree' %}?pid={{species.pid}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
+                        <a class="dropdown-item" href="{% url 'orchidaceae:ancestor' species.pid %}?tab=anc"><span style="color:#575757;;">Ancestry list</span></a>
+                        <a class="dropdown-item" href="{% url 'orchidaceae:ancestrytree' species.pid %}?tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
                     </div>
 
                 </li>
