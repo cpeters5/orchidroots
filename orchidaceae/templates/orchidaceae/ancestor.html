@@ -58,38 +58,38 @@
                     <tr  style="background-color: #f2f2f2">
                         <th class="border-lb text-left">
                         {% if sort == 'name' %}
-                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_upward</i></a>
+                            <a href="?sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_upward</i></a>
                         {% elif sort == '-name' %}
-                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_downward</i></a>
+                            <a href="?sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors <i class="material-icons" style="font-size:16px;">arrow_downward</i></a>
                         {% else %}
-                            <a href="?pid={{species.pid}}&sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors </a>
+                            <a href="?sort=name&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Ancestors </a>
                         {% endif %}
                         <span> (total {{anc_list.count}})</span>
                         </th>
                         {% if sort == 'pct' %}
                         <th class="border-rb text-center">
-                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
+                            <a href="?sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
                         {% elif sort == '-pct' %}
                         <th class="border-rb text-center">
-                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
+                            <a href="?sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
                         {% else %}
                         <th class="border-rb text-center">
-                            <a href="?pid={{species.pid}}&sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% </a></th>
+                            <a href="?sort=pct&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">% </a></th>
                         {% endif %}
                         {% if sort == 'img' %}
                         <th class="border-lb text-center">
-                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
+                            <a href="?sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_upward</i></a></th>
                         {% elif sort == '-img' %}
                         <th class="border-lb text-center">
-                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
+                            <a href="?sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img <i class="material-icons" style="font-size:16px;">arrow_downward</i></a></th>
                         {% else %}
                         <th class="border-rb text-center">
-                            <a href="?pid={{species.pid}}&sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img </a></th>
+                            <a href="?sort=img&prev_sort={{sort}}&genus={{species.genus}}&spc={{spc}}&type={{type}}">Img </a></th>
                         {% endif %}
                     </tr>
                     {% for anc in anc_list %}
                     <tr class="center">
-                        <td class="border-rb" style="text-align: left"><a href="{% url 'detail:information' %}?pid={{anc.aid.pid}}&role={{role}}">{{anc.aid.name|safe}}</a></td>
+                        <td class="border-rb" style="text-align: left"><a href="{% url 'detail:information' anc.aid.pid %}?role={{role}}">{{anc.aid.name|safe}}</a></td>
                         <td class="border-rb" style="text-align: right">{{anc.prettypct}}%</td>
                         <td class="border-rb " style="text-align: center">
                         {% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}

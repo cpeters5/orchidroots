@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.apps import apps
-from detail.views import getRole
+from utils.views import getRole
 import random
 import string
 import logging
@@ -55,8 +55,6 @@ def orchid_home(request):
 
     random.shuffle(randimages)
     role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
     context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'level': 'detail', 'tab': 'sum', }
     return render(request, 'orchid_home.html', context)
 
@@ -78,19 +76,15 @@ def home(request):
                 randimages.append(img[0])
 
     random.shuffle(randimages)
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'level': 'detail', 'tab': 'sum', }
     return render(request, 'home.html', context)
 
 
 def dispatch(request):
-    role = ''
     pid = ''
     send_url = ''
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     if 'pid' in request.GET:
         pid = request.GET['pid']
     if 'family' in request.GET:
@@ -98,7 +92,7 @@ def dispatch(request):
     if pid:
         species = Species
     if family == 'Orchidaceae':
-        send_url = '/detail/information/?pid=' + str(pid)
+        send_url = '/detail/information/' + str(pid) + '/'
     elif family == 'Bromeliaceae':
         send_url = '/bromeliaceae/advanced/?role=' + role
     logger.error("send_url = " + send_url + " - family = " + family)

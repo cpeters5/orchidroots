@@ -107,7 +107,7 @@ img{
             {% for x in des_list %}
                 <div class="imageitem p-1 justify-content-center  border" style="margin:2px;">
                     <div class="box" style="margin:0 auto;">
-                    <a href="{% url 'detail:information' %}?pid={{x.did.pid_id}}&role={{role}}">
+                    <a href="{% url 'detail:information' x.did.pid_id %}?role={{role}}">
                             {% if x.did.pid.get_best_img %}
                                 <img class="thumbnails" alt="" src="/static/{{x.did.pid.get_best_img.image_dir}}{{ x.did.pid.get_best_img.image_file }}">
                             {% else %}

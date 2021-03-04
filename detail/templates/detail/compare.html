@@ -369,7 +369,7 @@ label {
                         {% if role == 'cur' %}
                             <a href="{% url 'detail:photos' cross.pid.pid %}?role={{role}}">{{cross.pid.name|safe}}</a>
                         {% else %}
-                            <a href="{% url 'detail:information' %}?pid={{cross.pid.pid}}&role=pub">{{cross.pid.name|safe}}</a>
+                            <a href="{% url 'detail:information' cross.pid.pid %}?">{{cross.pid.name|safe}}</a>
                         {% endif %}
                     {% else %}
                         {% if pid1 and pid2 and pid1 != pid2 %}
@@ -400,7 +400,7 @@ label {
                             {% if message1 %}
                                 <span class="text-danger">{{message1|safe}}</span>
                             {% elif species.species or species1.species %}
-                                <a href="{% url 'detail:information' %}?role={{role}}&pid={{pid1}}">{{species1.abrevname|safe}}</a> {{species1.author}} {{species1.year}}
+                                <a href="{% url 'detail:information' pid1 %}?role={{role}}">{{species1.abrevname|safe}}</a> {{species1.author}} {{species1.year}}
                                 {% if accepted1 %} <br>(syn. {{accepted1.name|safe}}) {% endif %}
                             {% else %}
                                 Enter the correct name of the first orchid
@@ -471,7 +471,7 @@ label {
                             {% if message2 %}
                                 <span class="text-danger">{{message2|safe}}</span>
                             {% elif species2.species %}
-                                <a href="{% url 'detail:information' %}?role={{role}}&pid={{species2.pid}}">{{species2.abrevname|safe}}</a> {{species2.author}} {{species2.year}}
+                                <a href="{% url 'detail:information' species2.pid %}?role={{role}}">{{species2.abrevname|safe}}</a> {{species2.author}} {{species2.year}}
                                 {% if accepted2 %} <br>(syn. {{accepted2.name|safe}}) {% endif %}
                             {% else %}
                                 Enter the correct name of second orchid.

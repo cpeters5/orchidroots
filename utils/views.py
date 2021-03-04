@@ -6,6 +6,7 @@ from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
 
 logger = logging.getLogger(__name__)
 
+
 def write_output(request, detail=None):
     if str(request.user) != 'chariya' and request.user.is_authenticated:
         message = ">>> " + request.path + str(request.user)
@@ -14,11 +15,13 @@ def write_output(request, detail=None):
         logger.error(message)
         pass
 
+
 def imgdir():
     imgdir = 'utils/images/'
     hybdir = imgdir + 'hybrid/'
     spcdir = imgdir + 'species/'
     return imgdir, hybdir, spcdir
+
 
 # Return best image file for a species object
 def get_random_img(spcobj):
@@ -112,5 +115,24 @@ def getmyphotos(author, species):
         private_list = public_list = upload_list = []
 
     return private_list, public_list, upload_list, myspecies_list, myhybrid_list
+
+
+def getRole(request):
+    role = ''
+    if request.user.is_authenticated:
+        if 'role' in request.GET:
+            role = request.GET['role']
+        elif 'role' in request.POST:
+            role = request.POST['role']
+
+        if not role:
+            if request.user.tier.tier < 2:
+                role = 'pub'
+            elif request.user.tier.tier == 2:
+                role = 'pri'
+            else:
+                role = 'cur'
+        return role
+    return role
 
 # Create your views here.

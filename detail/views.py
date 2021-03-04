@@ -31,7 +31,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, is_int, getmyphotos
+from utils.views import write_output, is_int, getmyphotos, getRole
 
 # import pytz
 # MPTT stuff
@@ -116,13 +116,9 @@ def createhybrid(request):
     else:
         return HttpResponse(redirect_message)
 
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        # Only curator can create for now. Later, may open to private users
-        role = 'cur'
+    role = getRole(request)
     if not role or role != 'cur':
-        send_url = '/detail/compare/?pid=' + str(pid1)
+        send_url = '/detail/compare/' + str(pid1) + '/'
         return HttpResponseRedirect(send_url)
 
     import datetime
@@ -152,8 +148,8 @@ def createhybrid(request):
         msgnogenus = "404"
         genus1 = species1.genus
         genus2 = species2.genus
-        send_url = '/detail/compare/?pid=' + str(pid1) + '&msgnogenus=' + msgnogenus + '&genus1=' + genus1 + \
-                   '&genus2=' + genus2 + '&species1=' + species1 + '&species2=' + species2
+        send_url = '/detail/compare/' + str(pid1) + '/?msgnogenus=' + msgnogenus + '&genus1=' + genus1 + \
+                   '&genus2=' + genus2 + '&species1=' + str(species1) + '&species2=' + str(species2)
         return HttpResponseRedirect(send_url)
     # Create Species instance
     spcobj = Species()
@@ -188,26 +184,16 @@ def createhybrid(request):
         write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
     else:
         write_output(request)
-    return HttpResponseRedirect("/detail/" + str(spcobj.pid) + "/photos/?role=" + role + "&genus2=" + species2.genus)
+    return HttpResponseRedirect("/detail/photos/" + str(spcobj.pid) + "/?role=" + role + "&genus2=" + species2.genus)
 
 
 # All access - at least role = pub
-def compare(request, pid=None):
+def compare(request, pid):
     # TODO:  Use Species form instead
     infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     spcimg1_list = spcimg2_list = []
-    role = 'pub'
 
-    # Initial species
-    if not pid and 'pid' in request.GET:
-        pid = request.GET['pid']
-        if pid:
-            pid = int(pid)
-        else:
-            return HttpResponseRedirect("/")
-    else:
-        return HttpResponseRedirect("/")
     if pid > 0:
         try:
             species = Species.objects.get(pk=pid)
@@ -261,9 +247,7 @@ def compare(request, pid=None):
         if year2:
             year2 = year2.strip()
 
-    if 'role' in request.GET:
-        role = request.GET['role']
-
+    role = getRole(request)
     if gen1:  # Request new genus1:
         try:
             genus1 = Genus.objects.get(genus__iexact=gen1)
@@ -504,21 +488,6 @@ def quality_update(request, species):
     # return quality
 
 
-def getRole(request):
-    if request.user.is_authenticated:
-        if 'role' in request.GET:
-            role = request.GET['role']
-        if not role:
-            if request.user.tier.tier < 2:
-                role = 'pub'
-            elif request.user.tier.tier == 2:
-                role = 'pri'
-            else:
-                role = 'cur'
-        return role
-    return None
-
-
 def comment(request):
     from string import digits
     if request.method == 'POST':
@@ -599,7 +568,7 @@ def information(request, pid=None):
         return HttpResponseRedirect('/')
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=species.pid)
-        return HttpResponseRedirect("/detail/information/?pid=" + str(synonym.acc_id) + "&role=" + role)
+        return HttpResponseRedirect("/detail/information/" + str(synonym.acc_id) + "/")
 
     display_items = []
     synonym_list = Synonym.objects.filter(acc=pid).order_by('sgenus', 'sspecies')
@@ -753,11 +722,7 @@ def comments(request):
         comment_list.sort(key=lambda k: (k[0].name()), reverse=True)
     elif sort == 'name':
         comment_list.sort(key=lambda k: (k[0].name()))
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        role = 'pub'
-
+    role = getRole(request)
     write_output(request)
     context = {'comment_list': comment_list, 'sort': sort, 'role': role,}
     return render(request, 'detail/comments.html', context)
@@ -773,7 +738,7 @@ def curate_newupload(request):
     page_length = 20
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
         request, file_list, page_length, num_show)
-    role = 'cur'
+    role = getRole(request)
 
     write_output(request)
     context = {'file_list': page_list,
@@ -819,9 +784,7 @@ def curate_pending(request):
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
         request, file_list, page_length, num_show)
 
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     write_output(request)
     title = 'curate_pending'
     context = {'file_list': page_list, 'type': ortype,
@@ -882,9 +845,7 @@ def curate_newapproved(request):
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
         request, file_list, page_length, num_show)
 
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     write_output(request)
     context = {'file_list': page_list, 'type': ortype,
                'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
@@ -909,10 +870,7 @@ def photos(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
 
-    if 'role' in request.POST:
-        role = request.POST['role']
-    else:
-        role = getRole(request)
+    role = getRole(request)
 
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
@@ -1015,7 +973,6 @@ def curateinfospc(request, pid):
 
     distribution_list = Distribution.objects.filter(pid=species.pid)
     if request.method == 'POST':
-        request.POST.get("role", role)
         form = AcceptedInfoForm(request.POST, instance=accepted)
         if form.is_valid():
             spc = form.save(commit=False)
@@ -1048,7 +1005,7 @@ def curateinfospc(request, pid):
             spc.operator = request.user
             spc.save()
 
-            url = "%s?pid=%s&role=%s" % (reverse('detail:information'), species.pid, role)
+            url = "%s?role=%s" % (reverse('detail:information', args=(species.pid,)), role)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")
@@ -1076,19 +1033,16 @@ def curateinfohyb(request, pid):
         genus = species.genus
 
         if species.type == 'species':
-            url = "%s?tab=%s" % (reverse('detail:curateinfospc', args=(species.pid,)), 'info')
+            url = "%s?tab=info" % (reverse('detail:curateinfospc', args=(species.pid,)),)
             return HttpResponseRedirect(url)
 
     tab = 'inh'
     if 'tab' in request.GET:
         tab = request.GET['tab']
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     hybrid = Hybrid.objects.get(pk=species.pid)
     if request.method == 'POST':
-        request.POST.get("role", role)
         a = Hybrid.objects.get(pk=species.pid)
         b = Species.objects.get(pk=species.pid)
         form = HybridInfoForm(request.POST, instance=a)
@@ -1122,7 +1076,7 @@ def curateinfohyb(request, pid):
 
             spcspc.save()
             spc.save()
-            url = "%s?pid=%s&role=%s" % (reverse('detail:information'), species.pid, role)
+            url = "%s?role=%s" % (reverse('detail:information', args=(species.pid,)), role)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")
@@ -1142,12 +1096,10 @@ def reidentify(request, orid, pid):
         return HttpResponseRedirect('/login/')
 
     source_file_name = ''
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
-        if role != 'cur':
-            url = "%s?role=%s" % (reverse('detail:photos', args=(pid,)), role)
-            return HttpResponseRedirect(url)
+    role = getRole(request)
+    if role != 'cur':
+        url = "%s?role=%s" % (reverse('detail:photos', args=(pid,)), role)
+        return HttpResponseRedirect(url)
 
     old_species = Species.objects.get(pk=pid)
     if old_species.status == 'synonym':
@@ -1170,7 +1122,7 @@ def reidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s" % (reverse('detail:photos', args=(pid,)), 'cur')
+                url = "%s?role=%s" % (reverse('detail:photos', args=(pid,)), role)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same type
@@ -1238,8 +1190,9 @@ def reidentify(request, orid, pid):
 
 @login_required
 def myphoto(request, pid):
-    if request.user.tier.tier < 2:
-        url = "%s?pid=%s&role=%s" % (reverse('detail:information'), pid, role)
+    role = getRole(request)
+    if not role or role == 'pub':
+        url = "%s?role=%s" % (reverse('detail:information', args=(pid,)), role)
         return HttpResponseRedirect(url)
     else:
         author, author_list = get_author(request)
@@ -1262,7 +1215,7 @@ def myphoto(request, pid):
         private_list = private_list.filter(author=author)
     context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
-               'pri': 'active', 'role': 'pri', 'author': author,
+               'pri': 'active', 'role': role, 'author': author,
                'level': 'detail', 'title': 'myphoto',
                }
     write_output(request, str(species.textname()))
@@ -1272,8 +1225,11 @@ def myphoto(request, pid):
 @login_required
 def myphoto_browse_spc(request):
     author, author_list = get_author(request)
-
-    if request.user.tier.tier > 2 and 'author' in request.GET:
+    role = getRole(request)
+    if role == 'pub':
+        send_url = "%s?tab=%s" % (reverse('orchidaceae:browse'), 'sum')
+        return HttpResponseRedirect(send_url)
+    if role == 'cur' and 'author' in request.GET:
         author = request.GET['author']
         author = Photographer.objects.get(pk=author)
     else:
@@ -1302,26 +1258,26 @@ def myphoto_browse_spc(request):
 
     context = {'my_list': page_list, 'type': 'species',
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': 'pri', 'brwspc': 'active', 'author': author,
+               'role': role, 'brwspc': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,
                'level': 'detail', 'title': 'myphoto_browse',
                }
     write_output(request)
+    logger.error(" browse my hyb = " + role)
     return render(request, 'detail/myphoto_browse_spc.html', context)
 
 
 @login_required
 def myphoto_browse_hyb(request):
-    if not request.user.is_authenticated or request.user.tier.tier < 2:
+    role = getRole(request)
+    if role == 'pub':
         send_url = "%s?tab=%s" % (reverse('orchidaceae:browse'), 'sum')
         return HttpResponseRedirect(send_url)
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login/')
 
     author, author_list = get_author(request)
-    if request.user.tier.tier > 2 and 'author' in request.GET:
+    if role == 'cur' and 'author' in request.GET:
         author = request.GET['author']
         author = Photographer.objects.get(pk=author)
     else:
@@ -1350,7 +1306,7 @@ def myphoto_browse_hyb(request):
 
     context = {'my_list': page_list, 'type': 'hybrid',
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': 'pri', 'brwhyb': 'active', 'author': author,
+               'role': role, 'brwhyb': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,

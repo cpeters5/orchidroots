@@ -347,13 +347,13 @@ input {
                                 {% if role == 'cur' %}
                                     (syn. <a href="{% url 'detail:photos' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
                                 {% else %}
-                                    (syn. <a href="{% url 'detail:information' %}?pid={{species.getAccepted.pid}}&role={{role}}">{{species.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'detail:information' species.getAccepted.pid %}">{{species.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
                                     <a href="{% url 'detail:photos' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}} </a>
                                 {% else %}
-                                    <a href="{% url 'detail:information' %}?pid={{species.pid}}&role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}}</a>
+                                    <a href="{% url 'detail:information' species.pid %}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}}</a>
                                 {% endif %}
                                 {% if species.author %} {{species.author}}{% endif %}
                                 {% if species.year > 0 %}<span  style="font-size: 11px;"> {{species.year}}</span>{% endif %}
@@ -384,7 +384,7 @@ input {
                         </td>
                         <td class="small  d-none d-sm-table-cell text-center">
                             {% if species.num_descendant %}
-                                <a href="{% url 'orchidlist:progeny' species.pid %}?pid={{species.pid}}&role={{role}}">{{species.num_descendant}}</a>
+                                <a href="{% url 'orchidlist:progeny' species.pid %}">{{species.num_descendant}}</a>
                             {% endif %}
                         </td>
                         <td class="small  d-none d-sm-table-cell text-center">{% if species.num_image %}{{species.num_image}}{% endif %}</td>

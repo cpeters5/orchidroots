@@ -20,7 +20,7 @@ import re
 
 # import django.shortcuts
 from utils.views import write_output
-from detail.views import getRole
+from utils.views import getRole
 from utils.views import get_random_img, imgdir
 
 # Create your views here.
@@ -575,9 +575,7 @@ def species_list(request):
 
     if classtitle == '':
         classtitle = 'Classification'
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     write_output(request, str(genus))
     logger.warning(">>> " + request.path + str(request.user))
     context = {'page_list': page_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
@@ -734,6 +732,7 @@ def hybrid_list(request):
 
     genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
     genus_list.sort()
+    role = getRole(request)
     write_output(request, str(reqgenus))
     logger.warning(">>> " + request.path + str(request.user) + ": " + str(reqgenus))
     context = {'my_list': page_list, 'genus_list': genus_list,
@@ -744,7 +743,7 @@ def hybrid_list(request):
                'sort': sort, 'prev_sort': prev_sort,
                'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
                'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
-               'level': 'list', 'title': 'hybrid_list',
+               'role': role, 'level': 'list', 'title': 'hybrid_list',
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
@@ -1073,11 +1072,12 @@ def ancestor(request, pid=None):
 # All access - at least role = pub
 @login_required
 def ancestrytree(request, pid=None):
-    if not pid and 'pid' in request.GET:
-        pid = request.GET['pid']
-        pid = int(pid)
-    else:
-        pid = 0
+    if not pid:
+        if 'pid' in request.GET:
+            pid = request.GET['pid']
+            pid = int(pid)
+        else:
+            pid = 0
     role = getRole(request)
 
     try:

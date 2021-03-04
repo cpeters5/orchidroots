@@ -281,20 +281,21 @@ img{
             <span style="color:darkgreen; font-size:24px;font-weight:bold">
                 Images of
                 {% if type == 'hybrid' %}
-                    {% if seed_genus or seed %}
-                        {{seed_genus}} {{seed}}
-                        {% if pollen_genus or pollen %}
-                            and
+                    {% if seed_genus or seed or pollen_genus or pollen %}
+                        {% if seed_genus or seed %}
+                            ({{seed_genus}} {{seed}}
+                        {% else %}
+                            ( ?
                         {% endif %}
-                    {% endif %}
-                    {% if pollen_genus or pollen %}
-                        {{pollen_genus}} {{pollen}}
-                    {% endif %}
-                    {% if genus %}
+                                ×
+                        {% if pollen_genus or pollen %}
+                            {{pollen_genus}} {{pollen}})
+                        {% else %}
+                            ? )
+                        {% endif %}
+                    {% elif genus %}
                         {{genus}}
                     {% endif %}
-                {% else %}
-                    {{genus}}
                 {% endif %}
 
                 {{type}}
@@ -490,7 +491,7 @@ img{
                         <img class="thumbnails" alt="" src="{% static x.image_file %}" class="img-fluid fullimg">
                     </a>
                     {% else %}
-                    <a href="{% url 'detail:information' %}?pid={{x.pid}}&role={{role}}">
+                    <a href="{% url 'detail:information' x.pid %}?role={{role}}">
                         <img class="thumbnails" alt="" src="{% static x.image_file %}" class="img-fluid fullimg">
                     </a>
                     {% endif %}

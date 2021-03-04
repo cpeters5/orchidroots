@@ -146,7 +146,7 @@ img{
                         <div class="imgcaption_top">
                             <a href="{% url 'orchidaceae:browse' %}?type={{image.pid.pid.type}}&genus={{image.pid.pid.genus}}&display=checked"><i>{{image.pid.gen}}</i></a>
                         </div>
-                        <a href="{% url 'detail:information' %}?pid={{image.pid.pid_id}}&role={{role}}">
+                        <a href="{% url 'detail:information' image.pid.pid_id %}">
                             <div class="box">
                                 <img class="thumbnails" alt="" src="/static/utils/images/species/{{image.image_file}}">
                                 <div class="text-c">{{image.pid.pid.speciesname|safe}}</div>
@@ -162,7 +162,7 @@ img{
                         <div class="imgcaption_top">
                             <i>{{image.pid.gen}}</i>
                         </div>
-                        <a href="{% url 'detail:information' %}?pid={{image.pid.pid_id}}&role={{role}}">
+                        <a href="{% url 'detail:information'image.pid.pid_id  %}">
                             <div class="box">
                                 <img class="thumbnails" alt="" src="/static/utils/images/hybrid/{{image.image_file}}">
                                 <div class="text-c">{{image.pid.pid.speciesname|safe}}</div>

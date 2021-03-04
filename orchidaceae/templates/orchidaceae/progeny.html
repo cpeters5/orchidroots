@@ -125,11 +125,11 @@
                                 {% endif %}
                             {% else %}
                                 {% if image.did.seed_id.pid == species.pid %}
-                                    <a href="{% url 'detail:information' %}?pid={{image.did.pid.pid}}&role={{role}}"><span style="color:#7e14a3"><b>{{image.did.pid.namecasual|safe}}</b></span></a>
+                                    <a href="{% url 'detail:information' image.did.pid.pid %}?role={{role}}"><span style="color:#7e14a3"><b>{{image.did.pid.namecasual|safe}}</b></span></a>
                                 {% elif image.did.pollen_id_id == species.pid %}
-                                    <a href="{% url 'detail:information' %}?pid={{image.did.pid.pid}}&role={{role}}"><span style="color:#136da8"><b>{{image.did.pid.namecasual|safe}}</b></span></a>
+                                    <a href="{% url 'detail:information' image.did.pid.pid %}?role={{role}}"><span style="color:#136da8"><b>{{image.did.pid.namecasual|safe}}</b></span></a>
                                 {% else %}
-                                    <a href="{% url 'detail:information' %}?pid={{image.did.pid.pid }}&role={{role}}">{{image.did.pid.namecasual|safe}}</a>
+                                    <a href="{% url 'detail:information' image.did.pid.pid %}?role={{role}}">{{image.did.pid.namecasual|safe}}</a>
                                 {% endif %}
                             {% endif %}
                         {% else %}
@@ -143,7 +143,7 @@
                             {% if role == 'cur' %}
                                 <a href="{% url 'detail:photos' image.did.seed_id.pid %}?role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
                             {% else %}
-                                <a href="{% url 'detail:information' %}?pid={{image.did.seed_id.pid}}&role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
+                                <a href="{% url 'detail:information' image.did.seed_id.pid %}?role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
                             {% endif %}
                         {% else %}
                             na
@@ -156,7 +156,7 @@
                             {% if role == 'cur' %}
                                 <a href="{% url 'detail:photos' image.did.pollen_id.pid %}?role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
                             {% else %}
-                                    <a href="{% url 'detail:information' %}?pid={{image.did.pollen_id.pid}}&role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
+                                    <a href="{% url 'detail:information' image.did.pollen_id.pid %}?role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
                             {% endif %}
                         {% else %}
                             na

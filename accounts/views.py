@@ -17,8 +17,7 @@ from allauth.account.views import _ajax_response, PasswordChangeView, PasswordRe
 from allauth.account.forms import UserTokenForm, SetPasswordForm
 from django.conf import settings
 from datetime import datetime
-from utils.views import write_output
-from detail.views import getRole
+from utils.views import write_output, getRole
 
 from .forms import LoginForm, RegisterForm, GuestForm, ProfileForm, AddEmailForm 
 from .models import User, Profile, Photographer
@@ -41,13 +40,9 @@ def logout_page(request):
 # Will be replaced by the classbase LoginView when the bug is fixed
 def login_page(request):
     logging.error(">>> " + request.get_host())
+    role = getRole(request)
     if request.user.is_authenticated:
-        if request.user.tier.tier == 2:
-            return redirect("/?role=pri")
-        elif request.user.tier.tier < 2:
-            return redirect("/?role=pub")
-        else:
-            return redirect("/?role=cur")
+        return redirect("/?role=" + role)
 
     form = LoginForm(request.POST or None)
     context = {
@@ -69,8 +64,6 @@ def login_page(request):
                 pass
             # update the redirect_path here
             if user.is_active:
-                role = user.tier.tier
-                write_output(request, role)
                 if user.email:
                     return perform_login(request, user, email_verification=settings.ACCOUNT_EMAIL_VERIFICATION,
                                          redirect_url=redirect_path)
