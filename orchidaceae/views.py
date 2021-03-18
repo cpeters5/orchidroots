@@ -57,14 +57,12 @@ def genera(request):
     prev_sort = ''
     sf_obj = ''
     t = ''
-    role = 'pub'
     t_obj = ''
     st_obj = ''
     num_show = 5
     page_length = 1000
     # max_page_length = 1000
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     alpha = ''
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
@@ -311,7 +309,7 @@ def getPartialPid(reqgenus, type, status):
 
 
 @login_required
-def species_list(request):
+def xspecies_list(request):
     spc = genus = gen = reqgenus = ''
     # genus = partial genus name
     mysubgenus = mysection = mysubsection = myseries = ''
@@ -596,8 +594,375 @@ def species_list(request):
     return render(request, 'orchidaceae/species.html', context)
 
 
+def getPrev(request,arg, prev):
+    if arg in request.GET:
+        arg = request.GET[arg]
+    else:
+        arg = ''
+    if prev in request.GET:
+        prev = request.GET[prev]
+    else:
+        prev = ''
+    return arg, prev
+
+
+def species_list(request):
+    family = 'Orchidaceae'
+    spc = genus = gen = reqgenus = ''
+    # genus = partial genus name
+    mysubgenus = mysection = mysubsection = myseries = ''
+    subfamily, tribe, subtribe = '', '', ''
+    subfamily_list, tribe_list, subtribe_list = [], [], []
+
+    subgenus_obj = section_obj = subsection_obj = series_obj = ''
+    subgenus_list = section_list = subsection_list = series_list = []
+    region = subregion = ''
+    region_list = subregion_list = []
+    region_obj = subregion_obj = ''
+    classtitle = ''
+    year = ''
+    year_valid = 0
+    type = 'species'
+    status = author = dist = ''
+    sort = prev_sort = ''
+    num_show = 5
+    page_length = 500
+    filter_set = 0
+    # max_page_length = 1000
+
+    # Initialize
+    if 'genus' in request.GET:
+        reqgenus = request.GET['genus']
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    else:
+        alpha = ''
+
+    if 'year' in request.GET:
+        year = request.GET['year']
+        if valid_year(year):
+            year_valid = 1
+    if 'spc' in request.GET:
+        spc = request.GET['spc']
+        if len(spc) == 1:
+            alpha = ''
+    if 'author' in request.GET:
+        author = request.GET['author']
+    if 'dist' in request.GET:
+        dist = request.GET['dist']
+    if alpha != 'ALL':
+        alpha = alpha[0: 1]
+
+    # initialize subfamily, tribe subtribe
+    subfamily, prev_subfamily = getPrev(request,'sf', 'psf')
+    tribe, prev_tribe = getPrev(request,'t', 'pt')
+    if subfamily != prev_subfamily:
+        tribe = ''
+        prev_tribe = ''
+
+    subtribe, prev_subtribe = getPrev(request,'st', 'pst')
+    if subfamily != prev_subfamily or tribe != prev_tribe:
+        subtribe = prev_subtribe = ''
+    subfamily_list = Subfamily.objects.filter(family=family)
+    #
+    logger.error("1. subfamily_list = " + str(len(subfamily_list)))
+    tribe_list = Tribe.objects.all()
+    logger.error(">>2. tribe_list = " + str(len(tribe_list)))
+    if subfamily:
+        tribe_list = tribe_list.filter(subfamily=subfamily)
+    logger.error(">>2. tribe_list = " + str(len(tribe_list)))
+
+    subtribe_list = Subtribe.objects.all()
+    logger.error("3. subtribe_list = " + str(len(subtribe_list)))
+    if subfamily:
+        subtribe_list = subtribe_list.filter(subfamily=subfamily)
+    if tribe:
+        subtribe_list = subtribe_list.filter(tribe=tribe)
+    logger.error("3. subtribe_list = " + str(len(subtribe_list)))
+    # Get subgenus, section, subsection, series
+    if 'subgenus' in request.GET:
+        mysubgenus = request.GET['subgenus']
+    if 'section' in request.GET:
+        mysection = request.GET['section']
+    if 'subsection' in request.GET:
+        mysubsection = request.GET['subsection']
+    if 'series' in request.GET:
+        myseries = request.GET['series']
+    if 'region' in request.GET:
+        region = request.GET['region']
+    if 'subregion' in request.GET:
+        subregion = request.GET['subregion']
+    if region:
+        try:
+            region_obj = Region.objects.get(id=region)
+        except Region.DoesNotExist:
+            pass
+    if subregion:
+        try:
+            subregion_obj = Subregion.objects.get(code=subregion)
+        except Subregion.DoesNotExist:
+            pass
+    if 'status' in request.GET:
+        status = request.GET['status']
+        if not status:
+            status = 'accepted'
+
+    if status == 'synonym':
+        mysubgenus, mysection, mysubsection, myseries = '', '', '', ''
+
+    if request.GET.get('sort'):
+        sort = request.GET['sort']
+        sort.lower()
+    if sort:
+        if request.GET.get('prev_sort'):
+            prev_sort = request.GET['prev_sort']
+        if prev_sort == sort:
+            if sort.find('-', 0) >= 0:
+                sort = sort.replace('-', '')
+            else:
+                sort = '-' + sort
+        else:
+            # sort = '-' + sort
+            prev_sort = sort
+
+    # Get list of affected  genus
+    genus_list = Genus.objects.all()
+    logger.error("1. genus_list = " + str(len(genus_list)))
+    if subfamily:
+        genus_list = genus_list.filter(subfamily=subfamily)
+    logger.error("2. genus_list = " + str(len(genus_list)))
+    if tribe:
+        genus_list = genus_list.filter(tribe=tribe)
+    logger.error("3. genus_list = " + str(len(genus_list)))
+    if subtribe:
+        genus_list = genus_list.filter(subtribe=subtribe)
+    logger.error("4. genus_list = " + str(len(genus_list)))
+    genus_list = genus_list.values_list('pid',flat=True)
+    logger.error("5. genus_list = " + str(len(genus_list)))
+
+    genus, this_species_list, intragen_list = getPartialPid(reqgenus, type, status)
+    total = len(this_species_list)
+    logger.error("6. species_list = " + str(total))
+    this_species_list = this_species_list.filter(gen__in=genus_list)
+    total = len(this_species_list)
+    logger.error("7. species_list = " + str(total))
+
+
+    temp_subgen_list = []
+    if mysubgenus:
+        try:
+            subgenus_obj = Subgenus.objects.get(pk=mysubgenus)
+        except Subgenus.DoesNotExist:
+            pass
+        if genus:
+            temp_subgen_list = Accepted.objects.filter(subgenus=mysubgenus).filter(genus=genus).distinct(). \
+                values_list('pid', flat=True)
+        else:
+            temp_subgen_list = Accepted.objects.filter(subgenus=mysubgenus).distinct().values_list('pid', flat=True)
+
+    temp_sec_list = []
+    if mysection:
+        try:
+            section_obj = Section.objects.get(pk=mysection)
+        except Section.DoesNotExist:
+            section_obj = ''
+        if genus:
+            temp_sec_list = Accepted.objects.filter(section=mysection).filter(genus=genus).distinct(). \
+                values_list('pid', flat=True)
+        else:
+            temp_sec_list = Accepted.objects.filter(section=mysection).distinct().values_list('pid', flat=True)
+
+    temp_subsec_list = []
+    if mysubsection:
+        try:
+            subsection_obj = Subsection.objects.get(pk=mysubsection)
+        except Subsection.DoesNotExist:
+            pass
+        if genus:
+            temp_subsec_list = Accepted.objects.filter(subsection=mysubsection).filter(genus=genus).distinct(). \
+                values_list('pid', flat=True)
+        else:
+            temp_subsec_list = Accepted.objects.filter(subsection=mysubsection).distinct(). \
+                values_list('pid', flat=True)
+
+    temp_ser_list = []
+    if myseries:
+        try:
+            series_obj = Series.objects.get(pk=myseries)
+        except Series.DoesNotExist:
+            pass
+        if genus:
+            temp_ser_list = Accepted.objects.filter(series=myseries).filter(genus=genus).distinct(). \
+                values_list('pid', flat=True)
+        else:
+            temp_ser_list = Accepted.objects.filter(series=myseries).distinct().values_list('pid', flat=True)
+
+    if mysubgenus:
+        filter_set += 1
+        this_species_list = this_species_list.filter(pid__in=temp_subgen_list)
+    if mysection:
+        filter_set += 1
+        this_species_list = this_species_list.filter(pid__in=temp_sec_list)
+    if mysubsection:
+        filter_set += 1
+        this_species_list = this_species_list.filter(pid__in=temp_subsec_list)
+    if myseries:
+        filter_set += 1
+        this_species_list = this_species_list.filter(pid__in=temp_ser_list)
+
+
+    if spc:
+        filter_set += 1
+        # if species[0] != '%' and species[-1] != '%':
+        if len(spc) >= 2:
+            this_species_list = this_species_list.filter(species__icontains=spc)
+        else:
+            this_species_list = this_species_list.filter(species__istartswith=spc)
+
+    elif alpha:
+        filter_set += 1
+        if len(alpha) == 1:
+            this_species_list = this_species_list.filter(species__istartswith=alpha)
+
+    if author:
+        filter_set += 1
+        this_species_list = this_species_list.filter(author__icontains=author)
+
+    if dist:
+        filter_set += 1
+        this_species_list = this_species_list.filter(distribution__icontains=dist)
+
+    if year_valid:
+        filter_set += 1
+        year = int(year)
+        this_species_list = this_species_list.filter(year=year)
+
+    pid_list = []
+    if region_obj:
+        filter_set += 1
+        pid_list = Distribution.objects.filter(region_id=region_obj.id).values_list('pid', flat=True).distinct()
+        this_species_list = this_species_list.filter(pid__in=pid_list)
+    if subregion_obj:
+        filter_set += 1
+        pid_list = Distribution.objects.filter(subregion_code=subregion_obj.code). \
+            values_list('pid', flat=True).distinct()
+        this_species_list = this_species_list.filter(pid__in=pid_list)
+    if status == 'synonym':
+        pid_list = Synonym.objects.filter(acc_id__in=pid_list).values_list('spid', flat=True).distinct()
+        this_species_list = this_species_list.filter(pid__in=pid_list)
+
+    if not filter_set:
+        this_species_list = []
+        subtotal = ''
+    else:
+        if sort:
+            if sort == 'classification':
+                this_species_list = this_species_list.order_by('subgenus', 'section', 'subsection', 'series')
+            elif sort == '-classification':
+                this_species_list = this_species_list.order_by('-subgenus', '-section', '-subsection', '-series')
+            else:
+                this_species_list = this_species_list.order_by(sort)
+        else:
+            this_species_list = this_species_list.order_by('genus', 'species')
+        subtotal = len(this_species_list)
+
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = \
+        mypaginator(request, this_species_list, page_length, num_show)
+
+    region_list = Region.objects.exclude(id=0).order_by('name')
+    if region_obj:
+        subregion_list = Subregion.objects.filter(region=region_obj.id).order_by('name')
+    else:
+        subregion_list = Subregion.objects.all().order_by('name')
+
+
+    if status == 'accepted':
+        subgenus_list = intragen_list.filter(subgenus__isnull=False).values_list('subgenus', 'subgenus'). \
+            distinct().order_by('subgenus')
+
+        if genus:
+            subgenus_list = subgenus_list.filter(genus=genus)
+        elif reqgenus:
+            subgenus_list = subgenus_list.filter(genus__istartswith=reqgenus)
+
+        section_list = intragen_list.filter(section__isnull=False)
+        if genus:
+            section_list = section_list.filter(genus=genus)
+        elif reqgenus:
+            section_list = section_list.filter(genus__istartswith=reqgenus)
+
+        subsection_list = intragen_list.filter(subsection__isnull=False)
+        if genus:
+            subsection_list = subsection_list.filter(genus=genus)
+        elif reqgenus:
+            subsection_list = subsection_list.filter(genus__istartswith=reqgenus)
+
+        series_list = intragen_list.filter(series__isnull=False)
+        if genus:
+            series_list = series_list.filter(genus=genus)
+        elif reqgenus:
+            series_list = series_list.filter(genus__istartswith=reqgenus)
+
+        if mysubgenus:
+            section_list = section_list.filter(subgenus=mysubgenus)
+            subsection_list = subsection_list.filter(subgenus=mysubgenus)
+            series_list = series_list.filter(subgenus=mysubgenus)
+
+        if mysection:
+            subsection_list = subsection_list.filter(section=mysection)
+            series_list = series_list.filter(section=mysection)
+
+        section_list = section_list.values_list('section', 'section').distinct().order_by('section')
+        subsection_list = subsection_list.values_list('subsection', 'subsection').distinct().order_by('subsection')
+        series_list = series_list.values_list('series', 'series').distinct().order_by('series')
+
+        # Sort by classification
+        if not subgenus_list:
+            subgenus_obj = ''
+        else:
+            classtitle = classtitle + 'Subgenus'
+        if not section_list:
+            section_obj = ''
+        else:
+            classtitle = classtitle + ' Section'
+        if not subsection_list:
+            subsection_obj = ''
+        else:
+            classtitle = classtitle + ' Subsection'
+        if not series_list:
+            series_obj = ''
+        else:
+            classtitle = classtitle + ' Series'
+
+    if classtitle == '':
+        classtitle = 'Classification'
+    role = getRole(request)
+    write_output(request, str(genus))
+    logger.warning(">>> " + request.path + str(request.user))
+    context = {'page_list': page_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
+               'role': role, 'total': total, 'subtotal': subtotal,
+               'subgenus_list': subgenus_list, 'subgenus_obj': subgenus_obj,
+               'section_list': section_list, 'section_obj': section_obj, 'genus': reqgenus,
+               'subsection_list': subsection_list, 'subsection_obj': subsection_obj,
+               'series_list': series_list, 'series_obj': series_obj,
+               'classtitle': classtitle,
+               'subfamily': subfamily, 'prev_subfamily': prev_subfamily, 'subfamily_list': subfamily_list,
+               'tribe': tribe, 'prev_tribe': prev_tribe, 'tribe_list': tribe_list,
+               'subtribe': subtribe, 'prev_subtribe': prev_subtribe, 'subtribe_list': subtribe_list,
+
+               'year': year, 'status': status,
+               'author': author, 'dist': dist,
+               'region_obj': region_obj, 'region_list': region_list, 'subregion_obj': subregion_obj,
+               'subregion_list': subregion_list, 'sort': sort, 'prev_sort': prev_sort,
+               'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
+               'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
+               'level': 'list', 'title': 'species_list', 'type': 'species'
+               }
+    return render(request, 'orchidaceae/species.html', context)
+
+
 @login_required
-def hybrid_list(request):
+def xhybrid_list(request):
     spc = ''
     genus = ''
     type = 'hybrid'
@@ -748,13 +1113,150 @@ def hybrid_list(request):
     return render(request, 'orchidaceae/hybrid.html', context)
 
 
+@login_required
+def hybrid_list(request):
+    type = 'hybrid'
+    # min_lenspecies_req = 2
+    year = ''
+    year_valid = 0
+    status = ''
+    author = originator = ''
+    seed_genus, pollen_genus = '', ''
+    seed, pollen = '', ''
+    alpha = ''
+    sort, prev_sort = '', ''
+    reqgenus = ''
+    spc = ''
+    num_show = 5
+    page_length = 200
+    total = len(Species.objects.filter(type=type))
+
+    # Initialization
+    if 'seed' in request.GET:
+        seed = request.GET['seed']
+    if 'pollen' in request.GET:
+        pollen = request.GET['pollen']
+    seed_genus, prev_seed_genus = getPrev(request, 'seed_genus', 'prev_seed_genus')
+    pollen_genus, prev_pollen_genus = getPrev(request, 'pollen_genus', 'prev_pollen_genus')
+    logger.error(">>>>4 seed_genus " + seed_genus + ", >>> " + prev_seed_genus)
+    logger.error(">>>>5 pollen_genus" + pollen_genus + ", >>> " + prev_pollen_genus)
+    if 'status' in request.GET:
+        status = request.GET['status']
+    if not status:
+        status = 'accepted'
+    if 'spc' in request.GET:
+        spc = request.GET['spc']
+        if len(spc) == 1:
+            alpha = ''
+    if 'author' in request.GET:
+        author = request.GET['author']
+    if 'originator' in request.GET:
+        originator = request.GET['originator']
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    if 'year' in request.GET:
+        year = request.GET['year']
+        if valid_year(year):
+            year_valid = 1
+    if alpha != 'ALL':
+        alpha = alpha[0:1]
+    if request.GET.get('sort'):
+        sort = request.GET['sort']
+        sort.lower()
+    if sort:
+        if request.GET.get('prev_sort'):
+            prev_sort = request.GET['prev_sort']
+        if prev_sort == sort:
+            if sort.find('-', 0) >= 0:
+                sort = sort.replace('-', '')
+            else:
+                sort = '-' + sort
+        else:
+            # sort = '-' + sort
+            prev_sort = sort
+
+    if spc or alpha or author or originator or year_valid or seed_genus or pollen_genus or seed or pollen:
+        reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
+        logger.error(">>>>1 Genus " + reqgenus + ", >>> " + prev_genus)
+        genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+        logger.error(">>>>2 Genus " + str(genus) + ", >>> " + prev_genus)
+
+        if (reqgenus == prev_genus):
+
+            if seed_genus and pollen_genus:
+                this_species_list = this_species_list.filter(
+                    Q(hybrid__seed_genus=seed_genus) & Q(hybrid__pollen_genus=pollen_genus) | Q(
+                        hybrid__seed_genus=pollen_genus) & Q(hybrid__pollen_genus=seed_genus))
+            elif seed_genus:
+                this_species_list = this_species_list.filter(
+                    Q(hybrid__seed_genus=seed_genus) | Q(hybrid__pollen_genus=seed_genus))
+            elif pollen_genus:
+                this_species_list = this_species_list.filter(Q(hybrid__seed_genus=pollen_genus)
+                                                             | Q(hybrid__pollen_genus=pollen_genus))
+            if seed:
+                this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=seed)
+                                                             | Q(hybrid__pollen_species__icontains=seed))
+            if pollen:
+                this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=pollen)
+                                                             | Q(hybrid__pollen_species__icontains=pollen))
+
+        # Building pid ;list
+        total = len(this_species_list)
+
+        if spc:
+            if len(spc) >= 2:
+                this_species_list = this_species_list.filter(species__icontains=spc)
+            else:
+                this_species_list = this_species_list.filter(species__istartswith=spc)
+
+        elif alpha:
+            if len(alpha) == 1:
+                this_species_list = this_species_list.filter(species__istartswith=alpha)
+        if author and not originator:
+            this_species_list = this_species_list.filter(author__icontains=author)
+        if author and originator:
+            this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
+        if originator and not author:
+            this_species_list = this_species_list.filter(originator__icontains=originator)
+
+        if year_valid:
+            year = int(year)
+            this_species_list = this_species_list.filter(year=year)
+        if sort:
+            this_species_list = this_species_list.order_by(sort)
+        else:
+            this_species_list = this_species_list.order_by('genus', 'species')
+        subtotal = this_species_list.count()
+    else:
+        this_species_list = []
+        subtotal = ''
+
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
+        = mypaginator(request, this_species_list, page_length, num_show)
+
+    genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
+    genus_list.sort()
+    role = getRole(request)
+    write_output(request, str(reqgenus))
+    logger.warning(">>> " + request.path + str(request.user) + ": " + str(reqgenus))
+    context = {'my_list': page_list, 'genus_list': genus_list,
+               'total': total, 'subtotal': subtotal, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
+               'genus': reqgenus, 'year': year, 'status': status,
+               'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
+               'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
+               'sort': sort, 'prev_sort': prev_sort,
+               'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
+               'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
+               'role': role, 'level': 'list', 'title': 'hybrid_list',
+               }
+    return render(request, 'orchidaceae/hybrid.html', context)
+
+
 def browsegen(request):
     gen = 0
     genus = ''
     display = ''
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     alpha = ''
     if 'alpha' in request.GET:
@@ -1329,7 +1831,6 @@ def progeny(request, pid=None):
     prev_sort = ''
     num_show = 5
     page_length = 30
-    role = 'pub'
 
     if not pid:
         if 'pid' in request.GET:
@@ -1338,8 +1839,7 @@ def progeny(request, pid=None):
         else:
             pid = 0
 
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     try:
         species = Species.objects.get(pk=pid)
@@ -1430,9 +1930,7 @@ def progenyimg(request, pid=None):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     genus = species.genus
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt=20)
     des_list = des_list.order_by('-pct')
