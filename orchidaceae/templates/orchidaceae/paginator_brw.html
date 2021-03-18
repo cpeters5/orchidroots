@@ -1,7 +1,7 @@
 <style>
 .pagination {
-    font-size:11px;
-    padding:2px 6px;
+    font-size:13px;
+    padding:5px 10px;
     /*margin-top: 5px;*/
     margin-block-end: 5px;
 }
@@ -18,8 +18,13 @@
     background-color: #4CAF50;
     color: white;
 }
+.page-item {
+    margin: 0 2px 0 2px;
+
+}
 
 </style>
+<div class="container-fluid" style="margin:0 auto">
     <ul class="pagination pagination-xs" style="clear:left">
         {% if page > 1 %}
             <li class="page-item"><a class="page-link" href="?page=1&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
@@ -53,7 +58,7 @@
             <li class="page-item"><a class="page-link" href="?page={{last_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
         {% endif %}
   </ul>
-
+</div>
 
 
 

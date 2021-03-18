@@ -41,7 +41,7 @@ img{
 
 .imgcaption {
     font-size: 10px;
-    height: 80px;
+    height: 50px;
     overflow: hidden;
     padding:0 6px;
     text-align: left;
@@ -100,32 +100,29 @@ img{
         <!--main section-->
     {% include "detail/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
-    {% if des_list %}
+    {% if img_list %}
         <br>
             {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
             <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
-            {% for x in des_list %}
+            {% for x in img_list %}
                 <div class="imageitem p-1 justify-content-center  border" style="margin:2px;">
                     <div class="box" style="margin:0 auto;">
-                    <a href="{% url 'detail:information' x.did.pid_id %}?role={{role}}">
-                            {% if x.did.pid.get_best_img %}
-                                <img class="thumbnails" alt="" src="/static/{{x.did.pid.get_best_img.image_dir}}{{ x.did.pid.get_best_img.image_file }}">
-                            {% else %}
-                                <img class="thumbnails" alt="" src="{{ x.did.pid.image_url }}">
-                            {% endif %}
+                    <a href="{% url 'detail:information' x.pid_id %}?role={{role}}">
+                            <img class="thumbnails" alt="" src="/static/{{x.image_dir}}{{ x.image_file }}">
                     </a>
                     </div>
                     <div class="imgcaption">
-                        {{x.offspring.pid.namecasual|safe}}<br>
-                        <table>
-                            <tr><td valign="top">Photo</td><td><a href="{{x.did.pid.get_best_img.source_url}}">{{x.did.pid.get_best_img.author}}</a></td></tr>
-                            <tr><td valign="top">Seed</td><td>{{x.did.pid.hybrid.seed_id.namecasual|safe}}</td></tr>
-                            <tr><td valign="top">Pollen</td><td>{{x.did.pid.hybrid.pollen_id.namecasual|safe}}</td></tr>
-                        </table>
+                        {{x.name|safe}} ({{x.pct}}%)<br>
+                        (<a href="{% url 'detail:information' x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
+                        ×
+                        <a href="{% url 'detail:information' x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>)
+                        <br>
+                        Photo: <a href="{{x.source_url}}">{{x.author}}
                     </div>
                 </div>
             {% endfor %}
             </div>
+            {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
     {% else %}
         <div class="container" style="width:100%;text-align:center;padding:30px;">
             <h5><small>{{species.name|safe}} has no offspring with images</small></h5>
