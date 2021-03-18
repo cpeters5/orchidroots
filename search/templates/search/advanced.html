@@ -291,7 +291,7 @@ form {
                 <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Species</h6></div>
                 <div class="card-body border-top">
                     <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?role={{role}}&type=species&display=checked"><i>{{genus}}</i> species images</a>
-                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}">All Species</a>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&status=accepted&alpha=A">All Species</a>
                 </div>
             </div>
 
@@ -299,7 +299,7 @@ form {
                 <div class="card-header"><h6 class="card-title" style="margin-bottom: 0">Hybrids</h6></div>
                 <div class="card-body border-top">
                     <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:browse' %}?role={{role}}&type=hybrid&display=checked"><i>{{genus}}</i> hybrid images</a>
-                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}">All Hybrids</a>
+                    <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&status=accepted&alpha=A">All Hybrids</a>
                 </div>
             </div>
 
