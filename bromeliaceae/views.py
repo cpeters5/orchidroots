@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 import string
 from itertools import chain
-from utils.views import write_output, paginator
+from utils.views import write_output, paginator, getRole
 import logging
 import random
 from myproject import config
@@ -55,10 +55,7 @@ def advanced(request):
 
     genus_list = Genus.objects.filter(cit_status__isnull=True).exclude(cit_status__exact='').order_by('genus')
 
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        role = 'pub'
+    role = getRole(request)
 
     if 'genus' in request.GET:
         genus = request.GET['genus']
@@ -111,14 +108,12 @@ def genera(request):
     prev_sort = ''
     sf_obj = ''
     t = ''
-    role = 'pub'
     t_obj = ''
     st_obj = ''
     num_show = 5
     page_length = 1000
     # max_page_length = 1000
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     alpha = ''
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
@@ -504,9 +499,7 @@ def species_list(request):
         classtitle = classtitle + ' Series'
     if classtitle == '':
         classtitle = 'Classification'
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     write_output(request, str(genus))
     context = {'page_list': page_list, 'total': total, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role,

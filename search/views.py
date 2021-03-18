@@ -72,10 +72,7 @@ def advanced(request):
 
     # genus_list = Genus.objects.filter(cit_status__isnull=True).exclude(cit_status__exact='').order_by('genus')
 
-    if 'role' in request.GET:
-        role = request.GET['role']
-    else:
-        role = 'pub'
+    role = getRole(request)
 
     if 'genus' in request.GET:
         genus = request.GET['genus']
@@ -124,8 +121,6 @@ def search_genus(request):
     genus_list = []
 
     role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
 
     if 'search' in request.GET:
         search = request.GET['search'].strip()
@@ -275,8 +270,6 @@ def search_match(request, partner=None):
     #     hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
 
     role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
 
     if 'search' in request.GET:
         search = request.GET['search'].strip()
@@ -386,8 +379,6 @@ def search_fuzzy(request):
     search = ''
     search_list = []
     role = getRole(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
 
     if request.GET.get('search'):
         search = request.GET['search'].strip()

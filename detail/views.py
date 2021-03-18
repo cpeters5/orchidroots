@@ -984,7 +984,7 @@ def curateinfospc(request, pid):
                 spc.altitude = spc.altitude.replace("\r", "<br>")
             if spc.description:
                 spc.description = spc.description.replace("<br>", "")
-                spc.description = spc.description.replace("\"", "\'\'")
+                # spc.description = spc.description.replace("\"", "\'\'")
                 spc.description = spc.description.replace("\r", "<br>")
             if spc.culture:
                 spc.culture = spc.culture.replace("<br>", "")
@@ -995,12 +995,12 @@ def curateinfospc(request, pid):
                 spc.comment = spc.comment.replace("\"", "\'\'")
                 spc.comment = spc.comment.replace("\r", "<br>")
             if spc.history:
-                spc.history = spc.culture.replace("<br>", "")
+                spc.history = spc.history.replace("<br>", "")
                 spc.history = spc.history.replace("\"", "\'\'")
                 spc.history = spc.history.replace("\r", "<br>")
             if spc.etymology:
-                spc.etymology = spc.culture.replace("<br>", "")
-                spc.etymology = spc.etymology.replace("\"", "\'\'")
+                spc.etymology = spc.etymology.replace("<br>", "")
+                # spc.etymology = spc.etymology.replace("\"", "\'\'")
                 spc.etymology = spc.etymology.replace("\r", "<br>")
             spc.operator = request.user
             spc.save()
@@ -1346,9 +1346,7 @@ def deletephoto(request, orid):
     area = ''
     if 'area' in request.GET:
         area = request.GET['area']
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     if area == 'allpending':
         # bulk delete by curators from all_pending tab
@@ -1412,9 +1410,7 @@ def deletewebphoto(request, pid):
             spc.delete()
     days = 7
     area = ''
-    role = 'cur'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
     if 'area' in request.GET:
         area = request.GET['area']
     if 'days' in request.GET:
@@ -1535,12 +1531,7 @@ def uploadfile(request, pid):
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
-    if 'role' in request.POST:
-        role = request.POST['role']
-    else:
-        role = getRole(request)
-    if not role:
-        return HttpResponseRedirect('/')
+    role = getRole(request)
 
     form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
 
@@ -1548,7 +1539,6 @@ def uploadfile(request, pid):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             write_output(request, species.textname())
-            role = request.POST['role']
             spc = form.save(commit=False)
             spc.pid = species
             spc.type = species.type
@@ -1610,12 +1600,9 @@ def uploadweb(request, pid, orid=None):
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
 
-    role = 'pri'
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = getRole(request)
 
     if request.method == 'POST':
-        role = request.POST['role']
         if species.type == 'hybrid':
             accepted = species.hybrid
             form = UploadHybWebForm(request.POST)
