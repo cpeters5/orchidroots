@@ -40,6 +40,7 @@ class Genus(models.Model):
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', related_name='poolsubfamily', on_delete=models.DO_NOTHING)
     tribe = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', related_name='pooltribe', on_delete=models.DO_NOTHING)
     subtribe = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe', related_name='poolsubtribe', on_delete=models.DO_NOTHING)
+    is_succulent = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=20, default='')
     type = models.CharField(max_length=20, default='')
     description = models.TextField(null=True)

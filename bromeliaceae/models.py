@@ -49,6 +49,7 @@ class Genus(models.Model):
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', related_name='natsubfamily', on_delete=models.DO_NOTHING)
     tribe = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', related_name='nattribe', on_delete=models.DO_NOTHING)
     subtribe = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe', related_name='natsubtribe', on_delete=models.DO_NOTHING)
+    is_succulent = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=20, default='')
     type = models.CharField(max_length=20, default='')
     description = models.TextField(null=True)
@@ -467,7 +468,7 @@ class Hybrid(models.Model):
     seed_gen = models.ForeignKey(Genus, db_column='seedgen', related_name='natseedgen', null=True,
                                  on_delete=models.DO_NOTHING)
     seed_genus = models.CharField(max_length=50, null=True, blank=True)
-    seed_species = models.CharField(max_length=50, null=True, blank=True)
+    seed_species = models.CharField(max_length=200, null=True, blank=True)
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='natseed_id', null=True, blank=True,
                                 on_delete=models.DO_NOTHING)
@@ -475,7 +476,7 @@ class Hybrid(models.Model):
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='natpollgen', null=True,
                                    on_delete=models.DO_NOTHING)
     pollen_genus = models.CharField(max_length=50, null=True, blank=True)
-    pollen_species = models.CharField(max_length=50, null=True, blank=True)
+    pollen_species = models.CharField(max_length=200, null=True, blank=True)
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='natpollen_id', null=True, blank=True,
                                   on_delete=models.DO_NOTHING)

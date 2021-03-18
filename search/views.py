@@ -10,8 +10,7 @@ from itertools import chain
 import django.shortcuts
 from django.apps import apps
 from fuzzywuzzy import fuzz, process
-from utils.views import write_output
-from detail.views import getRole
+from utils.views import write_output, getRole
 from core.models import Family, Subfamily, Tribe, Subtribe
 
 Genus = apps.get_model('orchidaceae', 'Genus')

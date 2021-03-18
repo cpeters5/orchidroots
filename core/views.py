@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.apps import apps
 from itertools import chain
-from utils.views import write_output
+from utils.views import write_output, getRole
 from myproject import config
 # from myproject import config
 import logging
@@ -17,8 +17,6 @@ import re
 
 
 # import django.shortcuts
-from utils.views import write_output
-from detail.views import getRole
 
 # Create your views here.
 alpha_list = config.alpha_list
