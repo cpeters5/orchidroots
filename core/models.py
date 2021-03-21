@@ -16,8 +16,19 @@ from django.conf import settings
 
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
+from mptt.models import MPTTModel, TreeForeignKey
 import re
 import math
+
+
+class Taxonomy(models.Model):
+    taxon = models.CharField(db_column='taxon', max_length=50, default='',null=False, blank=False)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    parent_name = models.CharField(max_length=50, null=True)
+    rank = models.CharField(max_length=20, null=True, blank=True)
+    level = models.IntegerField(null=True)
+    def __str__(self):
+        return self.taxon
 
 
 class Family(models.Model):
