@@ -1152,23 +1152,22 @@ def reidentify(request, orid, pid):
                                              user_id=request.user, created_date=old_img.created_date)
                     os.rename(from_path, to_path)
                 else:
-                    new_img = ''
-                    hist = ''
+                    url = "%s?role=%s" % (reverse('detail:photos', args=(new_species.pid,)), role)
+                    return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
-            if new_img:
-                new_img.author = old_img.author
-                new_img.pk = None
-                new_img.source_url = old_img.source_url
-                new_img.image_url = old_img.image_url
-                new_img.image_file = old_img.image_file
-                new_img.name = old_img.name
-                new_img.awards = old_img.awards
-                new_img.variation = old_img.variation
-                new_img.form = old_img.form
-                new_img.text_data = old_img.text_data
-                new_img.description = old_img.description
-                new_img.created_date = old_img.created_date
+            new_img.author = old_img.author
+            new_img.pk = None
+            new_img.source_url = old_img.source_url
+            new_img.image_url = old_img.image_url
+            new_img.image_file = old_img.image_file
+            new_img.name = old_img.name
+            new_img.awards = old_img.awards
+            new_img.variation = old_img.variation
+            new_img.form = old_img.form
+            new_img.text_data = old_img.text_data
+            new_img.description = old_img.description
+            new_img.created_date = old_img.created_date
             # point to a new record
             # Who requested this change?
             new_img.user_id = request.user
