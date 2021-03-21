@@ -13,23 +13,33 @@ from fuzzywuzzy import fuzz, process
 from utils.views import write_output, getRole
 from core.models import Family, Subfamily, Tribe, Subtribe
 
-Genus = apps.get_model('orchidaceae', 'Genus')
-GenusRelation = apps.get_model('orchidaceae', 'GenusRelation')
-Alliance = apps.get_model('orchidaceae', 'Alliance')
-Species = apps.get_model('orchidaceae', 'Species')
-Accepted = apps.get_model('orchidaceae', 'Accepted')
-Hybrid = apps.get_model('orchidaceae', 'Hybrid')
-Synonym = apps.get_model('orchidaceae', 'Synonym')
 epoch = 1740
 alpha_list = string.ascii_uppercase
 logger = logging.getLogger(__name__)
+GenusRelation = []
+Alliance = []
+Accepted = []
+Synonym = []
+app_list = ['Orchidaceae', 'Bromeliaceae', 'Cactaceae']
 
 
 @login_required
-def advanced(request):
+def taxonomy(request):
     f, sf, t, st = '', '', '', ''
     if 'f' in request.GET:
         f = request.GET['f']
+    app = f.lower()
+    if f not in app_list:
+        app = 'other'
+    if f == 'Orchidaceae':
+        # only exist for orchidaceae
+        GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
+        Alliance = apps.get_model(app.lower(), 'Alliance')
+        Accepted = apps.get_model(app.lower(), 'Accepted')
+        Synonym = apps.get_model(app.lower(), 'Synonym')
+    Genus = apps.get_model(app.lower(), 'Genus')
+    Hybrid = apps.get_model(app.lower(), 'Hybrid')
+    Species = apps.get_model(app.lower(), 'Species')
 
     specieslist = []
     hybridlist = []
@@ -44,8 +54,115 @@ def advanced(request):
         subfamily_list = subfamily_list.filter(family=f)
         tribe_list = tribe_list.filter(family=f)
         subtribe_list = subtribe_list.filter(family=f)
+        # if f in app_list':
         genus_list = genus_list.filter(family=f)
+        # else:
+        #     genus_list = genus_list.filter(family=f)
         logger.error("tribe list = " + str(len(tribe_list)))
+        logger.error("genus list = " + str(len(genus_list)))
+
+    if 'sf' in request.GET:
+        sf = request.GET['sf']
+    if sf:
+        tribe_list = tribe_list.filter(subfamily=sf)
+        subtribe_list = subtribe_list.filter(subfamily=sf)
+        genus_list = genus_list.filter(subfamily=sf)
+        logger.error("tribe list = " + str(len(tribe_list)))
+
+    if 't' in request.GET:
+        t = request.GET['t']
+    if t:
+        subtribe_list = subtribe_list.filter(tribe=t)
+        genus_list = genus_list.filter(tribe=t)
+        logger.error("subtribe list = " + str(len(subtribe_list)))
+
+    if 'st' in request.GET:
+        st = request.GET['st']
+        genus_list = genus_list.filter(subtribe=st)
+    subfamily_list = subfamily_list.order_by('family', 'subfamily')
+    tribe_list = tribe_list.order_by('subfamily', 'tribe')
+    subtribe_list = subtribe_list.order_by('tribe', 'subtribe')
+    genus_list = genus_list.order_by('genus')
+
+    # genus_list = Genus.objects.filter(cit_status__isnull=True).exclude(cit_status__exact='').order_by('genus')
+
+    role = getRole(request)
+
+    if 'genus' in request.GET:
+        genus = request.GET['genus']
+        if genus:
+            try:
+                genus = Genus.objects.get(genus=genus)
+            except Genus.DoesNotExist:
+                genus = ''
+    else:
+        genus = ''
+
+    if genus:
+        # new genus has been selected. Now select new species/hybrid
+        specieslist = Species.objects.filter(gen=genus.pid).filter(type='species').filter(
+                cit_status__isnull=True).exclude(cit_status__exact='').order_by('species', 'infraspe', 'infraspr')
+
+        hybridlist = Species.objects.filter(gen=genus.pid).filter(type='hybrid').order_by('species')
+
+        # Construct intragen list
+        if genus.type == 'hybrid':
+            parents = GenusRelation.objects.get(gen=genus.pid)
+            if parents:
+                parents = parents.parentlist.split('|')
+                intragen_list = Genus.objects.filter(pid__in=parents)
+        else:
+            intragen_list = Genus.objects.filter(description__icontains=genus).filter(type='hybrid').filter(
+                num_hybrid__gt=0)
+
+    write_output(request, str(genus))
+    context = {
+        'genus': genus, 'genus_list': genus_list, 'species_list': specieslist, 'hybrid_list': hybridlist,
+        'intragen_list': intragen_list, 'f': f, 'sf': sf, 't': t, 'st': st,
+        'family_list': family_list, 'subfamily_list': subfamily_list, 'tribe_list': tribe_list,
+        'subtribe_list': subtribe_list, 'level': 'core', 'title': 'find_orchid', 'role': role,
+        'home_link': '/', 'title': 'OrchidRoots Home',
+    }
+    return render(request, "search/taxonomy.html", context)
+
+
+@login_required
+def advanced(request):
+    f, sf, t, st = '', '', '', ''
+    if 'f' in request.GET:
+        f = request.GET['f']
+    app = f.lower()
+    if f not in app_list:
+        app = 'other'
+    if f == 'Orchidaceae':
+        # only exist for orchidaceae
+        GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
+        Alliance = apps.get_model(app.lower(), 'Alliance')
+        Accepted = apps.get_model(app.lower(), 'Accepted')
+        Synonym = apps.get_model(app.lower(), 'Synonym')
+    Genus = apps.get_model(app.lower(), 'Genus')
+    Hybrid = apps.get_model(app.lower(), 'Hybrid')
+    Species = apps.get_model(app.lower(), 'Species')
+
+    specieslist = []
+    hybridlist = []
+    intragen_list = []
+    family_list = Family.objects.all()
+    subfamily_list = Subfamily.objects.all()
+    tribe_list = Tribe.objects.all()
+    subtribe_list = Subtribe.objects.all()
+    genus_list = Genus.objects.all()
+    logger.error("tribe list = " + str(len(tribe_list)))
+    if f:
+        subfamily_list = subfamily_list.filter(family=f)
+        tribe_list = tribe_list.filter(family=f)
+        subtribe_list = subtribe_list.filter(family=f)
+        # if f in app_list':
+        genus_list = genus_list.filter(family=f)
+        # else:
+        #     genus_list = genus_list.filter(family=f)
+        logger.error("tribe list = " + str(len(tribe_list)))
+        logger.error("genus list = " + str(len(genus_list)))
 
     if 'sf' in request.GET:
         sf = request.GET['sf']
@@ -112,8 +229,6 @@ def advanced(request):
 
 
 @login_required
-
-
 def search_genus(request):
     # from itertools import chain
     genus = ''

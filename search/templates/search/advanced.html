@@ -129,6 +129,19 @@ form {
 <!--<div style="min-height:200px;background-color:#495360;">-->
    <div style="clear:both"></div>
    <div class="row">
+        <div class="d-none d-sm-block col-sm-4 col-lg-3" >
+            <div class="card" style="border:1px solid pink;">
+                <div class="card-body" >
+                    <ul style="padding-left:5px">
+            <!--                <li><a type="button" class="btn btn-outline-primary bannerfont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
+                        <li class="li-side"><span class="bannerfont" style="color:lightseagreen"><b>Plant Families</b></span></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'search:advanced' %}?family=orchidaceae">Orchidaceae</a></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'bromeliaceae:advanced' %}?family=bromeliaceae">Bromeliaceae</a></li>
+                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="#">Cactaceae</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div class="col-sm-8 col-lg-9 border" style="text-align:left;font-size:13px;">
             <div class="card m-3 ">
                 <div class="card-header"><h6 class="card-title" style="margin-bottom: 0; color:green; font-size:24px;"><b>Family <i>{{f|title}}</i></b></h6></div>
@@ -315,19 +328,6 @@ form {
             {% endif %}
         </div>
 
-        <div class="d-none d-sm-block col-sm-4 col-lg-3" >
-            <div class="card" style="border:1px solid pink;">
-                <div class="card-body" >
-                    <ul style="padding-left:5px">
-            <!--                <li><a type="button" class="btn btn-outline-primary bannerfont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
-                        <li class="li-side"><span class="bannerfont" style="color:lightseagreen"><b>Plant Families</b></span></li>
-                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'search:advanced' %}?family=orchidaceae">Orchidaceae</a></li>
-                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="{% url 'bromeliaceae:advanced' %}?family=bromeliaceae">Bromeliaceae</a></li>
-                        <li class="li-side"><a type="button" class="btn family btn-default-primary btn-sm" href="#">Cactaceae</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
    </div>
 </div>
                 <br>
