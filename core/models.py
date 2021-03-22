@@ -35,6 +35,7 @@ class Family(models.Model):
     family = models.CharField(primary_key=True, default='', db_column='family', max_length=50)
     author = models.CharField(max_length=200, null=True, blank=True)
     year = models.IntegerField(null=True)
+    application = models.CharField(max_length=50, default='', null=True, blank=True)
     description = models.TextField(null=True)
     source = models.CharField(max_length=20, null=True)
     active = models.BooleanField(null=True, default=False)
