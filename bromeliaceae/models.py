@@ -170,6 +170,7 @@ class Species(models.Model):
     infraspe = models.CharField(max_length=50, null=True)
     author = models.CharField(max_length=200)
     originator = models.CharField(max_length=100, blank=True)
+    scientific_name = models.CharField(max_length=500, blank=True)
     citation = models.CharField(max_length=200)
     cit_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
