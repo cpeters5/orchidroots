@@ -1,0 +1,60 @@
+
+<ul>
+    <li>Data Sources
+        <ul>
+            <LI>Catalog of Life: get supra generic records.  Process 100% manual.</LI>
+            <li>BCR: Bromeliaceae hybrids.  Process is 40% manual. </li>
+            <li>WCSP: Process 30% manual</li>
+            <li>RHS: 20% manual</li>
+            <li>IPNI: infra gneric data</li>
+            <li>IOSPE: Orchidaceae culture and infra generic</li>
+        </ul>
+    </li>
+    <li>Cron Tasks
+        <ul>
+            <li>5 minutes: Generate images for new upload from web</li>
+            <li>5 minutes: Sync new accounts to photographer</li>
+            <li>5 minutes: Update ancestor descendant relation</li>
+            <li>daily: refresh genus / species images stat</li>
+            <li>daily: refresh anc/desc count for genus</li>
+        </ul>
+    </li>
+    <li>Daily Tasks
+        <ul>
+            <li>Approve uploade photos</li>
+            <li>Monitor Upload traffic and file growth in digital ocean</li>
+            <li>Monitor comments</li>
+            <li>Monitor new accounts and create profile, photographer</li>
+        </ul>
+    </li>
+    <li>Weekly Tasks
+        <ul>
+            <li>Data integrity: Various SQL scripts</li>
+            <li>monitor total file and directory size</li>
+            <li>monitor historical update (approve, reject, reidentify, delete)</li>
+        </ul>
+    </li>
+    <li>Monthly Tasks
+        <ul>
+            <li>Update WCSP: monthly</li>
+            <li>Update RHS: Monthly</li>
+            <li>Run python manage.py clearsessions once a month to truncate django sessions</li>
+        </ul>
+    </li>
+    <li>Yearly task
+        <ul>
+            <li>RHS Changes: Yearly (100% manual)</li>
+            <li>IPNI: yearly</li>
+            <li>Update GenusRelation (yearly or each time a new genus is created)</li>
+            <li>Update Taxonomy (yearly or each time there is a change in Genus related to subfamily/tribe/subtribe)</li>
+            <li>WCSP: Update Distribution code (yearly)</li>
+            <li>Clean up django migrations</li>
+        </ul>
+    </li>
+
+    <li>TODO
+        <ul>
+            <li>Scripts to compute stats and store in a new database (in core app)</li>
+        </ul>
+    </li>
+</ul>

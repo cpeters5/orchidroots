@@ -1,683 +1,987 @@
-from django.shortcuts import render
-from django.db.models import Q
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse, reverse_lazy
 import string
-from itertools import chain
-from utils.views import write_output, paginator, getRole
+import re
+import pytz
 import logging
-import random
-from myproject import config
-from myproject import conf_bromeliaceae
 
-# Create your views here.
+import django.shortcuts
+import random
+import os
+import shutil
+import json
+
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash, get_user_model
+# from django.contrib.auth.models import User, Group
+from django.contrib.auth import logout as django_logout
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, CreateView, UpdateView
+from django import template
+from django.conf import settings
+from PIL import Image
+from PIL import ExifTags
+from io import BytesIO
+from django.core.files import File
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render, redirect
+from django.urls import reverse, reverse_lazy
+from django.template import RequestContext
+from itertools import chain
+
+from django.utils import timezone
+from datetime import datetime, timedelta
+from utils.views import write_output, is_int, getRole, get_author
+# import pytz
+# MPTT stuff
+# from django.views.generic.list_detail import object_list
+from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
+    SpeciesForm, RenameSpeciesForm
+from accounts.models import User, Profile
+
 from django.apps import apps
+Family = apps.get_model('core', 'Family')
 Subfamily = apps.get_model('core', 'Subfamily')
 Tribe = apps.get_model('core', 'Tribe')
 Subtribe = apps.get_model('core', 'Subtribe')
+Region = apps.get_model('core', 'Region')
+Subregion = apps.get_model('core', 'Subregion')
+Photographer = apps.get_model('accounts', 'Photographer')
 
-Genus = apps.get_model('bromeliaceae', 'Genus')
-Species = apps.get_model('bromeliaceae', 'Species')
-Hybrid = apps.get_model('bromeliaceae', 'Hybrid')
-Accepted = apps.get_model('bromeliaceae', 'Accepted')
-SpcImages = apps.get_model('bromeliaceae', 'SpcImages')
-# HybImages = apps.get_model('bromeliaceae', 'HybImages')
-UploadFile = apps.get_model('orchidaceae', 'UploadFile')
-User = get_user_model()
-alpha_list = config.alpha_list
+app = 'bromeliaceae'
+Genus = apps.get_model(app, 'Genus')
+GenusRelation = apps.get_model(app, 'GenusRelation')
+Species = apps.get_model(app, 'Species')
+Accepted = apps.get_model(app, 'Accepted')
+Hybrid = apps.get_model(app, 'Hybrid')
+Synonym = apps.get_model(app, 'Synonym')
+SpcImages = apps.get_model(app, 'SpcImages')
+Distribution = apps.get_model(app, 'Distribution')
+UploadFile = apps.get_model(app, 'UploadFile')
+MAX_HYB = 500
+list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
 
-
-def advanced(request):
-    specieslist = []
-    hybridlist = []
-    # intragen_list = []
-    sf = t = st = ''
-    family = conf_bromeliaceae.family
-    logger.error("family = " + family)
-    # family_list = Family.objects.all()
-    # if 'f' in request.GET:
-    #     family = request.GET['f']
-
-    subfamily_list = Subfamily.objects.filter(family=family)
-    # subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0)
-    tribe_list = Tribe.objects.filter(subfamily=family)
-    subtribe_list = Subtribe.objects.filter(family=family)
-    if 't' in request.GET:
-        t = request.GET['t']
-        subtribe_list = subtribe_list.filter(tribe=t)
-    if 'st' in request.GET:
-        st = request.GET['st']
-    logger.error("family list = " + str(len(subfamily_list)))
-
-    genus_list = Genus.objects.filter(cit_status__isnull=True).exclude(cit_status__exact='').order_by('genus')
-
-    role = getRole(request)
-
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-        if genus:
-            try:
-                genus = Genus.objects.get(genus=genus)
-            except Genus.DoesNotExist:
-                genus = ''
-    else:
-        genus = ''
-
-    if genus:
-        # new genus has been selected. Now select new species/hybrid
-        specieslist = Species.objects.filter(gen=genus.pid).filter(type='species').filter(
-                cit_status__isnull=True).exclude(cit_status__exact='').order_by('species', 'infraspe', 'infraspr')
-
-        hybridlist = Species.objects.filter(gen=genus.pid).filter(type='hybrid').order_by('species')
-
-        # Construct intragen list
-        # if genus.type == 'hybrid':
-            # parents = GenusRelation.objects.get(gen=genus.pid)
-            # if parents:
-            #     parents = parents.parentlist.split('|')
-            #     intragen_list = Genus.objects.filter(pid__in=parents)
-        # else:
-        #     intragen_list = Genus.objects.filter(description__icontains=genus).filter(type='hybrid').filter(
-        #         num_hybrid__gt=0)
-
-    write_output(request, str(genus))
-    context = {
-        'genus': genus, 'genus_list': genus_list,
-        'species_list': specieslist, 'hybrid_list': hybridlist,
-        'family': family,
-        'subfamily': sf, 'tribe': t, 'subtribe': st,
-        'subfamily_list': subfamily_list, 'tribe_list': tribe_list, 'subtribe_list': subtribe_list,
-        'level': 'search', 'title': 'find_orchid', 'role': role,
-    }
-    return render(request, "bromeliaceae/advanced.html", context)
-
-
-def genera(request):
-    genus = ''
-    min_lengenus_req = 2
-    year = ''
-    genustype = ''
-    formula1 = ''
-    formula2 = ''
-    status = ''
-    sort = ''
-    prev_sort = ''
-    sf_obj = ''
-    t = ''
-    t_obj = ''
-    st_obj = ''
-    num_show = 5
-    page_length = 1000
-    # max_page_length = 1000
-    role = getRole(request)
-    alpha = ''
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-        if len(genus) > min_lengenus_req:
-            genus = str(genus).split()
-            genus = genus[0]
-
-    year_valid = 0
-    if 'year' in request.GET:
-        year = request.GET['year']
-        if valid_year(year):
-            year_valid = 1
-
-    if 'genustype' in request.GET:
-        genustype = request.GET['genustype']
-    if not genustype:
-        genustype = 'ALL'
-
-    if 'formula1' in request.GET:
-        formula1 = request.GET['formula1']
-    if 'formula2' in request.GET:
-        formula2 = request.GET['formula2']
-
-    # if 'formula1' in request.GET:
-    #     formula1 = request.GET['formula1']
-    # if 'formula2' in request.GET:
-    #     formula2 = request.GET['formula2']
-
-    if 'status' in request.GET:
-        status = request.GET['status']
-
-    genus_list = Genus.objects.all()
-    print(len(genus_list))
-
-    if year_valid:
-        year = int(year)
-        genus_list = genus_list.filter(year=year)
-
-    if genus:
-        if len(genus) >= 2:
-            genus_list = genus_list.filter(genus__icontains=genus)
-        elif len(genus) < 2:
-            genus_list = genus_list.filter(genus__istartswith=genus)
-    logger.error("genus = " + str(genus) + " genus lenght = " + str(len(genus_list)))
-
-    if status == 'synonym':
-        genus_list = genus_list.filter(status='synonym')
-
-    elif genustype:
-        if genustype == 'ALL':
-            if year:
-                genus_list = genus_list.filter(year=year)
-        elif genustype == 'hybrid':
-            genus_list = genus_list.filter(type='hybrid').exclude(status='synonym')
-            if formula1 != '' or formula2 != '':
-                genus_list = genus_list.filter(description__icontains=formula1).filter(description__icontains=formula2)
-        elif genustype == 'species':
-            # If an intrageneric is chosen, start from beginning.
-            genus_list = genus_list.filter(type='species').exclude(status='synonym')
-    else:
-        genustype = 'ALL'
-        #     genus_list = Genus.objects.none()
-    logger.error("year = " + str(year) + " genus lenght = " + str(len(genus_list)))
-
-    if alpha and len(alpha) == 1:
-        genus_list = genus_list.filter(genus__istartswith=alpha)
-
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
-
-    # Sort before paginator
-    if sort:
-        genus_list = genus_list.order_by(sort)
-
-    total = genus_list.count()
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
-        = paginator(request, genus_list, page_length, num_show)
-    logger.error("genus = " + str(genus) + " page lenght = " + str(len(page_list)))
-
-    genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
-    context = {'my_list': page_list, 'total': total, 'genus_lookup': genus_lookup,
-               'title': 'genera', 'genus': genus, 'year': year, 'genustype': genustype, 'status': status,
-               'alpha': alpha, 'alpha_list': alpha_list,
-               'sort': sort, 'prev_sort': prev_sort, 'role': role,
-               'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
-               'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item, }
-    write_output(request)
-    return render(request, 'bromeliaceae/genera.html', context)
+redirect_message = "<br><br>Species does not exist! "
 
 
 @login_required
-def species_list(request):
-    spc = genus = gen = ''
-    # genus = partial genus name
-    mysubgenus = mysection = mysubsection = myseries = ''
-    subgenus_obj = section_obj = subsection_obj = series_obj = ''
-    region_obj = subregion_obj = ''
-    year = ''
-    year_valid = 0
-    status = author = dist = ''
-    sort = prev_sort = ''
-    num_show = 5
-    page_length = 500
-    # max_page_length = 1000
-    # Initialize
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-    else:
-        alpha = ''
-
-    if 'year' in request.GET:
-        year = request.GET['year']
-        if valid_year(year):
-            year_valid = 1
-    if 'status' in request.GET:
-        status = request.GET['status']
-
-    # Get regions
-    if 'region' in request.GET:
-        region = request.GET['region']
-        if region:
+def rank_update(request, species):
+    rank = 0
+    if 'rank' in request.GET:
+        rank = request.GET['rank']
+        rank = int(rank)
+        if 'id' in request.GET:
+            orid = request.GET['id']
+            orid = int(orid)
+            image = ''
             try:
-                region_obj = Region.objects.get(id=region)
-            except Region.DoesNotExist:
-                pass
-    if 'subregion' in request.GET:
-        subregion = request.GET['subregion']
-        if subregion:
+                image = SpcImages.objects.get(pk=orid)
+            except SpcImages.DoesNotExist:
+                return 0
+                # acc = Accepted.objects.get(pk=pid)
+            image.rank = rank
+            image.save()
+    return rank
+
+
+@login_required
+def quality_update(request, species):
+    if request.user.tier.tier > 2 and 'quality' in request.GET:
+        quality = request.GET['quality']
+        quality = int(quality)
+        if 'id' in request.GET:
+            orid = request.GET['id']
+            orid = int(orid)
+            image = ''
             try:
-                subregion_obj = Subregion.objects.get(code=subregion)
-            except Subregion.DoesNotExist:
-                pass
-    region_list = Region.objects.exclude(id=0)
-    if region_obj:
-        subregion_list = Subregion.objects.filter(region=region_obj.id)
-    else:
-        subregion_list = Subregion.objects.all()
+                image = SpcImages.objects.get(pk=orid)
+            except SpcImages.DoesNotExist:
+                return 3
+            image.quality = quality
+            image.save()
+    # return quality
 
-    # Get list for display
-    if 'status' in request.GET:
-        status = request.GET['status']
-    this_species_list = Species.objects.exclude(status='pending').filter(type='species')
-    if status == 'synonym':
-        this_species_list = this_species_list.filter(status='synonym')
-    elif status == 'accepted':
-        this_species_list = this_species_list.exclude(status='synonym')
 
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
+# All access - at least role = pub
+def compare(request, pid):
+    # TODO:  Use Species form instead
+    infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
+    pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
+    spcimg1_list = spcimg2_list = []
+
+    if pid > 0:
         try:
-            gen = Genus.objects.get(genus=genus).pid
-        except Genus.DoesNotExist:
-            gen = ''
-
-    intragen_list = Intragen.objects.all()
-
-    if genus:
-        if genus[0] != '%' and genus[-1] != '%':
-            this_species_list = this_species_list.filter(genus__icontains=genus)
-            intragen_list = intragen_list.filter(genus__icontains=genus)
-
-        elif genus[0] == '%' and genus[-1] != '%':
-            mygenus = genus[1:]
-            this_species_list = this_species_list.filter(genus__iendswith=mygenus)
-            intragen_list = intragen_list.filter(genus__iendswith=genus)
-
-        elif genus[0] != '%' and genus[-1] == '%':
-            mygenus = genus[:-1]
-            this_species_list = this_species_list.filter(genus__istartswith=mygenus)
-            intragen_list = intragen_list.filter(genus__istartswith=genus)
-        elif genus[0] == '%' and genus[-1] == '%':
-            mygenus = genus[1:-1]
-            this_species_list = this_species_list.filter(genus__icontains=mygenus)
-            intragen_list = intragen_list.filter(genus__icontains=genus)
-
-    temp_subgen_list = []
-    if 'subgenus' in request.GET:
-        mysubgenus = request.GET['subgenus']
-        if mysubgenus:
-            try:
-                subgenus_obj = Subgenus.objects.get(pk=mysubgenus)
-            except Subgenus.DoesNotExist:
-                pass
-            if gen:
-                temp_subgen_list = Accepted.objects.filter(subgenus=mysubgenus).filter(gen=gen).distinct(). \
-                    values_list('pid', flat=True)
-            else:
-                temp_subgen_list = Accepted.objects.filter(subgenus=mysubgenus).distinct().values_list('pid', flat=True)
-
-    temp_sec_list = []
-    if 'section' in request.GET:
-        mysection = request.GET['section']
-        if mysection:
-            try:
-                section_obj = Section.objects.get(pk=mysection)
-            except Section.DoesNotExist:
-                section_obj = ''
-            if gen:
-                temp_sec_list = Accepted.objects.filter(section=mysection).filter(gen=gen).distinct(). \
-                    values_list('pid', flat=True)
-            else:
-                temp_sec_list = Accepted.objects.filter(section=mysection).distinct().values_list('pid', flat=True)
-
-    temp_subsec_list = []
-    if 'subsection' in request.GET:
-        mysubsection = request.GET['subsection']
-        if mysubsection:
-            try:
-                subsection_obj = Subsection.objects.get(pk=mysubsection)
-            except Subsection.DoesNotExist:
-                pass
-            if gen:
-                temp_subsec_list = Accepted.objects.filter(subsection=mysubsection).filter(gen=gen).distinct(). \
-                    values_list('pid', flat=True)
-            else:
-                temp_subsec_list = Accepted.objects.filter(subsection=mysubsection).distinct(). \
-                    values_list('pid', flat=True)
-
-    temp_ser_list = []
-    if 'series' in request.GET:
-        myseries = request.GET['series']
-        if myseries:
-            try:
-                series_obj = Series.objects.get(pk=myseries)
-            except Series.DoesNotExist:
-                pass
-            if gen:
-                temp_ser_list = Accepted.objects.filter(series=myseries).filter(gen=gen).distinct(). \
-                    values_list('pid', flat=True)
-            else:
-                temp_ser_list = Accepted.objects.filter(series=myseries).distinct().values_list('pid', flat=True)
-
-    if 'spc' in request.GET:
-        spc = request.GET['spc']
-        if len(spc) == 1:
-            alpha = ''
-
-    if 'author' in request.GET:
-        author = request.GET['author']
-
-    if 'dist' in request.GET:
-        dist = request.GET['dist']
-
-    if alpha != 'ALL':
-        alpha = alpha[0: 1]
-
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
-    if mysubgenus:
-        this_species_list = this_species_list.filter(pid__in=temp_subgen_list)
-    if mysection:
-        this_species_list = this_species_list.filter(pid__in=temp_sec_list)
-    if mysubsection:
-        this_species_list = this_species_list.filter(pid__in=temp_subsec_list)
-    if myseries:
-        this_species_list = this_species_list.filter(pid__in=temp_ser_list)
-
-    if spc:
-        # if species[0] != '%' and species[-1] != '%':
-        if len(spc) >= 2:
-            this_species_list = this_species_list.filter(species__icontains=spc)
-        else:
-            this_species_list = this_species_list.filter(species__istartswith=spc)
-
-    elif alpha:
-        if len(alpha) == 1:
-            this_species_list = this_species_list.filter(species__istartswith=alpha)
-
-    if author:
-        this_species_list = this_species_list.filter(author__icontains=author)
-
-    if dist:
-        this_species_list = this_species_list.filter(distribution__icontains=dist)
-
-    if year_valid:
-        year = int(year)
-        this_species_list = this_species_list.filter(year=year)
-
-    if region_obj:
-        pid_list = Distribution.objects.filter(region_id=region_obj.id).values_list('pid', flat=True).distinct()
-        this_species_list = this_species_list.filter(pid__in=pid_list)
-    if subregion_obj:
-        pid_list = Distribution.objects.filter(subregion_code=subregion_obj.code). \
-            values_list('pid', flat=True).distinct()
-        this_species_list = this_species_list.filter(pid__in=pid_list)
-
-    if sort:
-        if sort == 'classification':
-            this_species_list = this_species_list.order_by('subgenus', 'section', 'subsection', 'series')
-        elif sort == '-classification':
-            this_species_list = this_species_list.order_by('-subgenus', '-section', '-subsection', '-series')
-        else:
-            this_species_list = this_species_list.order_by(sort)
+            species = Species.objects.get(pk=pid)
+            pid = species.pid
+            genus = species.genus
+            species1 = species
+        except Species.DoesNotExist:
+            return HttpResponseRedirect("/")
     else:
-        this_species_list = this_species_list.order_by('genus', 'species')
-    total = this_species_list.count()
+        return HttpResponse("/")
 
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = \
-        mypaginator(request, this_species_list, page_length, num_show)
+    # Handfle request. Should use SpcForm instead.
+    if 'species1' in request.GET:
+        spc1 = request.GET['species1']
+        spc1 = spc1.strip()
+    if 'genus1' in request.GET:
+        gen1 = request.GET['genus1']
+        gen1 = gen1.strip()
+    if 'infraspe1' in request.GET:
+        infraspe1 = request.GET['infraspe1']
+        infraspe1 = infraspe1.strip()
+    if 'infraspr1' in request.GET:
+        infraspr1 = request.GET['infraspr1']
+        infraspr1 = infraspr1.strip()
+    if 'author1' in request.GET:
+        author1 = request.GET['author1']
+        author1 = author1.strip()
+    if 'year1' in request.GET:
+        year1 = request.GET['year1']
+        year1 = year1.strip()
+        if year1:
+            year1 = int(year1)
 
-    subgenus_list = intragen_list.filter(subgenus__isnull=False).values_list('subgenus', 'subgenus'). \
-        distinct().order_by('subgenus')
-    if gen:
-        subgenus_list = subgenus_list.filter(gen=gen)
-    elif genus:
-        subgenus_list = subgenus_list.filter(genus__istartswith=genus)
+    if 'species2' in request.GET:
+        spc2 = request.GET['species2']
+        spc2 = spc2.strip()
+    if 'genus2' in request.GET:
+        gen2 = request.GET['genus2']
+        gen2 = gen2.strip()
+    if 'infraspe2' in request.GET:
+        infraspe2 = request.GET['infraspe2']
+        infraspe2 = infraspe2.strip()
+    if 'infraspr2' in request.GET:
+        infraspr2 = request.GET['infraspr2']
+        infraspr2 = infraspr2.strip()
+    if 'author2' in request.GET:
+        author2 = request.GET['author2']
+        author2 = author2.strip()
+    if 'year2' in request.GET:
+        year2 = request.GET['year2']
+        if year2:
+            year2 = year2.strip()
 
-    section_list = intragen_list.filter(section__isnull=False)
-    if gen:
-        section_list = section_list.filter(gen=gen)
-    elif genus:
-        section_list = section_list.filter(genus__istartswith=genus)
-
-    subsection_list = intragen_list.filter(subsection__isnull=False)
-    if gen:
-        subsection_list = subsection_list.filter(gen=gen)
-    elif genus:
-        subsection_list = subsection_list.filter(genus__istartswith=genus)
-
-    series_list = intragen_list.filter(series__isnull=False)
-    if gen:
-        series_list = series_list.filter(gen=gen)
-    elif genus:
-        series_list = series_list.filter(genus__istartswith=genus)
-
-    if mysubgenus:
-        section_list = section_list.filter(subgenus=mysubgenus)
-        subsection_list = subsection_list.filter(subgenus=mysubgenus)
-        series_list = series_list.filter(subgenus=mysubgenus)
-
-    if mysection:
-        subsection_list = subsection_list.filter(section=mysection)
-        series_list = series_list.filter(section=mysection)
-
-    section_list = section_list.values_list('section', 'section').distinct().order_by('section')
-    subsection_list = subsection_list.values_list('subsection', 'subsection').distinct().order_by('subsection')
-    series_list = series_list.values_list('series', 'series').distinct().order_by('series')
-
-    # Sort by classification
-    classtitle = ''
-    if not subgenus_list:
-        subgenus_obj = ''
-    else:
-        classtitle = classtitle + 'Subgenus'
-    if not section_list:
-        section_obj = ''
-    else:
-        classtitle = classtitle + ' Section'
-    if not subsection_list:
-        subsection_obj = ''
-    else:
-        classtitle = classtitle + ' Subsection'
-    if not series_list:
-        series_obj = ''
-    else:
-        classtitle = classtitle + ' Series'
-    if classtitle == '':
-        classtitle = 'Classification'
     role = getRole(request)
-    write_output(request, str(genus))
-    context = {'page_list': page_list, 'total': total, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
-               'role': role,
-               'subgenus_list': subgenus_list, 'subgenus_obj': subgenus_obj,
-               'section_list': section_list, 'section_obj': section_obj, 'genus': genus,
-               'subsection_list': subsection_list, 'subsection_obj': subsection_obj,
-               'series_list': series_list, 'series_obj': series_obj,
-               'classtitle': classtitle,
-               'year': year, 'status': status,
-               'author': author, 'dist': dist,
-               'region_obj': region_obj, 'region_list': region_list, 'subregion_obj': subregion_obj,
-               'subregion_list': subregion_list, 'sort': sort, 'prev_sort': prev_sort,
-               'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
-               'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
-               'level': 'list', 'title': 'species_list', 'type': 'species'
-               }
-    return render(request, 'bromeliaceae/species.html', context)
+    if gen1:  # Request new genus1:
+        try:
+            genus1 = Genus.objects.get(genus__iexact=gen1)
+            genus = genus1
+        except Genus.DoesNotExist:
+            # Fallback to initial species
+            message = "genus, " + gen1 + ' does not exist'
+            context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                       'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
+                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                       'message1': message,
+                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+            return render(request, app + '/compare.html', context)
+        if spc1:
+            species1 = Species.objects.filter(species__iexact=spc1).filter(genus__iexact=gen1)
+            if infraspe1:
+                species1 = species1.filter(infraspe=infraspe1).filter(infraspr=infraspr1)
+            if author1:
+                species1 = species1.filter(author=author1)
+            if year1:
+                species1 = species1.filter(year=year1)
+
+            if len(species1) == 0:
+                message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> does not exist'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
+                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message1': message,
+                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, app + '/compare.html', context)
+            elif len(species1) > 1:
+                if infraspe1 and infraspr1:
+                    species1 = species1.filter(infraspe__icontains=infraspe1).filter(infraspr__icontains=infraspr1)
+                else:
+                    species1 = species1.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+                if year1:
+                    species1 = species1.filter(year=year1)
+                if len(species1) == 1:  # Found unique species
+                    species1 = species1[0]
+                    species = species1
+                    pid1 = species1.pid
+                    pid = ''
+                elif len(species1) > 1:  # MULTIPLE SPECIES RETURNED
+                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returns more than one values'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, app + '/compare.html', context)
+                else:  # length = 0  This could be a synonym
+                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returned none'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, app + '/compare.html', context)
+            else:  # Unique species found
+                species1 = species1[0]
+                species = species1
+                pid1 = species1.pid
+                pid = ''
+        else:
+            pid1 = ''
+    else:
+        # species 1 was not requested. use initial species
+        genus1 = species.genus
+        species1 = species
+        pid1 = pid
+
+    if not genus1 and not species1 and not genus2 and not species2 and not pid1 and not pid2:
+        send_url = "/common/photos/" + str(species.pid) + "/?role=cur" + "&family=" + family.family
+        return HttpResponseRedirect(send_url)
+
+    if species1:
+        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if gen2:
+        try:
+            genus2 = Genus.objects.get(genus__iexact=gen2)
+        except Genus.DoesNotExist:
+            # Fallback to initial species
+            message = "genus <b>" + gen2 + '</b> does not exist'
+            context = {'species1': species1, 'genus1': genus1,
+                       'pid1': species1.pid,
+                       'spcimg1_list': spcimg1_list,
+                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                       'message2': message,
+                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+            return render(request, app + '/compare.html', context)
+        if spc2:
+            species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
+            if len(species2) == 0:
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus1': species1.genus, 'species1': species1, 'spcimg1_list': spcimg1_list,
+                           'genus2': gen2, 'species2': spc2,
+                           'message2': message,
+                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, app + '/compare.html', context)
+            elif len(species2) > 1:
+                if infraspe2 and infraspr2:
+                    species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
+                else:
+                    species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+                if year2:
+                    species2 = species2.filter(year=year2)
+                if author2:
+                    species2 = species2.filter(author=author2)
+
+                if len(species2) == 1:  # Found unique species
+                    species2 = species2[0]
+                    pid2 = species2.pid
+                elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message2': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, app + '/compare.html', context)
+                else:  # length = 0
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, app + '/compare.html', context)
+            else:
+                species2 = species2[0]
+                pid2 = species2.pid
+        else:
+            pid2 = ''
+
+    cross = ''
+    message1 = message2 = accepted1 = accepted2 = ''
+
+    if species1 and species1.status == 'synonym':
+        pid1 = species1.getAcc()
+        accepted1 = species1.getAccepted()
+    if species2 and species2.status == 'synonym':
+        pid2 = species2.getAcc()
+        accepted2 = species2.getAccepted()
+
+    if pid1 and pid2:
+        cross = Hybrid.objects.filter(seed_id=pid1).filter(pollen_id=pid2)
+        if not cross:
+            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid1)
+        if cross:
+            cross = cross[0]
+        else:
+            cross = ''
+
+    if species1:
+        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    if species2:
+        spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    msgnogenus = ''
+    if 'msgnogenus' in request.GET:
+        msgnogenus = request.GET['msgnogenus']
+
+    write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    context = {'pid': pid, 'genus': genus, 'species': species,
+               'pid1': pid1, 'pid2': pid2, 'accepted1': accepted1, 'accepted2': accepted2,  # pid of accepted species
+               'genus1': genus1, 'species1': species1, 'spcimg1_list': spcimg1_list,
+               'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
+               'cross': cross,
+               'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
+               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+    return render(request, app + '/compare.html', context)
+
+
+def createhybrid(request):
+    genus1 = genus2 = species1 = species2 = ''
+    if 'pid1' in request.GET:
+        pid1 = request.GET['pid1']
+        try:
+            species1 = Species.objects.get(pk=pid1)
+        except Species.DoesNotExist:
+            return HttpResponse(redirect_message)
+        if species1.status == 'synonym':
+            species1 = species1.getAccepted()
+
+        if 'pid2' in request.GET:
+            pid2 = request.GET['pid2']
+            try:
+                species2 = Species.objects.get(pk=pid2)
+            except Species.DoesNotExist:
+                return HttpResponse(redirect_message)
+        else:
+            species2 = ''
+
+        if species2.status == 'synonym':
+            species2 = species2.getAccepted()
+
+        spc1 = species1.species
+        if species1.infraspe:
+            spc1 += ' ' + species1.infraspe
+        spc2 = species2.species
+        if species2.infraspe:
+            spc2 += ' ' + species2.infraspe
+    else:
+        return HttpResponse(redirect_message)
+
+    role = getRole(request)
+    if not role or role != 'cur':
+        send_url = app + '/compare/' + str(pid1) + '/'
+        return HttpResponseRedirect(send_url)
+
+    import datetime
+    # Now create the new species objects
+    # # Get nothogenus
+    # # First, find all genus ancestors of both
+    gen1 = species1.gen.pid
+    gen2 = species2.gen.pid
+    parent1 = GenusRelation.objects.get(gen=gen1)
+    parent2 = GenusRelation.objects.get(gen=gen2)
+    parentlist1 = parent1.get_parentlist()
+    parentlist2 = parent2.get_parentlist()
+    parentlist = parentlist1 + parentlist2
+    parentlist = list(dict.fromkeys(parentlist))
+    parentlist.sort()
+
+    # Look for genus with this parent list
+    result_list = GenusRelation.objects.all()
+    genus = ''
+    for x in result_list:
+        a = x.get_parentlist()
+        a.sort()
+        if a == parentlist:
+            genus = x.genus
+            break
+    if not genus:
+        msgnogenus = "404"
+        genus1 = species1.genus
+        genus2 = species2.genus
+        send_url = app + '/compare/' + str(pid1) + '/?msgnogenus=' + msgnogenus + '&genus1=' + genus1 + \
+                   '&genus2=' + genus2 + '&species1=' + str(species1) + '&species2=' + str(species2)
+        return HttpResponseRedirect(send_url)
+    # Create Species instance
+    spcobj = Species()
+    spcobj.genus = genus
+    spcobj.species = spc1 + '-' + spc2
+    spcobj.pid = Hybrid.objects.filter(pid__gt=900000000).filter(pid__lt=999999999).order_by('-pid')[0].pid_id + 1
+    spcobj.source = 'INT'
+    spcobj.type = 'hybrid'
+    spcobj.status = 'nonregistered'
+    datetime_obj = datetime.datetime.now()
+    spcobj.year = datetime_obj.year
+    spcobj.save()
+    spcobj = Species.objects.get(pk=spcobj.pid)
+
+    # Now create Hybrid instance
+    hybobj = Hybrid()
+    hybobj.pid = spcobj
+    hybobj.seed_genus = species1.genus
+    hybobj.pollen_genus = species2.genus
+    hybobj.seed_species = spc1
+    hybobj.pollen_species = spc2
+    if species1.status == 'synonym':
+        hybobj.seed_id = species1.getAccepted()
+    else:
+        hybobj.seed_id = species1
+    if species2.status == 'synonym':
+        hybobj.pollen_id = species2.getAccepted()
+    else:
+        hybobj.pollen_id = species2
+    hybobj.save()
+    if genus1 and genus2:
+        write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    else:
+        write_output(request)
+    return HttpResponseRedirect("/common/photos/" + str(spcobj.pid) + "/?role=" + role + "&genus2=" + species2.genus + "&family=" + family.family)
 
 
 @login_required
-def hybrid_list(request):
-    spc = ''
-    genus = ''
-    # min_lenspecies_req = 2
-    year = ''
-    year_valid = 0
-    status = ''
-    author = ''
-    originator = ''
-    seed_genus = ''
-    pollen_genus = ''
-    seed = ''
-    pollen = ''
+def curate_newupload(request):
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    file_list = UploadFile.objects.all().order_by('-created_date')
+    days = 7
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
+    role = getRole(request)
 
-    alpha = ''
-    sort = ''
-    prev_sort = ''
+    write_output(request)
+    context = {'file_list': page_list,
+               'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'app': app, 'title': 'curate_newupload', 'section': 'Curator Corner',
+               }
+    return render(request, "common/curate_newupload.html", context)
+
+
+@login_required
+def curate_pending(request):
+    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
+
+    ortype = ''
+    if 'type' in request.GET:
+        ortype = request.GET['type']
+    if not ortype:
+        ortype = 'species'
+
+    days = 7
+    if 'days' in request.GET:
+        days = int(request.GET['days'])
+    if not days:
+        days = 7
+
+    file_list = SpcImages.objects.filter(rank=0)
+
+    if days:
+        file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
+    file_list = file_list.order_by('-created_date')
 
     num_show = 5
-    page_length = 200
+    page_length = 100
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
 
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-
-    if 'year' in request.GET:
-        year = request.GET['year']
-        if valid_year(year):
-            year_valid = 1
-
-    if 'status' in request.GET:
-        status = request.GET['status']
-
-    this_species_list = Species.objects.exclude(status='pending').filter(type='hybrid')
-    if status == 'synonym':
-        this_species_list = this_species_list.filter(status='synonym')
-    elif status == 'accepted':
-        this_species_list = this_species_list.exclude(status='synonym')
-
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-    if 'seed_genus' in request.GET:
-        seed_genus = request.GET['seed_genus']
-    if seed_genus == 'clear':
-        seed_genus = ''
-
-    if 'pollen_genus' in request.GET:
-        pollen_genus = request.GET['pollen_genus']
-    if pollen_genus == 'clear':
-        pollen_genus = ''
-
-    genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
-    genus_list.sort()
-
-    if genus:
-        if not seed_genus and not pollen_genus:
-            if genus[0] == '*' or genus[-1] == '*':
-                genus = genus.replace('*','')
-                this_species_list = this_species_list.filter(genus__icontains=genus)
-            else:
-                this_species_list = this_species_list.filter(genus=genus)
-        else:
-            # If user request one or both parent genus, then reset genus to ''
-            genus = ''
-
-    if 'spc' in request.GET:
-        spc = request.GET['spc']
-        if len(spc) == 1:
-            alpha = ''
-
-    if 'author' in request.GET:
-        author = request.GET['author']
-    if 'originator' in request.GET:
-        originator = request.GET['originator']
-
-    if 'seed' in request.GET:
-        seed = request.GET['seed']
-
-    if 'pollen' in request.GET:
-        pollen = request.GET['pollen']
-
-
-    if alpha != 'ALL':
-        alpha = alpha[0:1]
-
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
-
-    if spc:
-        # if species[0] != '%' and species[-1] != '%':
-        if len(spc) >= 2:
-            this_species_list = this_species_list.filter(species__icontains=spc)
-        else:
-            this_species_list = this_species_list.filter(species__istartswith=spc)
-
-    elif alpha:
-        if len(alpha) == 1:
-            this_species_list = this_species_list.filter(species__istartswith=alpha)
-
-    if author and not originator:
-        this_species_list = this_species_list.filter(author__icontains=author)
-    if author and originator:
-        this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
-    if originator and not author:
-        this_species_list = this_species_list.filter(originator__icontains=originator)
-
-    if seed_genus:
-        this_species_list = this_species_list.filter(Q(hybrid__seed_genus=seed_genus)
-                                                     | Q(hybrid__pollen_genus=seed_genus))
-    if pollen_genus:
-        this_species_list = this_species_list.filter(Q(hybrid__seed_genus=pollen_genus)
-                                                     | Q(hybrid__pollen_genus=pollen_genus))
-
-    if seed:
-        this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=seed)
-                                                     | Q(hybrid__pollen_species__icontains=seed))
-
-    if pollen:
-        this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=pollen)
-                                                     | Q(hybrid__pollen_species__icontains=pollen))
-
-    if year_valid:
-        year = int(year)
-        this_species_list = this_species_list.filter(year=year)
-
-    # # Add the following to clear the list if no filter given
-    # if not genus and not spc and not seed and not pollen and not year and not author and not originator and not dist \
-    #         and not ancestor and not subgenus and not section and not subsection and not series:
-    #     this_species_list = Species.objects.none()
-
-    if sort:
-        this_species_list = this_species_list.order_by(sort)
-    else:
-        this_species_list = this_species_list.order_by('genus', 'species')
-    total = this_species_list.count()
-
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
-        = mypaginator(request, this_species_list, page_length, num_show)
-    write_output(request, str(genus))
-    context = {'my_list': page_list, 'genus_list': genus_list,
-               'total': total, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
-               'genus': genus, 'year': year, 'status': status,
-               'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen, 'seed_genus': seed_genus,
-               'pollen_genus': pollen_genus,
-               'sort': sort, 'prev_sort': prev_sort,
-               'page': page, 'page_range': page_range, 'last_page': last_page, 'next_page': next_page,
-               'prev_page': prev_page, 'num_show': num_show, 'first': first_item, 'last': last_item,
-               'level': 'list', 'title': 'hybrid_list',
+    role = getRole(request)
+    write_output(request)
+    title = 'curate_pending'
+    context = {'file_list': page_list, 'type': ortype,
+               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page,
+               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'app': app, 'title': title,
                }
-    return render(request, 'bromeliaceae/hybrid.html', context)
+    return render(request, 'common/curate_pending.html', context)
+
+
+@login_required
+def curate_newapproved(request):
+    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
+    species = ''
+    image = ''
+    ortype = 'species'
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    if 'type' in request.GET:
+        ortype = request.GET['type']
+        # Request to change rank/quality
+        if 'id' in request.GET:
+            orid = int(request.GET['id'])
+            try:
+                image = SpcImages.objects.get(pk=orid)
+            except SpcImages.DoesNotExist:
+                species = ''
+        if image:
+            species = Species.objects.get(pk=image.pid_id)
+
+    days = 3
+    if 'days' in request.GET:
+        days = int(request.GET['days'])
+    file_list = SpcImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
+
+    if days:
+        file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
+    file_list = file_list.order_by('-created_date')
+    if species:
+        rank_update(request, species)
+        quality_update(request, species)
+
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
+
+    role = getRole(request)
+    write_output(request)
+    context = {'file_list': page_list, 'type': ortype,
+               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page,
+               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'app': app, 'title': 'curate_newapproved',
+               }
+    return render(request, 'common/curate_newapproved.html', context)
+
+
+@login_required
+def curateinfospc(request, pid):
+    species = Species.objects.get(pk=pid)
+    genus = species.genus
+    accepted = Accepted.objects.get(pk=pid)
+
+    tab = 'ins'
+    if 'tab' in request.GET:
+        tab = request.GET['tab']
+    role = getRole(request)
+
+    url = app + '/curateinfospc.html'
+    distribution_list = Distribution.objects.filter(pid=species.pid)
+    if request.method == 'POST':
+        form = AcceptedInfoForm(request.POST, instance=accepted)
+        if form.is_valid():
+            spc = form.save(commit=False)
+            spc.pid = species
+
+            # TODO: Put these in form.clean methods
+            if spc.altitude:
+                spc.altitude = spc.altitude.replace("\"", "\'\'")
+                spc.altitude = spc.altitude.replace("\r", "<br>")
+            if spc.description:
+                spc.description = spc.description.replace("<br>", "")
+                # spc.description = spc.description.replace("\"", "\'\'")
+                spc.description = spc.description.replace("\r", "<br>")
+            if spc.culture:
+                spc.culture = spc.culture.replace("<br>", "")
+                spc.culture = spc.culture.replace("\"", "\'\'")
+                spc.culture = spc.culture.replace("\r", "<br>")
+            if spc.comment:
+                spc.comment = spc.comment.replace("<br>\r", "\r")
+                spc.comment = spc.comment.replace("\"", "\'\'")
+                spc.comment = spc.comment.replace("\r", "<br>")
+            if spc.history:
+                spc.history = spc.history.replace("<br>", "")
+                spc.history = spc.history.replace("\"", "\'\'")
+                spc.history = spc.history.replace("\r", "<br>")
+            if spc.etymology:
+                spc.etymology = spc.etymology.replace("<br>", "")
+                # spc.etymology = spc.etymology.replace("\"", "\'\'")
+                spc.etymology = spc.etymology.replace("\r", "<br>")
+            spc.operator = request.user
+            spc.save()
+
+            url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, family)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse("POST: Somethign's wrong")
+    else:
+        accepted = Accepted.objects.get(pk=species.pid)
+        form = AcceptedInfoForm(instance=accepted)
+        context = {'form': form, 'genus': genus, 'species': species,
+                   'title': 'curateinfo', 'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
+                   'app': app, 'role': role,}
+        return render(request, url, context)
+
+
+@login_required
+def reidentify(request, orid, pid):
+    source_file_name = ''
+    role = getRole(request)
+    old_species = Species.objects.get(pk=pid)
+    old_family = old_species.gen.family
+    if role != 'cur':
+        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+        return HttpResponseRedirect(url)
+
+    if old_species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        old_species = Species.objects.get(pk=pid)
+
+    form = SpeciesForm(request.POST or None)
+    old_img = SpcImages.objects.get(pk=orid)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            new_pid = form.cleaned_data.get('species')
+            try:
+                new_species = Species.objects.get(pk=new_pid)
+            except Species.DoesNotExist:
+                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+                return HttpResponseRedirect(url)
+
+            # If re-idenbtified to same genus. Just change pid
+            if new_species.genus == old_species.genus:
+                new_img = SpcImages.objects.get(pk=old_img.id)
+                new_img.pid = new_species
+                if source_file_name:
+                    new_img.source_file_name = source_file_name
+                new_img.pk = None
+            else :
+                if old_img.image_file:
+                    new_img = SpcImages(pid=new_species)
+                    from_path = os.path.join(settings.STATIC_ROOT, old_img.image_dir() + old_img.image_file)
+                    if new_species.gen.family.application == 'orchidaceae':
+                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family.application) + "/" + old_img.image_file)
+                    else:
+                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
+                    os.rename(from_path, to_path)
+                else:
+                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
+                    return HttpResponseRedirect(url)
+                if source_file_name:
+                    new_img.source_file_name = source_file_name
+            new_img.author = old_img.author
+            new_img.pk = None
+            new_img.source_url = old_img.source_url
+            new_img.image_url = old_img.image_url
+            new_img.image_file = old_img.image_file
+            new_img.name = old_img.name
+            new_img.awards = old_img.awards
+            new_img.variation = old_img.variation
+            new_img.form = old_img.form
+            new_img.text_data = old_img.text_data
+            new_img.description = old_img.description
+            new_img.created_date = old_img.created_date
+            # point to the new record, Who requested this change?
+            new_img.user_id = request.user
+
+            # ready to save
+            new_img.save()
+
+            # Delete old record
+            old_img.delete()
+
+            # write_output(request, old_species.textname() + " ==> " + new_species.textname())
+            url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
+            return HttpResponseRedirect(url)
+    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
+    return render(request, app + '/reidentify.html', context)
+
+
+@login_required
+def uploadfile(request, pid):
+    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@orchidroots.org'
+        return HttpResponse(message)
+
+    author, author_list = get_author(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    app = species.gen.family.application
+    family = species.gen.family
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    role = getRole(request)
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            if isinstance(species, Species):
+                spc.pid = species
+
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, species.gen.family)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse('save failed')
+
+    context = {'form': form, 'species': species, 'web': 'active',
+               'author_list': author_list, 'author': author, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, app + '/uploadfile.html', context)
+
+
+@login_required
+def uploadweb(request, pid, orid=None):
+    sender = 'web'
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponse(redirect_message)
+
+    # For Other application only
+    family = species.gen.family
+    app = family.application
+
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+
+    role = getRole(request)
+
+    if request.method == 'POST':
+        form = UploadSpcWebForm(request.POST)
+
+        if form.is_valid():
+            spc = form.save(commit=False)
+            if not spc.author and not spc.credit_to:
+                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            spc.user_id = request.user
+            spc.pid = species
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            if orid and orid > 0:
+                spc.id = orid
+            # set rank to 0 if private status is requested
+            if spc.is_private is True or request.user.tier.tier < 3:
+                spc.rank = 0
+
+            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
+            if spc.author.user_id and request.user.tier.tier < 3:
+                if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
+                    spc.rank = 0
+            if spc.image_url == 'temp.jpg':
+                spc.image_url = None
+            if spc.image_file == 'None':
+                spc.image_file = None
+            if spc.created_date == '' or not spc.created_date:
+                spc.created_date = timezone.now()
+            spc.save()
+
+            url = "%s?role=cur&family=%s" % (reverse('common:photos', args=(species.pid,)), species.gen.family)
+            write_output(request, species.textname())
+            return HttpResponseRedirect(url)
+        else:
+            logger.error(">>> Form is not valid: ")
+
+    if not orid:  # upload, initialize author. Get image count
+        if species.type == 'species':
+            form = UploadSpcWebForm(initial={'author': request.user.photographer.author_id})
+        else:
+            form = UploadHybWebForm(initial={'author': request.user.photographer.author_id})
+        img = ''
+    else:  # update. initialize the form iwht current image
+        img = SpcImages.objects.get(pk=orid)
+        if not img.image_url:
+            sender = 'file'
+            img.image_url = "temp.jpg"
+        else:
+            sender = 'web'
+        form = UploadSpcWebForm(instance=img)
+
+    context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
+               'species': species, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadweb'}
+    return render(request, app + '/uploadweb.html', context)
+
+
+def mypaginator(request, full_list, page_length, num_show):
+    page_list = []
+    first_item = 0
+    last_item = 0
+    next_page = 0
+    prev_page = 0
+    last_page = 0
+    page = 0
+    page_range = 0
+    total = len(full_list)
+    if page_length > 0:
+        paginator = Paginator(full_list, page_length)
+        if 'page' in request.GET:
+            page = request.GET.get('page', '1')
+        if not page or page == 0:
+            page = 1
+        else:
+            page = int(page)
+
+        try:
+            page_list = paginator.page(page)
+            last_page = paginator.num_pages
+        except EmptyPage:
+            page_list = paginator.page(1)
+            last_page = 1
+        next_page = page + 1
+        if next_page > last_page:
+            next_page = last_page
+        prev_page = page - 1
+        if prev_page < 1:
+            prev_page = 1
+
+        first_item = (page - 1) * page_length + 1
+        last_item = first_item + page_length - 1
+        if last_item > total:
+            last_item = total
+        # Get the index of the current page
+        index = page_list.number - 1  # edited to something easier without index
+        # This value is maximum index of your pages, so the last page - 1
+        max_index = len(paginator.page_range)
+        # You want a range of 7, so lets calculate where to slice the list
+        start_index = index - num_show if index >= num_show else 0
+        end_index = index + num_show if index <= max_index - num_show else max_index
+        # My new page range
+        page_range = paginator.page_range[start_index: end_index]
+    return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
+
+
+
+@login_required
+def curateinfospc(request, pid):
+    species = Species.objects.get(pk=pid)
+    accepted = Accepted.objects.get(pk=pid)
+    genus = species.genus
+    tab = 'ins'
+    if 'tab' in request.GET:
+        tab = request.GET['tab']
+    role = getRole(request)
+
+    distribution_list = Distribution.objects.filter(pid=species.pid)
+    if request.method == 'POST':
+        form = AcceptedInfoForm(request.POST, instance=accepted)
+        if form.is_valid():
+            spc = form.save(commit=False)
+            spc.pid = species
+
+            # TODO: Put these in form.clean methods
+            if spc.altitude:
+                spc.altitude = spc.altitude.replace("\"", "\'\'")
+                spc.altitude = spc.altitude.replace("\r", "<br>")
+            if spc.description:
+                spc.description = spc.description.replace("<br>", "")
+                # spc.description = spc.description.replace("\"", "\'\'")
+                spc.description = spc.description.replace("\r", "<br>")
+            if spc.culture:
+                spc.culture = spc.culture.replace("<br>", "")
+                spc.culture = spc.culture.replace("\"", "\'\'")
+                spc.culture = spc.culture.replace("\r", "<br>")
+            if spc.comment:
+                spc.comment = spc.comment.replace("<br>\r", "\r")
+                spc.comment = spc.comment.replace("\"", "\'\'")
+                spc.comment = spc.comment.replace("\r", "<br>")
+            if spc.history:
+                spc.history = spc.history.replace("<br>", "")
+                spc.history = spc.history.replace("\"", "\'\'")
+                spc.history = spc.history.replace("\r", "<br>")
+            if spc.etymology:
+                spc.etymology = spc.etymology.replace("<br>", "")
+                # spc.etymology = spc.etymology.replace("\"", "\'\'")
+                spc.etymology = spc.etymology.replace("\r", "<br>")
+            spc.operator = request.user
+            spc.save()
+
+            url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, species.gen.family)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse("POST: Somethign's wrong")
+    else:
+        accepted = Accepted.objects.get(pk=species.pid)
+        form = AcceptedInfoForm(instance=accepted)
+        context = {'form': form, 'genus': genus, 'species': species, 'app': app,
+                   'title': 'curateinfo', 'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
+                   'role': role,}
+        return render(request, app + '/curateinfospc.html', context)
+
+
+@login_required
+def curateinfohyb(request, pid):
+    species = Species.objects.get(pk=pid)
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=species.pid)
+        species = Species.objects.get(pk=synonym.acc_id)
+    genus = species.genus
+    if species.type == 'species':
+        url = "%s?tab=info&family=%s" % (reverse(app + ':curateinfospc', args=(species.pid,)),species.gen.family)
+        return HttpResponseRedirect(url)
+    accepted = species.hybrid
+    tab = 'inh'
+    if 'tab' in request.GET:
+        tab = request.GET['tab']
+    role = getRole(request)
+    hybrid = Hybrid.objects.get(pk=species.pid)
+    if request.method == 'POST':
+        a = Hybrid.objects.get(pk=species.pid)
+        b = Species.objects.get(pk=species.pid)
+        form = HybridInfoForm(request.POST, instance=a)
+        spcform = RenameSpeciesForm(request.POST, instance=b)
+        if form.is_valid():
+            spcspc = spcform.save(commit=False)
+            spc = form.save(commit=False)
+            spc.pid = species
+
+            # TODO: Put these in form.clean_description etc...  method
+            if spc.description:
+                spc.description = spc.description.replace("<br>", "")
+                spc.description = spc.description.replace("\"", "\'\'")
+                spc.description = spc.description.replace("\r", "<br>")
+            if spc.culture:
+                spc.culture = spc.culture.replace("<br>", "")
+                spc.culture = spc.culture.replace("\"", "\'\'")
+                spc.culture = spc.culture.replace("\r", "<br>")
+            if spc.comment:
+                spc.comment = spc.comment.replace("<br>\r", "\r")
+                spc.comment = spc.comment.replace("\"", "\'\'")
+                spc.comment = spc.comment.replace("\r", "<br>")
+            if spc.history:
+                spc.history = spc.history.replace("<br>", "")
+                spc.history = spc.history.replace("\"", "\'\'")
+                spc.history = spc.history.replace("\r", "<br>")
+            if spc.etymology:
+                spc.etymology = spc.etymology.replace("<br>", "")
+                spc.etymology = spc.etymology.replace("\"", "\'\'")
+                spc.etymology = spc.etymology.replace("\r", "<br>")
+
+            spcspc.save()
+            spc.save()
+            url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, species.gen.family)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse("POST: Somethign's wrong")
+    else:
+        form = HybridInfoForm(instance=hybrid)
+        spcform = RenameSpeciesForm(instance=accepted)
+
+        context = {'form': form, 'spcform': spcform, 'genus': genus, 'species': species,
+                   'tab': 'inh', tab: 'active', 'title': 'curateinfo', 'role': role,
+                   }
+        return render(request, app + '/curateinfohyb.html', context)
+

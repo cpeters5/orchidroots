@@ -65,16 +65,18 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'session_cleanup',
     'django_crontab',
+    'dbview',
     # 'rest_framework',
 
     #local
     'myproject',
     'accounts',
+    'common',
+    'core',
     'documents',
     'donation',
-    'search',
-    'utils',
-    'core',
+    # 'search',
+    # 'utils',
 
     'bromeliaceae',
     'detail',
@@ -158,7 +160,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # )
 
 # Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.0/ref/settings/#databasesz
 
 DATABASES = {
     'default': {

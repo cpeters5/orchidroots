@@ -1,0 +1,377 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+<style>
+
+.imageitem {
+    display:inline-block;
+    border:1px solid red;
+    margin:10px 20px;
+    width : 18vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 5px auto;
+    width:100%;
+}
+        /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding:2px;
+    margin:0 auto;
+}
+
+.imgcaption {
+    font-size: 12px;
+    height:60px;
+    text-align: left;
+    padding:0 10px;
+    width: 100%;
+    color: #0a6aa1;
+}
+
+.imgtitle {
+    font-size: 18px;
+    font-weight: bold;
+    height:40px;
+    text-align: center;
+    padding-top:5px;
+    /*overflow: hidden;*/
+}
+
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 4px 0;
+    font-size:12px;
+}
+
+
+
+@media only screen and (max-width: 800px){
+   .imageitem {
+        width: 30vw;
+        /*height : 250px;*/
+    }
+    .imgcaption {
+        font-size: 12px;
+    }
+   .box {
+        /*width: 35vw;*/
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 190px !important;
+       width : 95% !important;
+    }
+
+    div.text {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .imageitem {
+        width: 36vw;
+    }
+    .box {
+        width: 35vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 110px !important;
+       width : 95% !important;
+    }
+
+    .imgcaption {
+       width : 34vw;
+        font-size: 11px;
+        height: 59px;
+    }
+    div.text {
+        font-size: 10px;
+    }
+}
+
+
+img{
+    width:100%;
+}
+
+
+/* [3] Finally, transforming the image when container gets hovered */
+.img-hover-zoom:hover img {
+  transform: scale(1.5);
+}
+    ul{
+        padding-left:15px;
+        font-size: 13px;
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:none;
+    }
+    
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+    /*min-height:400px;*/
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
+.app-btn {
+    display:inline-block;
+    width:150px;
+    /*border:1px solid darkgrey !important;*/
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+    color: grey;
+    border:1px solid #2b77b5 !important;
+}
+
+</style>
+
+<div style="clear:both"></div>
+
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div style="clear:both"></div>
+    <div class="row">
+        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0;">
+            {% include "side_home.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9" style="margin-top:8px;">
+            <div class="card mt-3">
+                <div class="card-body" style="font-size:15px">
+                    <h6 class="card-title d-inline-block">Welcome to OrchidRoots</h6>
+                    <div class="d-inline-block">
+                        OrchidRoots is a non-profit organization. Our goal is to provide a tool that will help
+                        our users search for and find the roots of their orchids.
+                        Though each member of our team works on a voluntary basis, there are ongoing costs for technology,
+                        operation and new development that would require some funding. Please make a donation to help our course&nbsp;&nbsp;
+                            <a class="btn btn-custom btn-outline-primary" style="width: 120px; height:25px; padding:0" href="{% url 'donation:donateapp' %}">Donate</a>
+                        <br>
+                        Your donation will allow us to deliver more value and to make the world of orchids more transparent.
+
+                    </div>
+                    <br>
+                    <p>
+                    And now, to begin, select a family from the left panel and search for your orchids.
+                    <div class="p-2" style="text-align: center;">
+                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
+                            <input type="hidden" name="family" value="{{family}}" />
+                            <input type="hidden" name="search" value="species" />
+                            <input type="hidden" name="role" value="{{ role }}" />
+                            <div class="input-group">
+                            <input form="searchspc" type="text" name="spc_string" value="{{spc_string}}" placeholder="Search binomial" style="border:1px solid #ccc; border-right: 0">
+                            <button class="submit" form="searchspc" type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <br>
+                    </p>
+                    <div class="clearfix"></div>
+                    <div class="imageitem">
+                        <div class="imgtitle" style="background-color:#d3baff; color: #0a6aa1;">{{orcimage.gen.family}}</div>
+                        <a href="{% url 'common:browse' %}?family={{orcimage.gen.family}}&genus={{orcimage.gen.genus}}&role={{role}}&display=checked">
+                            <div class="box">
+                                <img class="thumbnails" alt="{{orcimage.pid.pid.textname}}" src="{% static orcimage.image_dir %}{{orcimage.image_file}}">
+                                <div class="text text-br">{{image.id}}</div>
+                            </div>
+                        </a>
+                        <div class="imgcaption">
+                            <a href="{% url 'common:information' orcimage.pid_id %}?family={{orcimage.gen.family}}&role={{role}}">
+                                {{orcimage.pid.name|safe}} {% if orcfamily.application == 'other' %}({{orcimage.gen.family}}){% endif %}
+                            </a>
+                            <br>&#169;<a href="{{orcimage.source_url}}" target="_blank" >{{orcimage.get_displayname}}</a>
+                        </div>
+                    </div>
+
+                    <div class="imageitem">
+                        <div class="imgtitle" style="background-color:#f6bebe; color: #0a6aa1;">{{broimage.gen.family}}</div>
+                        <a href="{% url 'common:browse' %}?family={{broimage.gen.family}}&genus=&role={{role}}&display=checked">
+                            <div class="box">
+                                <img class="thumbnails" alt="{{broimage.pid.pid.textname}}" src="{% static broimage.image_dir %}{{broimage.image_file}}">
+                                <div class="text text-br">{{image.id}}</div>
+                            </div>
+                        </a>
+                        <div class="imgcaption">
+                            <a href="{% url 'common:information' broimage.pid_id %}?family={{broimage.gen.family}}&role={{role}}">
+                                {{broimage.pid.name|safe}} {% if brofamily.application == 'other' %}({{broimage.gen.family}}){% endif %}
+                            </a>
+                            <br>&#169;<a href="{{broimage.source_url}}" target="_blank" >{{broimage.get_displayname}},</a>
+                        </div>
+                    </div>
+
+                    <div class="imageitem">
+                        <div class="imgtitle" style="background-color:#d9ffc9;; color: #0a6aa1;">{{cacimage.gen.family}}</div>
+                        <a href="{% url 'common:browse' %}?family={{cacimage.gen.family}}&genus=&role={{role}}&display=checked">
+                            <div class="box">
+                                <img class="thumbnails" alt="{{cacimage.pid.pid.textname}}" src="{% static cacimage.image_dir %}{{cacimage.image_file}}">
+                                <div class="text text-br">{{image.id}}</div>
+                            </div>
+                        </a>
+                        <div class="imgcaption">
+                            <a href="{% url 'common:information' cacimage.pid_id %}?family={{cacimage.gen.family}}&role={{role}}">
+                                {{cacimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{cacimage.gen.family}}){% endif %}
+                            </a>
+                            <br>&#169;<a href="{{cacimage.source_url}}" target="_blank" >{{cacimage.get_displayname}},</a>
+                        </div>
+                    </div>
+
+<!--                    Other families-->
+                    {% for othimage in other_list %}
+                       <div class="imageitem">
+                            <div class="imgtitle" style="background-color:#eee; color: #0a6aa1;">{{othimage.gen.family}}</div>
+                            <a href="{% url 'common:browse' %}?family={{othimage.gen.family}}&genus=&role={{role}}&display=checked">
+                                <div class="box">
+                                    <img class="thumbnails" alt="{{othimage.pid.pid.textname}}" src="{% static othimage.image_dir %}{{othimage.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                                </div>
+                            </a>
+                            <div class="imgcaption">
+                                <a href="{% url 'common:information' othimage.pid_id %}?family={{othimage.gen.family}}&role={{role}}">
+                                    {{othimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.gen.family}}){% endif %}
+                                </a>
+                                <br>&#169;<a href="{{othimage.source_url}}" target="_blank" >{{othimage.get_displayname}},</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+<!--                    Succulent genus-->
+                    {% if succulent_obj %}
+                       <div class="imageitem">
+                            <div class="imgtitle" style="background-color:#eee; color: #0a6aa1;">Succulent</div>
+                            <a href="{% url 'common:browse' %}?family={{succulent_obj.gen.family}}&genus=&role={{role}}&display=checked&group=succulent">
+                                <div class="box">
+                                    <img class="thumbnails" alt="{{succulent_obj.pid.pid.textname}}" src="{% static succulent_obj.image_dir %}{{succulent_obj.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                                </div>
+                            </a>
+                            <div class="imgcaption">
+                                <a href="{% url 'common:information' succulent_obj.pid_id %}?family={{succulent_obj.gen.family}}&role={{role}}">
+                                    {{succulent_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{succulent_obj.gen.family}}){% endif %}
+                                </a>
+                                <br>&#169;<a href="{{succulent_obj.source_url}}" target="_blank" >{{succulent_obj.get_displayname}},</a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+ <!--                    Carnivorous genus-->
+                    {% if carnivorous_obj %}
+                       <div class="imageitem">
+                            <div class="imgtitle" style="background-color:#eee; color: #0a6aa1;">Carnivorous</div>
+                            <a href="{% url 'common:browse' %}?family={{carnivorous_obj.gen.family}}&genus=&role={{role}}&display=checked&group=carnivorous">
+                                <div class="box">
+                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static carnivorous_obj.image_dir %}{{carnivorous_obj.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                                </div>
+                            </a>
+                            <div class="imgcaption">
+                                <a href="{% url 'common:information' carnivorous_obj.pid_id %}?family={{carnivorous_obj.gen.family}}&role={{role}}">
+                                    {{carnivorous_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{carnivorous_obj.gen.family}}){% endif %}
+                                </a>
+                                <br>&#169;<a href="{{carnivorous_obj.source_url}}" target="_blank" >{{carnivorous_obj.get_displayname}},</a>
+                            </div>
+                        </div>
+                    {% endif %}
+               </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+            <br>
+        </div>
+    </div>
+
+
+
+
+</div> <!--Summary-->
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+//
+// $(this).ekkoLightbox({
+//     alwaysShowClose: true
+// });
+
+// This function supposed to change position of lightbox close icon.
+// Lightbox.prototype.build = function() {
+//     var self = this;
+//     $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox">' +
+//         '<div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div>' +
+//         '<div class="lb-closeContainer"><a class="lb-close"></a></div></div></div><div class="lb-outerContainer"><div class="lb-container">' +
+//         '<img class="lb-image" src="/statics/utils/images/icon-close-512.png" />' +
+//         '<div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div>' +
+//         '<div class="lb-loader"><a class="lb-cancel"></a></div></div></div></div>').appendTo($('body'));
+// }
+</script>
+
+
+
+
+
+{% endblock %}

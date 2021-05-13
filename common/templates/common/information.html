@@ -1,0 +1,898 @@
+{% load static %}
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+
+<style>
+
+ul.b {list-style-type: disc;}
+label {
+    display: inline-block;
+    width: 250px;
+    margin-right: 5px;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: .25;
+  }
+}
+input:checked {
+    height: 20px;
+    width: 20px;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 0 auto;
+    width:100%;
+}
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+div.text-bl a {
+    color: #2fffff;
+}
+
+        /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 15vw;
+   width : 16vw;
+   padding: 3px;
+    margin: 3px;
+    margin-bottom: 0;
+
+}
+.thumbnails2 {
+   height: 10vw !important;
+   width : 10vw !important;
+}
+.thumbnails3 {
+   height: 7vw !important;
+   width : 7vw !important;
+    border:1px solid lightgrey;
+    padding:0 !important;
+    margin:0 !important;
+}
+.parent-text {
+    font-size:10px;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin:  0 auto;
+}
+.imageitem {
+    display:inline-block;
+    border:1px solid grey;
+    margin:0 2px;
+    width : 17vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+img{
+    width:100%;
+}
+
+.imgcaption {
+    font-size: 10px;
+    height: auto;
+    overflow: hidden;
+    padding:0 6px;
+    text-align: center;
+}
+
+. general-info {
+    padding:5px !important;
+    margin: 2px;
+    overflow:auto;
+    font-size:13px;
+    border: 1px solid lightgrey;
+
+}
+.list-group{
+    /*max-height: 300px;*/
+    /*margin-bottom: 10px;*/
+    /*padding:5px 50px !important;*/
+    margin: 2px;
+    overflow:auto;
+    width:22%;
+    /*max-height: 200px;*/
+    /*-webkit-overflow-scrolling: touch;*/
+    font-size:13px;
+    border-bottom: 0 solid lightgrey;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 5px 30px;
+    font-size  : 11px;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+.grandparent-title {
+    font-size: 14px;
+    text-align:center;
+}
+@media only screen and (max-width: 830px) {
+   .imageitem {
+        width: 30vw;
+    }
+    .imgcaption {
+        font-size: 10px;
+    }
+   .box {
+        /*width: 35vw;*/
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 190px !important;
+       width : 95% !important;
+    }
+
+    div.text {
+        font-size: 10px;
+    }
+   .thumbnails2 {
+       height: 13vw !important;
+       width : 13vw !important;
+    }
+   .thumbnails3 {
+       height: 13vw !important;
+       width : 13vw !important;
+   }
+   .list-group{
+        /*max-height: 100px;*/
+        font-size:11px;
+        text-align: left;
+    }
+
+    .grandparent-title {
+        font-size: 13px;
+        text-align:center;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .imageitem {
+        width: 36vw;
+    }
+    .box {
+        width: 35vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 110px !important;
+       width : 95% !important;
+    }
+
+    div.text {
+        font-size: 10px;
+    }
+    .thumbnails2 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+    .thumbnails3 {
+       height: 14vw !important;
+       width : 14vw !important;
+    }
+    .parent-text {
+        font-size:9px;
+    }
+    .list-group{
+        /*max-height: 200px;*/
+        font-size:10px;
+        padding:2px;
+    }
+    .grandparent-title {
+        font-size: 12px;
+        text-align:center;
+    }
+}
+
+
+/*style for lightroom*/
+.lb-dataContainer {
+    background-color:white;
+}
+.lb-caption {
+    color:black;
+}
+.lb-closeContainer {
+    color: black;
+}
+#main {
+  display: flex;
+  flex: 1;
+}
+seedparent, pollparent {
+  padding: 1em;
+}
+
+.anc {
+    width:80%; margin:0 auto; text-align:center;padding: 10px 3px 3px 3px; border:1px solid #aaa; background-color: #f4f4f6;
+}
+
+.row.display-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.row.display-flex > [class*='col-'] {
+  flex-grow: 1;
+  /*display: flex;*/
+  /*flex-direction: column;*/
+}
+
+
+
+
+.info-collapse {
+    text-align: left;
+    padding-left: 15px;
+    width: 200px;
+}
+.btn-group-xs > .btn, .btn-xs {
+    font-size: 12px;
+    line-height: .85;
+}
+
+
+[type="button"]:not(:disabled), [type="reset"]:not(:disabled), [type="submit"]:not(:disabled), button:not(:disabled) {
+
+    cursor: pointer;
+    /*width: 200px;*/
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 0;
+}
+.card {
+    margin: 5px 0;
+    /*width: 200px;*/
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0px solid rgba(0, 0, 0, .125);
+    border-radius: 0;
+}
+
+.card-body {
+    padding: 5px 15px 5px 15px;
+    /*width: 400px;*/
+}
+
+.btn-light.focus, .btn-light:focus {
+    /*box-shadow: 0 0 0 .2rem rgba(216,217,219,.5);*/
+    /*font-weight: bolder;*/
+    box-shadow: none;
+}
+
+.btn.focus, .btn:focus {
+    outline: 0;
+    /*box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);*/
+}
+.collapse {
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+
+
+</style>
+        <!--Main sections-->
+<div style="margin:0 auto;width:95%;">
+    <!-- Main -->
+    {% if role == 'cur' %}
+        {% include 'common/detail-nav.html' %}
+    {% else %}
+        {% include "common/detail-nav.html" %}
+    {% endif %}
+    <!-- body -->
+    <div style="background:white; margin:0 auto;background:white;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
+
+        <!--Classification-->
+            <!--Taxonomy-->
+                <!--  Top section -->
+        <div class="d-flex p-2 justify-content-center">
+            <!--Left panel-->
+            <div class="d-none d-sm-block col-sm-3 col-lg-3 p-2 list-group  bg-light" style="border:1px solid lightgrey">
+                <div style="padding-left:10px;">
+                    {% if species.gen.subfamily %}
+                        <br><b>Subfamily:</b>
+                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&subfamily={{species.gen.subfamily.subfamily}}&type=species&role={{role}}">{{species.gen.subfamily}}</a>
+                    {% endif %}
+
+                    {% if species.gen.tribe %}
+                        <br><b>Tribe:</b>
+                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&tribe={{species.gen.tribe.tribe}}&type=species&role={{role}}">{{species.gen.tribe}}</a>
+                    {% endif %}
+
+                    {% if species.gen.subtribe %}
+                        <br><b>Subtribe:</b>
+                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&subtribe={{species.gen.subtribe.subtribe}}&type=species&role={{role}}">{{species.gen.subtribe}}</a>
+                    {% endif %}
+
+                        <br><b>Genus:</b>
+                        {{species.gen}}:
+                        <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&type=species&genus={{species.genus}}&role={{role}}">list</a>&nbsp;&nbsp;|
+                        &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+
+                    {% if accepted.subgenus %}
+                        <br><b>Subgenus:</b>
+                        {{accepted.subgenus}}:
+                            <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                            &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                    {% endif %}
+
+                    {% if accepted.section %}
+                        <br><b>Section:</b>
+                            {{accepted.section}}:
+                                {% if accepted.subgenus %}
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                {% else %}
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                {% endif %}
+                    {% endif %}
+
+                    {% if accepted.subsection %}
+                        <br><b>Subsection:</b>
+                                {{accepted.subsection}}:
+                                {% if accepted.subgenus %}
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                {% else %}
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                {% endif %}
+                    {% endif %}
+
+                    {% if accepted.series %}
+                        <br><b>Series:</b>
+                                {{accepted.series}}
+                                {% if accepted.section %}
+
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                {% else %}
+                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
+                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&role={{role}}&series={{accepted.series}}&genus={{species.genus}}&type=species&display=checked">images</a>
+                                {% endif %}
+                    {% endif %}
+<!--                <hr>-->
+                </div>
+            </div>
+            <!--Right panel-->
+            <div class="col-sm-9 col-lg-9 p-2 list-group  bg-light flex-fill" style="border:1px solid lightgrey">
+                <div id="accordion">
+                    <!-- Update button for curators-->
+                    {% if user.tier.tier > 2 and role == 'cur' %}
+                    <div class="card">
+                       {% if species.type == 'species' %}
+                           <a type="button" class="btn btn-primary btn-sm info-collapse" href="/{{app}}/curateinfospc/{{species.pid}}/?&role={{role}}">Update Information</a>
+                       {% elif species.type == 'hybrid' %}
+                           <a type="button" class="btn btn-primary btn-sm info-collapse" href="/{{app}}/curateinfohyb/{{species.pid}}/?&role={{role}}">Update Information</a>
+                       {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if distribution_list %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Distribution">Distribution</button>
+                        <div id="Distribution" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                            <ul style="list-style-type:none;padding: 0 2px; margin-bottom: 10px;">
+                            {% for dist in distribution_list %}
+                                {% if forloop.first %}
+                                    <li>
+                                        {% if dist.localregion_id and dist.localregion_id > 0 %}{{dist.localregion_id}},{% endif %}
+                                        {% if dist.subregion_code %}{{dist.subregion_code}}, {% endif %}
+                                        {% if dist.region_id %}{{dist.region_id}}, {% endif %}
+                                        {% if dist.continent_id %}{{dist.continent_id}}{% endif %}
+                                    </li>
+                                {% else %}
+                                    <li>{{dist.name}}</li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if accepted.description %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Description">Description</button>
+                        <div id="Description" class="collapse" data-parent="#accordion">
+                            <div class="card-body" style="padding:10px;">
+                            {{accepted.description|safe}}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if accepted.comment %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Comments">Comments</button>
+                        <div id="Comments" class="collapse" data-parent="#accordion">
+                            <div class="card-body" style="padding:10px;">
+                            {{accepted.comment|safe}}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if species..culture %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Culture">Culture</button>
+                        <div id="Culture" class="collapse" data-parent="#accordion">
+                            <div class="card-body" style="padding:10px;">
+                            {{accepted.culture|safe}}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.history or accepted.etymology %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Information">Misc. Information</button>
+                        <div id="Information" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.history or accepted.etymology %}
+                                    {% if accepted.common_name or accepted.local_name %}
+                                        <br>
+                                        <b>Common Name:</b>
+                                        {% if accepted.common_name %}{{accepted.common_name}},{% endif %}
+                                        {% if accepted.local_name %}{{accepted.local_name}}{% endif %}
+                                    {% endif %}
+                                    {% if accepted.altitude %}
+                                        <br>
+                                        <b>Altitude:</b>
+                                        {{accepted.altitude|safe}}
+                                    {% endif %}
+                                    {% if accepted.bloom_month %}
+                                        <br>
+                                        <b>bloom_month (local):</b>
+                                        {{accepted.bloom_month|safe}}
+                                    {% endif %}
+                                    {% if accepted.history %}
+                                        <br>
+                                        <b>History</b>
+                                        {{accepted.history|safe}}
+                                    {% endif %}
+                                    {% if accepted.etymology %}
+                                        <br>
+                                        <b>Etymology</b>
+                                        {{accepted.etymology|safe}}
+                                    {% endif %}
+                                {% else %}
+                                        <br>
+                                    None
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if synonym_list.count > 0 %}
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Synonym">Synonym</button>
+                        <div id="Synonym" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% if synonym_list.count > 0 %}
+                                    <ul style="list-style-type:none; padding: 0 2px; margin-bottom: 10px;">
+                                    {% for synonym in synonym_list %}
+                                        <li>{{ synonym.spid.name|safe }}<i> {{ synonym.spid.author }}</i> {{synonym.spid.year|default:''}}
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    None
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="card">
+                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" href="#offspring">Immediate Offspring</button>
+                        <div id="offspring" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% if offspring_count > 0 %}
+                                    <table class="table table-sm table-hover table-condensed table-border offsp" style="margin: 0 auto;width:100%; padding:0;border:1px solid #ccc;">
+<!--                                        <tr bgcolor="#e3e3e3">-->
+<!--                                            <th class="border-rb">Grex</th><th class="border-rb">Parents</th></tr>-->
+                                        {% for off in offspring_list %}
+                                         <tr >
+                                             <td class="border-lb" style="text-align: left">
+                                                 <a href="{% url 'common:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
+                                                 <span style="font-zize:11px">
+                                                     {{off.pid.name |safe}}
+                                                     {% if off.pid.num_image > 0 %} *{% endif %}
+                                                 </span>
+                                                 </a> </td>
+                                             <td class="border-rb" style="text-align: left;">
+                                                 {% if off.seed_id %}
+                                                    <a href="{% url 'common:information' off.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_seed_name|safe }}</a>
+                                                 {% else %}
+                                                    na
+                                                 {% endif %}
+                                                    ×
+                                                 {% if off.pollen_id %}
+                                                    <a href="{% url 'common:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_pollen_name|safe }}</a>
+                                                 {% else %}
+                                                    na
+                                                 {% endif %}
+                                             </td>
+                                         </tr>
+                                         {% endfor %}
+                                     </table>
+                                {% else %}
+                                    None
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+<!--    Display images-->
+<!--        <div class="col-12 bg-light">-->
+        <div class="d-flex p-1 justify-content-center" style="width:100%; margin:0 auto;">
+            <div class="p-1 flex-fill list-group border" style="border:0 solid lightgrey">
+                {% if display_items %}
+                    <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
+                        {% for image in display_items %}
+                            <div class="imageitem p-1 justify-content-center" style="margin:2px;">
+                                {% if image.image_file %}
+                                    <div class="box">
+                                    <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
+                                        <img  class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
+                                        <div class="text text-br" ><span style="color:white">{{image.id}}</span></div>
+                                    </a>
+                                    </div>
+                                {% else %}
+                                    <div class="box">
+                                        <img  class="thumbnails" alt="" src="{{image.image_url}}">
+                                        <div class="text text-br" ><span style="color:white">{{image.id}}</span></div>
+                                    </div>
+                                {% endif %}
+                                <div class="imgcaption">
+                                    {% if image.source_url %}
+                                        &#169; <a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}}</a>
+                                    {% else %}
+                                        {{image.get_displayname}}
+                                    {% endif %}
+                                    <br>
+                                    {% if image.source_file_name %}
+                                        {{image.source_file_name}} (syn)
+                                    {% else %}
+                                        {{image.imginfo}}
+                                    {% endif %}
+                                    {{image.name|default:""}}
+                                    {{image.awards|default:""}}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'common:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}"><b>more ... </b></a></span>
+                {% else %}
+                    <div style="width: 100%; font-size:12px;border:0 solid lightgrey; margin:0 auto; text-align: center; padding:10px">
+                        No image available. if you have one please consider uploading it
+                        <a href="/{{app}}/uploadfile/{{species.pid}}/?tab=sum">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
+                            <a href="https://www.facebook.com/groups/BlueNanta/?ref=br_rs">Blue Nanta, OrchidRoots User's Group</a>.
+                        Copyright credit and a link to your website will be displayed with every photo.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if species.type == 'hybrid' %}
+            <div class="d-flex p-1 justify-content-center" style="width:100%; max-height:9999px;border:0 solid pink; margin:0 auto;">
+                <!--Seed parent-->
+                <div class="p-2 list-group  bg-light" style="border: 1px solid lightgrey; width:50%">
+                    <div class="bg-light" style="border: 0 solid lightgrey; margin:0px;margin-left:0px;">
+                        <div style="font-size: 14px; text-align:center"><b>Seed Parent</b></div>
+                        <div class="d-flex flex-wrap justify-content-center" >
+                            {% if seedimg_list %}
+                                {% for seed in seedimg_list %}
+                                    {% if forloop.last and seedimg_list.count > 1 %}
+                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
+                                        {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
+                                            <img  class="d-none d-md-block thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% static seed.image_dir %}{{seed.image_file}}">
+                                    </a>
+                                    {% else %}
+                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
+                                        {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
+                                            <img  class="thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% static seed.image_dir %}{{seed.image_file}}">
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <img class="thumbnails thumbnails2" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                            {% endif %}
+                        </div>
+                        <div class="parent-text " style="text-align:center; margin-bottom:10px;">
+                            {% if species.hybrid.seed_id.pid %}
+                                <a href="{% url 'common:information' species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
+                            {% else %}
+                                {{species.hybrid.seed_genus | default:"Nodata"}} ?
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!--Pollen Parents-->
+                <div class="p-2 list-group bg-light border" style="width:50%;">
+                    <div class="bg-light" style="border: 0 solid lightgrey;">
+                        <div style="font-size: 14px; text-align:center"><b>Pollen Parent</b></div>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            {% if pollimg_list %}
+                                {% for pol in pollimg_list %}
+                                    {% if forloop.last and pollimg_list.count > 1  %}
+                                    <a class="d-none d-md-block" href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
+                                                {% if pol.text_data %}{{pol.text_data|safe}}{% endif %}</small></h6>">
+                                        <img  class="thumbnails thumbnails2" alt="{{pol.pid.pid.textname}}" src="{% static pol.image_dir %}{{pol.image_file}}">
+                                    </a>
+                                    {% else %}
+                                    <a href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
+                                                {% if pol.text_data %}{{pol.text_data|safe}}{% endif %}</small></h6>">
+                                        <img  class="thumbnails thumbnails2" alt="{{pol.pid.pid.textname}}" src="{% static pol.image_dir %}{{pol.image_file}}">
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <img class="thumbnails thumbnails2"  alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                            {% endif %}
+                        </div>
+                        <div class="parent-text" style="text-align:center;">
+                            {% if species.hybrid.pollen_id.pid %}
+                                    <a href="{% url 'common:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
+                            {% else %}
+                                {{species.hybrid.pollen_genus | default:"Nodata"}} ?
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex p-1 justify-content-center" style="width:100%;">
+                <!-- Seed Grand Parents -->
+                <div class="list-group  align-self-stretch border" style="width:50%">
+                    {% if species.hybrid.seed_id.type == 'hybrid' %}
+                        <div class="grandparent-title"><b>Seed Grandparents</b></div>
+                        <div class="d-flex p-1 justify-content-center" style="width:100%;height:100%">
+                            <div class="list-group  bg-light border" style="width:50%">
+                                 <div class="d-flex flex-wrap justify-content-center">
+                                   {% if ss_list %}
+                                        {% for seedseed in ss_list %}
+                                                <a href="{% static seedseed.image_dir %}{{seedseed.image_file}}" data-lightbox="seedseed" data-title="
+                                                    <h6><small>{{seedseed.id}}: {{seedseed.imgname}}
+                                                    {% if seedseed.text_data %}{{seedseed.text_data|safe}}{% endif %}</small></h6>">
+                                                    <img  class="thumbnails thumbnails2" alt="{{seedseed.pid.pid.textname}}" src="{% static seedseed.image_dir %}{{seedseed.image_file}}">
+                                                </a>
+                                        {% endfor %}
+                                    {% else %}
+                                            <img class="thumbnails thumbnails2" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                    {% endif %}
+                                </div>
+                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
+                                    {% if species.hybrid.seed_id.hybrid.seed_id %}
+                                    <a href="{% url 'common:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
+                                    {% else %}
+                                    Unknown
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="list-group  bg-light border" style="width:50%">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    {% if sp_list %}
+                                        {% for seedpol in sp_list %}
+                                            <a href="{% static seedpol.image_dir %}{{seedpol.image_file}}" data-lightbox="seedpol" data-title="
+                                                <h6><small>{{seedpol.id}}: {{seedpol.imgname}}
+                                                {% if seedpol.text_data %}{{seedpol.text_data|safe}}{% endif %}</small</h6>">
+                                                <img  class="thumbnails thumbnails2" alt="{{seedpol.pid.pid.textname}}" src="{% static seedpol.image_dir %}{{seedpol.image_file}}">
+                                            </a>
+                                        {% endfor %}
+                                    {% else %}
+                                            <img class="thumbnails thumbnails2" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                    {% endif %}
+                                </div>
+                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
+                                    {% if species.hybrid.seed_id.hybrid.pollen_id %}
+                                    <a href="{% url 'common:information' species.hybrid.seed_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.pollen_id.name|safe}}</a>
+                                    {% else %}
+                                    unknown
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pollen Grand Parents -->
+                <div class="list-group  align-self-stretch border" style="border: 0 solid lightgrey; width:50%">
+                    {% if species.hybrid.pollen_id.type == 'hybrid' %}
+                        <div class="grandparent-title"><b>Pollen Grandparents</b></div>
+                        <div class="d-flex p-1 justify-content-center" style="width:100%; height:100%;">
+                            <div class="list-group  bg-light" style="border: 1px solid lightgrey; width:50%">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    {% if ps_list %}
+                                        {% for polseed in ps_list %}
+                                        <a href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed" data-title="
+                                        <h6><small>{{polseed.id}}: {{polseed.imgname}}
+                                            {% if polseed.text_data %}{{polseed.text_data|safe}}{% endif %}
+                                            </small></h6>">
+                                            <img class="thumbnails thumbnails2"  alt="{{polseed.pid.pid.textname}}" src="{% static polseed.image_dir %}{{polseed.image_file}}">
+                                        </a>
+                                        {% endfor %}
+                                    {% else %} <!-- if seed_list -->
+                                        <img class="thumbnails thumbnails2"  src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                    {% endif %}
+                                </div>
+                               <div class="parent-text" style="text-align:center; margin-bottom:10px;">
+                                    {% if species.hybrid.pollen_id.hybrid.seed_id %}
+                                            <a href="{% url 'common:information' species.hybrid.pollen_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.seed_id.name|safe}}</a>
+                                    {% else %}
+                                        Unknown
+                                    {% endif %} <!-- if pollenpollen_id -->
+                                </div>
+                            </div>
+                            <div class="list-group  bg-light" style="border: 1px solid lightgrey; width:50%">
+                                <div class="d-flex flex-wrap justify-content-center">
+                                    {% if pp_list %}
+                                        {% for polpol in pp_list %}
+                                            <a href="{% static polpol.image_dir %}{{polpol.image_file}}" data-lightbox="polpol" data-title="
+                                                <h6><small>{{polpol.id}}: {{polpol.imgname}}
+                                                {% if polpol.text_data %}{{polpol.text_data|safe}}{% endif %}
+                                                </small></h6>">
+                                                    <img class="thumbnails thumbnails2" alt="{{polpol.pid.pid.textname}}" src="{% static polpol.image_dir %}{{polpol.image_file}}">
+                                            </a>
+                                        {% endfor %}
+                                    {% else %} <!-- if seed_list -->
+                                        <img class="thumbnails thumbnails2" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                    {% endif %}
+                                </div>
+
+                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
+                                    {% if species.hybrid.pollen_id.hybrid.pollen_id %}
+                                            <a href="{% url 'common:information' species.hybrid.pollen_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.pollen_id.name|safe}}</a>
+                                    {% else %}
+                                        Unknown
+                                    {% endif %} <!-- if pollenpollen_id -->
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!--Species ancestors row   -->
+            <div style="display:block; text-align: center;">
+                <br>
+            <hr>
+            <div style="width: 100%; margin:0; text-align: center;font-size: 16px;"><b>Species Ancestors ({{ancspc_list.count}})</b></div>
+            <div class="anc">
+                {% if ancspc_list %}
+                    {% for p in ancspc_list %}
+                        <div style="display:inline-block;">
+                            {% if p.img %}
+                                <a href="/static/utils/images/species/{{p.img}}" data-lightbox="anc" data-title="
+                                    <h6><small>{{p.id}}: {{p.aid.abrevname|safe}}
+                                    {% if p.text_data %}{{p.text_data|safe}}{% endif %}</small></h6>">
+                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p.img}}">
+                                </a>
+                            {% elif  p.aid.pid > 0 %}
+                                <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                            {% endif %}
+                            <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
+                                {% if p.aid.pid > 0 %}
+                                   <br>
+                                    <a href="{% url 'common:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
+                                    {{p.pct}}%
+                                {% else %}
+                                    <span style="font-size: 14px;">No data</span>
+                                {% endif %}
+                                <br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    No data
+                <br>
+                <br>
+                {% endif %}
+            </div>
+            </div>
+        {% endif %}
+        <br>
+     </div>
+</div>
+
+
+
+
+<!--<footer>Copyright &copy; OrchidRoots.com</footer>-->
+
+
+
+{# TODO: Add sort image by - RANDOM, DISTANCE, DATE #}
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+
+// function myFunction() {
+//   // Get the checkbox
+//   var myCheck = document.querySelector('input[id="myCheck"]');
+//   var btn_mysubmit = document.getElementById("mysubmit");
+//   // Get the output text
+//   var text = document.getElementById("text");
+//
+//   // If the checkbox is checked, display the output text
+//   if (myCheck.checked == true){
+//     btn_mysubmit.disabled  = false;
+//   } else {
+//     btn_mysubmit.disabled  = true;
+//   }
+// }
+                        // function myFunction() {
+                        //     var x = document.getElementById("myCheck").defaultChecked;
+                        //     document.getElementById("demo").innerHTML = x;
+                        // }
+
+</script>
+
+
+
+{% endblock %}
+
+
+

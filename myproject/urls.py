@@ -23,11 +23,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
-from myproject.views import orchid_home, home, robots_txt, dispatch
+from common.views import orchid_home, xorchid_home
+from utils.views import robots_txt
 
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
+    path("robots.txt", robots_txt),
+    # path('home/', home, name='home'),
+    # path('dispatch', dispatch, name='dispatch'),
     path("robots.txt", robots_txt),
     path('documents/', include('documents.urls')),
     # path('index/', index, name='index'),
@@ -51,14 +55,19 @@ urlpatterns = [
 
     # High level
     path('', orchid_home, name='orchid_home'),
-    path('home/', home, name='home'),
-    path('dispatch', dispatch, name='dispatch'),
-    path('core/', include('core.urls')),
-    path('search/', include('search.urls')),
+    path('home/', xorchid_home, name='xorchid_home'),
+    # path('home/', home, name='home'),
+    # path('dispatch', dispatch, name='dispatch'),
+    # path('core/', include('core.urls')),
+    # path('common/', include('common.urls')),
+    # path('search/', include('search.urls')),
 
     # Family specific
-    # path('cactaceae/', include('cactaceae.urls')),
+    path('core/', include('core.urls')),
+    path('common/', include('common.urls')),
+    path('cactaceae/', include('cactaceae.urls')),
     path('bromeliaceae/', include('bromeliaceae.urls')),
+    path('other/', include('other.urls')),
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),
 

@@ -1,0 +1,426 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail-title.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+<style>
+    /*Styles for Top Descendants*/
+[class*="col-"] {
+    float: left;
+    padding: 10px;
+    margin-left: 15px;
+    height: 100%;
+}
+
+.imageitem {
+    display:inline-block;
+    margin:2px;
+    width : 17vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+.imageitem-tiny {
+    display:inline-block;
+    margin:2px;
+    width : 14vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 5px auto;
+    width:100%;
+}
+        /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 14vw;
+   width : 14vw;
+   padding:2px;
+    margin:5px auto;
+}
+
+.thumbnail-tiny {
+   object-fit: cover;
+   overflow: hidden;
+   height: 11vw;
+   width : 11vw;
+   padding:2px;
+    margin:5px auto;
+}
+
+.imgcaption {
+    font-size: 10px;
+    text-align: center;
+    height:70px;
+    /*overflow: hidden;*/
+}
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+div.text-bl a {
+    color: #2fffff;
+}
+
+
+
+@media only screen and (max-width: 800px){
+   .imageitem {
+        width: 30vw;
+        /*height : 250px;*/
+    }
+  .imageitem-tiny {
+        width: 18vw;
+        /*height : 250px;*/
+    }
+    .imgcaption {
+        font-size: 10px;
+    }
+   .box {
+        width: 35vw;
+        font-size: 10px;
+        /*margin-left:-3px;*/
+       margin: 0 auto;
+    }
+    .thumbnails {
+       height: 190px !important;
+       width : 95% !important;
+    }
+    div.text {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .imageitem {
+        width: 36vw;
+    }
+    .box {
+        width: 35vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 110px !important;
+       width : 95% !important;
+    }
+    .imageitem-tiny {
+        width: 19vw;
+        padding:2px;
+        margin:5px auto;
+    }
+    .box-tiny {
+        width: 18vw;
+        font-size: 9px;
+        margin-left:-3px;
+    }
+    .thumbnail-tiny {
+        height: 15vw;
+        width : 15vw;
+        padding:2px;
+        margin:3px auto;
+
+    }
+
+
+    .imgcaption {
+       width : 34vw;
+        font-size: 9px;
+        height: 59px;
+    }
+    div.text {
+        font-size: 10px;
+    }
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+label {
+    display: inline-block;
+    width: 250px;
+    margin-right: 5px;
+}
+
+.tab-content {
+    min-height: 200px !important;
+    background:white;
+    padding:10px 0;
+    border-left:1px solid lightgrey;
+    border-right:1px solid lightgrey;
+    border-bottom:1px solid lightgrey;
+}
+
+a:hover {
+    color:darkblue;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 5px;
+    width: 147px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+    /*min-height:400px;*/
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
+/*.litebox-overlay .litebox-close{*/
+/*    width: 36px;*/
+/*    height: 36px;*/
+/*    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAMAAADW3miqAAAABGdBT&hellip;vNcsmRuX4vc8d6dD9cGMVFL231VGoNUdfFRq2y/t8SS7NvNfRFXoyOLJ8AAAAASUVORK5CYII=) no-repeat center;*/
+/*    top: 20px;*/
+/*    right: 20px;*/
+/*}*/
+
+</style>
+
+<div style="width:95%;margin:0 auto;padding:0;">
+    {% include 'common/detail-nav.html' %}
+    <!-- Main -->
+    <div class="tab-content clearfix p-2">
+        <!--Author list-->
+        <div  class="p-2 justify-content-center align-items-center">
+        {% if msg %}<span style="text-align:center; color: red">{{msg}}</span>{% endif %}
+            {% if user.tier.tier > 1 and role != 'pub' %}
+                {% if user.tier.tier > 3 and role == 'cur' %}
+                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
+                {% endif %}
+                <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadweb/{{species.pid}}/?family={{family}}&role={{role}}&tab=web">Upload url</a>
+                <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
+                {% if role == 'cur' %}
+                    <form class="" action="" id="author">
+                        <input type="hidden" name="genus" value="{{genus}}" />
+                        <input type="hidden" name="family" value="{{species.gen.family}}" />
+                        <input type="hidden" name="role" value="{{role}}" />
+                        <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0 auto;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip" data-placement="bottom" title="author">
+                            {% if not author %}
+                                <option disabled selected>Select an author</option>
+                            {% endif %}
+                            <option value="">---</option>
+                            {% for aut in author_list %}
+                                {% if aut == author %}
+                                    <option selected="selected" disabled value="{{author}}">{{author.displayname}}</option>
+                                {% else %}
+                                    <option value="{{aut.author_id}}">{{aut.displayname}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+                    </form>
+                {% elif role == 'pri' %}
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>
+                {% endif %}
+            {% endif %}
+            {% if public_list %}
+        </div>
+        <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
+                {% for image in public_list %}
+                    <div class="imageitem">
+                        {% if image.image_file %}
+                            <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                                    <h6><small>
+                                    {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                    {{image.get_displayname}}
+                                    <br>{{image.text_data|default:''|safe}} </small></h6>">
+                                <div class="box">
+                                        <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
+                                        <div class="text text-br">{{image.id}}</div>
+                                </div>
+                            </a>
+                            <br>
+                        {% else %}
+                            <a href="#">
+                            <dev class="box">
+                                <img class="thumbnails" alt="" src="{{image.image_url}}">
+                                <div class="text text-br">{{image.id}}</div>
+                            </dev>
+                            </a>
+                        {% endif %}
+                        <div class="imgcaption">
+                            <div style="width:100%;word-wrap: break-word;">
+                                {% if role == 'cur' %}
+                                    {% include 'common/curate_links.html' %}
+                                {% else %}
+                                    {% if image.source_url %}
+                                        <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
+                                        <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                    {% else %}
+                                        {{image.imgname|safe}}
+                                        <br>{{image.author.displayname }}
+                                    {% endif %}
+                                {% endif %}
+                                {% if role == 'pri' and image.rank == 0 %}
+                                    (private <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>)
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
+            {% endif %}
+       </div>
+    </div>
+    {% if private_list and role == 'cur' %}
+    <div class="p-2 border" style="margin-top:10px;background:white;">
+        <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
+            <div class="font-weight-bold text-center text-info" ><h4>Private Photos</h4></div>
+            {% for image in private_list %}
+                <div class="imageitem p-1 justify-content-center align-items-center">
+                    {% if image.image_file %}
+                        <div class="box">
+                            <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                <h6><small>
+                                {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                {{image.get_displayname}}
+                                {{image.text_data|default:''|safe}} </small></h6>">
+                                    <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                    <div class="text text-br">{{image.id}}</div>
+                            </a>
+                        </div>
+                        <br>
+                    {% else %}
+                        <a href="#">
+                        <dev class="box">
+                            <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
+                            <div class="text text-br">{{image.id}}</div>
+                        </dev>
+                        </a>
+                    {% endif %}
+                    <div class="imgcaption">
+                        {% include 'common/curate_links.html' %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if upload_list or msg %}
+    <div class="p-2 border" style="background:white; margin-top:10px;">
+        <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
+            <div class="font-weight-bold text-center text-info" ><h6> Uploaded Files</h6></div>
+            <h6>{{msg|default:''}}</h6>
+            <br>
+            {% for image in upload_list %}
+                 <div class="imageitem-tiny" style="display:inline-block">
+                     {% if image.image_file_path %}
+                          <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                                   {{image.id}}: {{image.imgname}}
+                                   <br> {{image.get_displayname}}
+                                   <br>{{image.text_data|default:''|safe}}">
+                              <div class="box-tiny">
+                                  <img class="thumbnail-tiny" alt="" src="{% static 'media/' %}{{image.image_file_path}}" style="border: 0 solid red;">
+                                  <div class="text text-br">{{image.id}}</div>
+                                </div>
+                           </a>
+                     {% else %}
+<!--                                    <div class="box">-->
+<!--                                        <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">-->
+<!--                                        <div class="text">{{image.id}}</div>-->
+<!--                                    </div>-->
+                        Requested file does not exist
+                     {% endif %}
+                     <div style="font-size:10px">
+                        <a href="{{image.source_url}}">{{image.author.displayname}}</a>
+<!--                            Private and curate role may delete photos-->
+                        {% if role == "cur" or role == "pri" %}
+                            <br>
+                            {% if image.approved %}
+                                <b>Approved</b>
+                            {% elif role == 'cur' %}
+                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                            {% endif %}
+                            <a href="/common/deletephoto/{{image.id}}/{{image.pid_id}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
+                        {% endif %}
+                     </div>
+
+                 </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+//
+// $(this).ekkoLightbox({
+//     alwaysShowClose: true
+// });
+
+// This function supposed to change position of lightbox close icon.
+// Lightbox.prototype.build = function() {
+//     var self = this;
+//     $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox">' +
+//         '<div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div>' +
+//         '<div class="lb-closeContainer"><a class="lb-close"></a></div></div></div><div class="lb-outerContainer"><div class="lb-container">' +
+//         '<img class="lb-image" src="/statics/utils/images/icon-close-512.png" />' +
+//         '<div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div>' +
+//         '<div class="lb-loader"><a class="lb-cancel"></a></div></div></div></div>').appendTo($('body'));
+// }
+</script>
+
+
+
+{% endblock %}
+
+
+

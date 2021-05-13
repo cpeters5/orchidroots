@@ -21,7 +21,7 @@ defusedxml==0.6.0
 distlib==0.3.1
 dj-paypal==0.15.3
 dj-stripe==2.3.0
-Django==3.0.9
+Django==3.1.6
 django-allauth==0.42.0
 django-anymail==7.2
 django-appconf==1.0.4
@@ -55,7 +55,7 @@ django-sortedm2m==3.0.0
 django-static-jquery==2.1.4
 django-stronghold==0.4.0
 django-templatetag-sugar==1.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 djangorestframework-simplejwt==4.4.0
 dnspython==1.16.0
 docutils==0.16
@@ -81,7 +81,7 @@ numpy==1.19.0
 oauthlib==3.0.1
 opencv-contrib-python==4.3.0.36
 paypalrestsdk==1.13.1
-Pillow==7.2.0
+Pillow==8.1.1
 pipenv==2020.6.2
 pycparser==2.20
 Pygments==2.6.1

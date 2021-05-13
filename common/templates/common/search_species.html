@@ -1,0 +1,125 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% load testtags %}
+<style>
+    .btn_result {
+        font-size: 20px;
+        color: #0a6aa1;
+        font-weight: bold;
+    }
+</style>
+<div style="min-height:200px;background-color:white;width: 100%;">
+    <div style="clear:both"></div>
+    <div class="row" style="width:100%; margin:0 auto;">
+        <div class="col-xs-12 col-sm-4 col-lg-3" style="padding:0">
+           {% include "common/taxonomy.html" %}
+        </div>
+
+        <div class="col-sm-8 col-lg-9" style="text-align:left;font-size:13px;margin-top:30px;">
+            <div class="card-body"  style="display:inline-block; padding-top:0;">
+                <div style="padding:0; margin: 0">
+                    <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Show genera</a>
+                    {% if not genus or genus.num_hybrid > 0 %}
+                        <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Show species</a>
+                    {% endif %}
+                    <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?alpha=A">Full species list</a>{% endif %}
+                </div>
+                <br>
+                {% if genus_list or match_list %}
+                    {% if genus_list %}
+                    <b>Top {{ genus_total }} approximate matches genera for "<i>{{spc_string}}</i>"</b>
+                    <ul>
+                        {% for genus in genus_list %}
+                            <li>
+                                {% if genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {{genus.0.family|default:''}} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
+                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {{genus.0.family|default:''}} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if match_list %}
+                    <b>{{ match_total }} matches species found for "<i>{{spc_string}}</i>"</b>
+                        {% if not fuzzy %}
+                            <div style="display: inline; padding: 0; margin: 0">
+                                <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
+                            </div>
+                        {% endif %}
+                        <ul>
+                    {% for x in match_list %}
+                        <li>
+                       {% if x.status == 'synonym' %}
+                          {{ x.binomial }}
+                       {% else %}
+                          <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial }}</a>
+                       {% endif %}
+                       {{x.author|default:''}}
+                       {% if x.status == 'synonym' %}
+                          (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial}}</a>)
+                       {% elif family.application == 'other' %}
+                          {{x.family|default:''}}
+                       {% else %}
+                          {{x.description|default:''}}
+                       {% endif %}
+                       {{x.num_image|default:''}}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    {% endif %}
+                {% else %}
+                    {% if fuzzy_list %}
+                        <b>{{ fuzzy_total }} approximate matches retrieved</b>
+                        <ul>
+                            {% if match_list %}
+                                <li>fuzzy matches</li>
+                            {% endif %}
+                        {% for x in fuzzy_list %}
+<!--                            <li>{{x.1}} - -->
+                            <li>
+                               {% if x.0.status == 'synonym' %}
+                                  {{ x.0.binomial }}
+                               {% else %}
+                                  <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{ x.0.binomial }}</a>
+                               {% endif %}
+                               {{x.0.author|default:''}}
+                               {% if x.0.status == 'synonym' %}
+                                  (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial}}</a>)
+                               {% elif family.application == 'other' %}
+                                  {{x.0.family|default:''}}
+                               {% else %}
+                                  {{x.0.description|default:''}}
+                               {% endif %}
+                               {% if x.0.num_image %}
+                                   ({{x.0.num_image}} images available)
+                               {% endif %}
+
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <br><b>Your search returned no matches for</b>
+                        {% if app == 'other' %}other families. Please try switch to Orchidaceae, Cactaceae or Bromeliaceae
+                        {% else %}{{app}} family. Please try switch to other families
+                        {% endif %}
+                         or refine your search criteria or click on "More results" button for approximate search</b><br>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+
+</script>
+{% endblock %}

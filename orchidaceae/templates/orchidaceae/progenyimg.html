@@ -1,6 +1,6 @@
 {% load static %}
 {% include "base.html" %}
-{% include 'detail/detail-title.html' %}
+{% include 'detail-title.html' %}
 {% block body %}
 <style>
 
@@ -98,7 +98,7 @@ img{
 
 </style>
         <!--main section-->
-    {% include "detail/detail-nav.html" %}
+    {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
     {% if img_list %}
         <br>
@@ -107,15 +107,15 @@ img{
             {% for x in img_list %}
                 <div class="imageitem p-1 justify-content-center  border" style="margin:2px;">
                     <div class="box" style="margin:0 auto;">
-                    <a href="{% url 'detail:information' x.pid_id %}?role={{role}}">
+                    <a href="{% url 'common:information' x.pid_id %}?role={{role}}">
                             <img class="thumbnails" alt="" src="/static/{{x.image_dir}}{{ x.image_file }}">
                     </a>
                     </div>
                     <div class="imgcaption">
                         {{x.name|safe}} ({{x.pct}}%)<br>
-                        (<a href="{% url 'detail:information' x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
+                        (<a href="{% url 'common:information' x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
                         ×
-                        <a href="{% url 'detail:information' x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>)
+                        <a href="{% url 'common:information' x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>)
                         <br>
                         Photo: <a href="{{x.source_url}}">{{x.author}}
                     </div>

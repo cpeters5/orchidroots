@@ -21,7 +21,7 @@ from itertools import chain
 from django.utils import timezone
 from datetime import datetime, timedelta
 from accounts.models import User
-from utils.views import get_random_img, getmyphotos
+from utils.views import get_random_img
 from orchidaceae.views import mypaginator
 from orchidaceae.models import Donation
 

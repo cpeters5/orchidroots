@@ -1,0 +1,55 @@
+
+<h4>WCSP Refresh</h4>
+<ul>
+<h5>Data Processing</h5>
+    <LI>
+        Acquire data from WCSP
+        <ul>
+            <li>Run Kew/requestKewby year.pl</li>
+            <li>Process and upload Genus change</li>
+            <li>Process and upload Newspecies</li>
+            <li>Process and upload New Distribution</li>
+            <li>Process and upload Intraspe/infraspr changes</li>
+            <li>Process and upload Change_Status</li>
+        </ul>
+    </LI>
+<!--    Post processing - reports-->
+    <li>
+        Update Hybrid parents id (KEW post processing - update hybrid parent pid.sql)
+        <ul>
+            <li>If seed or pollen parents are now a synonym, update Hybrid set seed_id = new accepted id, pollen_id = new accepted id</li>
+
+        </ul>
+    </li>
+    <li>
+        Update AncestorDescendant.
+        <ul>
+            <li>Check if any aid in AncestorDescendant records aare now a synonym (KEW Remove duplicate.sql)</li>
+            <li>Remove thjese records and run updateancdesc.pl</li>
+        </ul>
+    </li>
+
+    <li>
+        Check for duplicate species with existing IPNI or other sources (KEW Remove duplicates.sql)
+    </li>
+</ul>
+<ul>
+    <h5>Post Processing</h5>
+
+    <li>Reports:
+        <ul>
+            <li>Report new genera</li>
+            <li>Report new species</li>
+            <li>Report update rank from synopnym to accepted</li>
+            <li>Report update rank from accepted to synonym</li>
+        </ul>
+    </li>
+    <li>
+        Check consistency (KEW post processing - check missing synonym.sql)
+        <ul>
+            <li>Check Species records where status = synonym but no record in Synonym</li>
+            <li>Check Species records where status != synonym but no record in Accepted</li>
+        </ul>
+    </li>
+
+</ul>

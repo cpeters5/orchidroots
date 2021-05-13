@@ -63,6 +63,13 @@ def migration(request):
     context = {}
     return render(request, 'documents/migration.html', context)
 
+@login_required
+def maintenance(request):
+    # if request.user.tier.tier < 5:
+    #     return HttpResponseRedirect(reverse('/'))
+    context = {}
+    return render(request, 'documents/maintenance.html', context)
+
 
 def navigation(request):
     context = {}

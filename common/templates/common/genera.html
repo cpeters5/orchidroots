@@ -1,0 +1,126 @@
+{% load static %}
+{% load testtags %}
+{% include "base.html" %}
+{% block body %}
+
+<div style="min-height:200px;background-color:white;width: 100%;">
+   <div style="clear:both"></div>
+   <div class="row" style="width:98%; margin:0 auto;">
+        <div class="col-xs-12 col-sm-4 col-lg-3" style="padding:0">
+            {% include "common/taxonomy.html" %}
+        </div>
+<!--Main table       -->
+        <div class="col-sm-8 col-lg-9" style="text-align:left;font-size:13px;margin-top:30px;">
+<!--            If family is requested, then populate right section with genus list-->
+<!--            Display list of genus in the family (subfamily/tribe or subtribe) -->
+                <div class="card m-1">
+                    <div class="card-header border">
+                        <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
+                            {{family}} {% if subfamily %} > {{subfamily}}  {% endif %}
+                            {% if tribe %}> {{tribe}}  {% endif %}
+                            {% if subtribe %} > {{subtribe}}  {% endif %}
+                            Genus list
+                            <dev style="font-size:16px;">
+                                {% if family %}
+                                {% if not genus or genus.num_species > 0 %}
+                                    <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N">Show species list</a>
+                                {% endif %}
+                                {% if not genus or genus.num_hybrid > 0 %}
+                                    <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N">Show hybrid list</a>
+                                {% endif %}
+                                {% if app == 'orchidaceae' %}<a class="btn border" href="{% url 'orchidaceae:genera' %}">Go to full genus list</a>{% endif %}
+                                {% endif %}
+                            </dev>
+                        </div>
+                    </div>
+                    <div class="card-body border-top"  style="display:inline-block">
+                        <div style="padding: 5px;">
+                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Species list</a>
+                            {% if not genus or genus.num_hybrid > 0 %}
+                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Hybrid list</a>
+                            {% endif %}
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?alpha=A">Full species list</a>{% endif %}
+                        </div>
+                        <!--   Main table-->
+                        {% if genus_list %}
+                            {% include "common/alpha_list_common.html" %}
+                            <div style="clear: all"></div>
+                            <div class="flex">
+                                <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
+                                    <thead>
+                                        <th>Genus</th>
+                                        <th>Higher taxonomic ranks</th>
+                                        <th>#images</th>
+                                    </thead>
+                                        {% for genus in genus_list %}
+                                        <tr><td>
+                                                <a href="{% url 'common:species' %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                {{genus.author|default:""}} {{genus.year|default:""}}
+                                            </td>
+
+                                            <td>
+                                                {{genus.family}} {% if genus.subfamily %} > {{genus.subfamily}} {% endif %} {% if genus.tribe %} > {{genus.tribe}} {% endif %} {% if genus.subtribe %}> {{genus.subtribe}} {% endif %}
+                                            </td>
+                                            <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
+        <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
+                                        </tr>
+                                        {% endfor %}
+                                </table>
+                                <!--Pagination-->
+                            </div>
+<!--                            {% if last_page > 1 %}-->
+<!--                                <div style="float:left">-->
+<!--                                    {% include "common/paginator_genus.html" %}-->
+<!--                                </div>-->
+<!--                            {% endif %}-->
+                            {% include "common/alpha_list_common.html" %}
+                        {% else %}
+                            None!
+                        {% endif %}
+                    </div>
+                </div>
+        </div>
+   </div>
+</div>
+<br>
+<br>
+<script>
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
+});
+
+</script>
+{% endblock %}

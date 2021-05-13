@@ -1,7 +1,7 @@
 {% load static %}
 {% include "base.html" %}
 {% block body %}
-{% include "detail/detail-title.html" %}
+{% include "detail-title.html" %}
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
     <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
@@ -138,7 +138,7 @@ div.text-br {
             {% if myspecies_list %}
                 <div class="dropdown-menu  scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
                     {% for spc in myspecies_list %}
-                        <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                        <a class="dropdown-item" href="{% url 'common:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.binomial}}</a>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -149,7 +149,7 @@ div.text-br {
             {% if myhybrid_list %}
                 <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
                     {% for spc in myhybrid_list %}
-                        <a class="dropdown-item" href="{% url 'detail:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
+                        <a class="dropdown-item" href="{% url 'common:photos' spc.pid %}?role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -184,7 +184,7 @@ div.text-br {
     <br>
     <br>
     {% if user.is_authenticated and user.tier.tier > 2 %}
-        <form class="form-inline justify-content-center" action="{% url 'detail:photos' species.pid %}" id="filter">
+        <form class="form-inline justify-content-center" action="{% url 'common:photos' species.pid %}" id="filter">
         <input type="hidden" name="genus" value="{{genus}}" />
         <input type="hidden" name="role" value="pri" />
         <select form='filter' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
@@ -234,7 +234,7 @@ div.text-br {
                     <div class="imgcaption">
                         <div style="width:100%;word-wrap: break-word;">
                             {% if role == 'cur' %}
-                                {% include 'detail/curate_links.html' %}
+                                {% include 'common/curate_links.html' %}
                             {% else %}
                                 {% if image.source_url %}
                                     <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
@@ -247,7 +247,7 @@ div.text-br {
                                     {{image.author.displayname }}
                                 {% endif %}
                             {% endif %}
-                            - <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                            - <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>
                         </div>
 
                     </div>
@@ -288,9 +288,9 @@ div.text-br {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                <a href="{% url 'detail:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                             {% endif %}
-                            <a href="{% url 'detail:deletephoto' image.id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                            <a href="{% url 'common:deletephoto' image.id %}?id={{image.id}}&role={{role}}" >Delete</a>
                         {% endif %}
                      </div>
 

@@ -153,9 +153,9 @@ td {
                         <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=synonym&genus={{genus}}">Synonym</a></li>
                     </ul>
                 </div>
-                <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species List</a>
+                <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species List</a>
                 {% if subtotal > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:browse' %}?type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
                 {% endif %}
             </h4>
 <!--            {% if seed_genus or seed or pollen_genus or pollen %}-->
@@ -292,7 +292,7 @@ td {
                         {% for spc in my_list %}
                             <tr>
                                 <td align="left">
-                                    <a href="{% url 'detail:information' spc.pid %}?role={{role}}"><i>{{spc.genus}}</i>
+                                    <a href="{% url 'common:information' spc.pid %}?role={{role}}"><i>{{spc.genus}}</i>
                                         {% if spc.is_hybrid %}
                                             <i>{{spc.get_species}}</i></a> {{spc.author}} {% if spc.originator %} / {{spc.originator}}{% endif %}</i>
                                         {% else %}
@@ -303,23 +303,23 @@ td {
 
                                 <td class="align-center">
                                     {% if spc.status == 'synonym' %}
-                                    Synonym of <a href="{% url 'detail:information' spc.getAccepted.pid %}?role={{role}}">{{spc.getAccepted.name|safe}}</a>
+                                    Synonym of <a href="{% url 'common:information' spc.getAccepted.pid %}?role={{role}}">{{spc.getAccepted.name|safe}}</a>
                                     {% else %}
                                         {% if spc.hybrid.seed_id.type == 'species' %}
                                             {% if spc.hybrid.seed_id_id %}
-                                                <a href="{% url 'detail:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
+                                                <a href="{% url 'common:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                             {% else %}
                                                 <a href="#">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                             {% endif %}
                                         {% elif spc.hybrid.seed_id.type == 'hybrid' %}
-                                            <a href="{% url 'detail:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
+                                            <a href="{% url 'common:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                             ×
                                         {% if spc.hybrid.pollen_id.type == 'species' %}
-                                            <a href="{% url 'detail:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
+                                            <a href="{% url 'common:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
                                         {% elif spc.hybrid.pollen_id.type == 'hybrid' %}
-                                            <a href="{% url 'detail:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
+                                            <a href="{% url 'common:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.abrevname|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                     {% endif %}

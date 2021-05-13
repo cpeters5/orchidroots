@@ -1,0 +1,44 @@
+
+<h4>IOA Update</h4>
+<ul>
+<h5>Source</h5>
+    <li>Code Page:	65001 (UTF-8)</li>
+    <li>Format:		Delimited</li>
+    <li>Text Qualifier:	"</li>
+    <li>Head Row Delim:	{CR}{LF}</li>
+    <li>Row Delim:	{LF}</li>
+    <li>Column Delim:	,</li>
+    <li>Column names are in the first data row</li>
+    <li>The structure of the International Odontoglossum Alliance registration files will be as follows.
+        <ul>
+            <li>RegistrationID int NULL,</li>
+            <li>SeedGenus nvarchar(50) NOT NULL,</li>
+            <li>SeedGenusName nvarchar(50) NOT NULL,</li>
+            <li>SeedGrexEpithet nvarchar(255) NOT NULL,</li>
+            <li>PollenGenus nvarchar(50) NOT NULL,</li>
+            <li>PollenGenusName nvarchar(50) NOT NULL,</li>
+            <li>PollenGrexEpithet nvarchar(255) NOT NULL,</li>
+            <li>GrexGenus nvarchar(50) NOT NULL,</li>
+            <li>GrexGenusName nvarchar(100) NOT NULL,</li>
+            <li>GrexEpithet nvarchar(255) NOT NULL,</li>
+            <li>ApplicantTitle nvarchar(10) NULL,</li>
+            <li>ApplicantFirstName nvarchar(50) NOT NULL,</li>
+            <li>ApplicantSecondName nvarchar(50) NOT NULL,</li>
+            <li>ApplicantCompanyName nvarchar(255) NULL,</li>
+            <li>OriginatorFirstName nvarchar(50) NOT NULL,</li>
+            <li>OriginatorLastName nvarchar(50) NOT NULL,</li>
+            <li>DateRegistered date NULL,</li>
+            <li>RegistrationSource varchar(3) NOT NULL</li>
+        </ul>
+    </li>
+    <li>The IOA will only publish with a RegistrationSource of 'IOA', this seperates the IOA data from other registration sources (e.g. RHS).</li>
+    <li>The IOA will publish data with the file name convention of Wikiregistration_yyyyMMdd.csv to indicate the year month and day the file was published.</li>
+    <li>Contact is robert.a.culver@gmail.com</li>
+</ul>
+
+<ul>
+    <h5>Procedures</h5>
+    <li>Place csv file delivered from IOA in /IOA/data/input directory</li>
+    <li>Run the perl script: "perl processIOA.py</li>
+    <li>Load the oputput (data/output/ioa_out.csv) to Species and Hybrid</li>
+</ul>

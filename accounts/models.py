@@ -187,6 +187,9 @@ class Photographer(BaseModel):
         on_delete=models.SET_NULL)
         # models.ForeignKey(User, null=True, blank=True, db_column='user_id', related_name='userid', on_delete=models.SET_NULL)
 
+    def get_authid(self):
+        return self.author_id
+
     def __str__(self):
         if self.displayname != self.fullname:
             return '%s (%s)' % (self.displayname, self.fullname)

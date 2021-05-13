@@ -25,6 +25,7 @@ urlpatterns = [
     path('instructionupload/', views.instructionupload, name='instructionupload'),
     path('list/', views.list, name='list'),
     path('migration/', views.migration, name='migration'),
+    path('maintenance/', views.maintenance, name='maintenance'),
     path('navigation/', views.navigation, name='navigation'),
     path('photosubmissionguideline/', views.photosubmissionguideline, name='photosubmissionguideline'),
     path('photoacquisionguideline/', views.photoacquisionguideline, name='photoacquisionguideline'),

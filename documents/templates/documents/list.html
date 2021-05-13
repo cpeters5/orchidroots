@@ -73,20 +73,46 @@
                         </div>
                     </div>
                 </div>
+<!--                Maintenance-->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title" style="margin-bottom: 0">Maintenance</h6>
+                    </div>
+                    <div class="card-body">
+                <!--                Upload instruction-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Maintenance">Scheduled Maintenance</button>
+                        <div id="Maintenance" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/maintenance.html' %}
+                            </div>
+                        </div>
+                <!--                Upload instruction-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">WCSP Upload</button>
+                        <div id="WCSP" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/datasources/WCSP.html' %}
+                            </div>
+                        </div>
+<!--                                IOA Upload-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IOA Upload</button>
+                        <div id="IOA" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/datasources/IOA.html' %}
+                            </div>
+                        </div>
 
+
+
+
+                    </div>
+                </div>
+
+<!--                Release Notes-->
                 <div class="card mt-3">
                     <div class="card-header">
                         <h6 class="card-title" style="margin-bottom: 0">Release Notes</h6>
                     </div>
                     <div class="card-body" style="padding:10px;">
-
-    <!--                V. 3.0-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change2">OrchidRoots V.3 - 2019/06/01</button>
-                        <div id="Change2" class="collapse" data-parent="#accordion">
-                            <div class="card-body">
-                                {% include 'documents/changes2.html' %}
-                            </div>
-                        </div>
 
     <!--                V. 3.1-->
                         <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">OrchidRoots V.3.1 - 2020-10-01</button>
@@ -96,8 +122,16 @@
                             </div>
                         </div>
 
+    <!--                V. 3.0-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change2">OrchidRoots V.3 - 2019/06/01</button>
+                        <div id="Change2" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% include 'documents/changes2.html' %}
+                            </div>
+                        </div>
+
     <!--                Bluenanta -->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2021-?-?</button>
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2015-?-?</button>
                         <div id="Change3" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 TBD
@@ -127,7 +161,7 @@
                 </div>
             </div>
 
-
+<!--                Public-->
             <div class="card mt-3">
                 <div class="card-header">
                     <h6 class="card-title" style="margin-bottom: 0">Public inspection requirements</h6>

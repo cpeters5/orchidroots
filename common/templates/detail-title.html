@@ -1,0 +1,73 @@
+<!--Title-->
+
+<style>
+.nav2 {
+    font-size: 13px;
+}
+   h1 {
+        font-size: 24px;
+    }
+
+@media only screen and (max-width: 600px) {
+    h1 {
+        font-size: 18px;
+
+    }
+    .nav2 {
+        font-size: 11px;
+        font-weight: bold;
+        /*height: 20px;*/
+        /*margin-bottom:30px;*/
+    }
+}
+.btn-custom {
+    width: 120px;
+}
+.btn-current {
+    background-color: blue;
+    color: white;
+}
+</style>
+<br>
+        {% if title != 'curate_newupload' and title != 'curate_pending' and title != 'myphoto_browse' %}
+            <div class="nav2 detail-title" style="text-align:center">
+                <h1 style="display:none">{{species.genus}} {{species.species}}</h1>
+                <h1>
+<!--                    <a href="{% url 'common:genera' %}?family={{species.gen.family}}&role={{role}}"><i>{{species.gen.family}}</i></a>:-->
+                    <a href="{% url 'common:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}"><i>{{species.genus}}</i></a>
+                    {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
+                    {% if species.year %}{{species.year}}{% endif %}
+                    {% if  species.source == 'RHS' or species.source == 'Kew' %}
+                    <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
+                    {% endif %}
+                    </h1>
+                {% if species.type == 'hybrid' %}
+                    {% if species.hybrid.seed_id.pid %}
+                        {{species.hybrid.registered_seed_name_long|safe}}</a>
+                    {% else %}
+                        na
+                    {% endif %}
+
+                    ×
+
+                    {% if species.hybrid.pollen_id.pid %}
+                        {{species.hybrid.registered_pollen_name_long|safe}}</a>
+                    {% else %}
+                        na
+                    {% endif %}
+                {% endif %}
+                {% if user.tier.tier > 2 and title == 'photos' %}
+                    {% if role == 'cur' %}
+                         <a class="btn btn-custom" href="?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
+                         <a class="btn btn-custom btn-current" href="?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>
+                    {% else %}
+                         <a class="btn btn-custom btn-current" href="?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
+                         <a class="btn btn-custom" href="?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>
+                    {% endif %}
+                {% endif %}
+               </div>
+                <br>
+            </div>
+        {% endif %}
+        <div style="clear:left;"></div>
+

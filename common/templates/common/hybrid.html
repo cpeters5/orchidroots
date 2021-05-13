@@ -1,0 +1,183 @@
+{% load static %}
+{% load testtags %}
+{% include "base.html" %}
+{% block body %}
+
+<div style="min-height:200px;background-color:white;width: 100%;">
+   <div style="clear:both"></div>
+   <div class="row">
+        <div class="col-xs-12 col-sm-4 col-lg-3" >
+            {% include "common/taxonomy.html" %}
+        </div>
+
+        <div class="col-sm-7 col-lg-9 align-items-center" style="text-align:left;font-size:13px;margin:30px 0 0 0;">
+<!--            If family is requested, then populate right section with genus list-->
+<!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
+                <div class="card m-1">
+                    <div class="card-header border">
+                        <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
+                            {{family}} {% if subfamily %} > {{subfamily}}  {% endif %}
+                            {% if tribe %}> {{tribe}}  {% endif %}
+                            {% if subtribe %} > {{subtribe}}  {% endif %}
+                            {% if genus %}: {{genus}}  {% endif %}
+                            Hybrid list
+                        </div>
+                    </div>
+
+                    <div class="card-body border-top"  style="display:inline-block">
+                            {% if message %}{{message}}<br>{% endif %}
+                                <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
+                                <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
+<!--                                {% if primary == 'Y' %}-->
+<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
+<!--                                {% else %}-->
+<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
+<!--                                {% endif %}-->
+<!--                                {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}">Full species list</a>{% endif %}-->
+                           </dev>
+
+                        <!--   Main table-->
+                        {% if hybrid_list %}
+                                <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
+                                    <input type="hidden" name="family" value="{{family}}" />
+                                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
+                                    <input type="hidden" name="tribe" value="{{tribe}}" />
+                                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
+                                    <input type="hidden" name="genus" value="{{genus}}" />
+                                    <input type="hidden" name="primary" value="{{primary}}" />
+                                    {% if syn == 'N' %}
+                                    <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Show synonyms</span>
+                                    {% else %}
+                                    <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
+                                    {% endif %}
+                                </form>
+                                <form action="?" id="primary" style="display:inline-block; margin-top: 5px;">
+                                    <input type="hidden" name="family" value="{{family}}" />
+                                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
+                                    <input type="hidden" name="tribe" value="{{tribe}}" />
+                                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
+                                    <input type="hidden" name="genus" value="{{genus}}" />
+                                    <input type="hidden" name="syn" value="{{syn}}" />
+                                    {% if primary == 'N' %}
+                                    <input type="checkbox" class="form-check-input" name="primary" value="Y" onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">All hybrids</span>
+                                    {% else %}
+                                    <input type="checkbox" class="form-check-input" name="primary" value="N" checked onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Primary only</span>
+                                    {% endif %}
+                                </form>
+                            <div style="clear:left">{% include "common/alpha_list_common.html" %}
+                                </div>
+                            <!--main table-->
+                                <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th >Scientific name</th>
+                                            <th style="border-right:0; text-align:right;">Seed parent</th>
+                                            <th style="border-left:0; border-right:0;">×</th>
+                                            <th style="border-left:0">Pollen parent</th>
+                                            <th >#images</th>
+                                        </tr>
+                                    </thead>
+                                        {% for species in hybrid_list %}
+                                        <tr>
+                                            <td>
+                                                {% if species.status == 'synonym' %}
+                                                    {% if species.getAcc %}
+                                                        <a href="{% url 'common:information' species.getAcc %}?family={{family}}"><i>{{species.name|safe}} (syn.)</i></a>
+                                                    {% else %}
+                                                        {{species.name|safe}} (syn.)
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="{% url 'common:information' species.pid %}?genus={{species.genus}}&family={{family}}&subfamily={{species.gen.get_subfamily}}&tribe={{species.gen.get_tribe}}&subtribe={{species.gen.get_subtribe}}"><i>{{species.genus}} {{species.species}}</i></a>
+                                                        {{genus.author|default:""}}
+                                                {% endif %}
+                                                {{species.year|default:""}}
+                                            </td>
+                                            <td style="border-right:0; text-align:right;">
+                                                {% if species.hybrid.seed_id %}
+                                                    <a href="#">
+                                                {% endif %}
+                                                    {% if species.hybrid.seed_genus %} {{species.hybrid.seed_genus}} {% endif %}
+                                                    {{species.hybrid.seed_species | default:'?'}}
+                                                {% if species.hybrid.seed_id %}
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                            <td style="border-left:0; border-right:0;" align="center">
+                                                  ×
+                                            </td>
+                                            <td style="border-left:0">
+                                                {% if species.hybrid.pollen_id %}
+                                                    <a href="#">
+                                                {% endif %}
+                                                    {% if species.hybrid.pollen_genus %} {{species.hybrid.pollen_genus}} {% endif %}
+                                                    {{ species.hybrid.pollen_species | default:'?' }}
+                                                {% if species.hybrid.pollen_id %}
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                                <td align="center">{% if species.num_image %} {{species.num_image}} {% endif %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                </table>
+                            <!--Pagination-->
+                           {% if last_page > 1 %}
+                                <div style="float:left">
+                                    {% include "common/paginator_genus.html" %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            None!
+                        {% endif %}
+                        {% include "common/alpha_list_common.html" %}
+
+                    </div>
+                </div>
+        </div>
+   </div>
+</div>
+<br>
+<br>
+
+<script>
+var toggler = document.getElementsByClassName("caret");
+var i;
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+
+// Sort table
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        "order": [[ 0, "asc" ]],
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
+});
+
+</script>
+
+
+{% endblock %}

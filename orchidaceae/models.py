@@ -19,6 +19,9 @@ from accounts.models import User, Photographer
 from core.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
 import re
 import math
+import logging
+logger = logging.getLogger(__name__)
+
 RANK_CHOICES = [(i,str(i)) for i in range(0,10)]
 RELATION_CHOICES = [('direct','direct'),('reverse','reverse')]
 QUALITY = (
@@ -147,14 +150,14 @@ class Gensyn(models.Model):
         db_column='pid',
         on_delete=models.CASCADE,
         primary_key=True)
-    accepted = models.CharField(max_length=50, default='')
-    acc_author = models.CharField(max_length=50, default='')
-    acc_year = models.IntegerField(null=True)
-    status = models.CharField(max_length=20, default='')
-    type = models.CharField(max_length=20, default='')
-    description = models.CharField(max_length=255, default='')
-    source = models.CharField(max_length=50, default='')
-    abrev = models.CharField(max_length=50, default='')
+    # accepted = models.CharField(max_length=50, default='')
+    # acc_author = models.CharField(max_length=50, default='')
+    # acc_year = models.IntegerField(null=True)
+    # status = models.CharField(max_length=20, default='')
+    # type = models.CharField(max_length=20, default='')
+    # description = models.CharField(max_length=255, default='')
+    # source = models.CharField(max_length=50, default='')
+    # abrev = models.CharField(max_length=50, default='')
     acc = models.ForeignKey(Genus, verbose_name='genus', related_name='oracc', null=True,on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
@@ -347,7 +350,8 @@ class Species(models.Model):
     infraspe = models.CharField(max_length=50, null=True)
     author = models.CharField(max_length=200)
     originator = models.CharField(max_length=100, blank=True)
-    scientific_name = models.CharField(max_length=500, blank=True)
+    binomial = models.CharField(max_length=500, blank=True)
+    family = models.ForeignKey(Family, null=True, db_column='family', related_name='sportfamily', on_delete=models.DO_NOTHING)
     citation = models.CharField(max_length=200)
     cit_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='')
@@ -375,6 +379,11 @@ class Species(models.Model):
         if self.infraspr:
             name = '%s %s %s' % (name, self.infraspr, self.infraspe)
         return name
+
+    def binomial_it(self):
+        if self.type == 'species' and self.binomial:
+            return '<i>%s</i>' % self.binomial
+        return
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
@@ -519,7 +528,7 @@ class Species(models.Model):
             return img
         return None
 
-    def get_best_img_by_author(self,author):
+    def get_best_img_by_author(self, author):
         if self.type == 'species':
             img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
@@ -531,6 +540,14 @@ class Species(models.Model):
             img = img[0:1][0]
             return img
         return None
+
+    def get_num_img_by_author(self, author):
+        if self.type == 'species':
+            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        else:
+            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
+        return len(img) + len(upl)
 
 
 class Specieshistory(models.Model):
@@ -621,6 +638,9 @@ class Accepted(models.Model):
 
     def __str__(self):
         return self.pid.name()
+
+    def name(self):
+        return '<i>%s</i> %s' % (self.genus, self.pid.speciesname())
 
 
 class Synonym(models.Model):
@@ -746,66 +766,68 @@ class Hybrid(models.Model):
     def __str__(self):
         return self.pid.name()
 
+    def name(self):
+        return '<i>%s</i> %s' % (self.genus, self.pid.speciesname())
+
     def registered_seed_name(self):
-        name = self.seed_id.name()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
-        return name
+        if self.seed_id:
+            name = self.seed_id.name()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_seed_name_short(self):
-        name = self.seed_id.abrevname()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
-        return name
+        if self.seed_id:
+            name = self.seed_id.abrevname()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+            return name
+        return None
 
     # Used in hybrid-detail parents
     def registered_pollen_name(self):
-        name = self.pollen_id.name()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
-        return name
+        if self.pollen_id:
+            name = self.pollen_id.name()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_pollen_name_short(self):
-        name = self.pollen_id.abrevname()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
-        return name
+        if self.pollen_id:
+            name = self.pollen_id.abrevname()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_seed_name_long(self):
-        name = self.seed_id.name()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_id.textname() + ' ' + '(syn ' + self.seed_genus + ' ' + self.seed_species + ')'
-        return name
+        if self.seed_id:
+            name = self.seed_id.name()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
+            return name
+        return None
 
     def registered_pollen_name_long(self):
-        name = self.pollen_id.name()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_id.textname() + ' ' + '(syn ' + self.pollen_genus + ' ' + self.pollen_species + ')'
-        return name
-
-    # def registered_seed_name_long(self):
-    #     name = self.seed_genus + ' ' + self.seed_species
-    #     if self.seed_id.textspeciesname() != self.seed_species or self.seed_id.genus != self.seed_genus:
-    #         name = name + ' ' + '(syn ' + self.seed_id.textname() + ')'
-    #     name = '<i>' + name + '</i>'
-    #     return name
-    #
-    # # Used in hybrid_detail/parents name
-    # def registered_pollen_name_long(self):
-    #     name = self.pollen_genus + ' ' + self.pollen_species
-    #     if self.pollen_id.textspeciesname() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-    #         name = name + ' ' + '(syn ' + self.pollen_id.textname() + ')'
-    #     name = '<i>' + name + '</i>'
-    #     return name
+        if self.pollen_id:
+            name = self.pollen_id.name()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
+            return name
+        return None
 
     def seed_status(self):
-        if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
-            return 'syn'
+        if self.seed_id:
+            if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
+                return 'syn'
         return None
 
     def pollen_status(self):
-        if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
-            return 'syn'
+        if self.pollen_id:
+            if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
+                return 'syn'
         return None
 
     def hybrid_type(self):

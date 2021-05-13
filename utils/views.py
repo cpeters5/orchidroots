@@ -1,19 +1,45 @@
 from django.shortcuts import render
 import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.http import require_GET
+# from django.core.urlresolvers import resolve
 from django.db.models import Q
+from django.http import HttpResponse
+from django.urls import resolve, get_resolver, URLResolver, URLPattern
+
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
+from accounts.models import Photographer
 
 logger = logging.getLogger(__name__)
 
+def getApp(request):
+    return request.resolver_match.app_name
 
 def write_output(request, detail=None):
     if str(request.user) != 'chariya' and request.user.is_authenticated:
-        message = ">>> " + request.path + str(request.user)
+        message = "ACCESS: " + request.path + " - " + str(request.user)
         if detail:
-            message += ": " + detail
+            message += " - " + detail
         logger.error(message)
-        pass
+    return
+
+
+def get_author(request):
+    if not request.user.is_authenticated or request.user.tier.tier < 2:
+        return None, None
+
+    author_list = Photographer.objects.exclude(user_id__isnull=True).order_by('displayname')
+    author = request.user.photographer.author_id
+    if request.user.tier.tier > 2 and 'author' in request.GET:
+        author = request.GET['author']
+        if author:
+            author = Photographer.objects.get(pk=author)
+    # if not author and request.user.tier.tier > 1:
+    #     try:
+    #         author = Photographer.objects.get(user_id=request.user)
+    #     except Photographer.DoesNotExist:
+    #         author = Photographer.objects.get(author_id='anonymous')
+    return author, author_list
 
 
 def imgdir():
@@ -88,51 +114,66 @@ def paginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
-def getmyphotos(author, species):
-    # Get species and hybrid lists that the user has at least one photo
-    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
-    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
-
-    upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    myspecies_list = myspecies_list.filter(Q(pid__in=upl_list) | Q(pid__in=spc_list)).order_by('genus', 'species')
-    myhybrid_list = myhybrid_list.filter(Q(pid__in=upl_list) | Q(pid__in=hyb_list)).order_by('genus', 'species')
-
-    if species:
-        upload_list = UploadFile.objects.filter(author=author).filter(pid=species.pid)  # Private photos
-        if species.type == 'species':
-            public_list = SpcImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
-        elif species.type == 'hybrid':
-            public_list = HybImages.objects.filter(author=author).filter(pid=species.pid)  # public photos
-        else:
-            message = 'How did we get here???.'
-            return HttpResponse(message)
-
-        private_list = public_list.filter(rank=0)  # rejected photos
-        # public_list  = public_list.filter(rank__gt=0)    # rejected photos
-    else:
-        private_list = public_list = upload_list = []
-
-    return private_list, public_list, upload_list, myspecies_list, myhybrid_list
-
-
 def getRole(request):
     role = ''
     if request.user.is_authenticated:
-        if 'role' in request.GET:
-            role = request.GET['role']
-        elif 'role' in request.POST:
-            role = request.POST['role']
-
+        # if 'role' in request.GET:
+        #     role = request.GET['role']
+        # elif 'role' in request.POST:
+        #     role = request.POST['role']
         if not role:
             if request.user.tier.tier < 2:
                 role = 'pub'
             elif request.user.tier.tier == 2:
+                # Tier 2 users (private) role default to private
                 role = 'pri'
             else:
                 role = 'cur'
+                if 'role' in request.GET:
+                    role = request.GET['role']
+                # Decommission public role (set as default)
+                if role == 'pub':
+                    role = 'pri'
         return role
     return role
 
-# Create your views here.
+# def get_view_name_by_path(path):
+#     logger.error(">>> path = " + str(path))
+#     result = resolve(path=path)
+#     return result.view_name
+#
+#
+# def find_url_pattern_by_name(name):
+#     if name is None:
+#         return None
+#
+#     def deep_find(rs):
+#         for r in rs.url_patterns:
+#             if isinstance(r, URLResolver):
+#                 result = deep_find(r)
+#                 if result is not None:
+#                     return result
+#             elif isinstance(r, URLPattern):
+#                 if r.name == name:
+#                     return r.pattern
+#
+#     return deep_find(get_resolver())
+#
+
+@require_GET
+def robots_txt(request):
+    lines = [
+        "User-Agent: *",
+        "Disallow: /accounts/",
+        "Disallow: /core/",
+        "Disallow: /documents/",
+        "Disallow: /detail/ancestor/",
+        "Disallow: /documents/",
+        "Disallow: /donations/",
+        "Disallow: /other/",
+        "Disallow: /search/",
+        "Disallow: /orchidaceae/",
+        "Disallow: /utils/",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+

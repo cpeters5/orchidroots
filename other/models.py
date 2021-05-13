@@ -1,14 +1,16 @@
 from django.db import models
-# from django.contrib.auth.models import (
-#     BaseUserManager, AbstractBaseUser
-# )
-# import six
-# from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
+# from io import BytesIO
+# import os, shutil
+# from django.core.files import File
+# from django.db.models.signals import post_save
 from django.conf import settings
+# from django.utils import timezone
+# from mptt.models import MPTTModel, TreeForeignKey
 
+# from utils.utils import rotate_image
 from accounts.models import User, Photographer
 from core.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
 import re
@@ -35,12 +37,13 @@ class Genus(models.Model):
     author = models.CharField(max_length=200, default='')
     citation = models.CharField(max_length=200, default='')
     cit_status = models.CharField(max_length=20, null=True)
-    alliance = models.CharField(max_length=50, default='')
-    family = models.ForeignKey(Family, null=True, db_column='family', related_name='poolfamily', on_delete=models.DO_NOTHING)
+    family = models.ForeignKey(Family, null=True, db_column='family', related_name='otfamily', on_delete=models.DO_NOTHING)
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', related_name='poolsubfamily', on_delete=models.DO_NOTHING)
     tribe = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', related_name='pooltribe', on_delete=models.DO_NOTHING)
     subtribe = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe', related_name='poolsubtribe', on_delete=models.DO_NOTHING)
     is_succulent = models.BooleanField(null=True, default=False)
+    is_carnivorous = models.BooleanField(null=True, default=False)
+    is_extinct = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=20, default='')
     type = models.CharField(max_length=20, default='')
     description = models.TextField(null=True)
@@ -125,6 +128,31 @@ class Genus(models.Model):
         ordering = ('genus',)
 
 
+class Gensyn(models.Model):
+    # pid = models.BigIntegerField(null=True, blank=True)
+    pid = models.OneToOneField(
+        Genus,
+        db_column='pid',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    acc = models.ForeignKey(Genus, verbose_name='genus', related_name='gen_id', null=True, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.pid
+
+class GenusRelation(models.Model):
+    gen = models.OneToOneField(Genus, db_column='gen',primary_key=True,on_delete=models.CASCADE)
+    genus = models.CharField(max_length=50, default='')
+    parentlist = models.CharField(max_length=500, null=True)
+    formula = models.CharField(max_length=500, null=True)
+
+    def get_parentlist(self):
+        x = self.parentlist.split('|')
+        return x
+
+
 class Species(models.Model):
     pid = models.BigIntegerField(primary_key=True)
     source = models.CharField(max_length=10)
@@ -135,8 +163,11 @@ class Species(models.Model):
     infraspe = models.CharField(max_length=50, null=True)
     author = models.CharField(max_length=200)
     originator = models.CharField(max_length=100, blank=True)
-    scientific_name = models.CharField(max_length=500, blank=True)
+    binomial = models.CharField(max_length=500, blank=True)
+    family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcotfamily', on_delete=models.DO_NOTHING)
     citation = models.CharField(max_length=200)
+    is_succulent = models.BooleanField(null=True, default=False)
+    is_carnivorous = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
@@ -163,6 +194,11 @@ class Species(models.Model):
         if self.infraspr:
             name = '%s %s %s' % (name, self.infraspr, self.infraspe)
         return name
+
+    def binomial_it(self):
+        if self.type == 'species' and self.binomial:
+            return '<i>%s</i>' % self.binomial
+        return
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
@@ -277,11 +313,7 @@ class Species(models.Model):
             return "#"
 
     def get_best_img(self):
-        if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
-        else:
-            img = HybImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+        img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
 
         if img.count() > 0:
@@ -290,12 +322,7 @@ class Species(models.Model):
         return None
 
     def get_best_img_by_author(self, author):
-        if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(
-                image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
-        else:
-            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(
+        img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(
                 image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
 
@@ -303,6 +330,52 @@ class Species(models.Model):
             img = img[0:1][0]
             return img
         return None
+
+
+class Accepted(models.Model):
+    pid = models.OneToOneField(
+        Species,
+        db_column='pid',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    gen = models.ForeignKey(Genus, db_column='gen', related_name='othgen_id', null=True, blank=True, on_delete=models.DO_NOTHING)
+    genus = models.CharField(max_length=50)
+    species = models.CharField(max_length=50)
+    infraspr = models.CharField(max_length=20, null=True)
+    infraspe = models.CharField(max_length=50, null=True)
+    distribution = models.TextField(blank=True)
+    is_type = models.BooleanField(null=True, default=False)
+    physiology = models.CharField(max_length=200, null=True, blank=True)
+    url = models.CharField(max_length=200, null=True, blank=True)
+    url_name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    common_name = models.CharField(max_length=100, null=True, blank=True)
+    local_name = models.CharField(max_length=100, null=True, blank=True)
+    bloom_month = models.CharField(max_length=200, null=True, blank=True)
+    size = models.CharField(max_length=50, null=True, blank=True)
+    color = models.CharField(max_length=50, null=True, blank=True)
+    fragrance = models.CharField(max_length=50, null=True, blank=True)
+    altitude = models.CharField(max_length=50, null=True, blank=True)
+
+    history = models.TextField(null=True, blank=True)
+    analysis = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    etymology = models.TextField(null=True, blank=True)
+    culture = models.TextField(null=True, blank=True)
+
+    subgenus = models.CharField(max_length=50, null=True, blank=True)
+    section = models.CharField(max_length=50, null=True, blank=True)
+    subsection = models.CharField(max_length=50, null=True, blank=True)
+    series = models.CharField(max_length=50, null=True, blank=True)
+
+    num_image = models.IntegerField(null=True, blank=True)
+    num_descendant = models.IntegerField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+    operator = models.ForeignKey(User, db_column='operator', related_name='othoperator', null=True, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return self.pid.name()
 
 
 class Hybrid(models.Model):
@@ -340,7 +413,7 @@ class Hybrid(models.Model):
     date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
     originator = models.CharField(max_length=100, null=True, blank=True)
-    user_id = models.ForeignKey(User, db_column='user_id', related_name='othuser_id', null=True, blank=True, on_delete=models.DO_NOTHING)
+    user_id = models.ForeignKey(User, db_column='user_id', related_name='othuser_id1', null=True, blank=True, on_delete=models.DO_NOTHING)
 
     description = models.TextField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
@@ -359,50 +432,64 @@ class Hybrid(models.Model):
         return self.pid.name()
 
     def registered_seed_name(self):
-        name = self.seed_id.name()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
-        return name
+        if self.seed_id:
+            name = self.seed_id.name()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_seed_name_short(self):
-        name = self.seed_id.abrevname()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
-        return name
+        if self.seed_id:
+            name = self.seed_id.abrevname()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
+            return name
+        return None
 
     # Used in hybrid-detail parents
     def registered_pollen_name(self):
-        name = self.pollen_id.name()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
-        return name
+        if self.pollen_id:
+            name = self.pollen_id.name()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_pollen_name_short(self):
-        name = self.pollen_id.abrevname()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
-        return name
+        if self.pollen_id:
+            name = self.pollen_id.abrevname()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
+            return name
+        return None
 
     def registered_seed_name_long(self):
-        name = self.seed_id.name()
-        if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-            name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
-        return name
+        if self.seed_id:
+            name = self.seed_id.name()
+            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
+            return name
+        return None
 
     def registered_pollen_name_long(self):
-        name = self.pollen_id.name()
-        if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-            name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
-        return name
+        if self.pollen_id:
+            name = self.pollen_id.name()
+            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
+            return name
+        return None
 
     def seed_status(self):
-        if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
-            return 'syn'
+        if self.seed_id:
+            if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
+                return 'syn'
         return None
 
     def pollen_status(self):
-        if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
-            return 'syn'
+        if self.pollen_id:
+            if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
+                return 'syn'
         return None
 
     def hybrid_type(self):
@@ -410,6 +497,104 @@ class Hybrid(models.Model):
             return 'natural'
         else:
             return 'artificial'
+
+
+class AncestorDescendant(models.Model):
+    class Meta:
+        unique_together = (("did", "aid"),)
+
+    did = models.ForeignKey(Hybrid, null=False, db_column='did', related_name='ordid',on_delete=models.CASCADE)
+    aid = models.ForeignKey(Species, null=False, db_column='aid', related_name='oraid',on_delete=models.CASCADE)
+    anctype = models.CharField(max_length=10, default='hybrid')
+    pct = models.FloatField(blank=True, null=True)
+    # file = models.CharField(max_length=10, blank=True)
+
+    def __str__(self):
+        hybrid = '%s %s' % (self.did.genus, self.did.species)
+        pct = '%'
+        return '%s %s %s' % (hybrid, self.aid, self.pct)
+
+    def anc_name(self):
+        name = Species.objects.get(pk=self.aid.pid)
+        if name.infraspr:
+            return "%s %s %s %s" % (name.genus, name.species, name.infraspr,name.infraspe)
+        else:
+            return "%s %s" % (name.genus, name.species)
+
+    def anc_abrev(self):
+        # name = Species.objects.get(pk=self.aid.pid)
+        abrev = self.did.abrev
+        return self.did.nameabrev()
+
+    def prettypct(self):
+        # pct = int(self.pct*100)/100
+        percent = '{:5.2f}'.format(float(self.pct))
+
+        return percent.strip("0").strip(".")
+
+
+class Distribution(models.Model):
+    id = models.AutoField(primary_key=True, default=10)
+    pid = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid',related_name='othdist_pid')
+    source = models.CharField(max_length=10, blank=True)
+    region_id = models.ForeignKey(Region, db_column='region_id',related_name='othnatregion_id',null=True, on_delete=models.DO_NOTHING)
+    subregion_code = models.ForeignKey(SubRegion, db_column='subregion_code',related_name='othnatsubregion_id',null=True, on_delete=models.DO_NOTHING)
+    continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='oth_continent_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+    orig_code = models.CharField(max_length=100, null=True)
+    distribution = models.CharField(max_length=500, null=True)
+    localregion_code = models.CharField(max_length=10, null=True)
+    localregion_id = models.ForeignKey(LocalRegion, db_column='localregion_id',related_name='othnatlocalregion_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+    comment = models.CharField(max_length=500,blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        unique_together = (("pid", "region_id","subregion_code","localregion_id"),)
+
+    def name(self):
+        name = ''
+        if self.localregion_id and self.localregion_id.id > 0 and self.localregion_id.code != 'OO':
+            name = name + self.localregion_id.name
+            if self.subregion_code:
+                name = name + ', ' + self.subregion_code.name + ', ' + self.continent_id.name
+        elif self.subregion_code:
+            name = name + self.subregion_code.name + ', ' + self.continent_id.name
+        elif self.region_id:
+            name = name + self.region_id.name
+        elif self.continent_id:
+            name = name + self.continent_id.name
+        return name
+
+    def __str__(self):
+        return self.name()
+
+    def subname(self):
+        return self.subregion_code.name
+
+    def regname(self):
+        return self.region_id.name
+
+    def locname(self):
+        return self.localregion_id.name
+
+    def conname(self):
+        return self.continent_id.name
+
+
+class Synonym(models.Model):
+    spid = models.OneToOneField(
+        Species,
+        related_name='cacspid',
+        db_column='spid',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    acc = models.ForeignKey(Species, verbose_name='accepted genus', related_name='cacaccid', on_delete=models.CASCADE)
+    comment = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.spid.name()
 
 
 class SpcImages(models.Model):
@@ -450,13 +635,13 @@ class SpcImages(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return self.pid.pid.textname()
+        return self.pid.textname()
 
     def imgname(self):
         if self.source_file_name:
             myname = '<i>%s</i>' % (self.source_file_name)
         else:
-            myname = self.pid.pid.abrevname()
+            myname = self.pid.abrevname()
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -487,7 +672,7 @@ class SpcImages(models.Model):
         if self.source_file_name:
             myname = self.source_file_name
         else:
-            myname = self.pid.pid
+            myname = self.pid
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -509,11 +694,11 @@ class SpcImages(models.Model):
 
     # TODO: add block_id
     def image_dir(self):
-        return 'utils/images/species/'
+        return 'utils/images/' + self.family.family + '/'
         # return 'utils/images/hybrid/' + block_id + '/'
 
     def thumb_dir(self):
-        return 'utils/images/species_thumb/'
+        return 'utils/images/' + self.family + '/'
 
     def get_displayname(self):
         if self.credit_to:
@@ -524,4 +709,34 @@ class SpcImages(models.Model):
         author = Photographer.objects.get(author=self.author_id)
         return author.user_id
 
+
+class UploadFile(models.Model):
+    pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid', related_name='othpid',on_delete=models.DO_NOTHING)
+    author     = models.ForeignKey(Photographer, db_column='author', related_name='othauthor', null=True, blank=True,on_delete=models.DO_NOTHING)
+    user_id    = models.ForeignKey(User, db_column='user_id', related_name='othuser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+    credit_to  = models.CharField(max_length=100, null=True, blank=True)    #should match author_id inPhotography
+    source_url = models.CharField(max_length=1000, null=True, blank=True)
+    source_file_name = models.CharField(max_length=100, null=True, blank=True)
+    name        = models.CharField(max_length=100, null=True, blank=True)
+    awards      = models.CharField(max_length=200, null=True, blank=True)
+    variation   = models.CharField(max_length=50, null=True, blank=True)
+    forma       = models.CharField(max_length=50, null=True, blank=True)
+    originator  = models.CharField(max_length=50, null=True, blank=True)
+    text_data   = models.TextField(null=True, blank=True)
+    description = models.CharField(max_length=100, null=True, blank=True)
+    certainty   = models.CharField(max_length=20, null=True, blank=True)
+    type        = models.CharField(max_length=20, null=True, blank=True)
+    location    = models.CharField(max_length=100, null=True, blank=True)
+    rank        = models.IntegerField(choices=RANK_CHOICES,default=0)
+    image_file_path = models.ImageField(upload_to='images/', null=True, blank=True)
+    image_file  = models.CharField(max_length=100, null=True, blank=True)
+    is_private  = models.BooleanField(null=True, default=False)
+    approved    = models.BooleanField(null=True, default=False)
+    compressed  = models.BooleanField(null=True, default=False)
+    block_id    = models.IntegerField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.pid.name()
 

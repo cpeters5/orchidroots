@@ -157,17 +157,13 @@ div.text-bl a {
     border:0 solid blue;
 }
 input[type=text], select {
-    /*width: 550px;*/
-    /*height: 100px;*/
-    /*margin: 10px 15px 50px;*/
-    /*border: 3px solid #d9569f;*/
-    /*border-radius: 50px;*/
-    /*outline: none;*/
-    /*font-family: sofia-pro-soft, sans-serif;*/
-    /*font-weight: 300;*/
-    font-size: 12px;
-    /*text-align: center;*/
-    /*text-align-last: center;*/
+  width: 100%;
+  padding: 12px 20px;
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
 }
 
 @media only screen and (max-width: 850px) {
@@ -311,7 +307,7 @@ label {
 }
 
 </style>
-    <br><br>
+    <br>
 <div style="clear:both"></div>
 
 <!--Title-->
@@ -352,12 +348,13 @@ label {
         </div>
     </div>
 </div>
-
+<br>
+{% include "common/detail-nav.html" %}
         <!--Main sections-->
     <div class="d-flex p-2 justify-content-center" style="margin:0 auto;width:95%;">
         <div class="tab-content clearfix" style="background:white; width:100%;">
                 <!-- Results -->
-                <div style="width:100%;margin: 0px auto; border:0 solid blue;">
+                <div style="width:100%;margin: 0 auto; border:0 solid blue;">
                     <div class="title" style="margin:0 auto;padding:10px;text-align: center; border:0 solid blue;">
                     {% if cross %}
                         This cross has already been
@@ -367,9 +364,9 @@ label {
                         temporarily created:
                         {% endif %}
                         {% if role == 'cur' %}
-                            <a href="{% url 'detail:photos' cross.pid.pid %}?role={{role}}">{{cross.pid.name|safe}}</a>
+                            <a href="{% url 'common:photos' cross.pid.pid %}?family={{species1.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
                         {% else %}
-                            <a href="{% url 'detail:information' cross.pid.pid %}?">{{cross.pid.name|safe}}</a>
+                            <a href="{% url 'common:information' cross.pid.pid %}?family={{species1.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
                         {% endif %}
                     {% else %}
                         {% if pid1 and pid2 and pid1 != pid2 %}
@@ -379,7 +376,7 @@ label {
                                     <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus1}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
                                 {% else %}
                                     WARNING: The cross will be removed if no photo uploaded.<br>
-                                    <a class="btn btn-primary btn-xs" href="{% url 'detail:createhybrid' %}?pid1={{species1.pid}}&pid2={{species2.pid}}&role={{role}}">
+                                    <a class="btn btn-primary btn-xs" href="{% url 'detail:createhybrid' %}?family={{species1.gen.family}}&pid1={{species1.pid}}&pid2={{species2.pid}}&role={{role}}">
                                         Create {{species1.namecasual|safe}} × {{species2.namecasual|safe}}
                                     </a>
                                 {% endif %}
@@ -400,15 +397,15 @@ label {
                             {% if message1 %}
                                 <span class="text-danger">{{message1|safe}}</span>
                             {% elif species.species or species1.species %}
-                                <a href="{% url 'detail:information' pid1 %}?role={{role}}">{{species1.abrevname|safe}}</a> {{species1.author}} {{species1.year}}
+                                <a href="{% url 'common:information' pid1 %}?family={{species1.gen.family}}&role={{role}}">1 {{species1.abrevname|safe}}</a> {{species1.author}} {{species1.year}}
                                 {% if accepted1 %} <br>(syn. {{accepted1.name|safe}}) {% endif %}
                             {% else %}
                                 Enter the correct name of the first orchid
                             {% endif %}
                         </div>
                         <div style="padding:10px;">
-                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             <form action="?" id="compare">
+                                <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                                 <input type="hidden" name="role" value="{{role}}" />
                                 <input type="hidden" name="pid" value="{{species1.pid}}" />
                                 <input form="compare" type="text" class="form-control form-control-sm"  name="genus1" onfocus="this.select()" value="{{genus1}}" placeholder="Genus" title=""/>
@@ -471,7 +468,7 @@ label {
                             {% if message2 %}
                                 <span class="text-danger">{{message2|safe}}</span>
                             {% elif species2.species %}
-                                <a href="{% url 'detail:information' species2.pid %}?role={{role}}">{{species2.abrevname|safe}}</a> {{species2.author}} {{species2.year}}
+                                <a href="{% url 'common:information' species2.pid %}?family={{species1.gen.family}}&role={{role}}">{{species2.abrevname|safe}}</a> {{species2.author}} {{species2.year}}
                                 {% if accepted2 %} <br>(syn. {{accepted2.name|safe}}) {% endif %}
                             {% else %}
                                 Enter the correct name of second orchid.

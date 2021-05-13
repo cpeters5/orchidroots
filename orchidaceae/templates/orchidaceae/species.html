@@ -205,14 +205,10 @@ option {
     <!--                    <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=&genus={{genus}}">All status</a></li>-->
                     </ul>
                 </div>
-                <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid List</a>
+                <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid List</a>
                 {% if subtotal > 0 and genus %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:browse' %}?type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:browse' %}?type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
                 {% endif %}
-                SubFamily = {{subfamily_list|length}}
-                Tribe = {{tribe_list|length}}
-                Subtribe = {{subtribe_list|length}}
-                species = {{subtribe_list|length}}
             </h4>
         </div>
 
@@ -446,15 +442,15 @@ option {
                                 {% if species.author %} {{species.author}}{% endif %}
                                 {% if species.year > 0 %}<span  style="font-size: 12px;"> {{species.year}}</span>{% endif %}
                                 {% if role == 'cur' %}
-                                    (syn. <a href="{% url 'detail:photos' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'common:photos' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
                                 {% else %}
-                                    (syn. <a href="{% url 'detail:information' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'common:information' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'detail:photos' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}} </a>
+                                    <a href="{% url 'common:photos' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}} </a>
                                 {% else %}
-                                    <a href="{% url 'detail:information' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}}</a>
+                                    <a href="{% url 'common:information' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}}</a>
                                 {% endif %}
                                 {% if species.author %} {{species.author}}{% endif %}
                                 {% if species.year > 0 %}<span  style="font-size: 12px;"> {{species.year}}</span>{% endif %}
@@ -465,10 +461,10 @@ option {
                             {% if species.status == 'synonym' %}
                                 {% if species.subgenus %}{{species.subgenus.subgenus}}{% endif %}
                             {% else %}
-                                {% if species.accepted.subgenus %}Subgen. <a href="{% url 'orchidaceae:browse' %}?subgenus={{species.accepted.subgenus}}&type=species&gen={{gen}}">{{species.accepted.subgenus}}</a>{% endif %}
-                                {% if species.accepted.section %} Sec. <a href="{% url 'orchidaceae:browse' %}?section={{species.accepted.section}}&type=species&gen={{gen}}">{{species.accepted.section}}</a>{% endif %}
-                                {% if species.accepted.subsection %} Subsec. <a href="{% url 'orchidaceae:browse' %}?subsection={{species.accepted.subsection}}&type=species&gen={{gen}}">{{species.accepted.subsection}}</a>{% endif %}
-                                {% if species.accepted.series %} Ser. <a href="{% url 'orchidaceae:browse' %}?series={{species.accepted.series}}&type=species&gen={{gen}}">{{species.accepted.series}}</a>{% endif %}
+                                {% if species.accepted.subgenus %}Subgen. <a href="{% url 'common:browse' %}?subgenus={{species.accepted.subgenus}}&type=species&gen={{gen}}">{{species.accepted.subgenus}}</a>{% endif %}
+                                {% if species.accepted.section %} Sec. <a href="{% url 'common:browse' %}?section={{species.accepted.section}}&type=species&gen={{gen}}">{{species.accepted.section}}</a>{% endif %}
+                                {% if species.accepted.subsection %} Subsec. <a href="{% url 'common:browse' %}?subsection={{species.accepted.subsection}}&type=species&gen={{gen}}">{{species.accepted.subsection}}</a>{% endif %}
+                                {% if species.accepted.series %} Ser. <a href="{% url 'common:browse' %}?series={{species.accepted.series}}&type=species&gen={{gen}}">{{species.accepted.series}}</a>{% endif %}
                             {% endif %}
                         </td>
                         {% endif %}
