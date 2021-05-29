@@ -13,6 +13,10 @@ def help(request):
     context = {}
     return render(request, 'documents/help.html', context)
 
+def releasenote_v4(request):
+    context = {}
+    return render(request, 'documents/releasenote_v4.html', context)
+
 def bylaws(request):
     context = {}
     return render(request, 'documents/bylaws.html', context)

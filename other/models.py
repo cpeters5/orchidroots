@@ -168,6 +168,7 @@ class Species(models.Model):
     citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
+    is_parasite = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
@@ -253,7 +254,11 @@ class Species(models.Model):
         return '<i>%s</i> %s' % (self.genus, self.speciesname())
 
     def abrevname(self):
-        return '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        if self.gen.abrev:
+            name = '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        else:
+            name = '<i>%s</i> %s' % (self.genus, self.speciesname())
+        return name
 
     def namecasual(self):
         namecasual = self.abrevname()

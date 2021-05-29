@@ -6,11 +6,11 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-lg-3" >
+        <div class="col-xs-12 col-sm-3 col-lg-2" >
             {% include "common/taxonomy.html" %}
         </div>
 
-        <div class="col-sm-7 col-lg-9 align-items-center" style="text-align:left;font-size:13px;margin:30px 0 0 0;">
+        <div class="col-sm-9 col-lg-10 align-items-center" style="text-align:left;font-size:13px;margin:30px 0 0 0;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
@@ -22,18 +22,22 @@
                             {% if genus %}: {{genus}}  {% endif %}
                             Hybrid list
                         </div>
+                            <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block">
                             {% if message %}{{message}}<br>{% endif %}
                                 <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
                                 <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
+                                <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked&type=hybrid">Browse</a>
 <!--                                {% if primary == 'Y' %}-->
 <!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
 <!--                                {% else %}-->
 <!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
 <!--                                {% endif %}-->
 <!--                                {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}">Full species list</a>{% endif %}-->
+                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
+                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:hybrid' %}?family={{family}}&alpha={{alpha}}">Detailed hybrids</a>{% endif %}
                            </dev>
 
                         <!--   Main table-->
@@ -59,9 +63,9 @@
                                     <input type="hidden" name="genus" value="{{genus}}" />
                                     <input type="hidden" name="syn" value="{{syn}}" />
                                     {% if primary == 'N' %}
-                                    <input type="checkbox" class="form-check-input" name="primary" value="Y" onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">All hybrids</span>
+                                    <input type="checkbox" class="form-check-input" name="primary" value="Y" onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Show all hybrids</span>
                                     {% else %}
-                                    <input type="checkbox" class="form-check-input" name="primary" value="N" checked onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Primary only</span>
+                                    <input type="checkbox" class="form-check-input" name="primary" value="N" checked onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Show primary only</span>
                                     {% endif %}
                                 </form>
                             <div style="clear:left">{% include "common/alpha_list_common.html" %}
@@ -165,7 +169,8 @@ $(document).ready(function() {
         // "dom": '<"wrapper"flipt>',
         // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
         // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
         // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
         language: {
             search: "_INPUT_",

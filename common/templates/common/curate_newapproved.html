@@ -141,11 +141,11 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="hybridDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days="></a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=3">past 3 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=7">past 7 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=20">past 20 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=30">past 30 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&tab=upl&type={{type}}&days="></a>
+                                <a class="dropdown-item" href="?family={{family}}&tab=upl&type={{type}}&days=3">past 3 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&tab=upl&type={{type}}&days=7">past 7 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&tab=upl&type={{type}}&days=20">past 20 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&tab=upl&type={{type}}&days=30">past 30 days</a>
                             </div>
                         </div>
                     </div>
@@ -165,12 +165,12 @@ div.text-br {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'detail:photos' image.pid_id %}?role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
+                                    <a href="{% url 'common:photos' image.pid_id %}?role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
                                     <br>Approved by {{image.user_id}}, {{image.created_date.date}}
                                     {% if image.source_url %}
-                                        <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                        <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
                                     {% else %}
-                                        {{image.author.displayname }}
+                                        {{image.get_displayname}}
                                     {% endif %}
                                     <br>
                                     Rank:

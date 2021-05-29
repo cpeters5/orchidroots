@@ -106,43 +106,13 @@ def quality_update(request, species):
 # All access - at least role = pub
 def compare(request, pid):
     # TODO:  Use Species form instead
-    infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     spcimg1_list = spcimg2_list = []
-
-    if pid > 0:
-        try:
-            species = Species.objects.get(pk=pid)
-            pid = species.pid
-            genus = species.genus
-            species1 = species
-        except Species.DoesNotExist:
-            return HttpResponseRedirect("/")
-    else:
-        return HttpResponse("/")
-
+    species = Species.objects.get(pk=pid)
+    family = species.gen.family
+    pid = species.pid
+    genus = species.genus
     # Handfle request. Should use SpcForm instead.
-    if 'species1' in request.GET:
-        spc1 = request.GET['species1']
-        spc1 = spc1.strip()
-    if 'genus1' in request.GET:
-        gen1 = request.GET['genus1']
-        gen1 = gen1.strip()
-    if 'infraspe1' in request.GET:
-        infraspe1 = request.GET['infraspe1']
-        infraspe1 = infraspe1.strip()
-    if 'infraspr1' in request.GET:
-        infraspr1 = request.GET['infraspr1']
-        infraspr1 = infraspr1.strip()
-    if 'author1' in request.GET:
-        author1 = request.GET['author1']
-        author1 = author1.strip()
-    if 'year1' in request.GET:
-        year1 = request.GET['year1']
-        year1 = year1.strip()
-        if year1:
-            year1 = int(year1)
-
     if 'species2' in request.GET:
         spc2 = request.GET['species2']
         spc2 = spc2.strip()
@@ -162,88 +132,8 @@ def compare(request, pid):
         year2 = request.GET['year2']
         if year2:
             year2 = year2.strip()
-
     role = getRole(request)
-    if gen1:  # Request new genus1:
-        try:
-            genus1 = Genus.objects.get(genus__iexact=gen1)
-            genus = genus1
-        except Genus.DoesNotExist:
-            # Fallback to initial species
-            message = "genus, " + gen1 + ' does not exist'
-            context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                       'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                       'message1': message,
-                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, app + '/compare.html', context)
-        if spc1:
-            species1 = Species.objects.filter(species__iexact=spc1).filter(genus__iexact=gen1)
-            if infraspe1:
-                species1 = species1.filter(infraspe=infraspe1).filter(infraspr=infraspr1)
-            if author1:
-                species1 = species1.filter(author=author1)
-            if year1:
-                species1 = species1.filter(year=year1)
 
-            if len(species1) == 0:
-                message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> does not exist'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message1': message,
-                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, app + '/compare.html', context)
-            elif len(species1) > 1:
-                if infraspe1 and infraspr1:
-                    species1 = species1.filter(infraspe__icontains=infraspe1).filter(infraspr__icontains=infraspr1)
-                else:
-                    species1 = species1.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
-                if year1:
-                    species1 = species1.filter(year=year1)
-                if len(species1) == 1:  # Found unique species
-                    species1 = species1[0]
-                    species = species1
-                    pid1 = species1.pid
-                    pid = ''
-                elif len(species1) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returns more than one values'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
-                else:  # length = 0  This could be a synonym
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returned none'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
-            else:  # Unique species found
-                species1 = species1[0]
-                species = species1
-                pid1 = species1.pid
-                pid = ''
-        else:
-            pid1 = ''
-    else:
-        # species 1 was not requested. use initial species
-        genus1 = species.genus
-        species1 = species
-        pid1 = pid
-
-    if not genus1 and not species1 and not genus2 and not species2 and not pid1 and not pid2:
-        send_url = "/common/photos/" + str(species.pid) + "/?role=cur" + "&family=" + family.family
-        return HttpResponseRedirect(send_url)
-
-    if species1:
-        # logger.error("species = " + str(species1) + " - pid = " + str(pid1))
-        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     if gen2:
         try:
             genus2 = Genus.objects.get(genus__iexact=gen2)
@@ -256,7 +146,7 @@ def compare(request, pid):
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
                        'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, app + '/compare.html', context)
+            return render(request, 'detail/compare.html', context)
         if spc2:
             species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
             if len(species2) == 0:
@@ -266,7 +156,7 @@ def compare(request, pid):
                            'genus2': gen2, 'species2': spc2,
                            'message2': message,
                            'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, app + '/compare.html', context)
+                return render(request, 'detail/compare.html', context)
             elif len(species2) > 1:
                 if infraspe2 and infraspr2:
                     species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
@@ -281,23 +171,19 @@ def compare(request, pid):
                     species2 = species2[0]
                     pid2 = species2.pid
                 elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value'
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message2': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
+                    return render(request, 'detail/compare.html', context)
                 else:  # length = 0
                     message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message1': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
+                    return render(request, 'detail/compare.html', context)
             else:
                 species2 = species2[0]
                 pid2 = species2.pid
@@ -307,36 +193,38 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
 
-    if species1 and species1.status == 'synonym':
-        pid1 = species1.getAcc()
-        accepted1 = species1.getAccepted()
     if species2 and species2.status == 'synonym':
         pid2 = species2.getAcc()
         accepted2 = species2.getAccepted()
 
-    if pid1 and pid2:
-        cross = Hybrid.objects.filter(seed_id=pid1).filter(pollen_id=pid2)
+    if pid2:
+        cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
         if not cross:
-            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid1)
+            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid)
         if cross:
             cross = cross[0]
         else:
             cross = ''
 
-    if species1:
-        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if species.type == 'species':
+        spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    else:
+        spcimg1_list = HybImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     if species2:
-        spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        if species2.type == 'species':
+            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     msgnogenus = ''
     if 'msgnogenus' in request.GET:
         msgnogenus = request.GET['msgnogenus']
 
-    write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
     context = {'pid': pid, 'genus': genus, 'species': species,
-               'pid1': pid1, 'pid2': pid2, 'accepted1': accepted1, 'accepted2': accepted2,  # pid of accepted species
-               'genus1': genus1, 'species1': species1, 'spcimg1_list': spcimg1_list,
+               'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
+               'spcimg1_list': spcimg1_list,
                'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
@@ -387,6 +275,9 @@ def createhybrid(request):
     # # First, find all genus ancestors of both
     gen1 = species1.gen.pid
     gen2 = species2.gen.pid
+
+    #Oops! We dont have GenusRelation built yet. Only for Orchidaceae
+    # Block this function for now.
     parent1 = GenusRelation.objects.get(gen=gen1)
     parent2 = GenusRelation.objects.get(gen=gen2)
     parentlist1 = parent1.get_parentlist()
@@ -415,7 +306,7 @@ def createhybrid(request):
     spcobj = Species()
     spcobj.genus = genus
     spcobj.species = spc1 + '-' + spc2
-    spcobj.pid = Hybrid.objects.filter(pid__gt=900000000).filter(pid__lt=999999999).order_by('-pid')[0].pid_id + 1
+    spcobj.pid = Hybrid.objects.filter(pid__gt=900000000000).filter(pid__lt=999999999999).order_by('-pid')[0].pid_id + 1
     spcobj.source = 'INT'
     spcobj.type = 'hybrid'
     spcobj.status = 'nonregistered'
@@ -584,7 +475,6 @@ def reidentify(request, orid, pid):
     if request.method == 'POST':
         if form.is_valid():
             new_pid = form.cleaned_data.get('species')
-            # logger.error(">>> Reidentify: from " + str(pid) + " to " + str(new_pid))
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
@@ -606,8 +496,6 @@ def reidentify(request, orid, pid):
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family.application) + "/" + old_img.image_file)
                     else:
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
-                    # logger.error(">>> old path = " + str(from_path))
-                    # logger.error(">>> to path = " + str(to_path))
                     os.rename(from_path, to_path)
                 else:
                     url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
@@ -644,180 +532,6 @@ def reidentify(request, orid, pid):
 
 
 @login_required
-def xdeletephoto(request, orid):
-    try:
-        image = UploadFile.objects.get(pk=orid)
-        species = Species.objects.get(pk=image.pid_id)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=species.pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    ortype = 'hybrid'
-    if 'type' in request.GET:
-        ortype = request.GET['type']
-
-    if 'page' in request.GET:
-        page = request.GET['page']
-    else:
-        page = "1"
-
-    upl = UploadFile.objects.get(id=orid)
-    filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-    upl.delete()
-    area = ''
-    if 'area' in request.GET:
-        area = request.GET['area']
-    role = getRole(request)
-
-    if area == 'allpending':
-        # bulk delete by curators from all_pending tab
-        url = "%s&page=%s&type=%s&days=%d" % (reverse(app + ':curate_pending'), page, ortype, days)
-    elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
-        # Requested from all upload photos
-        url = "%s?page=%s" % (reverse(app + ':curate_newupload'), page)
-    elif role == 'pri':
-        # Requested from private view
-        url = "%s?role=%s" % (reverse(app + ':myphoto', args=(species.pid,)), role)
-    else:
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
-
-    # Finally remove file if exist
-    if os.path.isfile(filename):
-        os.remove(filename)
-
-    return HttpResponseRedirect(url)
-
-
-@login_required
-def xdeletewebphoto(request, pid):
-    species = Species.objects.get(pk=pid)
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    spc = ''
-
-    if 'page' in request.GET:
-        page = request.GET['page']
-    else:
-        page = "1"
-
-    if 'id' in request.GET:
-        orid = request.GET['id']
-        orid = int(orid)
-
-        try:
-            spc = SpcImages.objects.get(id=orid)
-        except SpcImages.DoesNotExist:
-            pass
-        if spc:
-            if spc.image_file:
-                filename = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid", str(spc.image_file))
-                if os.path.isfile(filename):
-                    os.remove(filename)
-            spc.delete()
-    days = 7
-    area = ''
-    role = getRole(request)
-    if 'area' in request.GET:
-        area = request.GET['area']
-    if 'days' in request.GET:
-        days = request.GET['days']
-    if area == 'allpending':  # from curate_pending (all rank 0)
-        url = "%s?role=%s&page=%s&type=%s&days=%s" % (reverse(app + ':curate_pending'), role, page, type, days)
-    else:
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
-    return HttpResponseRedirect(url)
-
-
-@login_required
-def xapprovemediaphoto(request, pid):
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    # Only curator can approve
-    role = getRole(request)
-    if role != "cur":
-        message = 'You do not have privilege to approve photos.'
-        return HttpResponse(message)
-
-    if 'id' in request.GET:
-        orid = request.GET['id']
-        orid = int(orid)
-    else:
-        message = 'This photo does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    try:
-        upl = UploadFile.objects.get(pk=orid)
-    except UploadFile.DoesNotExist:
-        write_output(request, ">>> approvemediaphoto FAIL: " + species.textname() + "-" + str(orid))
-        msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%?role=%s&msg=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, msg, family)
-        return HttpResponseRedirect(url)
-
-    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-    tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
-
-    filename, ext = os.path.splitext(str(upl.image_file_path))
-    spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
-                    source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                    description=upl.description, location=upl.location, created_date=upl.created_date)
-    spc.approved_by = request.user
-    newdir = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(family))
-
-    if species.type == 'species':
-        image_file = "spc_"
-    else:
-        image_file = "hyb_"
-
-    image_file = image_file + str(format(upl.pid_id, "09d")) + "_" + str(format(upl.id, "09d"))
-    new_name = os.path.join(newdir, image_file)
-    if not os.path.exists(new_name + ext):
-        try:
-            shutil.copy(old_name, tmp_name)
-            shutil.move(old_name, new_name + ext)
-        except shutil.Error:
-            # upl.delete()
-            url = "%?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
-            return HttpResponseRedirect(url)
-        # logger.error(">>> approvemediaphoto: " + str(request.user) + " " + str(species.pid) + " " + old_name)
-        spc.image_file = image_file + ext
-    else:
-        i = 1
-        while True:
-            image_file = image_file + "_" + str(i) + ext
-            x = os.path.join(newdir, image_file)
-            if not os.path.exists(x):
-                try:
-                    shutil.copy(old_name, tmp_name)
-                    shutil.move(old_name, x)
-                except shutil.Error:
-                    upl.delete()
-                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
-                    return HttpResponseRedirect(url)
-                spc.image_file = image_file
-                break
-            i += 1
-
-    spc.save()
-    upl.approved = True
-    upl.delete(0)
-    # logger.error(">>> Status changed to approved")
-    write_output(request, species.textname() + "-" + str(orid))
-    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
-    return HttpResponseRedirect(url)
-
-
-@login_required
 def uploadfile(request, pid):
     author, author_list = get_author(request)
     try:
@@ -840,7 +554,6 @@ def uploadfile(request, pid):
             write_output(request, species.textname())
             spc = form.save(commit=False)
             if isinstance(species, Species):
-                # logger.error(">>> spc.image_file_path = " + str(spc.image_file_path))
                 spc.pid = species
 
             spc.type = species.type
@@ -849,7 +562,6 @@ def uploadfile(request, pid):
             spc.save()
             url = "%s?role=%s&author=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role,
                                                 request.user.photographer.author_id, family)
-            # logger.error(">>> url = " + url)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse('save failed')
@@ -871,8 +583,6 @@ def uploadweb(request, pid, orid=None):
     # For Other application only
     family = species.gen.family
     app = family.application
-    # logger.error(">>> Family = " + family.family)
-    # logger.error(">>> Family = " + family.application)
 
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
@@ -886,7 +596,6 @@ def uploadweb(request, pid, orid=None):
 
         if form.is_valid():
             spc = form.save(commit=False)
-            # logger.error(">>> Form is valid: " + str(spc.author))
             if not spc.author and not spc.credit_to:
                 return HttpResponse("Please select an author, or enter a new name for credit allocation.")
             spc.user_id = request.user
@@ -913,11 +622,8 @@ def uploadweb(request, pid, orid=None):
             url = "%s?role=cur&family=%s" % (reverse('common:photos', args=(species.pid,)), species.gen.family)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
-        # else:
-        #     logger.error(">>> Form is not valid: ")
 
     if not orid:  # upload, initialize author. Get image count
-        # logger.error(">>> Form is not posted: ")
         if species.type == 'species':
             form = UploadSpcWebForm(initial={'author': request.user.photographer.author_id})
         else:
@@ -995,15 +701,12 @@ def curateinfospc(request, pid):
     if 'tab' in request.GET:
         tab = request.GET['tab']
     role = getRole(request)
-    # logger.error(">>> spc.description = " + str(accepted.description))
 
     distribution_list = Distribution.objects.filter(pid=species.pid)
     if request.method == 'POST':
         form = AcceptedInfoForm(request.POST, instance=accepted)
-        # logger.error(">>> spc.description = " + str(accepted.description))
         if form.is_valid():
             spc = form.save(commit=False)
-            # logger.error(">>> spc = " + str(spc))
             spc.pid = species
 
             # TODO: Put these in form.clean methods

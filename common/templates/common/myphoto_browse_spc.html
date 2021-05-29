@@ -64,108 +64,120 @@ img{
 }
 
 </style>
-<br>
-<br>
-<div style="width:95%;margin:0 auto;">
+<div style="min-height:200px;background-color:white;width: 98%;margin-top:20px;">
+   <div class="row" style="width:98%; margin:0 auto;">
+        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
+            {% include "common/taxonomy.html" %}
+        </div>
+<!--Main table       -->
+        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;">
+            <div class="card m-2">
+                <div class="card-header">
 
-    <div style="text-align:center"><h5>My Species Photo Collection</h5></div>
-     <div class="d-flex flex-row justify-content-center">
-         {% if myspecies_list %}
-            <div class="dropdown" >
-                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My species list ({{myspecies_list.count}})</button>
-                <div class="dropdown-menu mymenu">
-                    {% for spc in myspecies_list %}
-                        <a class="dropdown-item" href="{% url 'detail:myphoto' spc.pid %}?type=species&role={{role}}&author={{author.author_id}}">{{spc.name|safe}}</a>
-                    {% endfor %}
-                </div>
-            </div>
-         {% else %}
-            <div class="dropdown" >
-                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My Species List (empty)</button>
-            </div>
-         {% endif %}
+                    <div style="text-align:center"><h5>My Species Photo Collection</h5></div>
+                    <div class="d-flex flex-row justify-content-center p-2">
+                         {% if user.is_authenticated and user.tier.tier > 2 %}
+                            <form class="form-inline" action="?" id="filter">
+                            <input type="hidden" name="genus" value="{{genus}}" />
+                            <input type="hidden" name="role" value="cur" />
+                            <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
+                                {% if author %}
+                                    <option selected disabled>{{author}}</option>
+                                {% else %}
+                                    <option selected disabled>Select an author</option>
+                               {% endif %}
+                                <option></option>
+                                {% for author in author_list %}
+                                    {% if author == author.author_id %}
+                                        <option selected="selected" disabled>{{author.displayname}}</option>
+                                    {% else %}
+                                        <option value="{{author.author_id}}">{{author.displayname}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+                            </form>
+                         {% endif %}
+                     </div>
 
-         {% if myhybrid_list %}
-             <div class="dropdown">
-                <button class="btn btn-default mybtn dropdown-toggle " type="button" data-toggle="dropdown">My hybrid list ({{myhybrid_list.count}})</button>
-                <div class="dropdown-menu mymenu">
-                    {% for spc in myhybrid_list %}
-                        <a class="dropdown-item" href="{% url 'detail:myphoto' spc.pid %}?type=hybrid&role={{role}}&author={{author.author_id}}">{{spc.name|safe}}</a>
-                    {% endfor %}
-                </div>
-            </div>
-         {% else %}
-            <div class="dropdown" >
-                <button class="btn btn-default mybtn dropdown-toggle" type="button" data-toggle="dropdown">My Hybrids List (empty)</button>
-            </div>
-         {% endif %}
-     </div>
-     <div class="d-flex flex-row justify-content-center p-2">
-         {% if user.is_authenticated and user.tier.tier > 2 %}
-            <form class="form-inline" action="?" id="filter">
-            <input type="hidden" name="genus" value="{{genus}}" />
-            <input type="hidden" name="role" value="cur" />
-            <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
-                {% if author %}
-                    <option selected disabled>{{author}}</option>
-                {% else %}
-                    <option selected disabled>Select an author</option>
-               {% endif %}
-                <option></option>
-                {% for author in author_list %}
-                    {% if author == author.author_id %}
-                        <option selected="selected" disabled>{{author.displayname}}</option>
-                    {% else %}
-                        <option value="{{author.author_id}}">{{author.displayname}}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
-            </form>
-         {% endif %}
-     </div>
+                    {% include "common/private-nav.html" %}
 
-    {% include "detail/private-nav.html" %}
+                    <div class="tab-content clearfix" style="background-color: white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+                        <div class="d-flex flex-row bd-highlight mb-3">
+                            <div class="p-2">
+                                <div style="margin:10px; text-align: center;min-height:200px;">
+                                    {% if my_list %}
+                                    <br>
+                                        {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
+                                        {% for x in my_list %}
+                                            <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
+                                                <div class="box">
+                                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
+                                                    <div class="text-c">{{x.pid.pid.name|safe}}</div>
+                                                </div>
+                    <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
+                                            </a>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
 
-    <div class="tab-content clearfix" style="background-color: white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
-        <div class="d-flex flex-row bd-highlight mb-3">
-            <div class="p-2">
-                <div style="margin:10px; text-align: center;min-height:200px;">
-                    {% if my_list %}
-                    <br>
-                        {% if last_page > 1 %} {% include "detail/paginator_brw.html" %} {% endif %}
-                        {% for x in my_list %}
-                            <a href="{% url 'detail:myphoto' x.pid_id %}?role={{role}}&author={{author.author_id}}">
-                                <div class="box">
-                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
-                                    <div class="text-c">{{x.pid.pid.name|safe}}</div>
+                                            <h5>Your photo collection is empty!</h5>
+                                            Start uploading photos to build your collection. You must know the correct name of the orchid in your photo and navigate to its detailed page.
+                                            Two different ways to get to the detail page.
+                                            <ul>
+                                                <li>Search for your orchid using the search box in the navigation bar on the top of the page.  If your orchid is not among the search result, it is likely that yoiu may have misspelled the name.
+                                                    Click on the "MORE RESULTS" button to continue the search.   Note:  You must include genus in your search string for "MORE RESULTS" button to work.</li>
+                                                <li>Another way to navigate to the detail page is to use Advanced search button in the navbar.  In the Advanced search form, you may find your orchid by selecting
+                                                    genus and species or hybrids from pulldown menus.  Or you could go directly to the entire list of genus, spoecies or hybrid. </li>
+                                            </ul>
+
+                                        </div>
+                                    {% endif %}
                                 </div>
-    <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
-                            </a>
-                        {% endfor %}
-                    {% else %}
-                        <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
-
-                            <h5>Your photo collection is empty!</h5>
-                            Start uploading photos to build your collection. You must know the correct name of the orchid in your photo and navigate to its detailed page.
-                            Two different ways to get to the detail page.
-                            <ul>
-                                <li>Search for your orchid using the search box in the navigation bar on the top of the page.  If your orchid is not among the search result, it is likely that yoiu may have misspelled the name.
-                                    Click on the "MORE RESULTS" button to continue the search.   Note:  You must include genus in your search string for "MORE RESULTS" button to work.</li>
-                                <li>Another way to navigate to the detail page is to use Advanced search button in the navbar.  In the Advanced search form, you may find your orchid by selecting
-                                    genus and species or hybrids from pulldown menus.  Or you could go directly to the entire list of genus, spoecies or hybrid. </li>
-                            </ul>
-
+                            </div>
                         </div>
-                    {% endif %}
+                        <br>
+                    </div>
+
+
+
                 </div>
             </div>
         </div>
-        <br>
-    </div>
+   </div>
 </div>
 
+<script type="text/javascript">
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
 
 
+</script>
 
 {% endblock %}

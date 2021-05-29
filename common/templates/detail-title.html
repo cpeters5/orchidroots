@@ -55,16 +55,20 @@
                     {% else %}
                         na
                     {% endif %}
+                    <br>
+                    <br>
                 {% endif %}
-                {% if user.tier.tier > 2 and title == 'photos' %}
-                    {% if role == 'cur' %}
-                         <a class="btn btn-custom" href="?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
-                         <a class="btn btn-custom btn-current" href="?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>
+                    {% if user.tier.tier > 2 %}
+                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
+                         <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'common:myphoto' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
+                         <a class="btn btn-custom {% if role == 'cur' %}btn-current{% endif %}" href="{% url 'common:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>
+                    {% elif user.tier.tier > 1 %}
+                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
+                         <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'common:myphoto' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
                     {% else %}
-                         <a class="btn btn-custom btn-current" href="?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
-                         <a class="btn btn-custom" href="?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>
+                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
+
                     {% endif %}
-                {% endif %}
                </div>
                 <br>
             </div>

@@ -118,13 +118,13 @@ class Genus(models.Model):
             return "%s" % syn
 
     def get_roundspcpct(self):
-        if self.pct_spc_with_image > 0:
-            return round(self.pct_spc_with_image)
+        if self.pct_spc_with_image and self.pct_spc_with_image > 0:
+            return str(round(self.pct_spc_with_image)) + '%'
         else: return None
 
     def get_roundhybpct(self):
-        if self.pct_hyb_with_image > 0:
-            return round(self.pct_hyb_with_image)
+        if self.pct_hyb_with_image and self.pct_hyb_with_image > 0:
+            return str(round(self.pct_hyb_with_image)) + '%'
         else: return None
 
 
@@ -438,7 +438,11 @@ class Species(models.Model):
         return '<i>%s</i> %s' % (self.genus, self.speciesname())
 
     def abrevname(self):
-        return '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        if self.gen.abrev:
+            name = '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        else:
+            name = '<i>%s</i> %s' % (self.genus, self.speciesname())
+        return name
 
     def namecasual(self):
         namecasual = self.abrevname()
@@ -532,9 +536,15 @@ class Species(models.Model):
         if self.type == 'species':
             img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
+            if not img:
+                img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
+                    'quality', '-rank', '?')
         else:
             img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
+            if not img:
+                img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
+                    'quality', '-rank', '?')
 
         if img.count() > 0:
             img = img[0:1][0]

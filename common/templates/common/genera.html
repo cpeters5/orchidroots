@@ -6,31 +6,19 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-4 col-lg-3" style="padding:0">
+        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 <!--Main table       -->
-        <div class="col-sm-8 col-lg-9" style="text-align:left;font-size:13px;margin-top:30px;">
+        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;margin-top:30px;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--            Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            {{family}} {% if subfamily %} > {{subfamily}}  {% endif %}
+                            List of Genera in {% if family %}{{family.family}} family{% else %}All {{app|title}} Families{% endif %} {% if subfamily %} > {{subfamily}}  {% endif %}
                             {% if tribe %}> {{tribe}}  {% endif %}
                             {% if subtribe %} > {{subtribe}}  {% endif %}
-                            Genus list
-                            <dev style="font-size:16px;">
-                                {% if family %}
-                                {% if not genus or genus.num_species > 0 %}
-                                    <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N">Show species list</a>
-                                {% endif %}
-                                {% if not genus or genus.num_hybrid > 0 %}
-                                    <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N">Show hybrid list</a>
-                                {% endif %}
-                                {% if app == 'orchidaceae' %}<a class="btn border" href="{% url 'orchidaceae:genera' %}">Go to full genus list</a>{% endif %}
-                                {% endif %}
-                            </dev>
                         </div>
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
@@ -40,17 +28,19 @@
                                 <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Hybrid list</a>
                             {% endif %}
                             <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?alpha=A">Full species list</a>{% endif %}
+                            {% if app == 'orchidaceae' %}
+                                <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Go to full genus list</a>
+                            {% endif %}
                         </div>
                         <!--   Main table-->
                         {% if genus_list %}
                             {% include "common/alpha_list_common.html" %}
-                            <div style="clear: all"></div>
+                            <div style="clear: both"></div>
                             <div class="flex">
                                 <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <th>Genus</th>
-                                        <th>Higher taxonomic ranks</th>
+                                        <th>Family Subfamily Tribe Subtribe</th>
                                         <th>#images</th>
                                     </thead>
                                         {% for genus in genus_list %}
@@ -60,7 +50,7 @@
                                             </td>
 
                                             <td>
-                                                {{genus.family}} {% if genus.subfamily %} > {{genus.subfamily}} {% endif %} {% if genus.tribe %} > {{genus.tribe}} {% endif %} {% if genus.subtribe %}> {{genus.subtribe}} {% endif %}
+                                                {{genus.family}} {% if genus.subfamily %} {{genus.subfamily}} {% endif %} {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
                                             </td>
                                             <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
@@ -110,7 +100,8 @@ $(document).ready(function() {
         // "dom": '<"wrapper"flipt>',
         // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
         // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
         // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
         language: {
             search: "_INPUT_",

@@ -181,7 +181,7 @@ def createhybrid(request):
         hybobj.pollen_id = species2.getAccepted()
     else:
         hybobj.pollen_id = species2
-    hybobj.save()
+    # hybobj.save()
     if genus1 and genus2:
         write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
     else:
@@ -191,44 +191,19 @@ def createhybrid(request):
 
 # All access - at least role = pub
 def compare(request, pid):
+    family = Family.objects.get(pk='Orchidaceae')
+    role = getRole(request)
+    if 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
+        return HttpResponseRedirect(url)
     # TODO:  Use Species form instead
-    infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     spcimg1_list = spcimg2_list = []
-
-    if pid > 0:
-        try:
-            species = Species.objects.get(pk=pid)
-            pid = species.pid
-            genus = species.genus
-            species1 = species
-        except Species.DoesNotExist:
-            return HttpResponseRedirect("/")
-    else:
-        return HttpResponse("/")
-
+    species = Species.objects.get(pk=pid)
+    pid = species.pid
+    genus = species.genus
     # Handfle request. Should use SpcForm instead.
-    if 'species1' in request.GET:
-        spc1 = request.GET['species1']
-        spc1 = spc1.strip()
-    if 'genus1' in request.GET:
-        gen1 = request.GET['genus1']
-        gen1 = gen1.strip()
-    if 'infraspe1' in request.GET:
-        infraspe1 = request.GET['infraspe1']
-        infraspe1 = infraspe1.strip()
-    if 'infraspr1' in request.GET:
-        infraspr1 = request.GET['infraspr1']
-        infraspr1 = infraspr1.strip()
-    if 'author1' in request.GET:
-        author1 = request.GET['author1']
-        author1 = author1.strip()
-    if 'year1' in request.GET:
-        year1 = request.GET['year1']
-        year1 = year1.strip()
-        if year1:
-            year1 = int(year1)
-
     if 'species2' in request.GET:
         spc2 = request.GET['species2']
         spc2 = spc2.strip()
@@ -249,90 +224,6 @@ def compare(request, pid):
         if year2:
             year2 = year2.strip()
 
-    role = getRole(request)
-    if gen1:  # Request new genus1:
-        try:
-            genus1 = Genus.objects.get(genus__iexact=gen1)
-            genus = genus1
-        except Genus.DoesNotExist:
-            # Fallback to initial species
-            message = "genus, " + gen1 + ' does not exist'
-            context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                       'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                       'message1': message,
-                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, 'detail/compare.html', context)
-        if spc1:
-            species1 = Species.objects.filter(species__iexact=spc1).filter(genus__iexact=gen1)
-            if infraspe1:
-                species1 = species1.filter(infraspe=infraspe1).filter(infraspr=infraspr1)
-            if author1:
-                species1 = species1.filter(author=author1)
-            if year1:
-                species1 = species1.filter(year=year1)
-
-            if len(species1) == 0:
-                message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> does not exist'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message1': message,
-                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, 'detail/compare.html', context)
-            elif len(species1) > 1:
-                if infraspe1 and infraspr1:
-                    species1 = species1.filter(infraspe__icontains=infraspe1).filter(infraspr__icontains=infraspr1)
-                else:
-                    species1 = species1.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
-                if year1:
-                    species1 = species1.filter(year=year1)
-                if len(species1) == 1:  # Found unique species
-                    species1 = species1[0]
-                    species = species1
-                    pid1 = species1.pid
-                    pid = ''
-                elif len(species1) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returns more than one values'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, 'detail/compare.html', context)
-                else:  # length = 0  This could be a synonym
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returned none'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, 'detail/compare.html', context)
-            else:  # Unique species found
-                species1 = species1[0]
-                species = species1
-                pid1 = species1.pid
-                pid = ''
-        else:
-            pid1 = ''
-    else:
-        # species 1 was not requested. use initial species
-        genus1 = species.genus
-        species1 = species
-        pid1 = pid
-
-    if not genus1 and not species1 and not genus2 and not species2 and not pid1 and not pid2:
-        send_url = "/common/photos/" + str(species.pid) + "/?role=cur" + "&family=" + family.family
-        return HttpResponseRedirect(send_url)
-
-    if species1:
-        # logger.error("species = " + str(species1) + " - pid = " + str(pid1))
-        if species1.type == 'species':
-            spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-        else:
-            spcimg1_list = HybImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     if gen2:
         try:
             genus2 = Genus.objects.get(genus__iexact=gen2)
@@ -370,10 +261,8 @@ def compare(request, pid):
                     species2 = species2[0]
                     pid2 = species2.pid
                 elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value'
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message2': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
@@ -381,8 +270,6 @@ def compare(request, pid):
                 else:  # length = 0
                     message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message1': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
@@ -396,27 +283,23 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
 
-    if species1 and species1.status == 'synonym':
-        pid1 = species1.getAcc()
-        accepted1 = species1.getAccepted()
     if species2 and species2.status == 'synonym':
         pid2 = species2.getAcc()
         accepted2 = species2.getAccepted()
 
-    if pid1 and pid2:
-        cross = Hybrid.objects.filter(seed_id=pid1).filter(pollen_id=pid2)
+    if pid2:
+        cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
         if not cross:
-            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid1)
+            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid)
         if cross:
             cross = cross[0]
         else:
             cross = ''
 
-    if species1:
-        if species1.type == 'species':
-            spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-        else:
-            spcimg1_list = HybImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if species.type == 'species':
+        spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    else:
+        spcimg1_list = HybImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     if species2:
         if species2.type == 'species':
@@ -428,10 +311,10 @@ def compare(request, pid):
     if 'msgnogenus' in request.GET:
         msgnogenus = request.GET['msgnogenus']
 
-    write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
     context = {'pid': pid, 'genus': genus, 'species': species,
-               'pid1': pid1, 'pid2': pid2, 'accepted1': accepted1, 'accepted2': accepted2,  # pid of accepted species
-               'genus1': genus1, 'species1': species1, 'spcimg1_list': spcimg1_list,
+               'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
+               'spcimg1_list': spcimg1_list,
                'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
@@ -522,143 +405,13 @@ def comments(request):
     return render(request, 'detail/comments.html', context)
 
 
-@login_required
-def curate_newupload(request):
-    if request.user.is_authenticated and request.user.tier.tier < 2:
-        return HttpResponseRedirect('/')
-    file_list = UploadFile.objects.all().order_by('-created_date')
-    days = 7
-    num_show = 5
-    page_length = 20
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, file_list, page_length, num_show)
-    role = getRole(request)
-
-    write_output(request)
-    context = {'file_list': page_list,
-               'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'title': 'curate_newupload', 'section': 'Curator Corner',
-               }
-    return render(request, 'detail/curate_newupload.html', context)
-
-
-@login_required
-def curate_pending(request):
-    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
-    if request.user.is_authenticated and request.user.tier.tier < 2:
-        return HttpResponseRedirect('/')
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login/')
-
-    ortype = ''
-    if 'type' in request.GET:
-        ortype = request.GET['type']
-    if not ortype:
-        ortype = 'species'
-
-    days = 7
-    if 'days' in request.GET:
-        days = int(request.GET['days'])
-    if not days:
-        days = 7
-
-    if ortype == 'species':
-        file_list = SpcImages.objects.filter(rank=0)
-    else:
-        file_list = HybImages.objects.filter(rank=0)
-
-    if days:
-        file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
-    file_list = file_list.order_by('-created_date')
-
-    num_show = 5
-    page_length = 100
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, file_list, page_length, num_show)
-
-    role = getRole(request)
-    write_output(request)
-    title = 'curate_pending'
-    context = {'file_list': page_list, 'type': ortype,
-               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page,
-               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'title': title,
-               }
-    return render(request, 'detail/curate_pending.html', context)
-
-
-@login_required
-def curate_newapproved(request):
-    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
-    species = ''
-    image = ''
-    ortype = 'species'
-    if request.user.is_authenticated and request.user.tier.tier < 2:
-        return HttpResponseRedirect('/')
-    if 'type' in request.GET:
-        ortype = request.GET['type']
-        # Request to change rank/quality
-        if 'id' in request.GET:
-            orid = int(request.GET['id'])
-            if ortype == 'species':
-                try:
-                    image = SpcImages.objects.get(pk=orid)
-                except SpcImages.DoesNotExist:
-                    species = ''
-            elif ortype == 'hybrid':
-                try:
-                    image = HybImages.objects.get(pk=orid)
-                except HybImages.DoesNotExist:
-                    species = ''
-            else:
-                species = ''
-        if image:
-            species = Species.objects.get(pk=image.pid_id)
-
-    days = 3
-    if 'days' in request.GET:
-        days = int(request.GET['days'])
-    if ortype == 'species':
-        file_list = SpcImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
-    else:
-        file_list = HybImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
-
-    if days:
-        file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
-    file_list = file_list.order_by('-created_date')
-    if species:
-        rank_update(request, species)
-        quality_update(request, species)
-
-    num_show = 5
-    page_length = 20
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, file_list, page_length, num_show)
-
-    role = getRole(request)
-    write_output(request)
-    context = {'file_list': page_list, 'type': ortype,
-               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page,
-               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'title': 'curate_newapproved',
-               }
-    return render(request, 'detail/curate_newapproved.html', context)
-
 
 @login_required
 def curateinfospc(request, pid):
     species = Species.objects.get(pk=pid)
-    logger.error(">>> 1 species = " + species.species)
     genus = species.genus
     family = species.gen.family
     accepted = Accepted.objects.get(pk=pid)
-    logger.error(">>> 1 species = " + species.species)
 
     tab = 'ins'
     if 'tab' in request.GET:
@@ -669,7 +422,6 @@ def curateinfospc(request, pid):
     if request.method == 'POST':
         form = AcceptedInfoForm(request.POST, instance=accepted)
         if form.is_valid():
-            logger.error(">>> 2 Form is valid" + species.species)
             spc = form.save(commit=False)
             spc.pid = species
 
@@ -703,10 +455,8 @@ def curateinfospc(request, pid):
             url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
-            logger.error(">>> 2 Form is not valid" + species.species)
             return HttpResponse("POST: Somethign's wrong")
     else:
-        logger.error(">>> 3 Initialize form " + species.species)
         accepted = Accepted.objects.get(pk=species.pid)
         form = AcceptedInfoForm(instance=accepted)
         context = {'form': form, 'genus': genus, 'species': species,
@@ -814,7 +564,6 @@ def reidentify(request, orid, pid):
     if request.method == 'POST':
         if form.is_valid():
             new_pid = form.cleaned_data.get('species')
-            # logger.error(">>> Reidentify: from " + str(pid) + " to " + str(new_pid))
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
@@ -884,134 +633,6 @@ def reidentify(request, orid, pid):
 
 
 @login_required
-def myphoto(request, pid):
-    role = getRole(request)
-    if not role or role == 'pub':
-        url = "%s?role=%s" % (reverse('common:information', args=(pid,)), role)
-        return HttpResponseRedirect(url)
-    else:
-        author, author_list = get_author(request)
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
-    author = Photographer.objects.get(user_id=request.user)
-    if author:
-        public_list = public_list.filter(author=author)
-        private_list = private_list.filter(author=author)
-    context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
-               'pri': 'active', 'role': role, 'author': author,
-               'title': 'myphoto',
-               }
-    write_output(request, str(species.textname()))
-    return render(request, 'common/photos.html', context)
-
-
-@login_required
-def myphoto_browse_spc(request):
-    author, author_list = get_author(request)
-    role = getRole(request)
-    if role == 'pub':
-        send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
-        return HttpResponseRedirect(send_url)
-    if role == 'cur' and 'author' in request.GET:
-        author = request.GET['author']
-        author = Photographer.objects.get(pk=author)
-    else:
-        try:
-            author = Photographer.objects.get(user_id=request.user)
-        except Photographer.DoesNotExist:
-            author = Photographer.objects.get(author_id='anonymous')
-
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
-
-    my_full_list = []
-    pid_list = SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
-
-    img_list = Species.objects.filter(pid__in=pid_list)
-    if img_list:
-        img_list = img_list.order_by('genus', 'species')
-        for x in img_list:
-            img = x.get_best_img_by_author(request.user.photographer.author_id)
-            if img:
-                my_full_list.append(img)
-
-    num_show = 5
-    page_length = 20
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, my_full_list, page_length, num_show)
-
-    context = {'my_list': page_list, 'type': 'species',
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': role, 'brwspc': 'active', 'author': author,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list,
-               'title': 'myphoto_browse',
-               }
-    write_output(request)
-    logger.error(" browse my hyb = " + role)
-    return render(request, 'detail/myphoto_browse_spc.html', context)
-
-
-@login_required
-def myphoto_browse_hyb(request):
-    role = getRole(request)
-    if role == 'pub':
-        send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
-        return HttpResponseRedirect(send_url)
-
-    author, author_list = get_author(request)
-    if role == 'cur' and 'author' in request.GET:
-        author = request.GET['author']
-        author = Photographer.objects.get(pk=author)
-    else:
-        try:
-            author = Photographer.objects.get(user_id=request.user)
-        except Photographer.DoesNotExist:
-            author = Photographer.objects.get(author_id='anonymous')
-
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
-
-    my_full_list = []
-    pid_list = HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
-
-    img_list = Species.objects.filter(pid__in=pid_list)
-    if img_list:
-        img_list = img_list.order_by('genus', 'species')
-        for x in img_list:
-            img = x.get_best_img_by_author(request.user.photographer.author_id)
-            if img:
-                my_full_list.append(img)
-
-    num_show = 5
-    page_length = 20
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, my_full_list, page_length, num_show)
-
-    context = {'my_list': page_list, 'type': 'hybrid',
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': role, 'brwhyb': 'active', 'author': author,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list,
-               'title': 'myphoto_browse',
-               }
-    write_output(request)
-    return render(request, 'detail/myphoto_browse_hyb.html', context)
-
-
-@login_required
 def approvemediaphoto(request, pid):
     species = Species.objects.get(pk=pid)
     if species.status == 'synonym':
@@ -1035,7 +656,6 @@ def approvemediaphoto(request, pid):
     try:
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
-        write_output(request, ">>> approvemediaphoto FAIL: " + species.textname() + "-" + str(orid))
         msg = "uploaded file #" + str(orid) + "does not exist"
         url = "%s?role=%s&msg=%s" % (reverse('common:photos', args=(species.pid,)), role, msg)
         return HttpResponseRedirect(url)
@@ -1072,7 +692,6 @@ def approvemediaphoto(request, pid):
             # upl.delete()
             url = "%s?role=%s" % (reverse('common:photos', args=(species.pid,)), role)
             return HttpResponseRedirect(url)
-        # logger.error(">>> approvemediaphoto: " + str(request.user) + " " + str(species.pid) + " " + old_name)
         spc.image_file = image_file + ext
     else:
         i = 1
@@ -1095,7 +714,6 @@ def approvemediaphoto(request, pid):
     hist.save()
     upl.approved = True
     upl.delete(0)
-    # logger.error(">>> Status changed to approved")
     write_output(request, species.textname() + "-" + str(orid))
     url = "%s?role=%s" % (reverse('common:photos', args=(species.pid,)), role)
     return HttpResponseRedirect(url)
@@ -1112,11 +730,7 @@ def uploadfile(request, pid):
     if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
         message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
                 'Please delete one or more of your photos before uploading a new one.'
-        logger.error(">>> message = " + message)
         return HttpResponse(message)
-    logger.error(">>> num_image uploaded = " + str(species.get_num_img_by_author(request.user.photographer.author_id)))
-
-
 
     author, author_list = get_author(request)
     try:
@@ -1140,7 +754,6 @@ def uploadfile(request, pid):
             write_output(request, species.textname())
             spc = form.save(commit=False)
             if isinstance(species, Species):
-                logger.error(">>> spc.image_file_path = " + str(spc.image_file_path))
                 spc.pid = species
 
             spc.type = species.type
@@ -1157,52 +770,6 @@ def uploadfile(request, pid):
                'author_list': author_list, 'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
-
-def xuploadfile(request, pid):
-    if request.user.is_authenticated and (request.user.tier.tier < 2 or not request.user.photographer.author_id):
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@orchidroots.org'
-        return HttpResponse(message)
-
-    author, author_list = get_author(request)
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    app = species.gen.family.application
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    role = getRole(request)
-
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, species.textname())
-            spc = form.save(commit=False)
-            spc.pid = species
-            spc.type = species.type
-            spc.user_id = request.user
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            if role == 'pri':
-                url = "%s?role=%s&author=%s" % (reverse('detail:myphoto', args=(species.pid,)), role,
-                                                request.user.photographer.author_id)
-            else:
-                url = "%s?role=%s&author=%s" % (reverse('common:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id)
-            return HttpResponseRedirect(url)
-        else:
-            return HttpResponse('save failed')
-
-    context = {'form': form, 'species': species, 'web': 'active',
-               'author_list': author_list, 'author': author, 'family':family,
-               'role': role, 'title': 'uploadfile'}
-    return render(request, 'detail/uploadfile.html', context)
 
 
 def get_author(request):
@@ -1365,6 +932,7 @@ def mypaginator(request, full_list, page_length, num_show):
 
 
 
+
 # MOVED TO COMMON
 def xinformation(request, pid=None):
     family = 'Orchidaceae'
@@ -1507,6 +1075,53 @@ def xinformation(request, pid=None):
                'role': role,
                }
     return render(request, 'common/information.html', context)
+
+
+def xuploadfile(request, pid):
+    if request.user.is_authenticated and (request.user.tier.tier < 2 or not request.user.photographer.author_id):
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@orchidroots.org'
+        return HttpResponse(message)
+
+    author, author_list = get_author(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    app = species.gen.family.application
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    role = getRole(request)
+
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            spc.pid = species
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            if role == 'pri':
+                url = "%s?role=%s&author=%s" % (reverse('detail:myphoto', args=(species.pid,)), role,
+                                                request.user.photographer.author_id)
+            else:
+                url = "%s?role=%s&author=%s" % (reverse('common:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse('save failed')
+
+    context = {'form': form, 'species': species, 'web': 'active',
+               'author_list': author_list, 'author': author, 'family':family,
+               'role': role, 'title': 'uploadfile'}
+    return render(request, 'detail/uploadfile.html', context)
 
 
 @login_required
@@ -1765,4 +1380,508 @@ def xquality_update(request, species):
             image.quality = quality
             image.save()
     # return quality
+
+def xcompare(request, pid):
+    # TODO:  Use Species form instead
+    infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
+    pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
+    spcimg1_list = spcimg2_list = []
+    pid1 = ''
+    if pid > 0:
+        try:
+            species = Species.objects.get(pk=pid)
+            pid = species.pid
+            genus = species.genus
+            species1 = species
+        except Species.DoesNotExist:
+            return HttpResponseRedirect("/")
+    else:
+        return HttpResponse("/")
+
+    # Handfle request. Should use SpcForm instead.
+    if 'species1' in request.GET:
+        spc1 = request.GET['species1']
+        spc1 = spc1.strip()
+    if 'genus1' in request.GET:
+        gen1 = request.GET['genus1']
+        gen1 = gen1.strip()
+    if 'infraspe1' in request.GET:
+        infraspe1 = request.GET['infraspe1']
+        infraspe1 = infraspe1.strip()
+    if 'infraspr1' in request.GET:
+        infraspr1 = request.GET['infraspr1']
+        infraspr1 = infraspr1.strip()
+    if 'author1' in request.GET:
+        author1 = request.GET['author1']
+        author1 = author1.strip()
+    if 'year1' in request.GET:
+        year1 = request.GET['year1']
+        year1 = year1.strip()
+        if year1:
+            year1 = int(year1)
+
+    if 'species2' in request.GET:
+        spc2 = request.GET['species2']
+        spc2 = spc2.strip()
+    if 'genus2' in request.GET:
+        gen2 = request.GET['genus2']
+        gen2 = gen2.strip()
+    if 'infraspe2' in request.GET:
+        infraspe2 = request.GET['infraspe2']
+        infraspe2 = infraspe2.strip()
+    if 'infraspr2' in request.GET:
+        infraspr2 = request.GET['infraspr2']
+        infraspr2 = infraspr2.strip()
+    if 'author2' in request.GET:
+        author2 = request.GET['author2']
+        author2 = author2.strip()
+    if 'year2' in request.GET:
+        year2 = request.GET['year2']
+        if year2:
+            year2 = year2.strip()
+    role = getRole(request)
+    if gen1:  # Request new genus1:
+        try:
+            genus1 = Genus.objects.get(genus__iexact=gen1)
+            genus = genus1
+        except Genus.DoesNotExist:
+            # Fallback to initial species
+            message = "genus, " + gen1 + ' does not exist'
+            context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                       'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
+                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                       'message1': message,
+                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+            return render(request, 'detail/compare.html', context)
+        if spc1:
+            species1 = Species.objects.filter(species__iexact=spc1).filter(genus__iexact=gen1)
+            if infraspe1:
+                species1 = species1.filter(infraspe=infraspe1).filter(infraspr=infraspr1)
+            if author1:
+                species1 = species1.filter(author=author1)
+            if year1:
+                species1 = species1.filter(year=year1)
+
+            if len(species1) == 0:
+                message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> does not exist'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
+                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message1': message,
+                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, 'detail/compare.html', context)
+            elif len(species1) > 1:
+                if infraspe1 and infraspr1:
+                    species1 = species1.filter(infraspe__icontains=infraspe1).filter(infraspr__icontains=infraspr1)
+                else:
+                    species1 = species1.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+                if year1:
+                    species1 = species1.filter(year=year1)
+                if len(species1) == 1:  # Found unique species
+                    species1 = species1[0]
+                    species = species1
+                    pid1 = species1.pid
+                    pid = ''
+                elif len(species1) > 1:  # MULTIPLE SPECIES RETURNED
+                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, 'detail/compare.html', context)
+                else:  # length = 0  This could be a synonym
+                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returned none'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, 'detail/compare.html', context)
+            else:  # Unique species found
+                species1 = species1[0]
+                species = species1
+                pid1 = species1.pid
+                pid = ''
+        else:
+            pid1 = ''
+    else:
+        # species 1 was not requested. use initial species
+        genus1 = species.genus
+        species1 = species
+        pid1 = pid
+
+    if not genus1 and not species1 and not genus2 and not species2 and not pid1 and not pid2:
+        send_url = "/common/photos/" + str(species.pid) + "/?role=cur" + "&family=" + family.family
+        return HttpResponseRedirect(send_url)
+
+    if species1:
+        logger.error("species = " + str(species1) + " - pid = " + str(pid1))
+        if species1.type == 'species':
+            spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg1_list = HybImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if gen2:
+        try:
+            genus2 = Genus.objects.get(genus__iexact=gen2)
+        except Genus.DoesNotExist:
+            # Fallback to initial species
+            message = "genus <b>" + gen2 + '</b> does not exist'
+            context = {'species1': species1, 'genus1': genus1,
+                       'pid1': species1.pid,
+                       'spcimg1_list': spcimg1_list,
+                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                       'message2': message,
+                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+            return render(request, 'detail/compare.html', context)
+        if spc2:
+            species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
+            if len(species2) == 0:
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus1': species1.genus, 'species1': species1, 'spcimg1_list': spcimg1_list,
+                           'genus2': gen2, 'species2': spc2,
+                           'message2': message,
+                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, 'detail/compare.html', context)
+            elif len(species2) > 1:
+                if infraspe2 and infraspr2:
+                    species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
+                else:
+                    species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+                if year2:
+                    species2 = species2.filter(year=year2)
+                if author2:
+                    species2 = species2.filter(author=author2)
+
+                if len(species2) == 1:  # Found unique species
+                    species2 = species2[0]
+                    pid2 = species2.pid
+                elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message2': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, 'detail/compare.html', context)
+                else:  # length = 0
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
+                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
+                               'infraspe1': infraspe1,
+                               'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                               'message1': message,
+                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                    return render(request, 'detail/compare.html', context)
+            else:
+                species2 = species2[0]
+                pid2 = species2.pid
+        else:
+            pid2 = ''
+
+    cross = ''
+    message1 = message2 = accepted1 = accepted2 = ''
+
+    if species1 and species1.status == 'synonym':
+        pid1 = species1.getAcc()
+        accepted1 = species1.getAccepted()
+    if species2 and species2.status == 'synonym':
+        pid2 = species2.getAcc()
+        accepted2 = species2.getAccepted()
+
+    if pid1 and pid2:
+        cross = Hybrid.objects.filter(seed_id=pid1).filter(pollen_id=pid2)
+        if not cross:
+            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid1)
+        if cross:
+            cross = cross[0]
+        else:
+            cross = ''
+
+    if species1:
+        if species1.type == 'species':
+            spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg1_list = HybImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    if species2:
+        if species2.type == 'species':
+            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    msgnogenus = ''
+    if 'msgnogenus' in request.GET:
+        msgnogenus = request.GET['msgnogenus']
+
+    write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    context = {'pid': pid, 'genus': genus, 'species': species,
+               'pid1': pid1, 'pid2': pid2, 'accepted1': accepted1, 'accepted2': accepted2,  # pid of accepted species
+               'genus1': genus1, 'species1': species1, 'spcimg1_list': spcimg1_list,
+               'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
+               'cross': cross,
+               'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
+               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+    return render(request, 'detail/compare.html', context)
+
+
+@login_required
+def xcurate_newupload(request):
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    file_list = UploadFile.objects.all().order_by('-created_date')
+    days = 7
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
+    role = getRole(request)
+
+    write_output(request)
+    context = {'file_list': page_list,
+               'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'title': 'curate_newupload', 'section': 'Curator Corner',
+               }
+    return render(request, 'detail/curate_newupload.html', context)
+
+
+@login_required
+def xcurate_pending(request):
+    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
+
+    ortype = ''
+    if 'type' in request.GET:
+        ortype = request.GET['type']
+    if not ortype:
+        ortype = 'species'
+
+    days = 7
+    if 'days' in request.GET:
+        days = int(request.GET['days'])
+    if not days:
+        days = 7
+
+    if ortype == 'species':
+        file_list = SpcImages.objects.filter(rank=0)
+    else:
+        file_list = HybImages.objects.filter(rank=0)
+
+    if days:
+        file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
+    file_list = file_list.order_by('-created_date')
+
+    num_show = 5
+    page_length = 100
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
+
+    role = getRole(request)
+    write_output(request)
+    title = 'curate_pending'
+    context = {'file_list': page_list, 'type': ortype,
+               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page,
+               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'title': title,
+               }
+    return render(request, 'detail/curate_pending.html', context)
+
+
+@login_required
+def xcurate_newapproved(request):
+    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
+    species = ''
+    image = ''
+    ortype = 'species'
+    if request.user.is_authenticated and request.user.tier.tier < 2:
+        return HttpResponseRedirect('/')
+    if 'type' in request.GET:
+        ortype = request.GET['type']
+        # Request to change rank/quality
+        if 'id' in request.GET:
+            orid = int(request.GET['id'])
+            if ortype == 'species':
+                try:
+                    image = SpcImages.objects.get(pk=orid)
+                except SpcImages.DoesNotExist:
+                    species = ''
+            elif ortype == 'hybrid':
+                try:
+                    image = HybImages.objects.get(pk=orid)
+                except HybImages.DoesNotExist:
+                    species = ''
+            else:
+                species = ''
+        if image:
+            species = Species.objects.get(pk=image.pid_id)
+
+    days = 3
+    if 'days' in request.GET:
+        days = int(request.GET['days'])
+    if ortype == 'species':
+        file_list = SpcImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
+    else:
+        file_list = HybImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
+
+    if days:
+        file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
+    file_list = file_list.order_by('-created_date')
+    if species:
+        rank_update(request, species)
+        quality_update(request, species)
+
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, file_list, page_length, num_show)
+
+    role = getRole(request)
+    write_output(request)
+    context = {'file_list': page_list, 'type': ortype,
+               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page,
+               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'title': 'curate_newapproved',
+               }
+    return render(request, 'detail/curate_newapproved.html', context)
+
+
+@login_required
+def myphoto(request, pid):
+    role = getRole(request)
+    if not role or role == 'pub':
+        url = "%s?role=%s" % (reverse('common:information', args=(pid,)), role)
+        return HttpResponseRedirect(url)
+    else:
+        author, author_list = get_author(request)
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+
+    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
+    author = Photographer.objects.get(user_id=request.user)
+    if author:
+        public_list = public_list.filter(author=author)
+        private_list = private_list.filter(author=author)
+    context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
+               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
+               'pri': 'active', 'role': role, 'author': author,
+               'title': 'myphoto',
+               }
+    write_output(request, str(species.textname()))
+    return render(request, 'common/photos.html', context)
+
+
+@login_required
+def myphoto_browse_spc(request):
+    author, author_list = get_author(request)
+    role = getRole(request)
+    if role == 'pub':
+        send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
+        return HttpResponseRedirect(send_url)
+    if role == 'cur' and 'author' in request.GET:
+        author = request.GET['author']
+        author = Photographer.objects.get(pk=author)
+    else:
+        try:
+            author = Photographer.objects.get(user_id=request.user)
+        except Photographer.DoesNotExist:
+            author = Photographer.objects.get(author_id='anonymous')
+
+    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
+
+    my_full_list = []
+    pid_list = SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
+
+    img_list = Species.objects.filter(pid__in=pid_list)
+    if img_list:
+        img_list = img_list.order_by('genus', 'species')
+        for x in img_list:
+            img = x.get_best_img_by_author(request.user.photographer.author_id)
+            if img:
+                my_full_list.append(img)
+
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, my_full_list, page_length, num_show)
+
+    context = {'my_list': page_list, 'type': 'species',
+               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+               'role': role, 'brwspc': 'active', 'author': author,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'author_list': author_list,
+               'title': 'myphoto_browse',
+               }
+    write_output(request)
+    logger.error(" browse my hyb = " + role)
+    return render(request, 'detail/myphoto_browse_spc.html', context)
+
+
+@login_required
+def myphoto_browse_hyb(request):
+    role = getRole(request)
+    if role == 'pub':
+        send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
+        return HttpResponseRedirect(send_url)
+
+    author, author_list = get_author(request)
+    if role == 'cur' and 'author' in request.GET:
+        author = request.GET['author']
+        author = Photographer.objects.get(pk=author)
+    else:
+        try:
+            author = Photographer.objects.get(user_id=request.user)
+        except Photographer.DoesNotExist:
+            author = Photographer.objects.get(author_id='anonymous')
+
+    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, 'orchidaceae', species, Species, UploadFile, SpcImages, HybImages, role)
+
+    my_full_list = []
+    pid_list = HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
+
+    img_list = Species.objects.filter(pid__in=pid_list)
+    if img_list:
+        img_list = img_list.order_by('genus', 'species')
+        for x in img_list:
+            img = x.get_best_img_by_author(request.user.photographer.author_id)
+            if img:
+                my_full_list.append(img)
+
+    num_show = 5
+    page_length = 20
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
+        request, my_full_list, page_length, num_show)
+
+    context = {'my_list': page_list, 'type': 'hybrid',
+               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+               'role': role, 'brwhyb': 'active', 'author': author,
+               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+               'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+               'author_list': author_list,
+               'title': 'myphoto_browse',
+               }
+    write_output(request)
+    return render(request, 'detail/myphoto_browse_hyb.html', context)
 

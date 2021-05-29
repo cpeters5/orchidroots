@@ -28,9 +28,9 @@ urlpatterns = [
     path('curateinfospc/', views.curateinfospc, name='curateinfospc'),
     path('curateinfohyb/<int:pid>/', views.curateinfohyb, name='curateinfohyb'),
     path('curateinfohyb/', views.curateinfohyb, name='curateinfohyb'),
-    path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
-    path('curate_pending/', views.curate_pending, name='curate_pending'),
-    path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
+    # path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
+    # path('curate_pending/', views.curate_pending, name='curate_pending'),
+    # path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
     path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
 
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),

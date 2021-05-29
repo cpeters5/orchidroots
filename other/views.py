@@ -106,43 +106,13 @@ def quality_update(request, species):
 # All access - at least role = pub
 def compare(request, pid):
     # TODO:  Use Species form instead
-    infraspr1 = infraspe1 = author1 = year1 = spc1 = gen1 = ''
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     spcimg1_list = spcimg2_list = []
-
-    if pid > 0:
-        try:
-            species = Species.objects.get(pk=pid)
-            pid = species.pid
-            genus = species.genus
-            species1 = species
-        except Species.DoesNotExist:
-            return HttpResponseRedirect("/")
-    else:
-        return HttpResponse("/")
-
+    species = Species.objects.get(pk=pid)
+    family = species.gen.family
+    pid = species.pid
+    genus = species.genus
     # Handfle request. Should use SpcForm instead.
-    if 'species1' in request.GET:
-        spc1 = request.GET['species1']
-        spc1 = spc1.strip()
-    if 'genus1' in request.GET:
-        gen1 = request.GET['genus1']
-        gen1 = gen1.strip()
-    if 'infraspe1' in request.GET:
-        infraspe1 = request.GET['infraspe1']
-        infraspe1 = infraspe1.strip()
-    if 'infraspr1' in request.GET:
-        infraspr1 = request.GET['infraspr1']
-        infraspr1 = infraspr1.strip()
-    if 'author1' in request.GET:
-        author1 = request.GET['author1']
-        author1 = author1.strip()
-    if 'year1' in request.GET:
-        year1 = request.GET['year1']
-        year1 = year1.strip()
-        if year1:
-            year1 = int(year1)
-
     if 'species2' in request.GET:
         spc2 = request.GET['species2']
         spc2 = spc2.strip()
@@ -162,87 +132,8 @@ def compare(request, pid):
         year2 = request.GET['year2']
         if year2:
             year2 = year2.strip()
-
     role = getRole(request)
-    if gen1:  # Request new genus1:
-        try:
-            genus1 = Genus.objects.get(genus__iexact=gen1)
-            genus = genus1
-        except Genus.DoesNotExist:
-            # Fallback to initial species
-            message = "genus, " + gen1 + ' does not exist'
-            context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                       'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                       'message1': message,
-                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, app + '/compare.html', context)
-        if spc1:
-            species1 = Species.objects.filter(species__iexact=spc1).filter(genus__iexact=gen1)
-            if infraspe1:
-                species1 = species1.filter(infraspe=infraspe1).filter(infraspr=infraspr1)
-            if author1:
-                species1 = species1.filter(author=author1)
-            if year1:
-                species1 = species1.filter(year=year1)
 
-            if len(species1) == 0:
-                message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> does not exist'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1, 'infraspe1': infraspe1,
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message1': message,
-                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, app + '/compare.html', context)
-            elif len(species1) > 1:
-                if infraspe1 and infraspr1:
-                    species1 = species1.filter(infraspe__icontains=infraspe1).filter(infraspr__icontains=infraspr1)
-                else:
-                    species1 = species1.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
-                if year1:
-                    species1 = species1.filter(year=year1)
-                if len(species1) == 1:  # Found unique species
-                    species1 = species1[0]
-                    species = species1
-                    pid1 = species1.pid
-                    pid = ''
-                elif len(species1) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returns more than one values'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
-                else:  # length = 0  This could be a synonym
-                    message = "species, <b>" + str(gen1) + ' ' + spc1 + '</b> returned none'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
-            else:  # Unique species found
-                species1 = species1[0]
-                species = species1
-                pid1 = species1.pid
-                pid = ''
-        else:
-            pid1 = ''
-    else:
-        # species 1 was not requested. use initial species
-        genus1 = species.genus
-        species1 = species
-        pid1 = pid
-
-    if not genus1 and not species1 and not genus2 and not species2 and not pid1 and not pid2:
-        send_url = "/common/photos/" + str(species.pid) + "/?role=cur" + "&family=" + family.family
-        return HttpResponseRedirect(send_url)
-
-    if species1:
-        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     if gen2:
         try:
             genus2 = Genus.objects.get(genus__iexact=gen2)
@@ -255,7 +146,7 @@ def compare(request, pid):
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
                        'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, app + '/compare.html', context)
+            return render(request, 'detail/compare.html', context)
         if spc2:
             species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
             if len(species2) == 0:
@@ -265,7 +156,7 @@ def compare(request, pid):
                            'genus2': gen2, 'species2': spc2,
                            'message2': message,
                            'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, app + '/compare.html', context)
+                return render(request, 'detail/compare.html', context)
             elif len(species2) > 1:
                 if infraspe2 and infraspr2:
                     species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
@@ -280,23 +171,19 @@ def compare(request, pid):
                     species2 = species2[0]
                     pid2 = species2.pid
                 elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value'
+                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message2': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
+                    return render(request, 'detail/compare.html', context)
                 else:  # length = 0
                     message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus1': species.genus, 'species1': species, 'infraspr1': infraspr1,
-                               'infraspe1': infraspe1,
                                'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message1': message,
                                'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
+                    return render(request, 'detail/compare.html', context)
             else:
                 species2 = species2[0]
                 pid2 = species2.pid
@@ -306,36 +193,38 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
 
-    if species1 and species1.status == 'synonym':
-        pid1 = species1.getAcc()
-        accepted1 = species1.getAccepted()
     if species2 and species2.status == 'synonym':
         pid2 = species2.getAcc()
         accepted2 = species2.getAccepted()
 
-    if pid1 and pid2:
-        cross = Hybrid.objects.filter(seed_id=pid1).filter(pollen_id=pid2)
+    if pid2:
+        cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
         if not cross:
-            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid1)
+            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid)
         if cross:
             cross = cross[0]
         else:
             cross = ''
 
-    if species1:
-        spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if species.type == 'species':
+        spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    else:
+        spcimg1_list = HybImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     if species2:
-        spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        if species2.type == 'species':
+            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     msgnogenus = ''
     if 'msgnogenus' in request.GET:
         msgnogenus = request.GET['msgnogenus']
 
-    write_output(request, str(genus1) + " " + str(species1) + " vs " + str(genus2) + " " + str(species2))
+    write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
     context = {'pid': pid, 'genus': genus, 'species': species,
-               'pid1': pid1, 'pid2': pid2, 'accepted1': accepted1, 'accepted2': accepted2,  # pid of accepted species
-               'genus1': genus1, 'species1': species1, 'spcimg1_list': spcimg1_list,
+               'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
+               'spcimg1_list': spcimg1_list,
                'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
@@ -762,11 +651,9 @@ def uploadweb(request, pid, orid=None):
     role = getRole(request)
 
     if request.method == 'POST':
-        logger.error(">>> Requested POST: ")
         form = UploadSpcWebForm(request.POST)
 
         if form.is_valid():
-            logger.error(">>> Form is valid: ")
             spc = form.save(commit=False)
             if not spc.author and not spc.credit_to:
                 return HttpResponse("Please select an author, or enter a new name for credit allocation.")
@@ -794,8 +681,6 @@ def uploadweb(request, pid, orid=None):
             url = "%s?role=cur&family=%s" % (reverse('common:photos', args=(species.pid,)), species.gen.family)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
-        else:
-            logger.error(">>> Form is not valid: ")
 
     if not orid:  # upload, initialize author. Get image count
         if species.type == 'species':
@@ -864,7 +749,6 @@ def mypaginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index: end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
-
 
 
 @login_required

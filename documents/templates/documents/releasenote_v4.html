@@ -1,0 +1,57 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<br><br>
+<div class="container" style="text-align:left;border:0 solid blue">
+    <h3>V-4 Release Notes</h3>
+    <h4>What's new in V4.0?</h4>
+    <ul style="list-style-type:disc">
+        <li>The website is divided into 4 areas: Bromeliaceae, Cactaceae, Orchidaceae and Other remaining families. Currently, we access all 4 areas with the same domain name (orchidroots or bluenanta). In the future, it is possible to split orchidroots off into its own isolate website using orchidroots.com all by itself if there is a call for the split.
+        </li>
+<br>
+        <li>There is a new dropdown selection on the navbar that allows you to jump from one area to another easily.
+            If you are only interested in orchids you can remain within Orchidaceae as long as you don't change this option.
+        </li>
+<br>
+        <li>Search. The search function is simplified. First, it searches one area at a time.
+            So you have to select where you want to search from the family dropdown options. The search function will try exact first, then partial matching.
+           If nothing found it will continue to perform fuzzy matching.  If user is not satisfied with the results, he/she can
+            <ul style="list-style-type:circle">
+                <li>Click on the "Approximate Search" button to continue the inexact search.  This is more forgiving than the conventional keyword matching.</li>
+                <li>Perform the same search in a different family.  Simply click on a family link in the side bar or from the pulldown menu in the navbar.</li>
+                <li>Modified the search term</li>
+            </ul>
+        </li>
+<br>
+        <li>Taxonomy list: In most except for detail pages, there is a left panel showing list of family, subfamily, tribe and subtribe.
+            You may easily switch from one to another while remaining on your current page.
+            For instance, after searching for something in Bromeliaceae family and didn't get result, you can switch to, say, Cactaceae and continue your search there.
+            <br>Note that this left panel functions the same way as the pulldown menu in the navbar.
+            It is currently left out in Orchidaceae domain to save some space and to avoid confusion.
+            Without this side panel, you can still navigate around using the dropdown in the navbar if needed.
+        </li>
+<br>
+
+        <li>Changes in Big tables
+            <ul style="list-style-type:circle">
+                <li>Sort by columns: It is now done on the client side, so much faster than previous version. Same for pagination.</li>
+                <li>"filter results" input field. This field lets you filter values quickly across all columns. For example, if you want to show only genera described in 1948, simply type 1948 in the filter table box.
+                When you fetch these big tables for the first time or when you switch domain or select new criteria, the page load could be slow since you have to retrieve all new data from the backend. But after the page is fully loaded, you can search and sort the table much faster. For example, instead of using the provided seed and pollen parents to search for grexes (which you know well how slow it can be) try using the filter results input box together with sort on parentage column, you can achieve similar results at a much faster speed.
+                </li>
+            </ul>
+        </li>
+<br>
+
+        <li>Taxonomic data: Bromeliaceae and Cactaceae are the only two non-orchid families that are fully loaded from WCSP and from ITIS or WFO respectively.
+            For the remaining families, we load data as needed (i.e. when we have images to upload).
+            Most of these families are listed in IPNI. But WCSP is our primary choice if they are listed there. Over time, we will continue to add other families.
+        </li>
+<br>
+        <li>Upload:  You can upload photos the same way as you do for orchids</li>
+        
+
+    </ul>
+</div>
+
+{% endblock %}

@@ -6,11 +6,39 @@ from django.views.decorators.http import require_GET
 from django.db.models import Q
 from django.http import HttpResponse
 from django.urls import resolve, get_resolver, URLResolver, URLPattern
+from django.apps import apps
 
+from core.models import Family
+from core.models import Subfamily
+from core.models import Tribe
+from core.models import Subtribe
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
 from accounts.models import Photographer
 
 logger = logging.getLogger(__name__)
+
+
+def change_family(request):
+    path = request.path
+    path_list = {
+            '': '',
+            'browse': 'browse',
+            '/common/genera/': '/common/genera/',
+            'species': 'species',
+            'hybrid': 'hybrid',
+            '/common/search_species/': '/common/search_species/',
+            'curate_newupload': 'curate_newupload',
+            'myphoto': 'myphoto_browspc',
+            'myphoto_browspc': 'myphoto_browspc',
+            'myphoto_browsehyb': 'myphoto_browsehyb'
+    }
+    return path_list[path]
+
+def get_family_list():
+    family_list = Family.objects.all()
+    favorite = Family.objects.filter(family__in=('Orchidaceae', 'Bromeliaceae', 'Cactaceae'))
+    family_list = favorite.union(family_list)
+    return family_list
 
 def getApp(request):
     return request.resolver_match.app_name
@@ -116,11 +144,11 @@ def paginator(request, full_list, page_length, num_show):
 
 def getRole(request):
     role = ''
+    if 'role' in request.GET:
+        role = request.GET['role']
+    elif 'role' in request.POST:
+        role = request.POST['role']
     if request.user.is_authenticated:
-        # if 'role' in request.GET:
-        #     role = request.GET['role']
-        # elif 'role' in request.POST:
-        #     role = request.POST['role']
         if not role:
             if request.user.tier.tier < 2:
                 role = 'pub'
@@ -135,10 +163,95 @@ def getRole(request):
                 if role == 'pub':
                     role = 'pri'
         return role
-    return role
+    return 'pub'
+
+def getModels(request, family=None):
+    subfamily, tribe, subtribe = '', '', ''
+    if not family:
+        if 'family' in request.GET:
+            family = request.GET['family']
+        elif 'family' in request.POST:
+            family = request.POST['family']
+        if 'newfamily' in request.GET:
+            newfamily = request.GET['newfamily']
+            if newfamily == 'other':
+                family = ''
+                app = 'other'
+            else:
+                family = newfamily
+    if family != 'other':
+        try:
+            family = Family.objects.get(pk=family)
+            app = family.application
+        except Family.DoesNotExist:
+            family = ''
+            app = 'other'
+    else:
+        family = ''
+        app = 'other'
+
+    if 'subfamily' in request.GET:
+        subfamily = request.GET['subfamily']
+        if subfamily:
+            try:
+                subfamily = Subfamily.objects.get(pk=subfamily)
+            except Subfamily.DoesNotExist:
+                subfamily = ''
+            if subfamily.family:
+                family = subfamily.family
+    if 'tribe' in request.GET:
+        tribe = request.GET['tribe']
+        if tribe:
+            try:
+                tribe = Tribe.objects.get(pk=tribe)
+            except Tribe.DoesNotExist:
+                tribe = ''
+            if tribe.subfamily:
+                subfamily = tribe.subfamily
+            if subfamily.family:
+                family = tribe.subfamily.family
+    if 'subtribe' in request.GET:
+        subtribe = request.GET['subtribe']
+        if subtribe:
+            try:
+                subtribe = Subtribe.objects.get(pk=subtribe)
+            except Subtribe.DoesNotExist:
+                subtribe = ''
+            if subtribe.tribe:
+                tribe = subtribe.tribe
+            if tribe.subfamily:
+                subfamily = tribe.subfamily
+            if subfamily.family:
+                family = subfamily.family
+    Genus = ''
+    Species = ''
+    Accepted = ''
+    Hybrid = ''
+    Synonym = ''
+    Distribution = ''
+    SpcImages = ''
+    HybImages = ''
+    UploadFile = ''
+    Intragen = ''
+    if app:
+        if app == 'orchidaceae':
+            from detail.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
+            # only exist for orchidaceae
+            GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
+            HybImages = apps.get_model(app.lower(), 'HybImages')
+            Intragen = apps.get_model(app.lower(), 'Intragen')
+        Genus = apps.get_model(app.lower(), 'Genus')
+        Hybrid = apps.get_model(app.lower(), 'Hybrid')
+        Species = apps.get_model(app.lower(), 'Species')
+        Accepted = apps.get_model(app.lower(), 'Accepted')
+        Ancestordescendant = apps.get_model(app.lower(), 'AncestorDescendant')
+        Synonym = apps.get_model(app.lower(), 'Synonym')
+        Distribution = apps.get_model(app.lower(), 'Distribution')
+        SpcImages = apps.get_model(app.lower(), 'SpcImages')
+        UploadFile = apps.get_model(app.lower(), 'UploadFile')
+    return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
 # def get_view_name_by_path(path):
-#     logger.error(">>> path = " + str(path))
 #     result = resolve(path=path)
 #     return result.view_name
 #

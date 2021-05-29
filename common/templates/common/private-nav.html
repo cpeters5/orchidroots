@@ -1,0 +1,57 @@
+
+<style>
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 5px;
+    width: 147px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+.mybtn {
+    font-size:13px;
+    width:200px;
+    background-color: white;
+    border: 1px solid grey;
+    margin: 3px;
+}
+.dropdown {
+    margin-top: 5px;
+}
+.mynav {
+    clear: left;
+    height: 30px !important;
+    display: inline-block;
+}
+</style>
+
+    <div class="d-flex justify-content-center mynav" >
+        <div class="p-2" >
+            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_list' %}?family={{family}}&role={{role}}">My Collection</a>
+        </div>
+
+        <div class="p-2" >
+            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}">My Species Photos</a>
+        </div>
+
+        <div class="p-2" >
+            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{family}}&role={{role}}">My Hybrid Photos</a>
+        </div>
+
+        <div class="p-2" >
+            {% if species %}
+                {% if author.author_id == 'anonymous' %}
+                    <div style="text-align:center; width:100%;padding:0 20%; font-size:14px;">
+                        <br>
+                        <b>Alert!</b>
+                        {{user}}, your profile is not synchronized with the current credit attribution name.
+                        If this is the first time you upload your photo, please contact 'admion@orchidroots.org' to create an author id for you.
+                        Otherwise, if your credit attribution author name already exists, please click on the link "update profile" in the dropdown menu under your user name and select your attribute the name we use to attribute your photos from the drop down menu in the update profile form"
+                        to <a href="https://www.facebook.com/Orchidrootscom-306266603228487/inbox/?mailbox_id=306266603228487&selected_item_id=631912977">OrchidRoots In-Box</a>
+                    </div>
+                {% else %}
+                        <a class="btn btn-xs btn-outline-primary" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}">upload file</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>

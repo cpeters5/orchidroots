@@ -221,9 +221,9 @@ a:hover {
         {% if msg %}<span style="text-align:center; color: red">{{msg}}</span>{% endif %}
             {% if user.tier.tier > 1 and role != 'pub' %}
                 {% if user.tier.tier > 3 and role == 'cur' %}
-                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" style="background-color:red" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
                 {% endif %}
                 <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadweb/{{species.pid}}/?family={{family}}&role={{role}}&tab=web">Upload url</a>
                 <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
@@ -284,10 +284,10 @@ a:hover {
                                 {% else %}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-                                        <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                        <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
                                     {% else %}
                                         {{image.imgname|safe}}
-                                        <br>{{image.author.displayname }}
+                                        <br>{{image.get_displayname }}
                                     {% endif %}
                                 {% endif %}
                                 {% if role == 'pri' and image.rank == 0 %}
@@ -352,7 +352,7 @@ a:hover {
                                    <br> {{image.get_displayname}}
                                    <br>{{image.text_data|default:''|safe}}">
                               <div class="box-tiny">
-                                  <img class="thumbnail-tiny" alt="" src="{% static 'media/' %}{{image.image_file_path}}" style="border: 0 solid red;">
+                                  <img class="thumbnail-tiny" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                   <div class="text text-br">{{image.id}}</div>
                                 </div>
                            </a>
@@ -364,7 +364,7 @@ a:hover {
                         Requested file does not exist
                      {% endif %}
                      <div style="font-size:10px">
-                        <a href="{{image.source_url}}">{{image.author.displayname}}</a>
+                        <a href="{{image.source_url}}">{{image.get_displayname}}</a>
 <!--                            Private and curate role may delete photos-->
                         {% if role == "cur" or role == "pri" %}
                             <br>

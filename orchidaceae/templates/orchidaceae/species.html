@@ -5,12 +5,6 @@
 
 <style>
 
-@media only screen and (max-width: 1200px) {
-}
-
-@media only screen and (max-width: 400px) {
-}
-
 .tooltip {
     position: relative;
     display: inline-block;
@@ -49,24 +43,24 @@ a:hover {
     color: darkblue;
 }
 
-.button-a {
-    /*background-color: #eaeaea;*/
-    height:30px;
-    width: 150px;
-    border:1px solid #857f7f;
-    padding-top:3px;
-    color: #222d2d;
-    background-color: white;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 13px;
-    margin: 4px;
-    -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
-    cursor: pointer;
-  opacity: 1; /* Firefox */
-}
+/*.button-a {*/
+/*    !*background-color: #eaeaea;*!*/
+/*    height:30px;*/
+/*    width: 150px;*/
+/*    border:1px solid #857f7f;*/
+/*    padding-top:3px;*/
+/*    color: #222d2d;*/
+/*    background-color: white;*/
+/*    text-align: center;*/
+/*    text-decoration: none;*/
+/*    display: inline-block;*/
+/*    font-size: 13px;*/
+/*    margin: 4px;*/
+/*    -webkit-transition-duration: 0.4s; !* Safari *!*/
+/*    transition-duration: 0.4s;*/
+/*    cursor: pointer;*/
+/*  opacity: 1; !* Firefox *!*/
+/*}*/
 
 
 ::placeholder {
@@ -78,90 +72,68 @@ a:hover {
   font-size: 14px;
 }
 
-input {
-    text-align: left;
-    /*margin: 0 5px;*/
-    padding:0;
-    height:30px;
-    width: 180px;
-    border: 1px solid grey;
- }
-.scrollable-menu {
-    height: auto;
-    width:150px;
-    padding:5px;
-    max-height: 400px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    font-size:13px;
-    color: grey;
-    line-height:20px;
-}
+/*input {*/
+/*    text-align: left;*/
+/*    !*margin: 0 5px;*!*/
+/*    padding:0;*/
+/*    height:30px;*/
+/*    width: 180px;*/
+/*    border: 1px solid grey;*/
+/* }*/
+/*.scrollable-menu {*/
+/*    height: auto;*/
+/*    width:150px;*/
+/*    padding:5px;*/
+/*    max-height: 400px;*/
+/*    overflow-x: hidden;*/
+/*    overflow-y: auto;*/
+/*    font-size:13px;*/
+/*    color: grey;*/
+/*    line-height:20px;*/
+/*}*/
 
-.filterinput {
-    text-align: left;
-    margin: 0 0 5px 5px;
-    padding:0 0 0 2px;
-    height:30px;
-    width: 150px;
-    border: 1px solid grey;
-    border-right: 0;
- }
+/*.filterinput {*/
+/*    text-align: left;*/
+/*    margin: 0 0 5px 5px;*/
+/*    padding:0 0 0 2px;*/
+/*    height:30px;*/
+/*    width: 150px;*/
+/*    border-radius: 3px;*/
+/* }*/
 
-.filterinput1 {
-    text-align: left;
-    margin: 0 0 5px 5px;
-    padding:0 0 0 2px;
-    height:30px;
-    width: 180px;
-    border: 1px solid grey;
- }
+/*.submit {*/
+/*    height:30px;*/
+/*    width: 30px;*/
+/*    font-size:12px;*/
+/*    !*font-color:lightgrey;*!*/
+/*    text-align:center;*/
+/*    float: left;*/
+/*    margin: 0;*/
+/*    background-color: #607951;*/
+/*    color:white;*/
+/*    border: 0;*/
+/*}*/
 
-.submit {
-    height:30px;
-    width: 30px;
-    font-size:12px;
-    /*font-color:lightgrey;*/
-    text-align:center;
-    float: left;
-    margin: 0;
-    background-color: #607951;
-    color:white;
-    float: right;
-    border: 0;
-}
-
-.submit2 {
-    height:30px;
-    width: 30px;
-    font-size:12px;
-    text-align:center;
-    float: left;
-    margin: 0;
-    background-color: #607951;
-    color:white;
-    float: right;
-    border: 1px solid grey;
-    border-left: 0;
-}
-
-.select-p2 {
-    font-size:13px;
-    color: #b9b9b9;
-    width:180px;
-    height:30px;
-    margin:0;
-    border:1px solid #768070;
-    padding:0;
-    background-color:white;
-}
+/*.select-p2 {*/
+/*    font-size:14px;*/
+/*    color: #b9b9b9;*/
+/*    text-align:left;*/
+/*    width:150px;*/
+/*    height:30px;*/
+/*    margin:0;*/
+/*    border:1px solid #768070;*/
+/*    padding:5px;*/
+/*    background-color:white;*/
+/*    border-radius: 3px;*/
+/*}*/
 .card-body {
     padding: 10px;
 }
 
-.dropdown {
-    display: inline-block;
-}
+/*.dropdown {*/
+/*    display: inline-block;*/
+/*}*/
+
 td {
     font-size: 13px;
 }
@@ -180,8 +152,14 @@ option {
   cursor: pointer;
 }
 
+.form-check-input {
+    height: 20px;
+    width: 20px;
+}
+.btn-custom {
+    width: 180px;
+}
 </style>
-<br>
 <br>
 <div style="clear:both"></div>
         <!--Filter-->
@@ -189,186 +167,99 @@ option {
     <div class="card m-2">
         <div class="card-header">
             <h4>
-                {{genus|title}} Species
-                {% if subgenus_obj %}Subgenus {{subgenus_obj.subgenus}}{% endif %}
-                {% if section_obj %}Section {{section_obj.section}}{% endif %}
-                {% if subsection_obj %}Subsection {{subsection_obj.subsection}}{% endif %}
-                {% if series_obj %}Series {{series_obj.series}}{% endif %}
-                 ({{subtotal|intcomma}} of {{total|intcomma}})
-                <div class="p-1 dropdown" data-toggle="tooltip" data-placement="top" title="status">
-                    <button class="dropdown-toggle button select-p2" type="button" data-toggle="dropdown">
-                        {% if status %}<span style="color:black">{{status}}</span>{% else %}Select status{% endif %}
-                    </button>
-                    <ul class="dropdown-menu scrollable-menu"  style="font-size: 11px;padding:5px;width:80px;">
-                        <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=accepted&genus={{genus}}">Accepted</a></li>
-                        <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=synonym&genus={{genus}}">Synonym</a></li>
-    <!--                    <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection=&series=&status=&genus={{genus}}">All status</a></li>-->
-                    </ul>
-                </div>
-                <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid List</a>
-                {% if subtotal > 0 and genus %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:browse' %}?type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
+                {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} Species
+                {% if genus.num_hybrid > 0 %}
+                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid</a>
                 {% endif %}
+                {% if subtotal > 0 and genus %}
+                    <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
+                {% endif %}
+                <a class="btn btn-custom" style="margin:0 8px;" href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N">Goto hybrid list</a>
+                <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
+                    <input type="hidden" name="genus" value="{{genus}}" />
+                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
+                    <input type="hidden" name="tribe" value="{{tribe}}" />
+                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
+                    <input type="hidden" name="alpha" value="{{alpha}}" />
+                    {% if syn == 'N' %}
+                        <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;">
+                        <span style="margin-left:35px;font-size:13px;">Uncheck to show synonyms</span>
+                    {% else %}
+                        <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left: 5px;">
+                        <span style="margin-left:35px;font-size:13px;">Check to hide synonyms</span>
+                    {% endif %}
+                </form>
             </h4>
+
+            <span style="color: red;">{{msg|default:''}}</span>
         </div>
 
         <div class="card-body d-flex flex-wrap" style="display:inline-block">
             <!--Genus-->
-            <form action="?" id="filter">
+            <form action="?" id="filter" style="display:inline-block; margin-top: 5px;">
                 <input type="hidden" name="alpha" value="{{alpha}}" />
-                <input type="hidden" name="sort" value="{{sort}}" />
-                <input type="hidden" name="status" value="{{status}}" />
-                <input type="hidden" name="prev_genus" value="{{genus}}" />
-                <input type="hidden" name="psf" value="{{subfamily}}" />
-                <input type="hidden" name="pt" value="{{tribe}}" />
-                <input type="hidden" name="pst" value="{{subtribe}}" />
-                <input type="hidden" name="prev_subgenus" value="{{subgenus_obj.subgenus}}" />
-                <input type="hidden" name="prev_section" value="{{section_obj.section}}" />
-                <input type="hidden" name="prev_subsection" value="{{subsection_obj.subsection}}" />
-                <input type="hidden" name="prev_series" value="{{series_obj.series}}" />
-                <input type="hidden" name="prev_region" value="{{region_obj.series}}" />
-                <input type="hidden" name="prev_subregion" value="{{subregion_obj.series}}" />
+                <input type="hidden" name="syn" value="{{syn}}" />
+                <input class="btn btn-custom p-1" form="filter" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="genus" data-toggle="tooltip"  data-placement="top" title="Genus" style="margin-right: 3px !important;"/>
             </form>
-
-
-            <div  class="form-group" style="display:inline-block; margin-bottom:0;">
-                <input  class="filterinput" form="filter" list="sf_list" name="sf" onClick="this.setSelectionRange(0, this.value.length)" value="{{subfamily}}" class="custom-select" placeholder="Subfamily" data-toggle="tooltip"  data-placement="bottom"  title="subfamily" style="border-right:0">
-                <input type="image" form="filter" class="submit2"  src="{% static 'utils/images/gobutton.jpg' %}" value="" alt="Go">
+            <div>
+                <button class="btn btn-custom p-1 m-1" type="button" id="subfamButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{subfamily|default:"Select new Subfamily"}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="subfamButton">
+                    <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&alpha={{alpha}}&syn=N">----</a>
+                    {% for g in subfamily_list %}
+                        <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&subfamily={{g.subfamily}}&alpha={{alpha}}&syn=N">{{g.subfamily}}</a>
+                    {% endfor %}
+                </div>
             </div>
-            {% if tribe_list %}
-            <div  class="form-group" style="display:inline-block; margin-bottom:0;">
-                <input  class="filterinput" form="filter" list="t_list" name="t" onClick="this.setSelectionRange(0, this.value.length)" value="{{tribe}}" class="custom-select" placeholder="Tribe" data-toggle="tooltip"  data-placement="bottom"  title="tribe">
-                <input type="image" form="filter" class="submit2"  src="{% static 'utils/images/gobutton.jpg' %}" value="" alt="Go">
-            </div>
-            {% endif %}
-            {% if subtribe_list %}
-                <input  class="filterinput1" form="filter" list="st_list" name="st" onClick="this.setSelectionRange(0, this.value.length)" value="{{subtribe}}" class="custom-select" placeholder="Subtribe" data-toggle="tooltip"  data-placement="bottom"  title="subtribe">
-            {% endif %}
-            <datalist id="sf_list" style="max-height:200px;">
-                {% for sf in subfamily_list %}
-                    <option value="{{sf}}">{{sf.subfamily}}</option>
-                {% endfor %}
-            </datalist>
-            <datalist id="t_list" style="max-height:200px;">
-                {% for t in tribe_list %}
-                    <option value="{{t}}">{{t.tribe}}</option>
-                {% endfor %}
-            </datalist>
-            <datalist id="st_list" style="max-height:200px;">
-                {% for st in subtribe_list %}
-                    <option value="{{st}}">{{st.subtribe}}</option>
-                {% endfor %}
-            </datalist>
-                    <!--Subgenus Filter-->
-                {% if spc == '' %}
-                    {% if subgenus_list.count > 1 or subgenus_obj %}
-                        <select form="filter" name="subgenus">
-                            {% for subgenus in subgenus_list %}
-                                <option value="{{subgenus.0}}">{{subgenus.0}}</option>
-                            {% endfor %}
-                        </select>
-                            <button class="filterinput1" data-toggle="dropdown">
-                                {% if subgenus_obj %}<span style="color:black">Subgen. {{subgenus_obj.subgenus}}</span>{% else %}Subgenus{% endif %}
-                            </button>
-                            <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                                <a class="dropdown-item" href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus=&section=&subsection=&series=&status={{status}}&genus={{genus}}">All subgenus</a>
-                                {% for subgenus in subgenus_list %}
-                                    <a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus.0}}&section=&subsection=&series=&status={{status}}&genus={{genus}}">{{subgenus.1}}</a>
-                                    <br>
-                                {% endfor %}
-                            </div>
-                    {% endif %}
-
-                    <!--Sections Filter-->
-                    {% if section_list.count > 1 or section_obj %}
-                        <div class="dropdown">
-                            <button class="filterinput1" data-toggle="dropdown">
-                                {% if section_obj %}<span style="color:black">Sec. {{section_obj.section}}</span>{% else %}Section{% endif %}
-                            </button>
-                            <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                                <a class="dropdown-item" href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus}}&section=&subsection=&series=&status={{status}}&genus={{genus}}">All section of {{subgenus}}</a>
-                                {% for section in section_list %}
-                                    <a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus={{subgenus}}&section={{section.0}}&subsection=&series=&status={{status}}&genus={{genus}}">{{section.1}}</a>
-                                    <br>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <!--Subections Filter-->
-                   {% if subsection_list.count > 1 %}
-                        <div class="dropdown">
-                            <button class="filterinput1" data-toggle="dropdown">
-                                {% if subsection_obj %}<span style="color:black">Subsec. {{subsection_obj.subsection}}</span>{% else %}Subsection{% endif %}
-                            </button>
-                            <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                                <a class="dropdown-item" href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus=&section=&subsection=&series=&status={{status}}&genus={{genus}}">All section</a>
-                                {% for subsection in subsection_list %}
-                                    <a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus=&section=&subsection={{subsection.0}}&series=&status={{status}}&genus={{genus}}">{{subsection.1}}</a>
-                                    <br>
-                                {% endfor %}
-                            </div>
-                        </div>
-                   {% endif %}
-
-                    <!--series Filter-->
-                   {% if series_list.count > 1 or series_obj %}
-                        <div class="dropdown">
-                            <button class="filterinput1" data-toggle="dropdown">
-                                {% if series_obj %}<span style="color:black">Ser. {{series_obj.series}}</span>{% else %}Series{% endif %}
-                            </button>
-                            <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                                <a class="dropdown-item" href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus=&section=&subsection=&series=&status={{status}}&genus={{genus}}">All series</a>
-                                {% for series in series_list %}
-                                    <a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion_obj.code}}&subgenus=&section=&subsection=&series={{series.0}}&status={{status}}&genus={{genus}}">{{series.1}}</a>
-                                    <br>
-                                {% endfor %}
-                            </div>
-                        </div>
-                   {% endif %}
-
-                    <div class="dropdown" data-toggle="tooltip" data-placement="top" title="Region">
-                        <button class="filterinput1" type="button" data-toggle="dropdown">
-                            {% if region_obj and region_obj.region != 0 and region_obj.region != 1 %}<span style="color:black">{{region_obj.name}}</span>{% else %}Region{% endif %}
+            {% if subfamily %}
+                {% if tribe_list %}
+                    <div>
+                        <button class="btn btn-custom p-1 m-1" type="button" id="tribeButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{tribe|default:"Select new Tribe"}}
                         </button>
-                        <ul class="dropdown-menu  scrollable-menu">
-                            <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region=&subregion=&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&status={{status}}&genus={{genus}}">None</a></li>
-                            {% for region in region_list %}
-                            <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region.id}}&subregion=&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&status={{status}}&genus={{genus}}">{{region.name}}</a>
-                            </li>
+                        <div class="dropdown-menu" aria-labelledby="tribeButton">
+                            <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&subfamily={{g.subfamily}}&alpha={{alpha}}&syn=N">----</a>
+                            {% for g in tribe_list %}
+                                <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&alpha={{alpha}}&syn=N">{{g.tribe}}</a>
                             {% endfor %}
-                        </ul>
+                        </div>
                     </div>
-
-                    <div class="dropdown">
-                        <button class="filterinput1" type="button" data-toggle="dropdown">
-                            {% if subregion_obj and subregion_obj.subregion != "All subregions" %}<span style="color:black">{{subregion_obj.name}}</span>{% else %}Subregion{% endif %}
-                        </button>
-                        <ul class="dropdown-menu  scrollable-menu" style="font-size: 11px;padding:5px;width:80px;">
-                            <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion=&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&status={{status}}&genus={{genus}}">All subregions</a></li>
-                            {% for subregion in subregion_list %}
-                            <li><a href="?alpha={{ alpha }}&sort={{ sort }}&region={{region_obj.id}}&subregion={{subregion.code}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&status={{status}}&genus={{genus}}">{{subregion.name}}</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                   <!--Submit-->
                 {% endif %}
+                {% if subtribe_list %}
+                    <div>
 
-
-
-
-            {% if total > 0 %}
-                 <!--Species-->
-                <input class="filterinput1" form="filter" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)"/>
-                <!--Year-->
-                <input class="filterinput1" form="filter" name="year" value='{{year}}' placeholder="Year" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="YYYY"/>
-                <!--Author-->
-                <input class="filterinput1" form="filter" name="author" value='{{author}}' onfocus="this.select()" placeholder="author" data-toggle="tooltip" data-placement="top" title="Author"/>
-                <input type="image" form="filter" class="submit" value="submit" src="{% static 'utils/images/gobutton.jpg' %}" alt="submit Button" onMouseOver="this.src='{% static 'utils/images/gobutton.jpg' %}'">
-            {% else %}
-                <div style="margin: 10px 0 0 10px;">No <i>{{genus|title}}</i> {{status}} species! Please try {% if status == 'accepted' %}synonym{% else %}accepted{% endif %} status, or go to hybrid, or select a different genus.</div>
+                        <button class="btn btn-custom p-1 m-1" type="button" id="SubtribeButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{subtribe|default:"Select new Subtribe"}}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="SubtribeButton">
+                            <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&alpha={{alpha}}&syn=N">----</a>
+                            {% for g in subtribe_list %}
+                                <a class="dropdown-item" href="?family={{family.family}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&subtribe={{g.subtribe}}&alpha={{alpha}}&syn=N">{{g.subtribe.subtribe}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
             {% endif %}
+            {% if total == 0 %}
+                <div style="margin: 10px 0 0 10px;">
+                    {% if genus %}
+                        No species matching <i>{{genus|title}}</i>.
+                    {% elif subftribe %}
+                        No species matching <i>{{subftribe|title}}</i>.
+                    {% elif tribe %}
+                        No species matching <i>{{tribe|title}}</i>.
+                    {% elif subfamily %}
+                        No species matching <i>{{subfamily|title}}</i>.
+                    {% endif %}
+                </div>
+            {% endif %}
+
+
+
+
+
+
         </div>
     </div>
 
@@ -376,62 +267,23 @@ option {
     <div class="card m-2">
 
     <!--Pagination        -->
-    {% if total > 0 %}
-        {% include "orchidaceae/alpha_list.html" %}
-    {% endif %}
+    {% include "orchidaceae/alpha_list.html" %}
     {% if page_list %}
-        {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
-        <div style="float:left; width:100%;">
+        <div class="flex">
         <!--main table-->
 
-            <table class="table table-bordered table-sm table-condensed table-hover" id="myTable">
+            <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
                 <thead  class="thead-light">
     {#                First column - All options#}
                     <tr class="center" bgcolor="#e3e3e3">
-                        <th class="text-center">
-                        {% if sort == 'genus' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=genus&prev_sort={{sort}}"><b>Genus&uarr;</b></a>
-                        {% elif sort == '-genus' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=genus&prev_sort={{sort}}"><b>Genus&darr;</b></a>
-                        {% else %}
-                            <a data-toggle="tooltip" title="Click to sort by Genus" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=genus&prev_sort={{sort}}">Genus </a>
-                        {% endif %}
-                        -
-                        {% if sort == 'species' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=species&prev_sort={{sort}}"><b>Species&uarr;</b></a>
-                        {% elif sort == '-species' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=species&prev_sort={{sort}}"><b>Species&darr;</b></a>
-                        {% else %}
-                            <a data-toggle="tooltip" title="Click to sort by species" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=species&prev_sort={{sort}}">Species</a>
-                        {% endif %}
-                        -
-    <!--                        <i >Author</i>-->
-                        -
-                        {% if sort == 'year' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=year&prev_sort={{sort}}"><b>Year&uarr;</b></a>
-                        {% elif sort == '-year' %}
-                            <a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=year&prev_sort={{sort}}"><b>Year&darr;</b></a>
-                        {% else %}
-                            <a data-toggle="tooltip" title="Click to sort by year" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=year&prev_sort={{sort}}">Year</a>
-                        {% endif %}
-                        </th>
-
+                        <th class="text-center">Binomial</th>
+                        <th class="text-center">Author</th>
+                        <th class="text-center">Year</th>
+<!--                        <th class="text-center">Suprageneric ranks</th>-->
+                        <th class="text-center">Subgeneric ranks</th>
                         <th class="text-center">Distribution</th>
-
-                        {% if sort == 'num_descendant' %}
-                            <th class="d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=num_descendant&prev_sort={{sort}}">   <b>#descendants&uarr;</b></a></th>
-                        {% elif sort == '-num_descendant' %}
-                            <th class="d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=num_descendant&prev_sort={{sort}}"><b>#descendants&darr;</b></a></th>
-                        {% else %}
-                            <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of descendants" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=-num_descendant&prev_sort={{sort}}">#descendants</a></th>
-                        {% endif %}
-                        {% if sort == 'num_image' %}
-                            <th class="d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=num_image&prev_sort={{sort}}"><b>#photos&uarr;</b></a></th>
-                        {% elif sort == '-num_image' %}
-                            <th class="d-none d-sm-table-cell"><a href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=num_image&prev_sort={{sort}}"><b>#photos&darr;</b></a></th>
-                        {% else %}
-                            <th class="d-none d-sm-table-cell"><a data-toggle="tooltip" title="Click to sort by number of images" href="?alpha={{ alpha }}&spc={{spc}}&genus={{genus}}&author={{author}}&year={{ year }}&status={{status}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&sort=-num_image&prev_sort={{sort}}">#photos</a></th>
-                        {% endif %}
+                        <th class="text-center">#descendants</th>
+                        <th class="text-center">#photos</th>
                     </tr>
                 </thead>
                 {% for species in page_list %}
@@ -439,35 +291,35 @@ option {
                         <td align="left">
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
-                                {% if species.author %} {{species.author}}{% endif %}
-                                {% if species.year > 0 %}<span  style="font-size: 12px;"> {{species.year}}</span>{% endif %}
                                 {% if role == 'cur' %}
-                                    (syn. <a href="{% url 'common:photos' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'common:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
                                 {% else %}
-                                    (syn. <a href="{% url 'common:information' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'common:information' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'common:photos' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}} </a>
+                                    <a href="{% url 'common:photos' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% else %}
-                                    <a href="{% url 'common:information' species.pid %}?role={{role}}"><i>{{species.genus}}</i> {{species.fullspeciesname|safe}}</a>
+                                    <a href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% endif %}
-                                {% if species.author %} {{species.author}}{% endif %}
-                                {% if species.year > 0 %}<span  style="font-size: 12px;"> {{species.year}}</span>{% endif %}
                             {% endif %}
-
-
-                        {% if not subgenus_obj and not section_obj and not subsection_obj and not series_obj %}
                             {% if species.status == 'synonym' %}
                                 {% if species.subgenus %}{{species.subgenus.subgenus}}{% endif %}
-                            {% else %}
-                                {% if species.accepted.subgenus %}Subgen. <a href="{% url 'common:browse' %}?subgenus={{species.accepted.subgenus}}&type=species&gen={{gen}}">{{species.accepted.subgenus}}</a>{% endif %}
-                                {% if species.accepted.section %} Sec. <a href="{% url 'common:browse' %}?section={{species.accepted.section}}&type=species&gen={{gen}}">{{species.accepted.section}}</a>{% endif %}
-                                {% if species.accepted.subsection %} Subsec. <a href="{% url 'common:browse' %}?subsection={{species.accepted.subsection}}&type=species&gen={{gen}}">{{species.accepted.subsection}}</a>{% endif %}
-                                {% if species.accepted.series %} Ser. <a href="{% url 'common:browse' %}?series={{species.accepted.series}}&type=species&gen={{gen}}">{{species.accepted.series}}</a>{% endif %}
                             {% endif %}
+                            </td>
+                        <td class="align-center">{{species.author|default:''}}</td>
+                        <td class="align-center">{{species.year|default:''}}</td>
+<!--                        <td class="align-center">-->
+<!--                            {% if species.gen.subfamily %}<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&type=species&display=checked">{{species.gen.subfamily}}</a>{% endif %}-->
+<!--                            {% if species.gen.section %} > <a href="{% url 'common:browse' %}?family={{species.gen.family}}&tribe={{species.gen.tribe}}&type=species&display=checked">{{species.gen.tribe}}</a>{% endif %}-->
+<!--                            {% if species.gen.subsection %} > <a href="{% url 'common:browse' %}?family={{species.gen.family}}&subtribe={{species.gen.subtribe}}&type=species&display=checked">{{species.gen.subtribe}}</a>{% endif %}-->
+<!--                        </td>-->
+                        <td class="align-center">
+                            {% if species.accepted.subgenus %}<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{species.accepted.subgenus}}&type=species&display=checked">{{species.accepted.subgenus}}</a>{% endif %}
+                            {% if species.accepted.section %}<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{species.accepted.section}}&type=species&display=checked">{{species.accepted.section}}</a>{% endif %}
+                            {% if species.accepted.subsection %}<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subsection={{species.accepted.subsection}}&type=species&display=checked">{{species.accepted.subsection}}</a>{% endif %}
+                            {% if species.accepted.series %}<a href="{% url 'common:browse' %}?family={{species.gen.family}}&series={{species.accepted.series}}&type=species&display=checked">{{species.accepted.series}}</a>{% endif %}
                         </td>
-                        {% endif %}
                         <td class="align-center">
                             {% if species.status == 'synonym' %}
                                 {% if species.getAccepted.distribution %}
@@ -490,7 +342,7 @@ option {
             </table>
         <!--Pagination-->
         </div>
-        {% if last_page > 1 %} {% include "./paginator_brw.html" %} {% endif %}
+        {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
     {% endif %}
     </div>
 </div>
@@ -502,21 +354,45 @@ $(document).ready(function(){
 });
 
 
-// For datalist styling
-input.onfocus = function () {
-  datalist.style.display = 'block';
-}
+var toggler = document.getElementsByClassName("caret");
+var i;
 
-for (let option of datalist.options) {
-  option.onclick = function () {
-    input.value = this.value;
-    datalist.style.display = 'none';
-  }
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
 }
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "pagingType": "full",
+        "bPaginate": true,
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Search table'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
 
-datalist.style.width = input.offsetWidth + 'px';
-datalist.style.left = input.offsetLeft + 'px';
-datalist.style.top = input.offsetTop + input.offsetHeight + 'px';
+});
+
 
 </script>
 

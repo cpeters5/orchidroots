@@ -12,12 +12,12 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
     <div style="clear:both"></div>
     <div class="row" style="width:100%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-4 col-lg-3" style="padding:0">
+        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
            {% include "common/taxonomy.html" %}
         </div>
 
-        <div class="col-sm-8 col-lg-9" style="text-align:left;font-size:13px;margin-top:30px;">
-            <div class="card-body"  style="display:inline-block; padding-top:0;">
+        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;margin-top:30px;">
+            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="padding:0; margin: 0">
                     <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Show genera</a>
                     {% if not genus or genus.num_hybrid > 0 %}
@@ -27,84 +27,139 @@
                     {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?alpha=A">Full species list</a>{% endif %}
                 </div>
                 <br>
-                {% if genus_list or match_list %}
+                <h6>Searching for "<i>{{spc_string}}</i>" in {% if family %}{{family.family}} Family {% else %}All {{app|title}} Families (other than Cactaceae, Orchidaceae and Bromeliaceae){% endif %}</h6>
+                {% if genus_list or match_list or perfect_list %}
                     {% if genus_list %}
-                    <b>Top {{ genus_total }} approximate matches genera for "<i>{{spc_string}}</i>"</b>
-                    <ul>
+                    <br>
+                    <table style="width:95%">
+                        <tr>
+                            <th width="85%">Genus</th>
+                            <th>Family</th>
+                        </tr>
+                        <tr><td>Top {{ genus_total }} approximate matches found for genera</td></tr>
                         {% for genus in genus_list %}
-                            <li>
-                                {% if genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {{genus.0.family|default:''}} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
-                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {{genus.0.family|default:''}} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
+                        <tr>
+                            <td>
+                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
+                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
                                 {% endif %}
-                            </li>
+                                species: {{genus.0.num_species|default:"0"}}
+                                hybrid: {{genus.0.num_hybrid|default:"0"}}
+                            </td>
+                            <td>{{genus.0.family}}</td>
+                        </tr>
                         {% endfor %}
-                    </ul>
+                    </table>
                     {% endif %}
-                    {% if match_list %}
-                    <b>{{ match_total }} matches species found for "<i>{{spc_string}}</i>"</b>
-                        {% if not fuzzy %}
-                            <div style="display: inline; padding: 0; margin: 0">
-                                <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
-                            </div>
+                    <br>
+                    <table width="95%">
+                        <tr>
+                            <th width="85%">species</th>
+                            <th>Family</th>
+                        </tr>
+
+                    {% if match_list or perfect_list %}
+                        {% if perfect_list %}
+                            {% for x in perfect_list %}
+                            <tr>
+                                <td>
+                                   {% if x.status == 'synonym' %}
+                                      {{ x.binomial }}
+                                   {% else %}
+                                      <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial }}</a>
+                                   {% endif %}
+                                   {{x.author|default:''}}
+                                   {% if x.status == 'synonym' %}
+                                      (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial}}</a>)
+                                   {% endif %}
+                                   {{x.num_image|default:''}} images
+                                </td>
+                                <td>{{x.family}}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr><td>No match found for {{spc_string}}</td></tr>
                         {% endif %}
-                        <ul>
-                    {% for x in match_list %}
-                        <li>
-                       {% if x.status == 'synonym' %}
-                          {{ x.binomial }}
-                       {% else %}
-                          <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial }}</a>
-                       {% endif %}
-                       {{x.author|default:''}}
-                       {% if x.status == 'synonym' %}
-                          (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial}}</a>)
-                       {% elif family.application == 'other' %}
-                          {{x.family|default:''}}
-                       {% else %}
-                          {{x.description|default:''}}
-                       {% endif %}
-                       {{x.num_image|default:''}}
-                        </li>
-                    {% endfor %}
-                    </ul>
+                        <tr><td><br></td></tr>
+                        {% if match_list %}
+                            <tr><td>{{ match_total}} other possibilities</td></tr>
+                            {% for x in match_list %}
+                            <tr>
+                                <td>
+                                   {% if x.status == 'synonym' %}
+                                      {{ x.binomial }}
+                                   {% else %}
+                                      <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial }}</a>
+                                   {% endif %}
+                                   {{x.author|default:''}}
+                                   {% if x.status == 'synonym' %}
+                                      (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial}}</a>)
+                                   {% endif %}
+                                   {{x.num_image|default:''}}
+                                </td>
+                                <td>{{x.family}}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    {% else %}
+                        <tr><td>No smatching species found</td></tr>
                     {% endif %}
+                    </table>
                 {% else %}
                     {% if fuzzy_list %}
-                        <b>{{ fuzzy_total }} approximate matches retrieved</b>
-                        <ul>
+                        <br>
+                        {{ fuzzy_total }} approximate matches retrieved</td></tr>
                             {% if match_list %}
-                                <li>fuzzy matches</li>
+                                fuzzy matches
                             {% endif %}
+                        <table width="95%">
+                            <tr>
+                                <th width="85%">Species</th>
+                                <th>Num. species</th>
+                                <th>Family</th>
+                            </tr>
                         {% for x in fuzzy_list %}
 <!--                            <li>{{x.1}} - -->
-                            <li>
-                               {% if x.0.status == 'synonym' %}
-                                  {{ x.0.binomial }}
-                               {% else %}
-                                  <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{ x.0.binomial }}</a>
-                               {% endif %}
-                               {{x.0.author|default:''}}
-                               {% if x.0.status == 'synonym' %}
-                                  (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial}}</a>)
-                               {% elif family.application == 'other' %}
-                                  {{x.0.family|default:''}}
-                               {% else %}
-                                  {{x.0.description|default:''}}
-                               {% endif %}
-                               {% if x.0.num_image %}
-                                   ({{x.0.num_image}} images available)
-                               {% endif %}
+                            <tr>
+                                <td>
+                                   {% if x.0.status == 'synonym' %}
+                                      {{ x.0.binomial }}
+                                   {% else %}
+                                      <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{ x.0.binomial }}</a>
+                                   {% endif %}
+                                   {{x.0.author|default:''}}
+                                   {% if x.0.status == 'synonym' %}
+                                      (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial}}</a>)
+                                   {% else %}
+                                      {{x.0.description|default:''}}
+                                   {% endif %}
+                                   {% if x.0.num_image %}
+                                       ({{x.0.num_image}} images)
+                                   {% endif %}
 
-                            </li>
+                                </td>
+                                <td>{{x.0.family}}</td>
+                            </tr>
                         {% endfor %}
-                        </ul>
+                        </table>
                     {% else %}
-                        <br><b>Your search returned no matches for</b>
-                        {% if app == 'other' %}other families. Please try switch to Orchidaceae, Cactaceae or Bromeliaceae
-                        {% else %}{{app}} family. Please try switch to other families
+                        <br><b>
+                        {% if not fuzzy %}
+                            Your search returned no matches for
+                            {{family.family|default:app}} families. Please try switch to another family or choose "All Other families" to expand the search to families other than Orchidaceae, Cactaceae and Bromeliaceae.
+                             or click on the "Aproximate search" button for imprecise matching
+                        {% else %}
+                            Sorry, even imprecise search couldn't find close enough matches for your search criteria.  Please select a different family.
                         {% endif %}
-                         or refine your search criteria or click on "More results" button for approximate search</b><br>
+                        </b><br>
                     {% endif %}
+                    </table>
+                {% endif %}
+                {% if not fuzzy %}
+                    <div style="padding: 0; margin-top: 20px;">
+                        Didn't see what you are looking for?<br>
+                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
+                    </div>
                 {% endif %}
             </div>
         </div>

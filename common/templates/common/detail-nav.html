@@ -44,18 +44,20 @@
                     <li class="nav-item"><a class="nav-link {{loc}}" href="/{{species.gen.family.application}}/uploadfile/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a></li>
                 {% endif %}
 
-                <li class="nav-item"><a class="nav-link {{sbs}}" href="/{{app}}/compare/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
-                    </a>
-                    <div class="nav3 dropdown-menu">
-                        {% if species.gen.family.family == 'Orchidaceae' %}
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
-                        {% endif %}
-                    </div>
-                </li>
+                <li class="nav-item"><a class="nav-link {{sbs}}" href="/{{species.gen.family.application}}/compare/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>
+                {% if family.family == 'Orchidaceae' %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
+                        </a>
+                        <div class="nav3 dropdown-menu">
+                            {% if species.gen.family.family == 'Orchidaceae' %}
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
                 {% if species.type == 'hybrid' %}
                     <li class="nav-item dropdown">
                         <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">

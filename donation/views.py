@@ -13,7 +13,7 @@ from PIL import Image, ExifTags
 from io import BytesIO
 from django.db.models import Q
 from django.core.files import File
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse, reverse_lazy
 from django.template import RequestContext
 from itertools import chain

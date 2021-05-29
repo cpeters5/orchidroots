@@ -30,6 +30,7 @@ urlpatterns = [
 
     path('myphoto/<int:pid>/', views.myphoto, name='myphoto'),
     path('myphoto/', views.myphoto, name='myphoto'),
+    path('myphoto_list/', views.myphoto_list, name='myphoto_list'),
     path('myphoto_browse_spc/', views.myphoto_browse_spc, name='myphoto_browse_spc'),
     path('myphoto_browse_hyb/', views.myphoto_browse_hyb, name='myphoto_browse_hyb'),
 

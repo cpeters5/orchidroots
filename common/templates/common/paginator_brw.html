@@ -1,0 +1,61 @@
+<style>
+.pagination {
+    font-size:11px;
+    padding:2px 6px;
+    /*margin-top: 5px;*/
+    margin-block-end: 5px;
+}
+.pagination a{
+    padding:2px 6px;
+    /*margin-top: 5px;*/
+}
+.pagination a.hover {
+    background-color: #f5f9f9;
+}
+
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+</style>
+    <ul class="pagination pagination-xs">
+        {% if page > 1 %}
+            <li class="page-item"><a class="page-link" href="?family={{family.family}}&page=1&role={{role}}&type={{type}}&gen={{gen}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}"><span class="fa fa-angle-double-left" ></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
+        {% endif %}
+
+        {% if page > 1 %}
+            <li class="page-item"><a class="page-link" href="?family={{family.family}}&page={{prev_page}}&role={{role}}&type={{type}}&gen={{gen}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}"><span class="fa fa-angle-left"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
+        {% endif %}
+
+        {% for pg in page_range %}
+            {% if pg == page %}
+                <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?family={{family.family}}&page={{pg}}&role={{role}}&type={{type}}&gen={{gen}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}">{{pg}}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page == last_page %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="?family={{family.family}}&page={{next_page}}&role={{role}}&type={{type}}&gen={{gen}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}"><span class="fa fa-angle-right"></span></a></li>
+        {% endif %}
+
+        {% if page == last_page %}
+            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link" href="?family={{family.family}}&page={{last_page}}&role={{role}}&type={{type}}&gen={{gen}}&tab={{tab}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}"><span class="fa fa-angle-double-right"></span></a></li>
+        {% endif %}
+  </ul>
+
+
+
+
+
+

@@ -104,15 +104,15 @@ img{
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                 </a>
                                 <div style="font-size:12px">
-                                    <a href="{% url 'detail:photos' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.namecasual|safe}}</a>
+                                    <a href="{% url 'common:photos' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.namecasual|safe}}</a>
                                     <br>{{image.created_date.date}}
                                     <br>
                                     {% if image.approved %}
                                         <b>Approved</b>
                                     {% else %}
-                                        <a href="{% url 'detail:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
+                                        <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{family.family}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
                                     {% endif %}
-                                    <a href="{% url 'detail:deletephoto' image.id %}?pid={{image.pid_id}}&role={{role}}&tab={{tab}}&page={{page}}&area=curate_newupload" >Delete</a>
+                                    <a href="/common/deletephoto/{{image.id}}/{{image.pid_id}}/?family={{family.family}}&role={{role}}&tab={{tab}}&page={{page}}&area=curate_newupload" >Delete</a>
                                 </div>
                             </div>
                         {% endfor %}

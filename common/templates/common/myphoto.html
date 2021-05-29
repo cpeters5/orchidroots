@@ -1,20 +1,12 @@
 {% load static %}
 {% include "base.html" %}
 {% block body %}
-{% include "detail-title.html" %}
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
     <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
 </head>
 
 <style>
-.mybtn {
-    font-size:13px;
-    width:200px;
-    background-color: white;
-    border: 1px solid grey;
-    margin: 3px;
-}
 
 .imageitem {
     display:inline-block;
@@ -113,74 +105,16 @@ div.text-br {
     }
 }
 
-.btn-group-xs > .btn, .btn-xs {
-    padding  : 8px 5px;
-    width: 147px;
-    /*padding  : .5rem .5rem;*/
-    font-size  : .8rem;
-    line-height  : .65;
-    border-radius : .2rem;
-}
-
-    .subtitle {
-        font-size: 13px;
-    }
 </style>
 
 <!--My species and my hybrids-->
 <div style="clear:both"></div>
+{% include "detail-title.html" %}
 
 
 <div style="width:95%;margin:0 auto;">
-    <div class="d-flex flex-row flex-wrap justify-content-center">
-        <div class="p-2 dropdown" >
-            <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Species List</button>
-            {% if myspecies_list %}
-                <div class="dropdown-menu  scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                    {% for spc in myspecies_list %}
-                        <a class="dropdown-item" href="{% url 'common:photos' spc.pid %}?family={{spc.gen.family}}&role=pri&author={{author.author_id}}">{{spc.binomial}}</a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
 
-        <div class="p-2 dropdown">
-            <button class="dropdown-toggle btn-outline-primary btn-xs select-p2" data-toggle="dropdown">My Hybrids List</button>
-            {% if myhybrid_list %}
-                <div class="dropdown-menu scrollable-menu" style="font-size: 11px;max-height:300px;overflow:auto;">
-                    {% for spc in myhybrid_list %}
-                        <a class="dropdown-item" href="{% url 'common:photos' spc.pid %}?family={{spc.gen.family}}&role=pri&author={{author.author_id}}">{{spc.textname|safe}}</a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="p-2 dropdown" >
-            <a class="btn dropdown-toggle btn-xs btn-outline-primary" href="{% url 'detail:myphoto_browse_spc' %}?role={{role}}">My Species Photos</a>
-        </div>
-
-        <div class="p-2 dropdown" >
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:myphoto_browse_hyb' %}?role={{role}}">My Hybrid Photos</a>
-        </div>
-
-        {% if author.author_id == 'anonymous' %}
-        <div style="text-align:center; width:100%;padding:0 20%; font-size:14px;">
-            <br>
-            <b>Alert!</b>
-            {{user}}, your profile is not synchronized with the current credit attribution name.
-            If this is the first time you upload your photo, please contact 'admion@orchidroots.org' to create an author id for you.
-            Otherwise, if your credit attribution author name already exists, please click on the link "update profile" in the dropdown menu under your user name and select your attribute the name we use to attribute your photos from the drop down menu in the update profile form"
-            to <a href="https://www.facebook.com/Orchidrootscom-306266603228487/inbox/?mailbox_id=306266603228487&selected_item_id=631912977">OrchidRoots In-Box</a>
-        </div>
-        {% else %}
-        <div class="p-2 dropdown" >
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'detail:uploadfile' species.pid %}?role={{role}}">upload file</a>
-        </div>
-        {% endif %}
-
-
-        <!--                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'detail:uploadweb' species.pid %}?role={{role}}&tab=web">Upload url</a>-->
-        </div>
+    {% include "common/private-nav.html" %}
     <br>
     <br>
     {% if user.is_authenticated and user.tier.tier > 2 %}
@@ -242,12 +176,15 @@ div.text-br {
                                     {{image.imgname|safe}}
                                 {% endif %}
                                 {% if image.source_url %}
-                                    <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.author.displayname }}</a>
+                                    <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
                                 {% else %}
-                                    {{image.author.displayname }}
+                                    {{image.get_displayname}}
                                 {% endif %}
                             {% endif %}
-                            - <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>
+                            {% if role == 'pri' %}
+                            - <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{image.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>
+                            - <a href="/{{image.gen.family.application}}/uploadweb/{{image.pid_id}}/{{image.id}}/?family={{image.gen.family}}&role={{role}}" >Update</a>
+                            {% endif %}
                         </div>
 
                     </div>

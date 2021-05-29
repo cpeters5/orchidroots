@@ -253,8 +253,12 @@ class Species(models.Model):
         return '<i>%s</i> %s' % (self.genus, self.speciesname())
 
     def abrevname(self):
-        return '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
-
+        if self.gen.abrev:
+            name = '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        else:
+            name = '<i>%s</i> %s' % (self.genus, self.speciesname())
+        return name
+    
     def namecasual(self):
         namecasual = self.abrevname()
         namecasual = re.sub('Memoria', 'Mem.', namecasual.rstrip())

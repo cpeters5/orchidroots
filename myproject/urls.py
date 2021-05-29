@@ -23,7 +23,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
-from common.views import orchid_home, xorchid_home
+from common.views import orchid_home
 from utils.views import robots_txt
 
 urlpatterns = [
@@ -55,7 +55,6 @@ urlpatterns = [
 
     # High level
     path('', orchid_home, name='orchid_home'),
-    path('home/', xorchid_home, name='xorchid_home'),
     # path('home/', home, name='home'),
     # path('dispatch', dispatch, name='dispatch'),
     # path('core/', include('core.urls')),

@@ -16,22 +16,25 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            {% if subfamily %}<i>{{subfamily}}</i>  {% endif %}
-                            {% if tribe %}> {{tribe}}  {% endif %}
-                            {% if subtribe %} > {{subtribe}}  {% endif %}
-                            {% if genus %}<i> {{genus}}</i>{% endif %}
-                            Species list
+                            List of Species in
+                            {% if family %}Family <i>{{family}}</i>{% else %} All Other Familes{% endif %}
+                            {% if subfamily %}Subfamily <i>{{subfamily}}</i>  {% endif %}
+                            {% if tribe %}Tribe {{tribe}}  {% endif %}
+                            {% if subtribe %}Subtribe {{subtribe}}  {% endif %}
+                            {% if genus %}Genus <i> {{genus}}</i>{% endif %}
+                            <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
                         </div>
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
                         <dev style="font-size:16px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Show genera</a>
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
                             {% if not genus or genus.num_hybrid > 0 %}
-                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Show hybrids</a>
+                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Hybrid list</a>
                             {% endif %}
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?alpha={{alpha}}">Full species list</a>{% endif %}
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
+                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
                         </dev>
                         {% if species_list %}
                                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
@@ -39,6 +42,7 @@
                                     <input type="hidden" name="subfamily" value="{{subfamily}}" />
                                     <input type="hidden" name="tribe" value="{{tribe}}" />
                                     <input type="hidden" name="subtribe" value="{{subtribe}}" />
+                                    <input type="hidden" name="genus" value="{{genus}}" />
                                     <input type="hidden" name="genus" value="{{genus}}" />
                                     {% if syn == 'N' %}
                                     <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Show synonyms</span>
@@ -48,7 +52,7 @@
                                 </form>
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
-                                <table  id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
+                                <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <tr>
                                             <th class="spc_column">Species</th>
@@ -119,6 +123,8 @@ for (i = 0; i < toggler.length; i++) {
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,
+        "pagingType": "full",
+
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
         "bPaginate": true,
@@ -131,7 +137,8 @@ $(document).ready(function() {
         // "dom": '<"wrapper"flipt>',
         // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
         // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
         // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
         language: {
             search: "_INPUT_",
