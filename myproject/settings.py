@@ -165,20 +165,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'orchiddev',
-        # 'PORT': env.str('PORT', default=''),
-        'HOST': 'localhost',
-        'USER': 'chariya',
-        'PASSWORD': 'Imh#r3r3',
-    },
-
-    'bluenanta': {
-        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bluenanta',
-        # 'PORT': env.str('PORT', default=''),
-        'HOST': 'localhost',
-        'USER': 'chariya',
-        'PASSWORD': 'Imh#r3r3',
+        'PORT': env.str('PORT', default=''),
+        'HOST': env.str('DBHOST', default=''),
+        'USER': env.str('DBUSER', default=''),
+        'PASSWORD': env.str('DBPASSWD', default=''),
     }
 }
 
