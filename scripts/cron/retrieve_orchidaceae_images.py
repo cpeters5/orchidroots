@@ -10,13 +10,13 @@ import glob, os, sys
 
 size = 500, 400
 
-HOST = '134.209.93.40'
-conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='orchiddev')
+HOST = '134.209.46.210'
+conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='bluenanta')
 # conn = pymysql.connect(host='134.209.46.210', user='chariya', port=3306, passwd='Imh#r3r3', db='orchiddev')
 cur = conn.cursor()
 
-# type = sys.argv[1]
-type = "hyb"
+type = sys.argv[1]
+# type = "hyb"
 print(type)
 # dir = "C:/projects/orchids/bluenanta/utils/static/utils/images/"
 dir = "/mnt/static/utils/images/"

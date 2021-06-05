@@ -8,8 +8,8 @@ use warnings FATAL => 'all';
 use DateTime;
 
 use DBI;
-my $host = '134.209.93.40';
-my $db = "orchiddev";
+my $host = '134.209.46.210';
+my $db = "bluenanta";
 # Database connection
 my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
 # $dbh = DBI->connect( "DBI:mysql:$db:localhost","chariya","imh3r3r3") or die( "Could not connect to: $DBI::errstr" );

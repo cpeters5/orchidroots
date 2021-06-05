@@ -10,8 +10,8 @@ use DBI;
 use Time::Duration;
 use POSIX qw(strftime);
 
-my $HOST = '134.209.93.40';
-my $DB = "orchiddev";
+my $HOST = '134.209.46.210';
+my $DB = "bluenanta";
 my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
 # my $dbh = DBI->connect( "DBI:ODBC:$DB") or die( "Could not connect to: $DBI::errstr" );		#local
 my ($sth, $sth1);
@@ -108,7 +108,7 @@ sub getFamImage {
 sub procGenus {
 	my $app = shift;
 	my $i = 0;
-	# &getASPM("UPDATE orchiddb_genus set num_species = 0, num_hybrid = 0, num_species_synonym=0, num_species_total=0,
+	# &getASPM("UPDATE bluenanta_genus set num_species = 0, num_hybrid = 0, num_species_synonym=0, num_species_total=0,
 	# 			num_spc_with_image=0,pct_spc_with_image=0,num_hybrid=0,num_hybrid_synonym=0,num_hybrid_total=0,
 	# 			num_hyb_with_image=0,pct_hyb_with_image=0");
 	foreach my $pid (sort keys %genus) {

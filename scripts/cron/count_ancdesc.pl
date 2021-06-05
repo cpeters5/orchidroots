@@ -10,8 +10,8 @@ use DBI;
 use Time::Duration;
 use POSIX qw(strftime);
 
-my $HOST = '134.209.93.40';
-my $DB = "orchidroots";
+my $HOST = '134.209.46.210';
+my $DB = "bluenanta";
 my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
 &getASPM("use $DB");
@@ -36,9 +36,9 @@ print "$date\t Runtime = ", duration(time() - $start_time),"\n";
 
 sub procSpecies {
 	# print "\tUpdating num_ancestor for species\n";
-	&getASPM("UPDATE orchiddb_species set num_ancestor = 0, num_species_ancestor = 0, num_descendant=0");
+	&getASPM("UPDATE orchidaceae_species set num_ancestor = 0, num_species_ancestor = 0, num_descendant=0");
 	foreach my $pid (sort keys %pid) {
-		$stmt = "update orchiddb_species set ";
+		$stmt = "update orchidaceae_species set ";
         if ($num_ancestor{$pid}) {
             $stmt .= "num_ancestor = $num_ancestor{$pid}, ";
         }
@@ -63,7 +63,7 @@ sub procSpecies {
 sub getancdesc {
 	&getASPM("use $DB");
 
-	$stmt = "select count(*), aid from orchiddb_ancestordescendant group by 2 order by 2;";
+	$stmt = "select count(*), aid from orchidaceae_ancestordescendant group by 2 order by 2;";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		if ($row[1]) {
@@ -72,7 +72,7 @@ sub getancdesc {
 		}
 	}
 
-	$stmt = "select count(*), did from orchiddb_ancestordescendant group by 2 order by 2;";
+	$stmt = "select count(*), did from orchidaceae_ancestordescendant group by 2 order by 2;";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		if ($row[1]) {
@@ -81,7 +81,7 @@ sub getancdesc {
 		}
 	}
 
-	$stmt = "select count(*), did from orchiddb_ancestordescendant where anctype = 'species' group by 2 order by 2;";
+	$stmt = "select count(*), did from orchidaceae_ancestordescendant where anctype = 'species' group by 2 order by 2;";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		if ($row[1]) {
@@ -90,7 +90,7 @@ sub getancdesc {
 		}
 	}
 
-	$stmt = "select count(*), seed_id from orchiddb_hybrid group by 2 order by 2;";
+	$stmt = "select count(*), seed_id from orchidaceae_hybrid group by 2 order by 2;";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		if ($row[1]) {
@@ -99,7 +99,7 @@ sub getancdesc {
 		}
 	}
 
-	$stmt = "select count(*), pollen_id from orchiddb_hybrid group by 2 order by 2;";
+	$stmt = "select count(*), pollen_id from orchidaceae_hybrid group by 2 order by 2;";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		if ($row[1]) {

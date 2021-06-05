@@ -5,33 +5,40 @@ import urllib
 import pymysql
 import shortuuid
 import re
+import sys
 from pathlib import Path
 
+print ('Number of arguments:', len(sys.argv), 'arguments.')
+
 genus = ''
-family = 'Bromeliaceae'
-tab = "bromeliaceae_spcimages"
+app = sys.argv[1]
+tab = app.lower() + "_spcimages"
 
 # import mysqlclient
 from urllib.request import urlopen
 from PIL import Image
 import glob, os, sys
 
-size = 500, 400
-HOST = '134.209.93.40'
-conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='orchiddev')
-cur = conn.cursor()
 
-imgdir = "/mnt/static/utils/images/" + family + "/"
-Path(imgdir).mkdir(parents=True, exist_ok=True)
+size = 500, 400
+HOST = '134.209.46.210'
+conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='bluenanta')
+cur = conn.cursor()
+if app != 'other':
+    family = app.title()
+    imgdir = "/mnt/static/utils/images/" + family + "/"
+    Path(imgdir).mkdir(parents=True, exist_ok=True)
+
 
 stmthead = "UPDATE " + tab + " set image_file = '%s' where id = %d"
-cur.execute(
-    "SELECT id, image_url, genus  FROM bromeliaceae_spcimages where image_url <>'' and image_url is not null and (image_file is null or image_file = '') order by id")
-
+stmt = "SELECT id, image_url, genus, family  FROM " + tab + " where image_url <>'' and image_url is not null and (image_file is null or image_file = '') order by id"
+cur.execute(stmt)
 i = 0
 for row in cur:
     i = i + 1
     url = row[1]
+    if app == 'other':
+        family = row[3].title()
     # print(url)
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)
@@ -51,7 +58,11 @@ for row in cur:
     try:
         # print(url)
         # html = urlopen(url)
+        if app == 'other':
+            imgdir = "/mnt/static/utils/images/" + family + "/"
+            Path(imgdir).mkdir(parents=True, exist_ok=True)
         local_filename, headers = urllib.request.urlretrieve(url, imgdir + fname)
+        print(imgdir)
     except urllib.error.URLError as e:
         print("URLError -- ", row[0], e.reason)
         cur.nextset()

@@ -10,7 +10,7 @@ use strict;
 use warnings FATAL => 'all';
 use DBI;
 my $host = '134.209.46.210';
-my $db = "orchidroots";
+my $db = "bluenanta";
 # Database connection
 my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
 # $dbh = DBI->connect( "DBI:mysql:$db:localhost","chariya","imh3r3r3") or die( "Could not connect to: $DBI::errstr" );
@@ -19,7 +19,7 @@ my ($sth, $sth1);
 
 if ($ARGV[0]) {
         my $pid = $ARGV[0];
-        my $stmt = "select seed_id, pollen_id from orchiddb_hybrid where pid = ?";
+        my $stmt = "select seed_id, pollen_id from orchidaceae_hybrid where pid = ?";
         my @row = $dbh->selectrow_array($stmt,undef,$pid);
         unless (@row) { die "Pid $pid not found in Hybrid"; }
         my ($seed,$poll) = @row;
@@ -40,7 +40,7 @@ use Math::Round;
 
 if ($ARGV[0]) {
 	my $pid = $ARGV[0];
-	my $stmt = "select seed_id, pollen_id from orchiddb_hybrid where pid = ?";
+	my $stmt = "select seed_id, pollen_id from orchidaceae_hybrid where pid = ?";
 	my @row = $dbh->selectrow_array($stmt,undef,$pid);
 	unless (@row) { die "Pid $pid not found in Hybrid"; }
 	my ($seed,$poll) = @row;
@@ -58,7 +58,7 @@ foreach my $pid (sort keys %pid) {
 }
 
 sub initHybrid {
-    my $stmt = "select pid, seed_id, pollen_id from orchiddb_hybrid where pid not in (select distinct did from orchiddb_ancestordescendant)
+    my $stmt = "select pid, seed_id, pollen_id from orchidaceae_hybrid where pid not in (select distinct did from orchidaceae_ancestordescendant)
     			order by pid;";
     &getASPM($stmt);
     while (my @row = $sth->fetchrow_array()) {
@@ -75,8 +75,8 @@ sub updatedata {
 	my ($pid, $seed, $poll) = @_;
 	my %aid;
 
-	&getASPM("delete from orchiddb_ancestordescendant where did = $pid");
-	my $stmt = "select sum(pct)/2, aid from orchiddb_ancestordescendant where did in ($seed,$poll) group by 2";
+	&getASPM("delete from orchidaceae_ancestordescendant where did = $pid");
+	my $stmt = "select sum(pct)/2, aid from orchidaceae_ancestordescendant where did in ($seed,$poll) group by 2";
     &getASPM($stmt);
     while (my @row = $sth->fetchrow_array()) {
 		$row[0] = nearest(.01,$row[0]);
@@ -86,7 +86,7 @@ sub updatedata {
 	$aid{$poll} += 50;
 	$numberpair = 0;
 	foreach my $aid (sort keys %aid) {
-		my $stmt = "insert into orchiddb_ancestordescendant (pct,aid,did) values($aid{$aid},$aid,$pid)";
+		my $stmt = "insert into orchidaceae_ancestordescendant (pct,aid,did) values($aid{$aid},$aid,$pid)";
 		$numberpair++;
 		$totalpair++;
 #		print "$totalpair\t$numberpair\t$aid{$aid}\t$aid\t$pid\n";
