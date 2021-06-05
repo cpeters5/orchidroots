@@ -260,61 +260,6 @@ class Series(models.Model):
         ordering = ['series']
 
 
-class GenusTree(MPTTModel):
-    genus    = models.CharField(max_length=50, unique=True)
-    parent      = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-
-    class MPTTMeta:
-        order_insertion_by = ['pid_pair']
-
-    def getpid(self):
-        pid, par = self.pid_pair.split('|')
-        return pid
-
-
-class Alliance(models.Model):
-    class Meta:
-        unique_together = (("alid", "gen"),)
-        ordering = ['alliance']
-
-    alid = models.ForeignKey(Genus, db_column='alid', related_name='oralid', null=True, blank=True,on_delete=models.CASCADE)
-    gen = models.ForeignKey(Genus, db_column='gen', related_name='or9gen', null=True, blank=True,on_delete=models.CASCADE)
-    alliance = models.CharField(max_length=50)
-    type = models.CharField(max_length=10)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return self.alliance
-
-
-class Infragen (models.Model):
-    # class Meta:
-    #     unique_together = (("genus", "infragen","rank","author"),)
-    source_pid = models.IntegerField(default=0)
-    version  = models.IntegerField(default=1)
-    gen      = models.ForeignKey(Genus,db_column='gen', related_name='or2gen',null=True,on_delete=models.CASCADE)
-    genus    = models.CharField(max_length=50, null=True)
-    infragen = models.CharField(max_length=50)
-    rank     = models.CharField(max_length=10)
-    author   = models.CharField(max_length=200, null=True)
-    citation = models.CharField(max_length=200, null=True)
-    year     = models.IntegerField(null=True)
-    source   = models.CharField(max_length=50,null=True)
-    description = models.TextField(null=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-
-class Infragenrelation (models.Model):
-    gen      = models.ForeignKey(Genus,db_column='gen', related_name='or3gen',on_delete=models.CASCADE)
-    genus    = models.CharField(max_length=50, null=True)
-    infragen = models.CharField(max_length=50)
-    parent   = models.ForeignKey(Infragen,null=True, db_column='parent_pid', related_name='orparent',on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-
 class Intragen (models.Model):
     class Meta:
         unique_together = (("gen", "subgen","sec","subsec","ser"),)
@@ -903,35 +848,6 @@ class Grexrelation(models.Model):
                 return '%s %s %s %s' % (self.genus, self.species, self.infraspr, self.infraspe)
             else:
                 return '%s %s' % (self.genus, self.species)
-
-
-class InfragenHybrid(models.Model):
-    pid = models.OneToOneField(
-        Species,
-        db_column='pid',
-        on_delete=models.CASCADE,
-        primary_key=True)
-    genus = models.CharField(max_length=50, null=True, blank=True)
-    species = models.CharField(max_length=50, null=True, blank=True)
-    subfamily   = models.CharField(max_length=500, null=True, blank=True)
-    tribe       = models.CharField(max_length=500, null=True, blank=True)
-    subtribe    = models.CharField(max_length=500, null=True, blank=True)
-    subgenus    = models.CharField(max_length=500, null=True, blank=True)
-    section     = models.CharField(max_length=500, null=True, blank=True)
-    subsection  = models.CharField(max_length=500, null=True, blank=True)
-    series      = models.CharField(max_length=500, null=True, blank=True)
-    sf_pct      = models.CharField(max_length=500, null=True, blank=True)
-    t_pct       = models.CharField(max_length=500, null=True, blank=True)
-    st_pct      = models.CharField(max_length=500, null=True, blank=True)
-    subgen_pct  = models.CharField(max_length=500, null=True, blank=True)
-    sec_pct     = models.CharField(max_length=500, null=True, blank=True)
-    subsec_pct  = models.CharField(max_length=500, null=True, blank=True)
-    ser_pct     = models.CharField(max_length=500, null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    # def __str__(self):
-    #     return '%s' % (self.pid)
 
 
 class AncestorDescendant(models.Model):
