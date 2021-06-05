@@ -43,10 +43,11 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    'dev.orchidroots.org',
-    '134.209.93.40',
+    'beta.bluenanta.com',
+    '157.245.210.148',
     '127.0.0.1',
     'localhost',
+    'beta.bluenanta.com',
 ]
 
 
