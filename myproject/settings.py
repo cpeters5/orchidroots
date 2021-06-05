@@ -43,10 +43,11 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    'dev.orchidroots.org',
-    '134.209.93.40',
+    'beta.bluenanta.com',
+    '157.245.210.148',
     '127.0.0.1',
     'localhost',
+    'beta.bluenanta.com',
 ]
 
 
@@ -165,20 +166,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'orchiddev',
-        # 'PORT': env.str('PORT', default=''),
-        'HOST': 'localhost',
-        'USER': 'chariya',
-        'PASSWORD': 'Imh#r3r3',
-    },
-
-    'bluenanta': {
-        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bluenanta',
-        # 'PORT': env.str('PORT', default=''),
-        'HOST': 'localhost',
-        'USER': 'chariya',
-        'PASSWORD': 'Imh#r3r3',
+        'PORT': env.str('PORT', default=''),
+        'HOST': env.str('DBHOST', default=''),
+        'USER': env.str('DBUSER', default=''),
+        'PASSWORD': env.str('DBPASSWD', default=''),
     }
 }
 

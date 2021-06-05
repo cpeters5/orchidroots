@@ -326,9 +326,13 @@ class Species(models.Model):
         return name
 
     def binomial_it(self):
-        if self.type == 'species' and self.binomial:
-            return '<i>%s</i>' % self.binomial
-        return
+        if self.type == 'species':
+            if self.infraspe:
+                return '<i>%s %s</i> %s <i>%s</i>' % (self.genus, self.species, self.infraspr, self.infraspe)
+            else:
+                return '<i>%s %s</i>' % (self.genus, self.species)
+        else:
+            return '<i>%s</i> %s' % (self.genus, self.species)
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
