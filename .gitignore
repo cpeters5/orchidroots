@@ -2,12 +2,12 @@
 myproject/local_settings.py
 __pycache__/
 __init__.py
-migrations/
 old/
 src/
 .idea/
 *.pyc
 src/
+data/
 .coverage
 .env*
 myproject/.env
