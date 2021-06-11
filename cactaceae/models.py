@@ -718,9 +718,6 @@ class SpcImages(models.Model):
         return 'utils/images/Cactaceae/'
         # return 'utils/images/hybrid/' + block_id + '/'
 
-    def thumb_dir(self):
-        return 'utils/images/species_thumb/'
-
     def get_displayname(self):
         if self.credit_to:
             return self.credit_to

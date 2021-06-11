@@ -4,6 +4,7 @@ from . import views
 app_name = 'orchidaceae'
 urlpatterns = [
     # Top level
+    path('', views.genera, name='genera'),
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),

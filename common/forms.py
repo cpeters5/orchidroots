@@ -338,7 +338,7 @@ class AcceptedInfoForm(forms.ModelForm):
 
 class UploadFileForm(forms.ModelForm):
     author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
+        queryset=Photographer.objects.order_by('displayname'),
         required=False,
         widget=Select2Widget
     )

@@ -169,14 +169,13 @@ option {
             <h4>
                 {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} Species
                 {% if genus.num_hybrid > 0 %}
-                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Hybrid</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Hybrid List</a>
                 {% endif %}
-                {% if subtotal > 0 and genus %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Show images</a>
-                {% endif %}
+                <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse</a>
                 <a class="btn btn-custom" style="margin:0 8px;" href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N">Goto hybrid list</a>
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                     <input type="hidden" name="genus" value="{{genus}}" />
+                    <input type="hidden" name="family" value="{{family}}" />
                     <input type="hidden" name="subfamily" value="{{subfamily}}" />
                     <input type="hidden" name="tribe" value="{{tribe}}" />
                     <input type="hidden" name="subtribe" value="{{subtribe}}" />
@@ -244,13 +243,13 @@ option {
             {% if total == 0 %}
                 <div style="margin: 10px 0 0 10px;">
                     {% if genus %}
-                        No species matching <i>{{genus|title}}</i>.
+                        No <i>{{genus|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
                     {% elif subftribe %}
-                        No species matching <i>{{subftribe|title}}</i>.
+                        No  <i>{{subftribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
                     {% elif tribe %}
-                        No species matching <i>{{tribe|title}}</i>.
+                        No <i>{{tribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
                     {% elif subfamily %}
-                        No species matching <i>{{subfamily|title}}</i>.
+                        No <i>{{subfamily|title}}</i> species {% if alpha and alpha != 'ALL' %}}starts with {{alpha}}.{% endif %}
                     {% endif %}
                 </div>
             {% endif %}
@@ -291,11 +290,11 @@ option {
                         <td align="left">
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
-                                {% if role == 'cur' %}
-                                    (syn. <a href="{% url 'common:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
-                                {% else %}
-                                    (syn. <a href="{% url 'common:information' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>)
-                                {% endif %}
+                                    (syn. {% if species.getAcc %}
+                                            <a href="{% url 'common:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
+                                        {% else %}
+                                            {{species.getAccepted.binomial|safe}}
+                                        {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
                                     <a href="{% url 'common:photos' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>

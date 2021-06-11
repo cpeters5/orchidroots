@@ -46,7 +46,7 @@ def information(request, pid):
     role = getRole(request)
     species = Species.objects.get(pk=pid)
     family = species.gen.family
-    send_url = '/detail/information/' + str(pid) + '?family=' + str(family)
+    send_url = '/common/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
     # print(send_url)
     return HttpResponseRedirect(send_url)
 
@@ -59,6 +59,8 @@ def photos(request, pid):
     # print(send_url)
     return HttpResponseRedirect(send_url)
 
+
+@login_required
 def reidentify(request, orid, pid):
     role = getRole(request)
     species = Species.objects.get(pk=pid)
@@ -66,6 +68,9 @@ def reidentify(request, orid, pid):
     send_url = '/detail/reidentify/' + str(orid) + "/" + str(pid) + '?family=' + str(family)
     # print(send_url)
     return HttpResponseRedirect(send_url)
+
+
+@login_required
 def uploadfile(request, pid):
     role = getRole(request)
     species = Species.objects.get(pk=pid)
@@ -73,6 +78,9 @@ def uploadfile(request, pid):
     send_url = '/detail/uploadfile/' + str(pid) + '?family=' + str(family)
     # print(send_url)
     return HttpResponseRedirect(send_url)
+
+
+@login_required
 def uploadweb(request, pid, orid=None):
     role = getRole(request)
     species = Species.objects.get(pk=pid)
@@ -84,18 +92,28 @@ def uploadweb(request, pid, orid=None):
     # print(send_url)
     return HttpResponseRedirect(send_url)
 
+
+@login_required
 def curateinfohyb(request, pid=None):
     if pid:
         send_url = '/detail/curateinfohyb/' + str(pid) + '/?family=Orchidaceae'
     else:
         send_url = '/detail/curateinfohyb/?family=Orchidaceae'
     return HttpResponseRedirect(send_url)
+
+
+@login_required
 def curateinfospc(request, pid):
     send_url = '/detail/curateinfospc/' + str(pid) + '?family=Orchidaceae'
     return HttpResponseRedirect(send_url)
+
+
 def compare(request, pid):
     send_url = '/detail/compare/' + str(pid) + '?family=Orchidaceae'
     return HttpResponseRedirect(send_url)
+
+
+@login_required
 def createhybrid(request, pid):
     send_url = '/detail/createhybrid/' + str(pid) + '?family=Orchidaceae'
     return HttpResponseRedirect(send_url)
@@ -225,7 +243,7 @@ def genera(request):
     context = {'my_list': genus_list, 'total': total, 'genus_lookup': genus_lookup, 'family':family,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,
                'st_obj': st_obj, 'st_list': st_list,
-               'title': 'genera', 'genustype': genustype, 'status': status,
+               'title': 'taxonomy', 'genustype': genustype, 'status': status,
                'formula1': formula1, 'formula2': formula2, 'alpha': alpha, 'alpha_list': alpha_list,
                'sort': sort, 'prev_sort': prev_sort, 'role': role,
                }
@@ -263,7 +281,7 @@ def series(request):
 
 def getPartialPid(reqgenus, type, status):
     pid_list = []
-    logger.error(">>00. reqgenus = " + str(reqgenus))
+    # logger.error(">>00. reqgenus = " + str(reqgenus))
     intragen_list = Intragen.objects.all()
     if status == 'synonym' or type == 'hybrid':
         intragen_list = []
@@ -302,7 +320,7 @@ def getPartialPid(reqgenus, type, status):
             pid_list = pid_list.filter(genus__icontains=mygenus)
             if intragen_list:
                 intragen_list = intragen_list.filter(genus__icontains=mygenus)
-        logger.error(">>01. reqgenus = " + str(reqgenus))
+        # logger.error(">>01. reqgenus = " + str(reqgenus))
         return reqgenus, pid_list, intragen_list
     else:
         return '', pid_list, intragen_list
@@ -322,6 +340,17 @@ def getPrev(request,arg, prev):
 
 @login_required
 def species(request):
+    role = getRole(request)
+    family = ''
+    if 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+    elif 'family' in request.GET:
+        family = request.GET['family']
+    if family != 'Orchidaceae':
+        send_url = '/common/species/?family=' + str(family) + '&role=' + role
+        # print(send_url)
+        return HttpResponseRedirect(send_url)
+
     family = Family.objects.get(pk='Orchidaceae')
     spc = reqgenus = ''
     msg = ''
@@ -384,24 +413,24 @@ def species(request):
             genus_list = genus_list.filter(subtribe=subtribe)
         genus_list = genus_list.values_list('pid',flat=True)
 
+        # logger.error(">>> 1 this species list = " + str(len(this_species_list)))
         if syn == 'N':
             this_species_list = this_species_list.exclude(status='synonym')
         else:
             syn = 'Y'
+        # logger.error(">>> 1 this species list = " + str(len(this_species_list)))
+        if this_species_list:
+            this_species_list = this_species_list.filter(gen__in=genus_list)
+            if alpha:
+                if len(alpha) == 1:
+                    this_species_list = this_species_list.filter(species__istartswith=alpha)
 
+            total = len(this_species_list)
 
-        this_species_list = this_species_list.filter(gen__in=genus_list)
-
-        if alpha:
-            if len(alpha) == 1:
-                this_species_list = this_species_list.filter(species__istartswith=alpha)
-
-        total = len(this_species_list)
-
-        if total > 5000:
-            msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
-            this_species_list = this_species_list[0:5000]
-            total = 5000
+            if total > 2000:
+                msg = 'Your search request generated over 2000 names. Please refine your search criteria.'
+                this_species_list = this_species_list[0:2000]
+                total = 2000
 
     subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0).order_by('subfamily')
     if subfamily_obj:
@@ -411,7 +440,6 @@ def species(request):
     elif subfamily_obj:
         subtribe_list = Subtribe.objects.filter(subfamily=subfamily_obj.subfamily).order_by ('subtribe')
 
-    role = getRole(request)
     write_output(request, str(genus))
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'total': total, 'family': family, 'genus': genus,
@@ -420,13 +448,25 @@ def species(request):
                'subtribe': subtribe, 'subtribe_list': subtribe_list,
                'msg': msg,
                'syn': syn,
-               'title': 'species_list', 'type': 'species'
+               'title': 'taxonomy', 'type': 'species'
                }
     return render(request, 'orchidaceae/species.html', context)
 
 
 @login_required
 def hybrid(request):
+    role = getRole(request)
+    family = ''
+    if 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+    elif 'family' in request.GET:
+        family = request.GET['family']
+    # logger.error(">>> 1 Family = " + str(family))
+    if family != 'Orchidaceae':
+        send_url = '/common/hybrid/?family=' + str(family) + '&role=' + role
+        # print(send_url)
+        return HttpResponseRedirect(send_url)
+
     type = 'hybrid'
     family = Family.objects.get(family='Orchidaceae')
     year = ''
@@ -468,8 +508,9 @@ def hybrid(request):
     # if alpha or seed_genus or pollen_genus or seed or pollen:
     reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
 
-    if reqgenus or spc or seed or pollen or seed_genus or pollen_genus or year or author or originator:
+    if reqgenus or spc or seed or pollen or seed_genus or pollen_genus or year or author or originator or alpha:
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', '')
+
         if syn == 'N':
             this_species_list = this_species_list.exclude(status='synonym')
         else:
@@ -498,38 +539,38 @@ def hybrid(request):
 
         # Building pid ;list
 
-        if alpha:
-            if len(alpha) == 1:
-                this_species_list = this_species_list.filter(species__istartswith=alpha)
-        if author and not originator:
-            this_species_list = this_species_list.filter(author__icontains=author)
-        if author and originator:
-            this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
-        if originator and not author:
-            this_species_list = this_species_list.filter(originator__icontains=originator)
-        if year_valid:
-            year = int(year)
-            this_species_list = this_species_list.filter(year=year)
-
         if this_species_list:
-            total = len(this_species_list)
-        else:
-            total = 0
-        if total > 5000:
-            msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
-            this_species_list = this_species_list[0:5000]
-            total = 5000
+            if alpha:
+                if len(alpha) == 1:
+                    this_species_list = this_species_list.filter(species__istartswith=alpha)
+            if author and not originator:
+                this_species_list = this_species_list.filter(author__icontains=author)
+            if author and originator:
+                this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
+            if originator and not author:
+                this_species_list = this_species_list.filter(originator__icontains=originator)
+            if year_valid:
+                year = int(year)
+                this_species_list = this_species_list.filter(year=year)
+
+            if this_species_list:
+                total = len(this_species_list)
+            else:
+                total = 0
+            if total > 2000:
+                msg = 'Your search request generated over 2000 names. Please refine your search criteria.'
+                this_species_list = this_species_list[0:2000]
+                total = 2000
 
     genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
     genus_list.sort()
-    role = getRole(request)
     write_output(request, str(reqgenus))
     context = {'my_list': this_species_list, 'genus_list': genus_list, 'family': family,
                'total': total, 'alpha_list': alpha_list, 'alpha': alpha,
                'genus': reqgenus, 'year': year, 'syn': syn,
                'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
                'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
-               'role': role, 'title': 'hybrid_list', 'msg': msg,
+               'role': role, 'title': 'taxonomy', 'msg': msg,
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
@@ -538,82 +579,6 @@ def browsedist(request):
     dist_list = get_distlist()
     context = {'dist_list': dist_list, }
     return render(request, 'orchidaceae/browsedist.html', context)
-
-
-def reidentify(request, orid, pid):
-    source_file_name = ''
-    role = getRole(request)
-    old_species = Species.objects.get(pk=pid)
-    old_family = old_species.gen.family
-    if role != 'cur':
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
-        return HttpResponseRedirect(url)
-
-    if old_species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        old_species = Species.objects.get(pk=pid)
-
-    form = SpeciesForm(request.POST or None)
-    old_img = SpcImages.objects.get(pk=orid)
-
-    if request.method == 'POST':
-        if form.is_valid():
-            new_pid = form.cleaned_data.get('species')
-            try:
-                new_species = Species.objects.get(pk=new_pid)
-            except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
-                return HttpResponseRedirect(url)
-
-            # If re-idenbtified to same genus. Just change pid
-            if new_species.genus == old_species.genus:
-                new_img = SpcImages.objects.get(pk=old_img.id)
-                new_img.pid = new_species.accepted
-                if source_file_name:
-                    new_img.source_file_name = source_file_name
-                new_img.pk = None
-            else :
-                if old_img.image_file:
-                    new_img = SpcImages(pid=new_species)
-                    from_path = os.path.join(settings.STATIC_ROOT, old_img.image_dir() + old_img.image_file)
-                    if new_species.gen.family.application == 'orchidaceae':
-                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family.application) + "/" + old_img.image_file)
-                    else:
-                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
-                    os.rename(from_path, to_path)
-                else:
-                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
-                    return HttpResponseRedirect(url)
-                if source_file_name:
-                    new_img.source_file_name = source_file_name
-            new_img.author = old_img.author
-            new_img.pk = None
-            new_img.source_url = old_img.source_url
-            new_img.image_url = old_img.image_url
-            new_img.image_file = old_img.image_file
-            new_img.name = old_img.name
-            new_img.awards = old_img.awards
-            new_img.variation = old_img.variation
-            new_img.form = old_img.form
-            new_img.text_data = old_img.text_data
-            new_img.description = old_img.description
-            new_img.created_date = old_img.created_date
-            # point to a new record
-            # Who requested this change?
-            new_img.user_id = request.user
-
-            # ready to save
-            new_img.save()
-
-            # Delete old record
-            # old_img.delete()
-
-            # write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
-            return HttpResponseRedirect(url)
-    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
-    return render(request, old_species.gen.family.application + '/reidentify.html', context)
 
 
 @login_required
@@ -958,7 +923,7 @@ def progeny(request, pid):
         return HttpResponse(message)
     genus = species.genus
     des_list = AncestorDescendant.objects.filter(aid=pid)
-    if len(des_list) > 5000:
+    if len(des_list) > 2000:
         des_list = des_list.filter(pct__gt=20)
     if direct:
         des_list = des_list.filter(Q(did__seed_id=pid) | Q(did__pollen_id=pid))
@@ -1109,3 +1074,84 @@ def mypaginator(request, full_list, page_length, num_show):
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
+
+def xreidentify(request, orid, pid):
+    source_file_name = ''
+    role = getRole(request)
+    old_species = Species.objects.get(pk=pid)
+    old_family = old_species.gen.family
+    if role != 'cur':
+        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+        return HttpResponseRedirect(url)
+
+    if old_species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        old_species = Species.objects.get(pk=pid)
+
+    form = SpeciesForm(request.POST or None)
+    if old_species.type == 'species':
+        old_img = SpcImages.objects.get(pk=orid)
+    else:
+        old_img = HybImages.objects.get(pk=orid)
+    if request.method == 'POST':
+        if form.is_valid():
+            new_pid = form.cleaned_data.get('species')
+            try:
+                new_species = Species.objects.get(pk=new_pid)
+            except Species.DoesNotExist:
+                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+                return HttpResponseRedirect(url)
+
+            # If re-idenbtified to same genus. Just change pid
+            if new_species.genus == old_species.genus:
+                if old_species.type == 'species':
+                    new_img = SpcImages.objects.get(pk=old_img.id)
+                    new_img.pid = new_species.accepted
+                else:
+                    new_img = HybImages.objects.get(pk=old_img.id)
+                    new_img.pid = new_species.hybris
+                if source_file_name:
+                    new_img.source_file_name = source_file_name
+                new_img.pk = None
+            else :
+                if old_img.image_file:
+                    new_img = SpcImages(pid=new_species)
+                    from_path = os.path.join(settings.STATIC_ROOT, old_img.image_dir() + old_img.image_file)
+                    if new_species.gen.family.application == 'orchidaceae':
+                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family.application) + "/" + old_img.image_file)
+                    else:
+                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
+                    os.rename(from_path, to_path)
+                else:
+                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
+                    return HttpResponseRedirect(url)
+                if source_file_name:
+                    new_img.source_file_name = source_file_name
+            new_img.author = old_img.author
+            new_img.pk = None
+            new_img.source_url = old_img.source_url
+            new_img.image_url = old_img.image_url
+            new_img.image_file = old_img.image_file
+            new_img.name = old_img.name
+            new_img.awards = old_img.awards
+            new_img.variation = old_img.variation
+            new_img.form = old_img.form
+            new_img.text_data = old_img.text_data
+            new_img.description = old_img.description
+            new_img.created_date = old_img.created_date
+            # point to a new record
+            # Who requested this change?
+            new_img.user_id = request.user
+
+            # ready to save
+            new_img.save()
+
+            # Delete old record
+            # old_img.delete()
+
+            # write_output(request, old_species.textname() + " ==> " + new_species.textname())
+            url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
+            return HttpResponseRedirect(url)
+    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
+    return render(request, old_species.gen.family.application + '/reidentify.html', context)

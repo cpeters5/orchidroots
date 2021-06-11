@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /core/
+Disallow: /detail/
+Disallow: /documents/
+Disallow: /donations/
+Disallow: /natural/
+Disallow: /orchid/
+Disallow: /orchidaceae/
+Disallow: /orchidlist/
+Disallow: /orchidlight/
+Disallow: /orchiddb/
+Disallow: /other/
+Disallow: /search/
+Disallow: /utils/
+
+User-Agent: PetalBot
+Disallow: /

@@ -334,7 +334,7 @@ class AcceptedInfoForm(forms.ModelForm):
 
 class UploadFileForm(forms.ModelForm):
     author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
+        queryset=Photographer.objects.order_by('displayname'),
         required=False,
         widget=Select2Widget
     )
@@ -391,7 +391,7 @@ class UploadFileForm(forms.ModelForm):
 
 class UploadSpcWebForm(forms.ModelForm):
     author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
+        queryset=Photographer.objects.order_by('displayname'),
         required=False,
         widget=Select2Widget
     )
@@ -503,7 +503,7 @@ class UploadSpcWebForm(forms.ModelForm):
 
 class UploadHybWebForm(forms.ModelForm):
     author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
+        queryset=Photographer.objects.order_by('displayname'),
         required=True,
         widget=Select2Widget
     )

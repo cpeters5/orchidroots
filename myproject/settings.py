@@ -43,11 +43,21 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
+    'orchidroots.org',
+    'www.orchidroots.org',
+    'orchidroots.com',
+    'www.orchidroots.com',
+    'bluenanta.com',
+    'www.bluenanta.com',
     'beta.bluenanta.com',
     '157.245.210.148',
     '127.0.0.1',
     'localhost',
     'beta.bluenanta.com',
+    'bluenanta.com',
+    'www.bluenanta.com',
+    'orchidroots.com',
+    'www.orchidroots.com',
 ]
 
 
@@ -85,9 +95,8 @@ INSTALLED_APPS = [
     'cactaceae',
     'other',
 
-    # 'orchidlist',
-    # 'catalog',
-    # 'distribution',
+    # Legacy
+    'orchidlist',
 
     # Third Party
     'allauth',
@@ -96,7 +105,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'bootstrap_modal_forms',
     'crispy_forms',
-    'robots',
+    'robots',  # use myproject/robots.txt
     'jquery',
 ]
 

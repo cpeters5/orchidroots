@@ -279,14 +279,21 @@ def robots_txt(request):
         "User-Agent: *",
         "Disallow: /accounts/",
         "Disallow: /core/",
-        "Disallow: /documents/",
-        "Disallow: /detail/ancestor/",
+        "Disallow: /detail/",
         "Disallow: /documents/",
         "Disallow: /donations/",
+        "Disallow: /natural/",
+        "Disallow: /orchid/",
+        "Disallow: /orchidaceae/",
+        "Disallow: /orchidlist/",
+        "Disallow: /orchidlight/",
+        "Disallow: /orchiddb/",
         "Disallow: /other/",
         "Disallow: /search/",
-        "Disallow: /orchidaceae/",
         "Disallow: /utils/",
+        "User-Agent: PetalBot",
+        "Disallow: /",
+
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 

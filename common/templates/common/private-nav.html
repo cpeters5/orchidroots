@@ -22,23 +22,27 @@
     clear: left;
     height: 30px !important;
     display: inline-block;
+    padding: 0;
+    margin: 0;
+
+}
+.mybtn1 {
+    font-size: 12px;
+    width: 100px;
+}
+
+
+@media only screen and (max-width: 800px) {
+.mybtn1 {
+    font-size: 10px;
+}
 }
 </style>
 
     <div class="d-flex justify-content-center mynav" >
-        <div class="p-2" >
-            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_list' %}?family={{family}}&role={{role}}">My Collection</a>
-        </div>
-
-        <div class="p-2" >
-            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}">My Species Photos</a>
-        </div>
-
-        <div class="p-2" >
-            <a class="btn btn-xs btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{family}}&role={{role}}">My Hybrid Photos</a>
-        </div>
-
-        <div class="p-2" >
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?family={{family}}&role={{role}}">My List</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}">My Species</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?family={{family}}&role={{role}}">My Hybrids</a>
             {% if species %}
                 {% if author.author_id == 'anonymous' %}
                     <div style="text-align:center; width:100%;padding:0 20%; font-size:14px;">
@@ -50,8 +54,7 @@
                         to <a href="https://www.facebook.com/Orchidrootscom-306266603228487/inbox/?mailbox_id=306266603228487&selected_item_id=631912977">OrchidRoots In-Box</a>
                     </div>
                 {% else %}
-                        <a class="btn btn-xs btn-outline-primary" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}">upload file</a>
+                        <a class="btn btn-xs btn-outline-primary m-1" style="width:100px;" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}">upload file</a>
                 {% endif %}
             {% endif %}
-        </div>
     </div>

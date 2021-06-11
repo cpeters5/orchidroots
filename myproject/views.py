@@ -21,17 +21,22 @@ num_img = 20
 
 @require_GET
 def robots_txt(request):
+    # only allow access to common
     lines = [
         "User-Agent: *",
+        "Disallow: /admin/",
         "Disallow: /accounts/",
+        "Disallow: /account/",
+        "Disallow: /bromeliaceae/",
+        "Disallow: /cactaceae/",
         "Disallow: /core/",
         "Disallow: /documents/",
-        "Disallow: /detail/ancestor/",
+        "Disallow: /detail/",
         "Disallow: /documents/",
         "Disallow: /donations/",
-        "Disallow: /other/",
-        "Disallow: /search/",
         "Disallow: /orchidaceae/",
+        "Disallow: /orchidlist/",
+        "Disallow: /other/",
         "Disallow: /utils/",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")

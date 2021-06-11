@@ -6,11 +6,11 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-4 col-lg-3" style="padding:0">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 
-        <div class="col-sm-8 col-lg-9 align-items-center" style="text-align:left;font-size:13px;margin:30px 0 0 0;">
+        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
@@ -69,7 +69,7 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/common/{{path}}/{{species.getAcc}}/?family={{family}}"><i>{{species.name|safe}} (syn.)</i></a>
+                                                        <a href="/common/{{path}}/{{species.getAccepted.pid}}/?family={{family}}"><i>{{species.name|safe}} (syn.)</i></a>
                                                     {% else %}
                                                         {{species.name|safe}} (syn.)
                                                     {% endif %}

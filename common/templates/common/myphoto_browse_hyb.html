@@ -19,13 +19,6 @@
         overflow-y: auto;
         font-size:12px;
     }
-.thumbnails {
-   object-fit: cover;
-   overflow: hidden;
-   height: 16vw;
-   width : 16vw;
-   padding:2px 1px 3px 1px;
-}
 
 div.text-c {
     position: absolute;
@@ -34,20 +27,14 @@ div.text-c {
     transform: translate(-50%, -50%);
     font-size: 13px;
 }
-
-@media only screen and (max-width: 830px) {
-
-    div.text-c {
-        font-size: 10px;
-    }
-    .thumbnails {
-       height: 22vw;
-       width : 22vw;
-       padding:2px 1px 3px 1px;
-    }
-}
-
-@media only screen and (max-width: 580px) {
+.imageitem {
+    display:inline-block;
+    border:1px solid red;
+    margin:10px 5px;
+    width : 18vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
 }
 
 .box {
@@ -56,6 +43,62 @@ div.text-c {
     text-align: center;
     color: white;
     margin: 0;
+}
+
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 16vw;
+   width : 16vw;
+   padding-top:10px;
+}
+
+.imgcaption {
+    font-size: 12px;
+    height:35px;
+    text-align: left;
+    padding:0 10px;
+    width: 100%;
+    color: #0a6aa1;
+}
+
+
+@media only screen and (max-width: 830px) {
+   .imageitem {
+        /*width: 30vw;*/
+        /*height : 250px;*/
+    }
+    .imgcaption {
+        font-size: 11px;
+    }
+
+    div.text-c {
+        font-size: 10px;
+    }
+    .thumbnails {
+       height: 16vw;
+       width : 16vw;
+       padding:4px 1px 1px 1px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+   .imageitem {
+        width: 21vw;
+        margin:10px 3px;
+        /*height : 250px;*/
+    }
+     .imgcaption {
+        font-size: 10px;
+    }
+   div.text-c {
+        font-size: 10px;
+    }
+    .thumbnails {
+       height: 19vw;
+       width : 19vw;
+       padding:2px 1px 3px 1px;
+    }
 }
 
 img{
@@ -67,11 +110,11 @@ img{
 <div style="min-height:200px;background-color:white;width: 98%;">
     <!--Title-->
     <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 <!--Main table       -->
-        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;">
+        <div class="col" style="text-align:left;font-size:13px;">
             <div class="card m-2">
                 <div class="card-header">
                     <h5>My Hybrid Collection</h5>
@@ -106,13 +149,20 @@ img{
                         <br>
                             {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
                             {% for x in my_list %}
-                                <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
+                               <div class="imageitem">
+                               <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
                                     <div class="box">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
-                                        <div class="text-c">{{x.pid.pid.name|safe}}</div>
                                     </div>
         <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
-                                </a>
+                               </a>
+                                   <div class="imgcaption">
+                                        <a href="?family={{carnivorous_obj.gen.family}}&role={{role}}">
+                                            {{x.pid.pid.name|safe}}
+                                        </a>
+                                    </div>
+
+                               </div>
                             {% endfor %}
                         {% else %}
                             <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">

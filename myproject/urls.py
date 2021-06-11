@@ -29,10 +29,9 @@ from utils.views import robots_txt
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
-    path("robots.txt", robots_txt),
-    # path('home/', home, name='home'),
+    # path("robots.txt", robots_txt),
+    path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
     # path('dispatch', dispatch, name='dispatch'),
-    path("robots.txt", robots_txt),
     path('documents/', include('documents.urls')),
     # path('index/', index, name='index'),
 
@@ -55,11 +54,6 @@ urlpatterns = [
 
     # High level
     path('', orchid_home, name='orchid_home'),
-    # path('home/', home, name='home'),
-    # path('dispatch', dispatch, name='dispatch'),
-    # path('core/', include('core.urls')),
-    # path('common/', include('common.urls')),
-    # path('search/', include('search.urls')),
 
     # Family specific
     path('core/', include('core.urls')),
@@ -71,13 +65,10 @@ urlpatterns = [
     path('detail/', include('detail.urls')),
 
     # old
-    # path('orchidlist/', include('orchidlist.urls')),
-    # path('natural/', include('natural.urls')),
-    # path('orchid/', include('orchid.urls')),
-    # path('orchidlite/', include('orchidlite.urls')),
-
-    # Experiment
-    # path('sendmail/', include('sendmail.urls')),
+    path('natural/', include('detail.urls')),
+    path('orchid/', include('orchidaceae.urls')),
+    path('orchidlite/', include('detail.urls')),
+    path('orchidlist/', include('orchidlist.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

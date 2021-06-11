@@ -39,11 +39,6 @@ def logout_page(request):
 
 # Will be replaced by the classbase LoginView when the bug is fixed
 def login_page(request):
-    logging.error(">>> " + request.get_host())
-    role = getRole(request)
-    if request.user.is_authenticated:
-        return redirect("/?role=" + role)
-
     form = LoginForm(request.POST or None)
     context = {
         "form": form,
@@ -58,6 +53,7 @@ def login_page(request):
         password = form.cleaned_data.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            logging.error(">>> " + request.get_host() + " - user " + str(request.user))
             try:
                 del request.session['guest_email_id']
             except:
@@ -72,10 +68,9 @@ def login_page(request):
                     return redirect('set_email')
 
             if is_safe_url(redirect_path, request.get_host()):
-
             # if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
             #     return redirect("/detail/myphoto_browse_spc/?role=" + role + "&display=checked")
-                return redirect(redirect_path + "?role=" + role)
+                return redirect(redirect_path + "?role=pri")
             else:
                 return redirect("/?role=pri")
         else:

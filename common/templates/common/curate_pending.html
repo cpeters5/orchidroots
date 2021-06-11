@@ -142,8 +142,8 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="speciesDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="{% url 'detail:curate_pending' %}?tab=upl&type=species&days={{days}}">Pending Species</a>
-                                <a class="dropdown-item" href="{% url 'detail:curate_pending' %}?tab=upl&type=hybrid&days={{days}}">Pending Hybrid</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?tab=upl&type=species&days={{days}}">Pending Species</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?tab=upl&type=hybrid&days={{days}}">Pending Hybrid</a>
                             </div>
                         </div>
                         &nbsp;

@@ -1,5 +1,4 @@
 {% load static %}
-{% load static %}
 {% include "base.html" %}
 {% block body %}
 {% load testtags %}
@@ -25,7 +24,7 @@
                         <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Show species</a>
                     {% endif %}
                     <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
-                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&alpha=A&syn=N">Full species list</a>{% endif %}
+                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&syn=N&alpha=A">Full species list</a>{% endif %}
                 </div>
                 <br>
                 <h6>Searching for "<i>{{spc_string}}</i>"</h6>
@@ -72,12 +71,14 @@
                                         <i>{{ x.binomial }}</i>
                                     {% elif x.status == 'synonym' %}
                                         {{ x.binomial }}
+                                    {% elif x.type == 'species' %}
+                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}"><i>{{ x.binomial }}</i></a>
                                     {% else %}
-                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
+                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial }}</a>
                                     {% endif %}
                                     {{x.author|default:''}}
                                     {% if x.status == 'synonym' %}
-                                       (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                       (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial}}</a>)
                                     {% endif %}
                                 </td>
                                 <td>
@@ -93,14 +94,23 @@
                             {% for x in match_list %}
                             <tr>
                                 <td>
-                                    <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
-                                    {{x.author|default:''}}
+                                    {% if user.tier.tier > 3 %}
+                                        ({{x.1}})
+                                    {% endif %}
+                                    {% if x.0.status == 'synonym' %}
+                                        {{ x.0.binomial_it|safe }} {{x.author|default:''}}
+                                        (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial}}</a>)
+                                    {% else %}
+                                        <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{ x.0.binomial_it|safe }}</a>
+                                        {{x.author|default:''}}
+                                    {% endif %}
                                     {% if x.status == 'synonym' %}
-                                        (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                        (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial_it|safe}}</a>)
                                    {% endif %}
-                                   {{x.num_image|default:''}}
+                                   {{x.0.num_image|default:''}}
                                 </td>
-                                <td>{{x.family}}</td>
+                                <td>{{x.0.num_image|default:''}}
+                                </td>
                             </tr>
                             {% endfor %}
                         {% endif %}

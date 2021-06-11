@@ -5,61 +5,16 @@
     <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
     <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
 </head>
-
 <style>
-    .mybtn {
-        font-size:13px;
-        width:150px;
-        background-color: white;
-        border: 1px solid grey;
-        margin: 3px;
-    }
-    .mymenu {
-        max-height:400px;
-        overflow-y: auto;
-        font-size:12px;
-    }
-.thumbnails {
-   object-fit: cover;
-   overflow: hidden;
-   height: 16vw;
-   width : 16vw;
-   padding:2px 1px 3px 1px;
-}
 
-div.text-c {
-    position: absolute;
-    top: 80%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 13px;
-}
-
-@media only screen and (max-width: 830px) {
-
-    div.text-c {
-        font-size: 10px;
-    }
-    .thumbnails {
-       height: 22vw;
-       width : 22vw;
-       padding:2px 1px 3px 1px;
-    }
+.mytable-sx {
+    font-size: 12px;
 }
 
 @media only screen and (max-width: 580px) {
+.mytable-sx {
+    font-size: 11px;
 }
-
-.box {
-    position: relative;
-    display: inline-block;
-    text-align: center;
-    color: white;
-    margin: 0;
-}
-
-img{
-    width:100%;
 }
 
 </style>
@@ -67,11 +22,11 @@ img{
 <div style="min-height:200px;background-color:white;width: 98%;">
     <!--Title-->
     <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 <!--Main table       -->
-        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;">
+        <div class="col" style="text-align:left;font-size:13px;">
             <div class="card m-2">
                 <div class="card-header">
                     <h5>{{user|title}}'s {{family.family}} Photos</h5>
@@ -106,11 +61,11 @@ img{
                         <br>
                             <div style="clear: both"></div>
                             <div class="flex">
-                                <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
+                                <table id="sortTable" class="table table-striped table-condensed table-sm table-bordered table-hover mytable-sx">
                                     <thead>
                                         <th>Species</th>
                                         <th>type</th>
-                                        <th>Family</th>
+                                        <th class="d-none d-lg-table-cell">Family</th>
                                     </thead>
                                         {% for species in my_list %}
                                         <tr>
@@ -119,7 +74,7 @@ img{
                                                 {{species.author|default:""}} {{species.year|default:""}}
                                             </td>
                                             <td>{{species.type}}</td>
-                                            <td>{{species.family}}</td>
+                                            <td class="d-none d-lg-table-cell">{{species.family}}</td>
                                         </tr>
                                         {% endfor %}
                                 </table>

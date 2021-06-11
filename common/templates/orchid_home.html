@@ -189,13 +189,13 @@ img{
                     <p>
                     And now, to begin, select a family from the left panel and search for your orchids.
                     <div class="p-2" style="text-align: center;">
-                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
+                        <form class="form-inline" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
                             <input type="hidden" name="family" value="{{family}}" />
                             <input type="hidden" name="search" value="species" />
                             <input type="hidden" name="role" value="{{ role }}" />
                             <div class="input-group">
-                            <input form="searchspc" type="text" name="spc_string" value="{{spc_string}}" placeholder="Search binomial" style="border:1px solid #ccc; border-right: 0">
-                            <button class="submit" form="searchspc" type="submit"><i class="fa fa-search"></i></button>
+                            <input type="text" name="spc_string" value="{{spc_string}}" pattern=".{3,}" placeholder="Search binomial" required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                            <button class="submit" type="submit"><i class="fa fa-search"></i></button>
                             </div>
                         </form>
                     </div>

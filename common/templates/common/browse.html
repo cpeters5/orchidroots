@@ -265,13 +265,13 @@ img{
 
 <div style="min-height:200px;background-color:white;width: 98%;">
     <!--Title-->
-   <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-xs-12 col-sm-3 col-lg-2" style="padding:0">
+   <div class="row" style="width:100%; margin:0 auto;">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 <!--Main table       -->
-        <div class="col-sm-9 col-lg-10" style="text-align:left;font-size:13px;margin-top:25px;">
-            <div class="card m-2">
+        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+            <div class="card">
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
                         Sample images of
@@ -303,14 +303,14 @@ img{
                     </span>
                 </div>
                 <div class="card-body">
-                        <dev style="font-size:16px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
-                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
-                            <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Hybrid list</a>
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}?family={{family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
-                        </dev>
-                     <form action="?" autocomplete="off" style="display:inline-block">
+                    <dev style="font-size:16px;">
+                        <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
+                        <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
+                        <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Hybrid list</a>
+                        {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
+                        {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}?family={{family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
+                    </dev>
+                    <form action="?" autocomplete="off" style="display:inline-block">
                         <input type="hidden" name="family" value="{{family}}" />
                         <input type="hidden" name="role" value="{{ role }}" />
                         <input type="hidden" name="type" value="species" />
@@ -416,100 +416,100 @@ img{
                         </div>
                     {% endif %}
                 {% endif %}
-            </div>
 
-            <!-- Display -->
-            <div class="card m-2">
-                <div class="container justify-content-left align-items-center" style="margin:0 auto; padding:0; text-align: left;">
+                <!-- Display -->
+                <div class="card m-2" style="text-align:center">
+                    <div class="container justify-content-left align-items-center" style="margin:0 auto; padding:0; text-align: left;">
 
-                    <ul class="alphalist text-n" style="display:inline-block !important">
-                            <!--Alphabetical-->
-                                {% for opt in alpha_list %}
-                                    {% if alpha == opt %}
-                                        <li class="page-item active"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
+                        <ul class="alphalist text-n" style="display:inline-block !important">
+                                <!--Alphabetical-->
+                                    {% for opt in alpha_list %}
+                                        {% if alpha == opt %}
+                                            <li class="page-item active"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?family={{family}}&group={{group}}&alpha={{opt}}&role={{role}}&type={{type}}&genus={{genus}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}" >{{opt}}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if not alpha or alpha == "ALL" %}
+                            <li class="page-item active"><a class="page-link" href="#">All </a></li>
                                     {% else %}
-                                        <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?family={{family}}&group={{group}}&alpha={{opt}}&role={{role}}&type={{type}}&genus={{genus}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}" >{{opt}}</a></li>
+                            <li class="page-item"><a class="page-link" href="?family={{family}}&group={{group}}&alpha=ALL&role={{role}}&type={{type}}&genus={{genus}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}">All </a></li>
                                     {% endif %}
-                                {% endfor %}
-                                {% if not alpha or alpha == "ALL" %}
-                        <li class="page-item active"><a class="page-link" href="#">All </a></li>
-                                {% else %}
-                        <li class="page-item"><a class="page-link" href="?family={{family}}&group={{group}}&alpha=ALL&role={{role}}&type={{type}}&genus={{genus}}&display={{display}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}">All </a></li>
-                                {% endif %}
-                    </ul>
+                        </ul>
 
 
 
 
-                    {% if page_list %}
-                        <div class="container justify-content-left align-items-center" style="margin:0 auto; padding:0; text-align: left;">
-                            {% if last_page > 1 %}
-                                <div style="float:left">
-                                    <ul class="pagination pagination-xs" style="clear:left">
-                                        {% if page > 1 %}
-                                            <li class="page-item"><a class="page-link" href="?family={{family}}&page=1&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
-                                        {% else %}
-                                            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
-                                        {% endif %}
-
-                                        {% if page > 1 %}
-                                            <li class="page-item"><a class="page-link" href="?family={{family}}&page={{prev_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
-                                        {% else %}
-                                            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
-                                        {% endif %}
-
-                                        {% for pg in page_range %}
-                                            {% if pg == page %}
-                                                <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
+                        {% if page_list %}
+                            <div class="container justify-content-center align-items-center" style="margin:0 auto; padding:0; text-align: left;">
+                                {% if last_page > 1 %}
+                                    <div style="float:left">
+                                        <ul class="pagination pagination-xs" style="text-align: center">
+                                            {% if page > 1 %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&page=1&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
                                             {% else %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&page={{pg}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}">{{pg}}</a></li>
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
                                             {% endif %}
-                                        {% endfor %}
 
-                                        {% if page == last_page %}
-                                            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
-                                        {% else %}
-                                            <li class="page-item"><a class="page-link" href="?family={{family}}&page={{next_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
-                                        {% endif %}
+                                            {% if page > 1 %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&page={{prev_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
+                                            {% endif %}
 
-                                        {% if page == last_page %}
-                                            <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
-                                        {% else %}
-                                            <li class="page-item"><a class="page-link" href="?family={{family}}&page={{last_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
-                                        {% endif %}
-                                  </ul>
+                                            {% for pg in page_range %}
+                                                {% if pg == page %}
+                                                    <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?family={{family}}&page={{pg}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}">{{pg}}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
 
+                                            {% if page == last_page %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&page={{next_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
+                                            {% endif %}
+
+                                            {% if page == last_page %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&page={{last_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
+                                            {% endif %}
+                                      </ul>
+
+                                    </div>
+                                {% endif %}
+                                <div class="text-n" style="float:left">
+                                    ({{first}}-{{last}} of {{total}})<br>
                                 </div>
-                            {% endif %}
-                            <div class="text-n" style="float:left">
-                                ({{first}}-{{last}} of {{total}})<br>
                             </div>
+                        {% endif %}
+                    </div>
+            <!--            <br>-->
+                    {% if page_list %}
+                        <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
+                        {% for x in page_list %}
+                            <div class="imageitem m-1 border">
+                                {% if role == 'cur' %}
+                                <a href="{% url 'common:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
+                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
+                                </a>
+                                {% else %}
+                                <a href="{% url 'common:information' x.pid %}?role={{role}}&family={{x.gen.family}}">
+                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
+                                </a>
+                                {% endif %}
+                                <div class="imgcaption_top">{{x.binomial_it|safe}}</div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="margin:0 auto; text-align: center; min-height:200px;">
+                        <h7>No images available</h7>
                         </div>
                     {% endif %}
                 </div>
-        <!--            <br>-->
-                {% if page_list %}
-                    <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
-                    {% for x in page_list %}
-                        <div class="imageitem m-1 border">
-                            {% if role == 'cur' %}
-                            <a href="{% url 'common:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
-                                <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
-                            </a>
-                            {% else %}
-                            <a href="{% url 'common:information' x.pid %}?role={{role}}&family={{x.gen.family}}">
-                                <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
-                            </a>
-                            {% endif %}
-                            <div class="imgcaption_top">{{x.binomial}}</div>
-                        </div>
-                    {% endfor %}
-                    </div>
-                {% else %}
-                    <div style="margin:0 auto; text-align: center; min-height:200px;">
-                    <h7>No images available</h7>
-                    </div>
-                {% endif %}
             </div>
         </div>
         <br>
