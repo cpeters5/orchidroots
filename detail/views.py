@@ -37,10 +37,12 @@ from common.views import getmyphotos
 # import pytz
 # MPTT stuff
 # from django.views.generic.list_detail import object_list
+
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
 from accounts.models import User, Profile
 from common.views import quality_update, rank_update, deletephoto
+
 # from orchidaceae.views import mypaginator
 
 
@@ -541,7 +543,7 @@ def curateinfohyb(request, pid):
 
 
 @login_required
-def myphoto(request, pid):
+def xmyphoto(request, pid):
     role = getRole(request)
     if not role or role == 'pub':
         url = "%s?role=%s" % (reverse('common:information', args=(pid,)), role)
@@ -576,7 +578,7 @@ def myphoto(request, pid):
 
 
 @login_required
-def myphoto_browse_spc(request):
+def xmyphoto_browse_spc(request):
     author, author_list = get_author(request)
     role = getRole(request)
     if role == 'pub':
@@ -624,7 +626,7 @@ def myphoto_browse_spc(request):
 
 
 @login_required
-def myphoto_browse_hyb(request):
+def xmyphoto_browse_hyb(request):
     role = getRole(request)
     if role == 'pub':
         send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')

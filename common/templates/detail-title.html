@@ -69,6 +69,12 @@
                          <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
 
                     {% endif %}
+<!--                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+                    {% if family.family == 'Orchidaceae' %}
+                        <br>
+                        <h7 style="color: red;text-align: center">To upload orchids photo, click here <a href="https://orchidroots.com/detail/photos/{{species.pid}}/?family=Orchidaceae&role=pri">OrchidRoots</a></h7>
+                    {% endif %}
+<!--                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
                </div>
                 <br>
             </div>

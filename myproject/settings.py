@@ -43,21 +43,16 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    'orchidroots.org',
-    'www.orchidroots.org',
-    'orchidroots.com',
-    'www.orchidroots.com',
+    # 'orchidroots.org',
+    # 'www.orchidroots.org',
+    # 'orchidroots.com',
+    # 'www.orchidroots.com',
     'bluenanta.com',
     'www.bluenanta.com',
     'beta.bluenanta.com',
     '157.245.210.148',
     '127.0.0.1',
     'localhost',
-    'beta.bluenanta.com',
-    'bluenanta.com',
-    'www.bluenanta.com',
-    'orchidroots.com',
-    'www.orchidroots.com',
 ]
 
 

@@ -30,6 +30,7 @@
             {% if species %}
                 <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&role={{role}}">Summary<br></a></li>
                 <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'common:photos' species.pid %}?family={{species.gen.family}}&role={{role}}">Photos<br></a></li>
+{% if family.family != 'Orchidaceae' %}
                 {% if user.tier.tier > 2 %}
                     <li class="nav-item dropdown">
                         <a class="nav-link {{loc}} {{web}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
@@ -42,6 +43,7 @@
                     </li>
                 {% elif user.tier.tier > 1 %}
                     <li class="nav-item"><a class="nav-link {{loc}}" href="/{{species.gen.family.application}}/uploadfile/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a></li>
+{% endif %}
                 {% endif %}
 
                 <li class="nav-item"><a class="nav-link {{sbs}}" href="/{{species.gen.family.application}}/compare/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>

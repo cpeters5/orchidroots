@@ -39,7 +39,7 @@ redirect_message = 'species does not exist'
 # page_length = 500
 
 
-def getForms(request):
+def xgetForms(request):
     family, app = '', ''
     if 'family' in request.GET:
         family = request.GET['family']
@@ -78,7 +78,7 @@ def getAllGenera():
     return OrGenus, BrGenus, CaGenus, OtGenus
 
 
-def getAllSpecies():
+def xgetAllSpecies():
     # Call this when Genus or Family is not provided
     OrSpecies = apps.get_model('orchidaceae', 'Species')
     BrSpecies = apps.get_model('bromeliaceae', 'Species')
@@ -297,13 +297,13 @@ def species(request):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'genus' in request.GET:
         genus = request.GET['genus']
-        logger.error(">>>0 genus = " + str(genus))
+        # logger.error(">>>0 genus = " + str(genus))
         if genus:
             try:
                 genus = Genus.objects.get(genus=genus)
             except Genus.DoesNotExist:
                 genus = ''
-    logger.error(">>>1 genus = " + str(genus))
+    # logger.error(">>>1 genus = " + str(genus))
 
     # If Orchidaceae, go to full table.
     if family and family.family == 'Orchidaceae':
@@ -321,7 +321,7 @@ def species(request):
     if genus:
         species_list = Species.objects.filter(type='species').filter(
             cit_status__isnull=True).exclude(cit_status__exact='').filter(genus=genus)
-        logger.error(">>>2 genus = " + str(len(species_list)))
+        # logger.error(">>>2 genus = " + str(len(species_list)))
         # new genus has been selected. Now select new species/hybrid
     elif family:
         species_list = Species.objects.filter(type='species').filter(
@@ -2027,6 +2027,8 @@ def search_species(request):
         spc_string = request.GET['spc_string'].strip()
         if ' ' not in spc_string:
             genus_string = spc_string
+        elif spc_string.split()[0]:
+            genus_string = spc_string.split()[0]
     else:
         send_url = '/'
         return HttpResponseRedirect(send_url)
@@ -2323,7 +2325,7 @@ def xsearch_species_fixthis(request):
         family = request.GET['family']
     elif 'newfamily' in request.GET:
         family = request.GET['newfamily']
-    logger.error("0 >>> family = " + str(family))
+    # logger.error("0 >>> family = " + str(family))
     if 'spc_string' in request.GET:
         spc_string = request.GET['spc_string'].strip()
         if ' ' not in spc_string:
@@ -2386,7 +2388,7 @@ def xsearch_species_fixthis(request):
 
 
 
-    logger.error("1 >>> qgenus = " + str(qgenus))
+    # logger.error("1 >>> qgenus = " + str(qgenus))
 
     spc = spc_string
     if family:
@@ -2601,10 +2603,10 @@ def deletephoto(request, orid, pid):
 
     if area == 'allpending':
         # bulk delete by curators from all_pending tab
-        url = "%s&page=%s&type=%s&days=%d&family=" % (reverse('detail:curate_pending'), page, ortype, days, family)
+        url = "%s&page=%s&type=%s&days=%d&family=" % (reverse('common:curate_pending'), page, ortype, days, family)
     elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
         # Requested from all upload photos
-        url = "%s?page=%s" % (reverse('detail:curate_newupload'), page)
+        url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
     url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
 
     # Finally remove file if exist

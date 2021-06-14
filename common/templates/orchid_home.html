@@ -175,14 +175,17 @@ img{
             <div class="card mt-3">
                 <div class="card-body" style="font-size:15px">
                     <h6 class="card-title d-inline-block">Welcome to OrchidRoots</h6>
+                    <h6 style="color: red; font-weight:bold">Uploading orchid photo is disabled on this site. For orchid-only site, go here <a class="btn btn-custom btn-outline-primary" style="width: 120px; height:25px; padding:0" href="https://orchidroots.com">OrchidRoots</a></h6>
                     <div class="d-inline-block">
-                        OrchidRoots is a non-profit organization. Our goal is to provide a tool that will help
-                        our users search for and find the roots of their orchids.
+                        BlueNanta is a new project under the OrchidRoots, a non-profit organization.
+                        The initial mission of OrchdRoots is to develop an educational tool that provides visual identification and comparison of orchids.
+                        The goal of the new BlueNanta project is to expand the coverage of OrchidRoots to other plant families.
+                        <br>
                         Though each member of our team works on a voluntary basis, there are ongoing costs for technology,
                         operation and new development that would require some funding. Please make a donation to help our course&nbsp;&nbsp;
                             <a class="btn btn-custom btn-outline-primary" style="width: 120px; height:25px; padding:0" href="{% url 'donation:donateapp' %}">Donate</a>
                         <br>
-                        Your donation will allow us to deliver more value and to make the world of orchids more transparent.
+                        Your donation will allow us to improve and deliver more value our users.
 
                     </div>
                     <br>
@@ -194,7 +197,7 @@ img{
                             <input type="hidden" name="search" value="species" />
                             <input type="hidden" name="role" value="{{ role }}" />
                             <div class="input-group">
-                            <input type="text" name="spc_string" value="{{spc_string}}" pattern=".{3,}" placeholder="Search binomial" required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                            <input type="text" name="spc_string" value="{{spc_string}}" pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
                             <button class="submit" type="submit"><i class="fa fa-search"></i></button>
                             </div>
                         </form>

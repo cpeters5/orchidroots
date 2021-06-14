@@ -54,7 +54,9 @@
                         to <a href="https://www.facebook.com/Orchidrootscom-306266603228487/inbox/?mailbox_id=306266603228487&selected_item_id=631912977">OrchidRoots In-Box</a>
                     </div>
                 {% else %}
+                    {% if app != 'orchidaceae' %}
                         <a class="btn btn-xs btn-outline-primary m-1" style="width:100px;" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}">upload file</a>
+                    {% endif %}
                 {% endif %}
             {% endif %}
     </div>

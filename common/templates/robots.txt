@@ -4,6 +4,7 @@ Disallow: /accounts/
 Disallow: /bromeliaceae/
 Disallow: /cactaceae/
 Disallow: /core/
+Disallow: /detail/
 Disallow: /documents/
 Disallow: /donations/
 Disallow: /natural/

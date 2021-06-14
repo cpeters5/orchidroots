@@ -45,10 +45,6 @@
 <div class="card" style="width:100%;margin:0; padding:0;" style="border:1px solid pink;">
     <div class="card-body" >
         <ul style="padding-left:5px">
-<!--                <li><a type="button" class="btn btn-outline-primary sidefont" href="{% url 'orchid_home' %}" style="font-size:16px;"><b>Enter OrchidRoots</b></a></li>-->
-            <li class="li-side"><a type="button" class="btn sidebtn btn-success btn-sm" href="{% url 'documents:releasenote_v4' %}?family=Orchidaceae&role={{role}}">V.4.0 RELEASE NOTES</a></li>
-
-<hr>
             <li class="li-side"><span class="sidefont" style="color:lightseagreen"><b>Plant Families</b></span></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Orchidaceae' %}active{% endif %}" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&display=checked">Orchidaceae</a></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Bromeliaceae' %}active{% endif %}" href="{% url 'common:browse' %}?family=Bromeliaceae&role={{role}}&display=checked">Bromeliaceae</a></li>
