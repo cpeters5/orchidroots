@@ -451,11 +451,11 @@ img{
                         {% for x in page_list %}
                             <div class="imageitem m-1 border">
                                 {% if role == 'cur' %}
-                                <a href="{% url 'common:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
+                                <a href="{% url 'display:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
                                     <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                 </a>
                                 {% else %}
-                                <a href="{% url 'common:information' x.pid %}?role={{role}}&family={{x.gen.family}}">
+                                <a href="{% url 'display:information' x.pid %}?role={{role}}&family={{x.gen.family}}">
                                     <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                 </a>
                                 {% endif %}

@@ -16,7 +16,7 @@
                  {% csrf_token %}
                  <span style="font-size:16px;">
                      <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                     <a href="{% url 'common:photos' species.pid %}?role={{role}}&tab=sum&variety={{var}}&family={{family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                     <a href="{% url 'display:photos' species.pid %}?role={{role}}&tab=sum&variety={{var}}&family={{family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                      <span style="margin-left: 20px;">The reidentified species/hybrid must be within the same family and the new name must be complete and correct and must not be a synonym.</span>
                  </span>
                  <br>

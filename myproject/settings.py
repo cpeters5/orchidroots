@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'accounts',
     'common',
     'core',
+    'display',
     'documents',
     'donation',
     # 'search',

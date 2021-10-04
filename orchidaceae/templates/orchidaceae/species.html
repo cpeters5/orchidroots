@@ -292,15 +292,15 @@ option {
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
                                     (syn. {% if species.getAcc %}
-                                            <a href="{% url 'common:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
+                                            <a href="{% url 'display:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
                                         {% else %}
                                             {{species.getAccepted.binomial|safe}}
                                         {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'common:photos' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
+                                    <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% else %}
-                                    <a href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
+                                    <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% endif %}
                             {% endif %}
                             {% if species.status == 'synonym' %}

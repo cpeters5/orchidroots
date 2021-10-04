@@ -251,13 +251,11 @@ def species(request):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'genus' in request.GET:
         genus = request.GET['genus']
-        # logger.error(">>>0 genus = " + str(genus))
         if genus:
             try:
                 genus = Genus.objects.get(genus=genus)
             except Genus.DoesNotExist:
                 genus = ''
-    # logger.error(">>>1 genus = " + str(genus))
 
     # If Orchidaceae, go to full table.
     if family and family.family == 'Orchidaceae':
@@ -274,7 +272,6 @@ def species(request):
     if genus:
         species_list = Species.objects.filter(type='species').filter(
             cit_status__isnull=True).exclude(cit_status__exact='').filter(genus=genus)
-        # logger.error(">>>2 genus = " + str(len(species_list)))
         # new genus has been selected. Now select new species/hybrid
     elif family:
         species_list = Species.objects.filter(type='species').filter(
@@ -413,163 +410,6 @@ def hybrid(request):
     return render(request, "common/hybrid.html", context)
 
 
-def information(request, pid):
-    role = getRole(request)
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    ps_list = pp_list = ss_list = sp_list = seedimg_list = pollimg_list = ()
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-    offspring_list = []
-    offspring_count = 0
-    offspring_test = ''
-    max_items = 3000
-    ancspc_list = []
-    seedimg_list = []
-    pollimg_list = []
-    distribution_list = []
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
-
-    # If pid is a synonym, convert to accept
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    genus = species.gen
-
-    display_items = []
-    synonym_list = Synonym.objects.filter(acc=pid)
-    if species.gen.family.family == 'Orchidaceae':
-        if species.type == 'species':
-            accepted = species.accepted
-            images_list = SpcImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
-            distribution_list = Distribution.objects.filter(pid=species.pid)
-        else:
-            accepted = species.hybrid
-            images_list = HybImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
-
-    else:
-        images_list = SpcImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
-        if species.type == 'species':
-            accepted = species.accepted
-        else:
-            accepted = species.hybrid
-
-    # Build display in main table
-    if images_list:
-        i_1, i_2, i_3, i_4, i_5, i_7, i_8 = 0, 0, 0, 0, 0, 0, 0
-        for x in images_list:
-            if x.rank == 1 and i_1 <= 0:
-                i_1 += 1
-                display_items.append(x)
-            elif x.rank == 2 and i_2 <= 0:
-                i_2 += 1
-                display_items.append(x)
-            elif x.rank == 3 and i_3 <= 1:
-                i_3 += 1
-                display_items.append(x)
-            elif x.rank == 4 and i_4 <= 3:
-                i_4 += 1
-                display_items.append(x)
-            elif x.rank == 5 and i_5 <= 3:
-                i_5 += 1
-                display_items.append(x)
-            elif x.rank == 7 and i_7 <= 2:
-                i_7 += 1
-                display_items.append(x)
-            elif x.rank == 8 and i_8 < 2:
-                i_8 += 1
-                display_items.append(x)
-    # Build parents display for Orchidaceae hybrid  only
-    from orchidaceae.models import AncestorDescendant
-    seed_list = Hybrid.objects.filter(seed_id=species.pid).order_by('pollen_genus', 'pollen_species')
-    pollen_list = Hybrid.objects.filter(pollen_id=species.pid)
-    # Remove duplicates. i.e. if both parents are synonym.
-    temp_list = pollen_list
-    for x in temp_list:
-        if x.seed_status() == 'syn' and x.pollen_status() == 'syn':
-            pollen_list = pollen_list.exclude(pid=x.pid_id)
-    pollen_list = pollen_list.order_by('seed_genus', 'seed_species')
-    offspring_list = chain(list(seed_list), list(pollen_list))
-    offspring_count = len(seed_list) + len(pollen_list)
-    if offspring_count > max_items:
-        offspring_list = offspring_list[0:max_items]
-
-    if species.type == 'hybrid':
-        if accepted.seed_id and accepted.seed_id.type == 'species':
-            seed_obj = Species.objects.get(pk=accepted.seed_id.pid)
-            seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7). \
-                               order_by('-rank', 'quality', '?')[0: 3]
-        elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
-            seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
-            if seed_obj:
-                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 3]
-                assert isinstance(seed_obj, object)
-                if seed_obj.seed_id:
-                    ss_type = seed_obj.seed_id.type
-                    if ss_type == 'species':
-                        ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).order_by(
-                            '-rank', 'quality', '?')[: 1]
-                    elif ss_type == 'hybrid':
-                        ss_list = HybImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).order_by(
-                            '-rank', 'quality', '?')[: 1]
-                if seed_obj.pollen_id:
-                    sp_type = seed_obj.pollen_id.type
-                    if sp_type == 'species':
-                        sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(
-                            rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
-                    elif sp_type == 'hybrid':
-                        sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(
-                            rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
-        # Pollen
-        if accepted.pollen_id and accepted.pollen_id.type == 'species':
-            pollen_obj = Species.objects.get(pk=accepted.pollen_id.pid)
-            pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).order_by('-rank', 'quality',
-                                                                                                    '?')[0: 3]
-        elif accepted.pollen_id and accepted.pollen_id.type == 'hybrid':
-            pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
-            pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7). \
-                               order_by('-rank', 'quality', '?')[0: 3]
-            if pollen_obj.seed_id:
-                ps_type = pollen_obj.seed_id.type
-                if ps_type == 'species':
-                    ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
-                elif ps_type == 'hybrid':
-                    ps_list = HybImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
-            if pollen_obj.pollen_id:
-                pp_type = pollen_obj.pollen_id.type
-                if pp_type == 'species':
-                    pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
-                elif pp_type == 'hybrid':
-                    pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
-
-        ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
-        if ancspc_list:
-            for x in ancspc_list:
-                img = x.aid.get_best_img()
-                if img:
-                    x.img = img.image_file
-    write_output(request, str(family))
-    context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
-               'title': 'information', 'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
-               'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
-               'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
-               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
-               'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'role': role, 'ancspc_list': ancspc_list,
-               }
-    return render(request, "common/information.html", context)
-
-
 def rank_update(request, SpcImages):
     rank = 0
     if 'rank' in request.GET:
@@ -668,104 +508,6 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
         private_list = public_list = upload_list = []
 
     return private_list, public_list, upload_list, myspecies_list, myhybrid_list
-
-
-def photos(request, pid=None):
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-
-    author, author_list = get_author(request)
-    if not pid and 'pid' in request.GET:
-        pid = request.GET['pid']
-        if pid:
-            pid = int(pid)
-        else:
-            pid = 0
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
-
-
-    if role == 'pri':
-        url = "%s?role=%s&family=%s" % (reverse('common:myphoto', args=(species.pid,)), role, family)
-        return HttpResponseRedirect(url)
-
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    variety = ''
-    tail = ''
-
-    if family.family == 'Orchidaceae' and species.type == 'hybrid':
-        all_list = HybImages.objects.filter(pid=species.pid)
-    else:
-        all_list = SpcImages.objects.filter(pid=species.pid)
-
-    # Get private photos
-
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages, role)
-    # Happened when a curator request an author photos
-    # if role == 'cur':
-    #     if author:
-    #         public_list = all_list.filter(rank__gt=0).filter(author=author)
-    #         private_list = all_list.filter(rank=0).filter(author=author)
-    # else:  # anonymous
-    #     public_list = all_list.filter(rank__gt=0)
-
-    # upload_list = UploadFile.objects.filter(pid=species.pid)
-    # if role != 'cur':
-    #     if author:
-    #         upload_list = upload_list.filter(author=author)
-    if app == 'orchidaceae' and species.type == 'hybrid':
-        rank_update(request, HybImages)
-        quality_update(request, HybImages)
-    else:
-        rank_update(request, SpcImages)
-        quality_update(request, SpcImages)
-    # Handle Variety filter
-    if 'variety' in request.GET:
-        variety = request.GET['variety']
-    if variety == 'semi alba':
-        variety = 'semialba'
-
-    # Extract first term, possibly an infraspecific
-    parts = variety.split(' ', 1)
-    if len(parts) > 1:
-        tail = parts[1]
-    var = variety
-    if variety and tail:
-        public_list = public_list.filter(Q(variation__icontains=var) | Q(form__icontains=var) | Q(name__icontains=var)
-                                         | Q(source_file_name__icontains=var) | Q(description__icontains=var)
-                                         | Q(variation__icontains=tail) | Q(form__icontains=tail)
-                                         | Q(name__icontains=tail) | Q(source_file_name__icontains=tail)
-                                         | Q(description__icontains=tail))
-    elif variety:
-        public_list = public_list.filter(Q(variation__icontains=var) | Q(form__icontains=var) | Q(name__icontains=var)
-                                         | Q(source_file_name__icontains=var) | Q(description__icontains=var))
-
-    if public_list:
-        if var == "alba":
-            public_list = public_list.exclude(variation__icontains="semi")
-        public_list = public_list.order_by('-rank', 'quality', '?')
-        if private_list:
-            private_list = private_list.order_by('created_date')
-
-    write_output(request, str(family))
-    context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
-               'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
-               'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': role, 'title': 'photos', 'namespace': 'common',
-               }
-    return render(request, 'common/photos.html', context)
 
 
 def browse(request):
@@ -1095,15 +837,11 @@ def search_gen(request):
         elif family.family == 'Bromeliaceae':
             species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
         else:
-            # logger.error("1 subfamily = " + str(subfamily))
             species_list = get_species_list('other')
             species_list = species_list.filter(gen__family=family.family)
-            # logger.error("2 subfamily = " + str(subfamily))
-            # logger.error("3 species_list = " )
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
-    # logger.error("4 species_list = "+ " --- " + spc_string)
 
     # Perform conventional match
     if not fuzzy:
@@ -1153,7 +891,6 @@ def search_gen(request):
             else:
                 match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            # logger.error("4 match_list = " )
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
@@ -1257,15 +994,11 @@ def search_spc(request):
         elif family.family == 'Bromeliaceae':
             species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
         else:
-            # logger.error("1 subfamily = " + str(subfamily))
             species_list = get_species_list('other')
             species_list = species_list.filter(gen__family=family.family)
-            # logger.error("2 subfamily = " + str(subfamily))
-            # logger.error("3 species_list = " )
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
-    # logger.error("4 species_list = "+ " --- " + spc_string)
 
     # Perform conventional match
     if not fuzzy:
@@ -1315,7 +1048,6 @@ def search_spc(request):
             else:
                 match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            # logger.error("4 match_list = " )
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
@@ -1419,15 +1151,11 @@ def search_hyb(request):
         elif family.family == 'Bromeliaceae':
             species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
         else:
-            # logger.error("1 subfamily = " + str(subfamily))
             species_list = get_species_list('other')
             species_list = species_list.filter(gen__family=family.family)
-            # logger.error("2 subfamily = " + str(subfamily))
-            # logger.error("3 species_list = " )
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
-    # logger.error("4 species_list = "+ " --- " + spc_string)
 
     # Perform conventional match
     if not fuzzy:
@@ -1477,7 +1205,6 @@ def search_hyb(request):
             else:
                 match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            # logger.error("4 match_list = " )
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
@@ -1586,16 +1313,12 @@ def search_match(request):
         search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
         del search_list[5:]
         genus_list = search_list
-        # logger.error("5 genus_list = " )
 
-
-    # logger.error("1 search = " + str(search))
     keyword = spc_string
     if keyword:
         rest = keyword.split(' ', 1)
         if len(rest) > 1:
             tail = rest[1]
-        # logger.error("1 tail = " + str(tail))
         keys = keyword.split()
         if len(keys[0]) < 3 or keys[0].endswith('.'):
             keys = keys[1:]
@@ -1616,8 +1339,6 @@ def search_match(request):
             y = y[: -2]  # Allow for some ending variation
         elif len(y) > 5:
             y = y[: -1]
-        # logger.error("2 keyword = " + str(keyword))
-        # logger.error("3 keys[0] = " + str(keys[0]))
 
         try:
             GenusRel = apps.get_model('orchidaceae', 'GenusRelation')
@@ -1633,54 +1354,41 @@ def search_match(request):
             qgenlist = GenusRel.objects.filter(formula__icontains=genus.genus).values_list('genus', flat=True).distinct()
         else:
             qgenlist = []
-        # logger.error("3.1 >>> qgenlist = " + str(len(qgenlist)))
-        # logger.error("4 >>> qgenus = " + str(qgenus))
 
         temp_list = Species.objects.exclude(status__iexact='pending')
-        # logger.error("6 temp_list = "  +  " " + str(request.user))
 
         search_list = temp_list.filter(genus__in=qgenlist).filter(species__istartswith=tail)
         if len(search_list) > 0:
             mylist = search_list.values('pid')
-            # logger.error("7 search_list = "  + " " + str(request.user))
 
         elif len(keys) == 1:
             search_list = temp_list.filter(species__icontains=keys[0])
             mylist = search_list.values('pid')
             partial_spc = temp_list.filter(species__icontains=x).exclude(pid__in=mylist)
-            # logger.error("7 search_list = " +  " " + str(request.user))
-            # logger.error("8 partial_spc = " + " " + str(request.user))
 
         elif len(keys) == 2:
             search_list = temp_list.filter(species__iexact=keys[1])
-            # logger.error("9 search_list = " + " " + str(request.user))
             mylist = search_list.values('pid')
             partial_spc = temp_list.filter(Q(species__icontains=x) | Q(infraspe__icontains=y)
                                            | Q(species__icontains=y)).exclude(pid__in=mylist)
-            # logger.error("10 partial_spc = " + " " + str(request.user))
 
         elif len(keys) == 3:
             search_list = temp_list.filter((Q(species__iexact=keys[0]) & Q(infraspe__iexact=keys[2])) |
                                            (Q(genus__iexact=keys[0]) & Q(species__iexact=keys[1]) &
                                             Q(infraspe__iexact=keys[2])))
-            # logger.error("11 search_list = "  + " " + str(request.user))
             mylist = search_list.values('pid')
             partial_spc = temp_list.filter(Q(species__icontains=x) | Q(species__icontains=keys[1])).exclude(
                 pid__in=mylist)
-            # logger.error("12 partial_spc = "  + " " + str(request.user))
 
         elif len(keys) >= 4:
             search_list = temp_list.filter((Q(species__iexact=keys[0]) & Q(infraspe__iexact=keys[2]))
                                            | (Q(genus__iexact=keys[0]) & Q(species__iexact=keys[1])
                                               & Q(infraspe__iexact=keys[2])))
-            # logger.error("13 search_list = "  + " " + str(request.user))
             mylist = search_list.values('pid')
             partial_spc = temp_list.filter(Q(species__icontains=keys[1]) | Q(infraspe__icontains=keys[3])).exclude(
                 pid__in=mylist)
-            # logger.error("14 partial_spc = "  + " " + str(request.user))
 
         all_list = list(chain(search_list, partial_hyb, partial_spc))
-        # logger.error("15 all_list = "  + " " + str(request.user))
         for x in all_list:
             short_grex = x.short_grex().lower()
             score = fuzz.ratio(short_grex, keyword)     # compare against entire keyword
@@ -1697,7 +1405,6 @@ def search_match(request):
             if score >= 60:
                 match_list.append([x, score])
             # match_list.append([x, 0])
-        # logger.error("16 match_list = "  + " " + str(request.user))
 
     match_list.sort(key=lambda k: (-k[1], k[0].name()))
     alpha = ''
@@ -1886,7 +1593,6 @@ def search_fuzzy(request):
         reverse('common:search_species'), role, family, spc_string)
         return HttpResponseRedirect(url)
 
-    logger.error(">>> Family = " + family)
     grexlist = Species.objects.exclude(status='pending')
     # Filter for partner specific list.
     if spc_list:
@@ -2106,24 +1812,21 @@ def search_species(request):
         else:
              grex = grex[0]
         subgrex = grex.rsplit(' ', 1)[0]
-        perfect_list = species_list.filter(binomial__istartswith=spc_string)
-        logger.error(">>> 3. perfect_list = " + str(len(perfect_list)))
+        if len(words) > 1:
+            perfect_list = species_list.filter(binomial__istartswith=spc_string)
         if len(perfect_list) == 0:
             if len(words) == 1:
                 # Single word could be a genus or an epithet
                 match_list = species_list.filter(species__istartswith=grex)
-                logger.error(">>> 1. match_list = " + str(len(match_list)))
                 # match_list = species_list.filter(species__icontains=grex)
             else:
                 match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
-                logger.error(">>> 2. match_list = " + str(len(match_list)))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
                     url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
                     return HttpResponseRedirect(url)
-        logger.error(">>> 3. match_list = " + str(len(match_list)))
 
     # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
     else:
@@ -2182,7 +1885,6 @@ def search(request):
         family = request.GET['family']
     elif 'newfamily' in request.GET:
         family = request.GET['newfamily']
-    # logger.error("0 >>> family = " + str(family))
     if 'spc_string' in request.GET:
         spc_string = request.GET['spc_string'].strip()
         if ' ' not in spc_string:
@@ -2243,10 +1945,6 @@ def search(request):
     else:
         qgenlist = []
 
-
-
-    # logger.error("1 >>> qgenus = " + str(qgenus))
-
     spc = spc_string
     if family:
         if family.family == 'Cactaceae':
@@ -2258,17 +1956,11 @@ def search(request):
         elif family.family == 'Bromeliaceae':
             species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
         else:
-            logger.error("1 subfamily = " + str(subfamily))
             species_list = get_species_list('other')
             species_list = species_list.filter(gen__family=family.family)
-            # logger.error("2 subfamily = " + str(subfamily))
-            # logger.error("3 species_list = ")
-        # logger.error("3 >>> species_list = " + str(species_list[0].pid) )
-        # logger.error("3 >>> species_list = " + str(species_list[1].pid) )
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
-    # logger.error("7 >>> species_list = " )
 
     # Perform conventional match
     if not fuzzy:
@@ -2297,7 +1989,6 @@ def search(request):
             search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
             del search_list[5:]
             genus_list = search_list
-            # logger.error("5 genus_list = " )
 
         # spc_string = spc_string.replace('.', '')
         if qgenus:
@@ -2305,7 +1996,6 @@ def search(request):
             if not perfect_list:
                 perfect_list = species_list.filter(genus__iexact=qgenus).filter(species__istartswith=grex)
 
-            # logger.error("8 >>> perfect_list = " )
         else:
             if len(grex) > 1:
                 grex = grex[1]
@@ -2337,7 +2027,6 @@ def search(request):
             else:
                 match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            # logger.error("4 match_list = " )
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
@@ -2467,7 +2156,7 @@ def deletephoto(request, orid, pid):
     elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
         # Requested from all upload photos
         url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
-    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
+    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
 
     # Finally remove file if exist
     if os.path.isfile(filename):
@@ -2522,7 +2211,7 @@ def deletewebphoto(request, pid):
     if area == 'allpending':  # from curate_pending (all rank 0)
         url = "%s?role=%s&page=%s&type=%s&days=%s" % (reverse('detail:curate_pending'), role, page, type, days)
     else:
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
+        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
     write_output(request, str(family))
     return HttpResponseRedirect(url)
 
@@ -2552,7 +2241,7 @@ def approvemediaphoto(request, pid):
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
         msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%s?role=%s&msg=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, msg, family)
+        url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
         return HttpResponseRedirect(url)
     upls = UploadFile.objects.filter(pid=pid)
 
@@ -2597,7 +2286,7 @@ def approvemediaphoto(request, pid):
                 shutil.move(old_name, new_name + ext)
             except shutil.Error:
                 # upl.delete()
-                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
+                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
                 return HttpResponseRedirect(url)
             spc.image_file = image_file + ext
         else:
@@ -2611,7 +2300,7 @@ def approvemediaphoto(request, pid):
                         shutil.move(old_name, x)
                     except shutil.Error:
                         upl.delete()
-                        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
+                        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
                         return HttpResponseRedirect(url)
                     spc.image_file = image_file
                     break
@@ -2622,7 +2311,7 @@ def approvemediaphoto(request, pid):
         upl.approved = True
         upl.delete(0)
     write_output(request, str(family))
-    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role, family)
+    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
     return HttpResponseRedirect(url)
 
 
@@ -2640,7 +2329,7 @@ def myphoto(request, pid):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     if not role or request.user.tier.tier < 2:
-        url = "%s?role=%s&family=%s" % (reverse('common:information', args=(pid,)), role, species.gen.family)
+        url = "%s?role=%s&family=%s" % (reverse('display:information', args=(pid,)), role, species.gen.family)
         return HttpResponseRedirect(url)
     else:
         author, author_list = get_author(request)

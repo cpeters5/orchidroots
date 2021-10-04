@@ -331,7 +331,7 @@ def createhybrid(request):
     else:
         write_output(request)
     family = species2.gen.family
-    return HttpResponseRedirect("/common/photos/" + str(spcobj.pid) + "/?role=" + role + "&genus2=" + species2.genus + "&family=" + family.family)
+    return HttpResponseRedirect("/display/photos/" + str(spcobj.pid) + "/?role=" + role + "&genus2=" + species2.genus + "&family=" + family.family)
 
 
 @login_required
@@ -457,7 +457,7 @@ def reidentify(request, orid, pid):
     old_species = Species.objects.get(pk=pid)
     old_family = old_species.gen.family
     if role != 'cur':
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
         return HttpResponseRedirect(url)
 
     if old_species.status == 'synonym':
@@ -474,7 +474,7 @@ def reidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same genus. Just change pid
@@ -494,7 +494,7 @@ def reidentify(request, orid, pid):
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
                     os.rename(from_path, to_path)
                 else:
-                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
+                    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, new_family)
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
@@ -520,7 +520,7 @@ def reidentify(request, orid, pid):
             old_img.delete()
 
             # write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
+            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
     return render(request, app + '/reidentify.html', context)
@@ -559,7 +559,7 @@ def uploadfile(request, pid):
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('common:photos', args=(species.pid,)), role,
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
                                                 request.user.photographer.author_id, species.gen.family)
             return HttpResponseRedirect(url)
         else:
@@ -618,7 +618,7 @@ def uploadweb(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
 
-            url = "%s?role=cur&family=%s" % (reverse('common:photos', args=(species.pid,)), species.gen.family)
+            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 
@@ -736,7 +736,7 @@ def curateinfospc(request, pid):
             spc.operator = request.user
             spc.save()
 
-            url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, species.gen.family)
+            url = "%s?role=%s&family=%s" % (reverse('display:information', args=(species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")
@@ -800,7 +800,7 @@ def curateinfohyb(request, pid):
 
             spcspc.save()
             spc.save()
-            url = "%s?role=%s&family=%s" % (reverse('common:information', args=(species.pid,)), role, species.gen.family)
+            url = "%s?role=%s&family=%s" % (reverse('display:information', args=(species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")

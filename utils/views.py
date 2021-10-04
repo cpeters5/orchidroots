@@ -259,6 +259,41 @@ def getModels(request, family=None):
         UploadFile = apps.get_model(app.lower(), 'UploadFile')
     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
+
+def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages, role):
+    # Get species and hybrid lists that the user has at least one photo
+    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
+    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+
+    my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    if app == 'orchidaceae':
+        my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+    else:
+        my_hyb_list = []
+    # list for dropdown select
+    myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
+    myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
+
+    # Get list for display
+    if species:
+        if app == 'orchidaceae' and species.type == 'hybrid':
+            public_list = HybImages.objects.filter(pid=species.pid)  # public photos
+        else:
+            public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
+        upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
+        private_list = public_list.filter(rank=0)  # rejected photos
+        if role == 'pri':
+            upload_list = upload_list.filter(author=author) # Private photos
+            private_list = private_list.filter(author=author) # Private photos
+
+        # Display all rank > 0 or rank = 0 if author matches
+        public_list  = public_list.filter(Q(rank__gt=0) | Q(author=author))
+    else:
+        private_list = public_list = upload_list = []
+
+    return private_list, public_list, upload_list, myspecies_list, myhybrid_list
+
 # def get_view_name_by_path(path):
 #     result = resolve(path=path)
 #     return result.view_name

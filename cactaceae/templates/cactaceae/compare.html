@@ -186,9 +186,9 @@ input[type=text] {
                         temporarily created:
                         {% endif %}
                         {% if role == 'cur' %}
-                            <a href="{% url 'common:photos' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
+                            <a href="{% url 'detail:photos' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
                         {% else %}
-                            <a href="{% url 'common:information' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
+                            <a href="{% url 'detail:information' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.name|safe}}</a>
                         {% endif %}
                     {% else %}
                         {% if pid and pid2 and pid != pid2 %}
@@ -285,7 +285,7 @@ input[type=text] {
                             {% if message2 %}
                                 <span class="text-danger">{{message2|safe}}</span>
                             {% elif species2.species %}
-                                <a href="{% url 'common:information' species2.pid %}?family={{species.gen.family}}&role={{role}}">{{species2.name|safe}}</a> {{species2.author|default:''}} {{species2.year|default:''}}
+                                <a href="{% url 'detail:information' species2.pid %}?family={{species.gen.family}}&role={{role}}">{{species2.name|safe}}</a> {{species2.author|default:''}} {{species2.year|default:''}}
                                 {% if accepted2 %} <br>(syn. {{accepted2.name|safe}}) {% endif %}
                             {% else %}
                                 Enter the correct name of second orchid.

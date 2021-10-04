@@ -51,9 +51,9 @@
                                {% if species.0.status == 'synonym' %}{{species.0.name|safe}}
                                {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
                                   {% if role == "cur" %}
-                                       <a href="{% url 'common:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.name|safe}}</a>
+                                       <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.name|safe}}</a>
                                   {% else %}
-                                       <a href="{% url 'common:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
+                                       <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
                                   {% endif %}
                                {%  else %}
                                    {{species.0.name}}
@@ -67,9 +67,9 @@
                                {% if species.0.status == 'synonym' %}
                                    {% if species.0.getAcc %}
                                        {% if role == "cur" %}
-                                           <a href="{% url 'common:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                           <a href="{% url 'display:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
                                        {% else %}
-                                           <a href="{% url 'common:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                           <a href="{% url 'display:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
                                         {% endif %}
                                    {% else %}
                                         Error! Accepted name does not exist
@@ -77,9 +77,9 @@
                                {% elif species.0.type == 'hybrid' %}
                                    {% if species.0.hybrid.seed_id %}
                                        {% if role == "cur" %}
-                                           <a href="{% url 'common:photos' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                           <a href="{% url 'display:photos' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
                                        {% else %}
-                                           <a href="{% url 'common:information' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&pid={{species.0.hybrid.seed_id.pid}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                           <a href="{% url 'display:information' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&pid={{species.0.hybrid.seed_id.pid}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
                                       {% endif %}
 
                                     {%  else %}
@@ -88,9 +88,9 @@
                                    ×
                                    {% if species.0.hybrid.pollen_id %}
                                        {% if role == "cur" %}
-                                           <a href="{% url 'common:photos' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                           <a href="{% url 'display:photos' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
                                        {% else %}
-                                           <a href="{% url 'common:information' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&pid={{species.0.hybrid.pollen_id.pid}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                           <a href="{% url 'display:information' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&pid={{species.0.hybrid.pollen_id.pid}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
                                       {% endif %}
 
                                    {%  else %}

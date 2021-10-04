@@ -534,7 +534,7 @@ seedparent, pollparent {
                                         {% for off in offspring_list %}
                                          <tr >
                                              <td class="border-lb" style="text-align: left">
-                                                 <a href="{% url 'common:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
+                                                 <a href="{% url 'display:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
                                                  <span style="font-zize:11px">
                                                      {{off.pid.name |safe}}
                                                      {% if off.pid.num_image > 0 %} *{% endif %}
@@ -542,13 +542,13 @@ seedparent, pollparent {
                                                  </a> </td>
                                              <td class="border-rb" style="text-align: left;">
                                                  {% if off.seed_id %}
-                                                    <a href="{% url 'common:information' off.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_seed_name|safe }}</a>
+                                                    <a href="{% url 'display:information' off.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_seed_name|safe }}</a>
                                                  {% else %}
                                                     na
                                                  {% endif %}
                                                     ×
                                                  {% if off.pollen_id %}
-                                                    <a href="{% url 'common:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_pollen_name|safe }}</a>
+                                                    <a href="{% url 'display:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_pollen_name|safe }}</a>
                                                  {% else %}
                                                     na
                                                  {% endif %}
@@ -606,7 +606,7 @@ seedparent, pollparent {
                             </div>
                         {% endfor %}
                     </div>
-                <span style="text-align:center;font-size:18px;"><a href="{% url 'common:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}"><b>more ... </b></a></span>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}"><b>more ... </b></a></span>
                 {% else %}
                     <div style="width: 100%; font-size:12px;border:0 solid lightgrey; margin:0 auto; text-align: center; padding:10px">
                         No image available. if you have one please consider uploading it
@@ -644,7 +644,7 @@ seedparent, pollparent {
                         </div>
                         <div class="parent-text " style="text-align:center; margin-bottom:10px;">
                             {% if species.hybrid.seed_id.pid %}
-                                <a href="{% url 'common:information' species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
+                                <a href="{% url 'display:information' species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.seed_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -677,7 +677,7 @@ seedparent, pollparent {
                         </div>
                         <div class="parent-text" style="text-align:center;">
                             {% if species.hybrid.pollen_id.pid %}
-                                    <a href="{% url 'common:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.pollen_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -708,7 +708,7 @@ seedparent, pollparent {
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.seed_id.hybrid.seed_id %}
-                                    <a href="{% url 'common:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
                                     {% else %}
                                     Unknown
                                     {% endif %}
@@ -730,7 +730,7 @@ seedparent, pollparent {
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.seed_id.hybrid.pollen_id %}
-                                    <a href="{% url 'common:information' species.hybrid.seed_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.pollen_id.name|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.pollen_id.name|safe}}</a>
                                     {% else %}
                                     unknown
                                     {% endif %}
@@ -762,7 +762,7 @@ seedparent, pollparent {
                                 </div>
                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.pollen_id.hybrid.seed_id %}
-                                            <a href="{% url 'common:information' species.hybrid.pollen_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.seed_id.name|safe}}</a>
+                                            <a href="{% url 'display:information' species.hybrid.pollen_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.seed_id.name|safe}}</a>
                                     {% else %}
                                         Unknown
                                     {% endif %} <!-- if pollenpollen_id -->
@@ -786,7 +786,7 @@ seedparent, pollparent {
 
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.pollen_id.hybrid.pollen_id %}
-                                            <a href="{% url 'common:information' species.hybrid.pollen_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.pollen_id.name|safe}}</a>
+                                            <a href="{% url 'display:information' species.hybrid.pollen_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.pollen_id.name|safe}}</a>
                                     {% else %}
                                         Unknown
                                     {% endif %} <!-- if pollenpollen_id -->
@@ -818,7 +818,7 @@ seedparent, pollparent {
                             <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
                                 {% if p.aid.pid > 0 %}
                                    <br>
-                                    <a href="{% url 'common:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
+                                    <a href="{% url 'display:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
                                     {{p.pct}}%
                                 {% else %}
                                     <span style="font-size: 14px;">No data</span>

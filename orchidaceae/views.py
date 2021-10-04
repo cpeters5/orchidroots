@@ -46,7 +46,7 @@ def information(request, pid):
     role = getRole(request)
     species = Species.objects.get(pk=pid)
     family = species.gen.family
-    send_url = '/common/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
+    send_url = '/display/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
     # print(send_url)
     return HttpResponseRedirect(send_url)
 
@@ -1133,7 +1133,7 @@ def xreidentify(request, orid, pid):
     old_species = Species.objects.get(pk=pid)
     old_family = old_species.gen.family
     if role != 'cur':
-        url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
         return HttpResponseRedirect(url)
 
     if old_species.status == 'synonym':
@@ -1152,7 +1152,7 @@ def xreidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(pid,)), role, old_family)
+                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same genus. Just change pid
@@ -1176,7 +1176,7 @@ def xreidentify(request, orid, pid):
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
                     os.rename(from_path, to_path)
                 else:
-                    url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, new_family)
+                    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, new_family)
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
@@ -1203,7 +1203,7 @@ def xreidentify(request, orid, pid):
             # old_img.delete()
 
             # write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s" % (reverse('common:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
+            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
     return render(request, old_species.gen.family.application + '/reidentify.html', context)

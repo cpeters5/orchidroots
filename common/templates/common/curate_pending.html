@@ -180,7 +180,7 @@ div.text-br {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'common:photos' image.pid_id %}?family={{family.family}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
+                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family.family}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
                                     <br>Approved by {{image.user_id}}, {{image.created_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
