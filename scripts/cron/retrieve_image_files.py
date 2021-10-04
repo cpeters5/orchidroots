@@ -8,7 +8,7 @@ import re
 import sys
 from pathlib import Path
 
-print ('Number of arguments:', len(sys.argv), 'arguments.')
+# print ('Number of arguments:', len(sys.argv), 'arguments.')
 
 genus = ''
 app = sys.argv[1]
@@ -32,17 +32,17 @@ if app != 'other':
 
 stmthead = "UPDATE " + tab + " set image_file = '%s' where id = %d"
 stmt = "SELECT id, image_url, genus, family  FROM " + tab + " where image_url <>'' and image_url is not null and (image_file is null or image_file = '') order by id"
+# print (stmt)
+
 cur.execute(stmt)
 i = 0
 for row in cur:
     i = i + 1
     url = row[1]
-    if app == 'other':
+    if app == 'other' and row[3]:
         family = row[3].title()
-    # print(url)
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)
-    # print(a)
     # ext = a.split('.')[-1]
     ext = 'jpg'
     uid = shortuuid.uuid()
@@ -56,13 +56,18 @@ for row in cur:
         cur.nextset()
 
     try:
-        # print(url)
         # html = urlopen(url)
         if app == 'other':
             imgdir = "/mnt/static/utils/images/" + family + "/"
             Path(imgdir).mkdir(parents=True, exist_ok=True)
         local_filename, headers = urllib.request.urlretrieve(url, imgdir + fname)
-        print(imgdir)
+        print(imgdir + fname)
+        stmt = stmthead % (fname, row[0])
+        # print(stmt)
+        curinsert = conn.cursor()
+
+        curinsert.execute(stmt)
+        conn.commit()
     except urllib.error.URLError as e:
         print("URLError -- ", row[0], e.reason)
         cur.nextset()
@@ -75,12 +80,12 @@ for row in cur:
     except:
         cur.nextset()
 
-    stmt = stmthead % (fname, row[0])
-    curinsert = conn.cursor()
-
-    curinsert.execute(stmt)
-    conn.commit()
-# print (stmt)
+    # stmt = stmthead % (fname, row[0])
+    # # print(stmt)
+    # curinsert = conn.cursor()
+    #
+    # curinsert.execute(stmt)
+    # conn.commit()
 
 
 cur.close()

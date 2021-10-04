@@ -1,0 +1,132 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+
+    .table {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .table {
+            font-size: 12px;
+        }
+    }
+</style>
+<div class="row" style="width:100%; margin:0 auto;">
+    <div class="col-3 d-none d-lg-block" style="padding:0">
+       {% include "common/taxonomy.html" %}
+    </div>
+    <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div style="text-align: center; margin:0;">
+            {% if fuzzy %}
+                <span class="btn-group large" style="font-size: 16px; color:darkblue; vertical-align:middle">Search Results for "<i>{{spc_string}}</i>"</span>
+                <div style="font-size: 14px;margin-bottom:10px;" align="center">
+                     <a class="btn btn-primary btn-sm" type="button" href="{% url 'common:search_fuzzy' %}?family={{family.family}}&spc_string={{spc_string}}&role={{role}}"><span >APPROXIMATE SEARCH</span></a>
+                </div>
+            {% else %}
+                <span class="btn-group large" style="font-size: 16px; color:darkblue; vertical-align:middle">Approximate Search Results for "<i>{{spc_string}}</i>"</span>
+                <br>
+                <div style="font-size: 14px;margin-bottom:10px;" align="center">
+                Search complete
+                </div>
+            {% endif %}
+            <br>
+        </div>
+        <div style="margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
+            {% if result_list %}
+                <table class="table table-sm table-condensed table-bordered table-hover" style="width:90%;" align="center">
+                     <tr style="background-color: #eeeeee;">
+<!--                           <th class=" d-none d-sm-table-cell">score</th>-->
+                           <th class="text-center">Matches</th>
+                           <!--<th>status</th>-->
+                           <th>Accepted Name or Parents</th>
+                           <th>Images</th>
+                     </tr>
+                     {% for species in result_list %}
+                     <tr>
+<!--                          <td class=" d-none d-sm-table-cell" align="center">{{ species.1 }}</td>-->
+                          <td style="padding-left: 10px; ">
+                               {% if species.0.status == 'synonym' %}{{species.0.name|safe}}
+                               {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
+                                  {% if role == "cur" %}
+                                       <a href="{% url 'common:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.name|safe}}</a>
+                                  {% else %}
+                                       <a href="{% url 'common:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
+                                  {% endif %}
+                               {%  else %}
+                                   {{species.0.name}}
+                               {% endif %}
+                               {% if species.0.author %}{{species.0.author}}{% endif %}
+                               {{species.0.source}} {{species.0.status}}
+                               {% if species.0.year %}{{species.0.year}}{% endif %}
+                          </td>
+
+                          <td>
+                               {% if species.0.status == 'synonym' %}
+                                   {% if species.0.getAcc %}
+                                       {% if role == "cur" %}
+                                           <a href="{% url 'common:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                       {% else %}
+                                           <a href="{% url 'common:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                        {% endif %}
+                                   {% else %}
+                                        Error! Accepted name does not exist
+                                   {% endif %}
+                               {% elif species.0.type == 'hybrid' %}
+                                   {% if species.0.hybrid.seed_id %}
+                                       {% if role == "cur" %}
+                                           <a href="{% url 'common:photos' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                       {% else %}
+                                           <a href="{% url 'common:information' species.0.hybrid.seed_id.pid %}?family={{species.0.gen.family}}&pid={{species.0.hybrid.seed_id.pid}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                      {% endif %}
+
+                                    {%  else %}
+                                       {{species.0.hybrid.seed_id.name}}
+                                   {%  endif %}
+                                   ×
+                                   {% if species.0.hybrid.pollen_id %}
+                                       {% if role == "cur" %}
+                                           <a href="{% url 'common:photos' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                       {% else %}
+                                           <a href="{% url 'common:information' species.0.hybrid.pollen_id.pid %}?family={{species.gen.family}}&pid={{species.0.hybrid.pollen_id.pid}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                      {% endif %}
+
+                                   {%  else %}
+                                       {{species.0.hybrid.pollen_id.name}}
+                                   {%  endif %}
+                               {% endif %}
+
+                          </td>
+                          <td align="center">{% if species.0.num_image %}{{species.0.num_image}}{% endif %}</td>
+        <!--                  <td class=" d-none d-sm-table-cell" align="center">{% if species.0.num_image %}{{species.0.num_image}}{% endif %}</td>-->
+                     </tr>
+                     {% endfor %}
+                 </table>
+            {% endif %}
+        </div>
+            <br>
+    </div>
+</div>
+<script>
+$('#myTab a').click(function(e) {
+  e.preventDefault();
+  $(this).tab('show');
+});
+
+
+//
+//// store the currently selected tab in the hash value
+//$("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+//  var id = $(e.target).attr("href").substr(1);
+//  window.location.hash = id;
+//});
+//
+//// on load of the page: switch to the currently selected tab
+//var hash = window.location.hash;
+//$('#myTab a[href="' + hash + '"]').tab('show');
+
+
+</script>
+{% endblock %}

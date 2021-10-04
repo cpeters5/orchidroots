@@ -1,0 +1,166 @@
+{% load static %}
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
+<style>
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+    /*transition: opacity 1s;*/
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+</style>
+
+
+    <div style="margin:0 auto;width:95%;">
+        <!--main section-->
+    {% include "common/detail-nav.html" %}
+    <div class="tab-content clearfix" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
+    {% if des_list %}
+        <div style="display:block; margin: 0; width: 100%; font-size:13px">
+            <form action="?" autocomplete="off" style="display:inline-block">
+                <input type="hidden" name="family" value="{{family}}" />
+                <input type="hidden" name="role" value="{{ role }}" />
+                <input type="hidden" name="tab" value="pro" />
+            {% if direct %}
+            <input type="checkbox" class="form-check-input" name="direct" value="checked" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Uncheck for all descendants</span>
+            {% else %}
+            <input type="checkbox" class="form-check-input" name="direct" value="checked" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Check for primary descendans</span>
+            {% endif %}
+            </form>
+            {% include "orchidaceae/alpha_list.html" %}
+            <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
+                <thead>
+                    <th>Descendants</th>
+                    <th style="border-right:0; text-align:right;">Seed Parent</th>
+                    <th style="border-left:0; border-right:0;">×</th>
+                    <th style="border-left:0">Pollen Parent</th>
+                    <th class="text-center d-none d-sm-block" >pct</th>
+                    <th class="text-center d-none d-sm-table-cell"># images</th>
+                </thead>
+
+                {% for image in des_list %}
+                <tr style="text-align: left">
+                    <td class="border-lb">
+                        {% if role == 'cur' %}
+                            <a href="{% url 'common:photos' image.did.pid.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.pid.binomial_it|safe}}</a>
+                        {% else %}
+                            <a href="{% url 'common:information' image.did.pid.pid %}?family={{image.did.pid.gen.family}}&role={{role}}"><i>{{image.did.pid.binomial_it|safe}}</i></a>
+                        {% endif %}
+                    </td>
+
+                    <td style="border-right:0; text-align:right;">
+                        {% if image.did.seed_id.pid %}
+                            {% if role == 'cur' %}
+                                <a href="{% url 'common:photos' image.did.seed_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
+                            {% else %}
+                                <a href="{% url 'common:information' image.did.seed_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
+                            {% endif %}
+                        {% else %}
+                            na
+                        {% endif %}
+                    </td>
+                    <td align="center"  style="border-left:0; border-right:0;">×</td>
+                    <td  style="border-left:0">
+<!--                        Some hybrrid's parent(s) are missing-->
+                        {% if image.did.pollen_id.pid %}
+                            {% if role == 'cur' %}
+                                <a href="{% url 'common:photos' image.did.pollen_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
+                            {% else %}
+                                    <a href="{% url 'common:information' image.did.pollen_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
+                            {% endif %}
+                        {% else %}
+                            na
+                        {% endif %}
+                    </td>
+
+                    <td class="border-rb text-center d-none d-sm-block">
+                        {{image.pct|floatformat:0}}%
+                    </td>
+
+                    <td class="border-rb text-center d-none d-sm-table-cell" valign="middle">
+                        {% if image.did.pid.num_image %}{{image.did.pid.num_image}} {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% elif alpha %}
+        <div style="display:block; margin: 0; width: 100%; font-size:13px">
+            <br>
+            {% include "orchidaceae/alpha_list.html" %}
+        </div>
+        <div class="container" style="width:100%;text-align:center;padding:30px;">
+            <h5><small>{{species.name|safe}} has no offspring with name begins with {{alpha|upper}}.</small></h5>
+        </div>
+    {% else %}
+        <div class="container" style="width:100%;text-align:center;padding:30px;">
+            <h5><small>None</small></h5>
+        </div>
+    {% endif %}
+    </div>
+
+
+</div>
+
+<script>
+
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        "columnDefs": [{ "orderable": false, "targets": 2 }],
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+
+    });
+});
+
+
+</script>
+
+{% endblock %}

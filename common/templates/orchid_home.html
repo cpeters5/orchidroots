@@ -190,18 +190,17 @@ img{
                     </div>
                     <br>
                     <p>
-                    And now, to begin, select a family from the left panel and search for your orchids.
-                    <div class="p-2" style="text-align: center;">
-                        <form class="form-inline" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="family" value="{{family}}" />
-                            <input type="hidden" name="search" value="species" />
-                            <input type="hidden" name="role" value="{{ role }}" />
-                            <div class="input-group">
-                            <input type="text" name="spc_string" value="{{spc_string}}" pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
-                            <button class="submit" type="submit"><i class="fa fa-search"></i></button>
-                            </div>
-                        </form>
-                    </div>
+<!--                    And now, to begin, select a family from the left panel and search for your orchids.-->
+<!--                    <div class="p-2" style="text-align: center;">-->
+<!--                        <form class="form-inline" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">-->
+<!--                            <input type="hidden" name="family" value="{{family}}" />-->
+<!--                            <input type="hidden" name="role" value="{{ role }}" />-->
+<!--                            <div class="input-group">-->
+<!--                            <input type="text" name="spc_string" value="{{spc_string}}" pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">-->
+<!--                            <button class="submit" type="submit"><i class="fa fa-search"></i></button>-->
+<!--                            </div>-->
+<!--                        </form>-->
+<!--                    </div>-->
                     <br>
                     </p>
                     <div class="clearfix"></div>
@@ -238,7 +237,7 @@ img{
                     </div>
 
                     <div class="imageitem">
-                        <div class="imgtitle" style="background-color:#d9ffc9;; color: #0a6aa1;">{{cacimage.gen.family}}</div>
+                        <div class="imgtitle" style="background-color:#d9ffc9; color: #0a6aa1;">{{cacimage.gen.family}}</div>
                         <a href="{% url 'common:browse' %}?family={{cacimage.gen.family}}&genus=&role={{role}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="{{cacimage.pid.pid.textname}}" src="{% static cacimage.image_dir %}{{cacimage.image_file}}">

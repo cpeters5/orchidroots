@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+{% load static %}
+{% load humanize %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+
+
+
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
+    <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
+    <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
+    <!--    <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico?v=2' %}"/>-->
+<!--    <script>-->
+<!--        window.dataLayer = window.dataLayer || [];-->
+<!--        function gtag(){dataLayer.push(arguments);}-->
+<!--        gtag('js', new Date());-->
+<!--        gtag('config', 'UA-128957305-1');-->
+<!--    </script>-->
+    {% if species %}
+        <title>{{species.genus}} {{species.species}}</title>
+    {% elif genus %}
+        <title>{{genus}}</title>
+    {% else %}
+        <title>Bluenanta</title>
+    {% endif %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Fondamento" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!--    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="{% static '/utils/css/style.css' %}">
+	<link rel="{% static '/utils/css/index.css' %}">
+
+<!--    Get rid of apple-touch error caused by requests from cellphone. Doesn't work anyway oh what to do??? -->
+<!--    <link rel="apple-touch-icon" href="apple-touch-icon.png">-->
+<!--    <link rel="icon" sizes="196x196" href="apple-touch-icon.png">-->
+<!--    <link rel="icon" sizes="120x120" href="apple-touch-icon.png">-->
+<!--    <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">-->
+<!--    <link rel="apple-touch-icon-precomposed apple-touch-icon" href="apple-touch-icon-precomposed.png">-->
+
+<!--    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>-->
+<!--	<script src="{% static 'utils/js/jstree.min.js' %}"></script>-->
+
+<!--    Select2-->
+<!--    <link href="select2.css" rel="stylesheet"/>-->
+<!--    <script src="select2.js"></script>-->
+    <script>
+        $(document).ready(function() { $("#genselect").select2(
+            {
+                placeholder: "Select a Genus",
+                allowClear: true,
+                closeOnSelect: false
+            }
+
+
+        ); });
+        $(document).ready(function() { $("#spcselect").select2();});
+        $(document).ready(function() { $("#hybselect").select2();});
+    </script>
+
+    <style>
+
+    .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+    .mytable>tbody>tr>th { font-size: 16px; }
+    .mytable>tbody>tr>td { font-size: 12px !important; }
+	a {text-decoration: none}
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .navbar-nav > li > a {padding-top:0 !important; padding-bottom:0 !important;}
+
+</style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-128957305-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-128957305-4');
+</script>
+{% block extra-head %}
+
+{% endblock %}
+
+</head>
+
+<style>
+
+body {
+    width:100%;
+    /*background-color: #efeeee;*/
+}
+
+#wrapper {
+     width: 100%;
+     text-align: center;
+    background-color: black;
+    color: #92d028;
+
+}
+#pub2, #pri2, #pub3, #pri3, #cur3 {
+    float: left;
+}
+.rolebtn {
+    font-size:12px !important;
+}
+.rolebtn:hover {
+    background-color: #cad4f7;
+}
+#pub2, #pri2 {
+    width: 17%;
+}
+#pub3, #pri3, #cur3 {
+    width: 17%;
+}
+
+#log, #reg {
+    float: right;
+     width: 17%;
+     text-align: center;
+}
+
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 12vw;
+   width : 12vw;
+    padding:2px;
+}
+
+.imgcaption {
+    font-size: 11px;
+    text-align: center;
+    height:40px;
+    overflow: hidden;
+}
+
+.table-text {
+    font-size:13px;
+    text-align: left;
+    line-height: 20px;
+}
+
+.searchbox {
+        margin:0 4px;
+        font-size: 13px;
+        width: 120px;
+    }
+.nav-style {
+    font-size:18px;
+    width:100px;
+}
+
+@media only screen and (max-width: 800px){
+    .imgcaption {
+        font-size: 10px;
+        height: 50px;
+        overflow: hidden
+    }
+    .table-text {
+        font-size:12px;
+    }
+}
+
+@media only screen and (max-width: 600px){
+    .searchbox {
+        font-size: 12px;
+    }
+    .modal-content {
+        width: 100%;
+    }
+    .imgcaption {
+        font-size: 9px;
+        height: 60px;
+        overflow: hidden
+    }
+    .table-text {
+        font-size:12px;
+    }
+   .thumbnails {
+        width: 22vw;
+        height: 22vw;
+    }
+    .detail-title {
+        font-size:13px;
+    }
+    .dropdown-content a {
+        font-size:10px;
+
+    }
+}
+
+.navbar2 {
+    background-color: #fef9ff;
+    color: black;
+    width:100%;
+    margin:0;
+    float:left;
+    padding:4px;
+    font-size: 15px;
+    border: 1px solid lightgrey;
+}
+
+.navbar2:hover {
+    text-decoration: none;
+}
+.selected {
+    background-color: #bac4e8;
+    border: 1px solid #808080;
+    color: black;
+}
+
+.item-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.item-list:hover {
+    text-decoration: none;
+}
+
+.dropdown-item {
+    padding: 5px 10px;
+}
+
+.dropdown-item:hover {
+    background-color:lightgrey;
+}
+
+
+.dropdown-menu {
+    padding: 10px;
+    font-size:13px;
+
+}
+
+.dropdown:hover>.dropdown-menu {
+    display: block;
+}
+    .advanced_search {
+        height: 33px !important;
+        width: 170px !important;
+        border: 1px solid darkgrey !important;
+        font-size: 13px;
+    }
+
+.select2-hidden-accessible {
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+}
+.navbar {
+  min-height: 40px;
+}
+/*option:nth-child(2), option:nth-child(3) {*/
+/*    font-weight:bold;*/
+/*}*/
+
+.bannerfont {
+  font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
+  font-size: 20pt;
+  color: #ffff33;
+  line-height: 11px;
+}
+
+.famfont {
+  font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
+  /*font-size: 20pt;*/
+  color: #ffff33;
+}
+
+.selectedText{
+    color:blue;
+    font-weight:bold;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+    .navbar-nav {
+      flex-direction: row;
+    }
+
+    .nav-link {
+        padding-right: .5rem !important;
+        padding-left: .5rem !important;
+        color: white !important;
+        font-size:16px;
+        margin:0 10px;
+    }
+
+.custom-find{
+    /*color: #292929;*/
+    color:white;
+}
+
+.custom-find:hover {
+    text-decoration: none;
+    background-color: #353547;
+    color: lightblue !important;
+}
+
+.btn-custom{
+    /*margin:1px;*/
+    width:120px;
+    height:32px;
+    display: inline-block;
+    background: none;
+    border-color: #2196F3;
+    color: dodgerblue;
+    padding: 5px 5px;
+    font-size: 14px;
+}
+
+.btn-custom:hover {
+    text-decoration: none;
+    background-color: #c2cdd0;
+    color: black;
+}
+
+.btn-custom:active {
+    text-decoration: none;
+    background-color: #8887bd;
+    color: black;
+}
+
+.taxtree {
+    overflow-y:auto;
+    height:1000px;
+    margin: 30px 10px;
+    padding: 30px 10px;
+}
+@media only screen and (max-width: 600px) {
+    .taxtree {
+        height: 300px;
+        width: 100%;
+    }
+}
+
+/*Taxonomy*/
+ul{
+        font-size: 13px;
+        padding-left:10px;
+        line-height: 23px;
+        list-style-type:none;
+}
+li {
+    padding-left:0;
+}
+form {
+    display: inline-block; //Or display: inline;
+}
+ul, #myUL {
+  list-style-type: none;
+}
+
+#myUL {
+  margin: 0;
+  padding: 0;
+}
+
+ul, #myUL1 {
+  list-style-type: none;
+}
+
+#myUL1 {
+  margin: 0;
+  padding: 0;
+}
+
+.spc_column {
+    min-width: 200px;
+}
+
+.indent {
+  text-indent: 18px;
+}
+
+.nested {
+  display: none;
+    margin-left: 8px;
+}
+
+.active {
+  display: block;
+}
+.dataTables_filter {
+    float: left;
+}
+
+.caret {
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+}
+
+.caret::before {
+  content: "\25B7";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.caret-down::before {
+  content: "\25BD";
+  /*-ms-transform: rotate(90deg); !* IE 9 *!*/
+  /*-webkit-transform: rotate(90deg); !* Safari *!'*/
+  /*transform: rotate(90deg);*/
+}
+
+a {
+        text-decoration: none;
+    /*color: blue;*/
+}
+
+a:hover {
+    /*text-decoration: none;*/
+    color: darkblue;
+}
+.submit {
+    /*Use only in home page*/
+    /*height:35px;*/
+    /*width: 38px;*/
+    height: 40px;
+    /*font-color:lightgrey;*/
+    /*border: none;*/
+    float: left;
+    margin: 0;
+    /*background-color: #607951;*/
+    /*color:white;*/
+    border: 1px solid #ccc;
+    border-left: 0;
+    /*visibility: hidden;*/
+}
+
+nav a {
+  float: left;
+  display: block;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 14px;
+}
+/*nav a:hover {*/
+/*  background-color: #ddd;*/
+/*  color: black;*/
+/*}*/
+
+
+nav input[type=text] {
+  padding: 6px;
+  margin: 1px;
+  font-size: 14px;
+  border: none;
+    border-radius: 3px;
+    width: 220px;
+    height: 35px;
+}
+nav select {
+  height: 35px;
+  padding: 6px;
+  margin: 1px;
+  font-size: 16px;
+  /*border: 1px solid #ccc;*/
+  background-color: #5858be;
+  color: white;
+  border-left: #ccc;
+     border-radius: 3px;
+}
+option:not(:checked) {
+    background-color: #FFF;
+    color: black;
+}
+nav button[type=submit] {
+  padding: 6px !important;
+  margin: 1px !important;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  height: 35px !important;
+  width: 35px;
+}
+
+nav .search-container button {
+  float: right;
+  padding: 6px 10px;
+  margin-top: 4px;
+  margin-right: 16px;
+    height: 30px;
+  background: inherit;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+nav .search-container button:hover {
+  background: #ccc;
+}
+.search-btn {
+    width: 150px !important;
+    height:40px !important;
+    font-size: 13px;
+}
+.search-btn1 {
+    width: 40px;
+    height:40px;
+    font-size: 12px;
+}
+
+@media screen and (max-width: 600px) {
+  nav .search-container {
+    float: none;
+  }
+  nav a, .topnav input[type=text], .topnav .search-container button {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 14px;
+  }
+  nav input[type=text] {
+    border: 1px solid #ccc;
+  }
+  .bannerfont {
+    font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
+    font-size: 13px;
+  }
+
+  .search-btn {
+     width: 100px !important;
+     height:30px !important;
+      font-size: 11px;
+
+  }
+.search-btn1 {
+    width: 30px !important;
+    height:30px !important;
+    font-size: 11px;
+}
+}
+
+</style>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; "><b>Orchid<br>R<span style="font-size:18px;">oots</span></b><span style="font-size:12px;color:darkgrey;font-family:Lucida;"> ©2017-{% now 'Y' %}</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Brand -->
+        </div>
+<!-- Links -->
+
+        <div class="collapse navbar-collapse" id="nav-content" style="height:30px;">
+            <ul class="navbar-nav" style="line-height:25px !important;">
+                <li  class="nav-item">
+                    <div  class="search-container">
+                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
+                            <input type="hidden" name="family" value="{{ family.family }}" />
+                            <input type="hidden" name="role" value="{{ role }}" />
+                            <div class="input-group">
+                                <input class="search-btn" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                                <input class="search-btn1" type="submit" form="searchspc" value="go" name="search" />
+                            </div>
+                        </form>
+
+                    </div>
+                </li>
+                <li  class="nav-item">
+                    <div  class="search-container m-1" style="margin-top:3px;">
+                        <form class="form-inline" id="newfamily" action="" style="display:inline-block;">
+                            <input form="newfamily" type="hidden" name="spc_string" value="{{ spc_string }}" />
+                            <input form="newfamily" type="hidden" name="display" value="checked" />
+                            <select class="search-btn" form="newfamily" name="newfamily">
+                                    <option value="bromeliaceae" {% if family.application != "other" and family.application != "cactaceae"  and family.application != "orchidaceae" %} selected {% endif %}>Bromeliaceae</option>
+                                    <option value="cactaceae"    {% if family.application != "other" and family.application != "bromeliaceae"  and family.application != "orchidaceae" %} selected {% endif %}>Cactaceae</option>
+                                    <option value="orchidaceae"    {% if family.application != "other" and family.application != "bromeliaceae"  and family.application != "cactaceae" %} selected {% endif %}>Orchidaceae</option>
+                                    <option value="other"        {% if family.family != 'Orchidaceae' and family.family != 'Cactaceae' and family.family != 'Bromeliaceae' %} selected {% endif %}>All other families</option>
+                                    <option disabled>_________</option>
+                                {% for f in family_list %}
+                                    {% if f.application == "other" %}
+                                    <option value="{{f.family}}" {% if family.family == f.family %} selected {% endif %}>{{f.family}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                           </select>
+                            <input class="search-btn1" form="newfamily" type="submit" value="go" name="fam" />
+                        </form>
+                    </div>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <div class="nav-item dropdown" style="float:right;">
+                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
+                        <ul class="dropdown-menu">
+                            {% if user.tier.tier == 5 %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
+                                <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}">Maintenance</a></li>
+                                <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
+                                {% if species %}
+                                    <li><a class="dropdown-item" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&role=pub">Public</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="{% url 'common:browse' %}?role=cur&family={{family.family}}&display=checked">Browse</a></li>
+                                {% endif %}
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Species</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Hybrids</a></li>
+                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family}}&tab=brg&role=pri">My Collection</a></li>
+<!--                            <hr style="margin:0;padding:0;">-->
+                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/">Update profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/">Logout</a></li>
+                     <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:browse' %}?family={{family.family}}&role=pub&display=checked">Public</a>
+                     <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family}}&role=pri&display=checked">Private</a>
+                     <a class="btn btn-custom {% if role == 'cur' %}btn-current{% endif %}" href="{% url 'common:browse' %}?family={{family.family}}&role=cur&display=checked">Curate</a>
+                        </ul>
+                    </div>
+                </li>
+                {% else %}
+                    <li class="nav-item" style="margin-top:8px;">
+                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login"><span style="color:white">Register</span></a>
+                    </li>
+                    <li class="nav-item" style="margin-top:8px;">
+                        <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+<!-- Search -->
+  </div>
+</nav>
+    <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark" >-->
+{% if messages %}
+  <div class="row">
+  <div class="col-sm-12">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+          <p>{{ message }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
+
+
+<div id="wrapper" style="background-color:black">
+            <h2 class="famfont p-2">
+
+    {% if family.family %}
+        {% if family.application == 'other' %}
+            <a href="{% url 'common:genera' %}?" style="color: inherit"></a> <a href="{% url 'common:genera' %}?family={{family.family}}" style="color: inherit">{{family.family}}</a>
+        {% elif family.application != 'other' %}
+            <a href="{% url 'common:genera' %}?family={{family.family}}" style="color: inherit">{{family.family}}</a>
+        {% endif %}
+    {% elif species %}
+        {% if species.gen.family.application == 'other' %}
+            <a href="{% url 'common:genera' %}" style="color: inherit">Others</a> - <a href="{% url 'common:genera' %}?family={{species.gen.family}}" style="color: inherit">{{species.gen.family}}</a>
+        {% else %}
+            <a href="{% url 'common:genera' %}?family={{species.gen.family}}" style="color: inherit">{{species.gen.family}}</a>
+        {% endif %}
+    {% elif genus %}
+        {% if genus.family.application == 'other' %}
+            <a href="{% url 'common:genera' %}" style="color: inherit">Others</a> - <a href="{% url 'common:genera' %}?family={{genus.family}}" style="color: inherit">{{genus.family}}</a>
+        {% else %}
+            <a href="{% url 'common:genera' %}?family={{genus.family}}" style="color: inherit">{{genus.family}}</a></h2>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'common:genera' %}?" style="color: inherit">Other Families</a>
+    {% endif %}
+        </h2>
+</div>
+
+
+{% block content %}
+    {%  block body %}
+
+
+    {% endblock %}
+{% endblock %}
+
+
+
+<script>
+
+    (function($) {
+
+  $('#search-button').on('click', function(e) {
+    if($('#search-input-container').hasClass('hdn')) {
+      e.preventDefault();
+      $('#search-input-container').removeClass('hdn')
+      return false;
+    }
+  });
+
+  $('#hide-search-input-container').on('click', function(e) {
+    e.preventDefault();
+    $('#search-input-container').addClass('hdn')
+    return false;
+  });
+
+})(jQuery);
+
+</script>
+
+{% block extra-scripts %}
+
+{% endblock %}
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -427,10 +427,10 @@ def species(request):
 
             total = len(this_species_list)
 
-            if total > 2000:
-                msg = 'Your search request generated over 2000 names. Please refine your search criteria.'
-                this_species_list = this_species_list[0:2000]
-                total = 2000
+            if total > 5000:
+                msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
+                this_species_list = this_species_list[0:5000]
+                total = 5000
 
     subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0).order_by('subfamily')
     if subfamily_obj:
@@ -557,10 +557,10 @@ def hybrid(request):
                 total = len(this_species_list)
             else:
                 total = 0
-            if total > 2000:
-                msg = 'Your search request generated over 2000 names. Please refine your search criteria.'
-                this_species_list = this_species_list[0:2000]
-                total = 2000
+            if total > 5000:
+                msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
+                this_species_list = this_species_list[0:5000]
+                total = 5000
 
     genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
     genus_list.sort()
@@ -903,7 +903,7 @@ def ancestrytree(request, pid=None):
 
 # All access - at least role = pub
 @login_required
-def progeny(request, pid):
+def progeny_old(request, pid):
     alpha = ''
     direct = ''
     role = getRole(request)
@@ -923,7 +923,7 @@ def progeny(request, pid):
         return HttpResponse(message)
     genus = species.genus
     des_list = AncestorDescendant.objects.filter(aid=pid)
-    if len(des_list) > 2000:
+    if len(des_list) > 5000:
         des_list = des_list.filter(pct__gt=20)
     if direct:
         des_list = des_list.filter(Q(did__seed_id=pid) | Q(did__pollen_id=pid))
@@ -937,6 +937,58 @@ def progeny(request, pid):
 
     write_output(request, species.textname())
     context = {'des_list': des_list, 'species': species, 'total': total, 'alpha': alpha, 'alpha_list': alpha_list,
+                'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
+               'title': 'progeny', 'section': 'Public Area', 'role': role,
+               }
+    return render(request, 'orchidaceae/progeny_old.html', context)
+
+def progeny(request, pid):
+    direct = ''
+    role = getRole(request)
+    if 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
+        return HttpResponseRedirect(url)
+    else:
+        family = Family.objects.get(pk='Orchidaceae')
+
+    if 'direct' in request.GET:
+        direct = request.GET['direct']
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    genus = species.genus
+
+    #All descendants
+    des_list = AncestorDescendant.objects.filter(aid=pid)
+
+    # primary
+    prim_list = Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True)
+    # Secondary
+    sec_list = Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True)
+    prim_list = set(prim_list)
+    sec_list = set(sec_list)
+
+
+    if len(des_list) > 5000:
+        des_list = des_list.filter(pct__gt=40)
+
+    result_list = []
+    for x in des_list:
+        if x.did.pid.pid in prim_list:
+            result_list.append([x,'primary'])
+        elif x.did.pid.pid in sec_list:
+            result_list.append([x,'secondary'])
+        else:
+            result_list.append([x,''])
+
+    # total = des_list.count()
+
+    write_output(request, species.textname())
+    context = {'result_list': result_list, 'species': species, 'family': family,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role,
                }

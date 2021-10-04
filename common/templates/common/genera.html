@@ -6,7 +6,7 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-3 d-none d-lg-block" style="padding:0">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
             {% include "common/taxonomy.html" %}
         </div>
 <!--Main table       -->
@@ -16,20 +16,20 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of Genera in {% if family %}{{family.family}} family{% else %}All {{app|title}} Families{% endif %} {% if subfamily %} > {{subfamily}}  {% endif %}
-                            {% if tribe %}> {{tribe}}  {% endif %}
-                            {% if subtribe %} > {{subtribe}}  {% endif %}
+                            List of Genera in {% if family %}family <i>{{family.family}}</i> {% else %}All {{app|title}} Families{% endif %} {% if subfamily %} subfamily <i>{{subfamily}}</i>  {% endif %}
+                            {% if tribe %} tribe <i>{{tribe}}</i>  {% endif %}
+                                {% if subtribe %} subtribe <i>{{subtribe}}</i>  {% endif %}
                         </div>
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Species list</a>
+                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Species list</a>
                             {% if not genus or genus.num_hybrid > 0 %}
                                 <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Hybrid list</a>
                             {% endif %}
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked">Browse</a>
                             {% if app == 'orchidaceae' %}
-                                <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Go to full genus list</a>
+                                <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&alpha={{alpha}}&role={{role}}">Go to full genus list</a>
                             {% endif %}
                         </div>
                         <!--   Main table-->
@@ -64,7 +64,6 @@
 <!--                                    {% include "common/paginator_genus.html" %}-->
 <!--                                </div>-->
 <!--                            {% endif %}-->
-                            {% include "common/alpha_list_common.html" %}
                         {% else %}
                             None!
                         {% endif %}
@@ -76,15 +75,6 @@
 <br>
 <br>
 <script>
-var toggler = document.getElementsByClassName("caret");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,

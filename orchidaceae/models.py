@@ -49,8 +49,10 @@ class Genus(models.Model):
     tribe  = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', related_name='ortribe',on_delete=models.DO_NOTHING)
     subtribe  = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe', related_name='orsubtribe',on_delete=models.DO_NOTHING)
     is_succulent = models.BooleanField(null=True, default=False)
+    is_parasitic = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=20, default='')
     type = models.CharField(max_length=20, default='')
+    common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True)
     distribution = models.TextField(null=True)
     text_data = models.TextField(null=True)
@@ -142,6 +144,22 @@ class GenusRelation(models.Model):
     def get_parentlist(self):
         x = self.parentlist.split('|')
         return x
+
+
+class Alliance(models.Model):
+    class Meta:
+        unique_together = (("alid", "gen"),)
+        ordering = ['alliance']
+
+    alid = models.ForeignKey(Genus, db_column='alid', related_name='alid', null=True, blank=True,on_delete=models.CASCADE)
+    gen = models.ForeignKey(Genus, db_column='gen', related_name='algen', null=True, blank=True,on_delete=models.CASCADE)
+    alliance = models.CharField(max_length=50)
+    type = models.CharField(max_length=10)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.alliance
 
 
 class Gensyn(models.Model):
@@ -300,8 +318,9 @@ class Species(models.Model):
     citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
-    is_parasite = models.BooleanField(null=True, default=False)
+    is_parasitic = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
+    conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='')
     type = models.CharField(max_length=10,choices=TYPE_CHOICES,default='')
     year = models.IntegerField(null=True)
@@ -572,7 +591,7 @@ class Accepted(models.Model):
     url = models.CharField(max_length=200, null=True, blank=True)
     url_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    common_name = models.CharField(max_length=100, null=True, blank=True)
+    common_name = models.CharField(max_length=200, null=True, blank=True)
     local_name = models.CharField(max_length=100, null=True, blank=True)
     bloom_month = models.CharField(max_length=200, null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)

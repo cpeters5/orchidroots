@@ -34,11 +34,17 @@ def change_family(request):
     }
     return path_list[path]
 
-def get_family_list():
-    family_list = Family.objects.all()
+def get_family_list(request, alpha):
+    if alpha != '':
+        family_list = Family.objects.filter(family__istartswith=alpha)
+        logger.error("family_list " + str(len(family_list)))
+    else:
+        family_list = Family.objects.all()
+        logger.error("family_list " + str(len(family_list)))
     favorite = Family.objects.filter(family__in=('Orchidaceae', 'Bromeliaceae', 'Cactaceae'))
     family_list = favorite.union(family_list)
     return family_list
+
 
 def getApp(request):
     return request.resolver_match.app_name
@@ -240,6 +246,8 @@ def getModels(request, family=None):
             GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
             HybImages = apps.get_model(app.lower(), 'HybImages')
             Intragen = apps.get_model(app.lower(), 'Intragen')
+        else:
+            HybImages = apps.get_model(app.lower(), 'SpcImages')
         Genus = apps.get_model(app.lower(), 'Genus')
         Hybrid = apps.get_model(app.lower(), 'Hybrid')
         Species = apps.get_model(app.lower(), 'Species')

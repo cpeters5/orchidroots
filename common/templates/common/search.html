@@ -4,28 +4,28 @@
 {% block body %}
 {% load testtags %}
 <style>
-    .btn_result {
-        font-size: 20px;
+    .btn_search {
+        font-size: 13px;
         color: #0a6aa1;
-        font-weight: bold;
+        /*width: 100px;*/
     }
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
     <div style="clear:both"></div>
     <div class="row" style="width:100%; margin:0 auto;">
-        <div class="col-3 d-none d-lg-block" style="padding:0">
+        <div class="col-2 d-none d-lg-block" style="padding:0">
+            Filter search
            {% include "common/taxonomy.html" %}
         </div>
 
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div class="col" style="text-align:left;font-size:13px;margin-top:5px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
-                <div style="padding:0; margin: 0">
-                    <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Show genera</a>
-                    {% if not genus or genus.num_hybrid > 0 %}
-                        <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Show species</a>
-                    {% endif %}
-                    <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
-                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&alpha=A&syn=N">Full species list</a>{% endif %}
+                <div class="">
+                    <a class="btn border btn_search" href="?family={{family}}&role={{role}}&search=families&keyword={{keyword}}">families</a>
+                    <a class="btn border btn_search" href="?family={{family}}&role={{role}}&search=genera&keyword={{keyword}}">genera</a>
+                    <a class="btn border btn_search" href="?family={{family}}&role={{role}}&search=species&keyword={{keyword}}">species</a>
+                    <a class="btn border btn_search" href="?family={{family}}&role={{role}}&search=hybrids&keyword={{keyword}}">hybrids</a>
+                    <a class="btn border btn_search" href="?family={{family}}&role={{role}}&search=common&keyword={{keyword}}">common names</a>
                 </div>
                 <br>
                 <h6>Searching for "<i>{{spc_string}}</i>"</h6>
@@ -166,17 +166,8 @@
             </div>
         </div>
     </div>
-</div>
+<!--</div>-->
 <script>
-var toggler = document.getElementsByClassName("caret");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
 
 </script>
 {% endblock %}

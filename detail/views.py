@@ -228,6 +228,16 @@ def compare(request, pid=None):
         year2 = request.GET['year2']
         if year2:
             year2 = year2.strip()
+    if pid:
+        try:
+            species = Species.objects.get(pk=pid)
+            pid = species.pid
+            genus = species.genus
+            species1 = species
+        except Species.DoesNotExist:
+            return HttpResponseRedirect("/")
+    else:
+        return HttpResponse("/")
 
     if gen2:
         try:

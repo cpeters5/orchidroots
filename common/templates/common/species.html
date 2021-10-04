@@ -28,11 +28,9 @@
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
                         <dev style="font-size:16px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
-                            {% if not genus or genus.num_hybrid > 0 %}
-                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Hybrid list</a>
-                            {% endif %}
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&genus={{genus}}&display=checked">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}">Genus list</a>
+                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&alpha={{alpha}}&syn=N">Hybrid list</a>
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked">Browse</a>
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
                         </dev>
@@ -69,9 +67,9 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/common/{{path}}/{{species.getAccepted.pid}}/?family={{family}}"><i>{{species.name|safe}} (syn.)</i></a>
+                                                        {{species.binomial_it|safe}} (syn. <a href="/common/{{path}}/{{species.getAccepted.pid}}/?family={{family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>)
                                                     {% else %}
-                                                        {{species.name|safe}} (syn.)
+                                                        {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
                                                     <a href="/common/{{path}}/{{species.pid}}/?family={{family}}"><i>{{species.name|safe}}</i></a>
@@ -112,14 +110,6 @@
 <br>
 
 <script>
-var toggler = document.getElementsByClassName("caret");
-var i;
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,

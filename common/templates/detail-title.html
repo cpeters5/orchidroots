@@ -34,11 +34,23 @@
                 <h1 style="display:none">{{species.genus}} {{species.species}}</h1>
                 <h1>
 <!--                    <a href="{% url 'common:genera' %}?family={{species.gen.family}}&role={{role}}"><i>{{species.gen.family}}</i></a>:-->
-                    <a href="{% url 'common:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}"><i>{{species.genus}}</i></a>
+                    {% if species.type == 'hybrid' %}
+                        {% if family.family == 'Orichidaceae' %}
+                            <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&display=checked"><i>{{species.genus}}</i></a>
+                        {% else %}
+                            <a href="{% url 'common:hybrid' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
+                        {% endif %}
+                    {% else %}
+                        {% if family.family == 'Orichidaceae' %}
+                            <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&display=checked"><i>{{species.genus}}</i></a>
+                        {% else %}
+                            <a href="{% url 'common:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
+                        {% endif %}
+                    {% endif %}
                     {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
                     {% if species.year %}{{species.year}}{% endif %}
                     {% if  species.source == 'RHS' or species.source == 'Kew' %}
-                    <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
+                        <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
                     {% endif %}
                     </h1>
                 {% if species.type == 'hybrid' %}
@@ -69,12 +81,10 @@
                          <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'common:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
 
                     {% endif %}
-<!--                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
-                    {% if family.family == 'Orchidaceae' %}
-                        <br>
-                        <h7 style="color: red;text-align: center">To upload orchids photo, click here <a href="https://orchidroots.com/detail/photos/{{species.pid}}/?family=Orchidaceae&role=pri">OrchidRoots</a></h7>
-                    {% endif %}
-<!--                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+<!--                    {% if family.family == 'Orchidaceae' %}-->
+<!--                        <br>-->
+<!--                        <h7 style="color: red;text-align: center">To upload a {{species.name|safe}} photo, click here <a href="https://orchidroots.com/detail/photos/{{species.pid}}/?family=Orchidaceae&role=pri">OrchidRoots</a></h7>-->
+<!--                    {% endif %}-->
                </div>
                 <br>
             </div>

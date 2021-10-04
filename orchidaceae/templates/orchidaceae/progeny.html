@@ -37,28 +37,16 @@
 
 
     <div style="margin:0 auto;width:95%;">
-<br>
-
         <!--main section-->
     {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
-    {% if des_list %}
+    {% if result_list %}
         <div style="display:block; margin: 0; width: 100%; font-size:13px">
             <br>
-            <form action="?" autocomplete="off" style="display:inline-block">
-                <input type="hidden" name="family" value="{{family}}" />
-                <input type="hidden" name="role" value="{{ role }}" />
-                <input type="hidden" name="tab" value="pro" />
-            {% if direct %}
-            <input type="checkbox" class="form-check-input" name="direct" value="checked" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">direct descendants</span>
-            {% else %}
-            <input type="checkbox" class="form-check-input" name="direct" value="checked" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">all progeny</span>
-            {% endif %}
-            </form>
-            {% include "orchidaceae/alpha_list.html" %}
             <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
                 <thead>
-                    <th>Descendant ({{first}}-{{last}} of {{total}})</th>
+                    <th>Descendants</th>
+                    <th>Level</th>
                     <th style="border-right:0; text-align:right;">Seed Parent</th>
                     <th style="border-left:0; border-right:0;">×</th>
                     <th style="border-left:0">Pollen Parent</th>
@@ -66,22 +54,24 @@
                     <th class="text-center d-none d-sm-table-cell"># images</th>
                 </thead>
 
-                {% for image in des_list %}
+                {% for hybrid in result_list %}
                 <tr style="text-align: left">
                     <td class="border-lb">
                         {% if role == 'cur' %}
-                            <a href="{% url 'common:photos' image.did.pid.pid %}?family={{image.did.pid.gen.family}}&role={{role}}"><i>{{image.did.pid.binomial}}</i></a>
+                            <a href="{% url 'common:photos' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.pid.binomial_it|safe}}</a>
                         {% else %}
-                            <a href="{% url 'common:information' image.did.pid.pid %}?family={{image.did.pid.gen.family}}&role={{role}}"><i>{{image.did.pid.namecasual|safe}}</i></a>
+                            <a href="{% url 'common:information' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
                         {% endif %}
                     </td>
-
+                    <td class="border-lb">
+                        {{hybrid.1}}
+                    </td>
                     <td style="border-right:0; text-align:right;">
-                        {% if image.did.seed_id.pid %}
+                        {% if hybrid.0.did.seed_id.pid %}
                             {% if role == 'cur' %}
-                                <a href="{% url 'common:photos' image.did.seed_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
+                                <a href="{% url 'common:photos' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name_short|safe}}</a>
                             {% else %}
-                                <a href="{% url 'common:information' image.did.seed_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_seed_name_short|safe}}</a>
+                                <a href="{% url 'common:information' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name_short|safe}}</a>
                             {% endif %}
                         {% else %}
                             na
@@ -90,11 +80,11 @@
                     <td align="center"  style="border-left:0; border-right:0;">×</td>
                     <td  style="border-left:0">
 <!--                        Some hybrrid's parent(s) are missing-->
-                        {% if image.did.pollen_id.pid %}
+                        {% if hybrid.0.did.pollen_id.pid %}
                             {% if role == 'cur' %}
-                                <a href="{% url 'common:photos' image.did.pollen_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
+                                <a href="{% url 'common:photos' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name_short|safe}}</a>
                             {% else %}
-                                    <a href="{% url 'common:information' image.did.pollen_id.pid %}?family={{image.did.pid.gen.family}}&role={{role}}">{{image.did.registered_pollen_name_short|safe}}</a>
+                                    <a href="{% url 'common:information' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name_short|safe}}</a>
                             {% endif %}
                         {% else %}
                             na
@@ -102,11 +92,11 @@
                     </td>
 
                     <td class="border-rb text-center d-none d-sm-block">
-                        {{image.pct|floatformat:0}}%
+                        {{hybrid.0.pct|floatformat:0}}%
                     </td>
 
                     <td class="border-rb text-center d-none d-sm-table-cell" valign="middle">
-                        {% if image.did.pid.num_image %}{{image.did.pid.num_image}} {% endif %}
+                        {% if hybrid.0.did.pid.num_image %}{{hybrid.0.did.pid.num_image}} {% endif %}
                     </td>
 
                 </tr>

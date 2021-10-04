@@ -13,6 +13,7 @@ urlpatterns = [
     path('ancestrytree/<int:pid>/', views.ancestrytree, name='ancestrytree'),
     path('ancestrytree/', views.ancestrytree, name='ancestrytree'),
     path('progeny/<int:pid>/', views.progeny, name='progeny'),
+    path('progeny_old/<int:pid>/', views.progeny_old, name='progeny_old'),
     # path('progeny/', views.progeny, name='progeny'),
     path('progenyimg/<int:pid>/', views.progenyimg, name='progenyimg'),
     path('progenyimg/', views.progenyimg, name='progenyimg'),

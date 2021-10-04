@@ -96,6 +96,7 @@ def getFamilyImage(family):
     SpcImages = apps.get_model(family.application, 'SpcImages')
     return SpcImages.objects.filter(rank__lt=7).filter(status='approved').order_by('-rank','quality', '?')[0:1][0]
 
+
 def orchid_home(request):
     role = getRole(request)
     if 'newfamily' in request.GET:
@@ -135,12 +136,41 @@ def orchid_home(request):
     # get random carnivorous
     sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     carnivorous_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
-
-
-    context = {'orcimage': orcimage, 'broimage': broimage, 'cacimage': cacimage, 'family': orcfamily,
+    context = {'orcimage': orcimage, 'broimage': broimage, 'cacimage': cacimage,
                'other_list': other_list, 'succulent_obj': succulent_obj, 'carnivorous_obj': carnivorous_obj,
         'title': 'orchid_home', 'role': role }
     return render(request, 'orchid_home.html', context)
+
+
+def ode(request):
+    author = 'JFowler'
+    role = getRole(request)
+    if 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
+        return HttpResponseRedirect(url)
+
+    author = Photographer.objects.get(pk=author)
+    OrSpcImg = apps.get_model('orchidaceae', 'SpcImages')
+    OrHybImg = apps.get_model('orchidaceae', 'HybImages')
+    BrImg = apps.get_model('bromeliaceae', 'SpcImages')
+    CaImg = apps.get_model('cactaceae', 'SpcImages')
+    OtImg = apps.get_model('other', 'SpcImages')
+
+    or_spclist = OrSpcImg.objects.filter(author=author)
+    or_Hyblist = OrHybImg.objects.filter(author=author)
+    br_spclist = BrImg.objects.filter(author=author)
+    ca_spclist = CaImg.objects.filter(author=author)
+    ot_spclist = OtImg.objects.filter(author=author)
+
+    context = {'author': author,
+               'or_spclist': or_spclist,
+               'or_Hyblist': or_Hyblist,
+               'br_spclist': br_spclist,
+               'ca_spclist': ca_spclist,
+               'ot_spclist': ot_spclist,
+               'title': 'ode', 'role': role }
+    return render(request, 'ode.html', context)
 
 
 def require_get(view_func):
@@ -160,9 +190,13 @@ def genera(request):
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
 
+    talpha = ''
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
     alpha = ''
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     if family:
         if subtribe:
@@ -178,24 +212,27 @@ def genera(request):
         OrGenus, BrGenus, CaGenus, OtGenus = getAllGenera()
         # brgenus_list = BrGenus.objects.all().order_by('genus')
         # cagenus_list = CaGenus.objects.all().order_by('genus')
-        otgenus_list = OtGenus.objects.all().order_by('family','genus')
+        if alpha:
+            fam_list = family_list.values_list('family', flat=True)
+            otgenus_list = OtGenus.objects.filter(family__in=fam_list)
+        else:
+            otgenus_list = OtGenus.objects.all()
         # orgenus_list = OrGenus.objects.all().order_by('genus')
         # genus_list = list(chain(otgenus_list, brgenus_list, cagenus_list)) #, orgenus_list))
         # genus_list = sorted(allgenus_list, key=operator.attrgetter('genus'))
         genus_list = otgenus_list
     # Complete building genus list
     # Define sort
-    if alpha and len(alpha) == 1:
-        genus_list = genus_list.filter(genus__istartswith=alpha)
+    if talpha and len(talpha) == 1:
+        genus_list = genus_list.filter(genus__istartswith=talpha)
     if request.GET.get('sort'):
         sort = request.GET['sort']
         sort.lower()
 
-    family_list = get_family_list()
     total = len(genus_list)
     write_output(request, str(family))
     context = {
-        'genus_list': genus_list,  'app': app, 'total':total,
+        'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
         'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
         'path': path
@@ -204,89 +241,6 @@ def genera(request):
 
 
 @login_required
-def xspecies(request):
-    # path = resolve(request.path).url_name
-    genus = ''
-    path = 'information'
-    if str(request.user) == 'chariya':
-        path = 'photos'
-    role = getRole(request)
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-        if genus:
-            try:
-                genus = Genus.objects.get(genus=genus)
-            except Genus.DoesNotExist:
-                genus = ''
-
-    # If Orchidaceae, go to full table.
-    if family and family.family == 'Orchidaceae':
-        url = "%s?role=%s&family=%s" % (reverse('orchidaceae:species'), role, family)
-        if genus:
-            url = url + "&genus=" + str(genus)
-        return HttpResponseRedirect(url)
-    alpha = ''
-    max_items = 3000
-
-    syn = ''
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
-
-    if genus:
-        species_list = Species.objects.filter(type='species').filter(
-            cit_status__isnull=True).exclude(cit_status__exact='')
-        # new genus has been selected. Now select new species/hybrid
-        species_list = species_list.filter(genus=genus)
-    elif family:
-        species_list = Species.objects.filter(type='species').filter(
-            cit_status__isnull=True).exclude(cit_status__exact='')
-        genus_list = Genus.objects.filter(family=family)
-        if subtribe:
-            genus_list = genus_list.filter(subtribe=subtribe)
-        elif tribe:
-            genus_list = genus_list.filter(tribe=tribe)
-        elif subfamily:
-            genus_list = genus_list.filter(subfamily=subfamily)
-        genus_list = genus_list.values_list('genus', flat=True)
-        species_list = species_list.filter(genus__in=genus_list)
-    else:
-        # app = 'other'
-        # Species = apps.get_model(app, 'Species')
-        species_list = Species.objects.filter(type='species')
-        # genus_list = Genus.objects.filter(family__application=app)
-        # genus_list = genus_list.values_list('genus', flat=True)
-        species_list = species_list.filter(gen__family__application=app)
-
-    if syn == 'N':
-        species_list = species_list.exclude(status='synonym')
-        syn = 'N'
-    else:
-        syn = 'Y'
-
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
-    if alpha != '':
-        species_list = species_list.filter(species__istartswith=alpha)
-    total = len(species_list)
-    msg = ''
-
-    if total > max_items:
-        species_list = species_list[0:max_items]
-        msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
-        total = max_items
-    family_list = get_family_list()
-
-    write_output(request, str(family))
-    context = {
-        'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
-        'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
-        'msg': msg, 'path': path
-    }
-    return render(request, "common/species.html", context)
 def species(request):
     # path = resolve(request.path).url_name
     genus = ''
@@ -311,7 +265,6 @@ def species(request):
         if genus:
             url = url + "&genus=" + str(genus)
         return HttpResponseRedirect(url)
-    alpha = ''
     max_items = 3000
 
     syn = ''
@@ -348,13 +301,11 @@ def species(request):
         syn = 'N'
     else:
         syn = 'Y'
-
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
-    if alpha != '':
-        species_list = species_list.filter(species__istartswith=alpha)
+    talpha = ''
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if talpha != '':
+        species_list = species_list.filter(species__istartswith=talpha)
     total = len(species_list)
     msg = ''
 
@@ -362,13 +313,16 @@ def species(request):
         species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
         total = max_items
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, str(family))
     context = {
         'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
+        'family_list': family_list, 'alpha': alpha, 'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path': path
     }
     return render(request, "common/species.html", context)
@@ -402,8 +356,6 @@ def hybrid(request):
     alpha = ''
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
 
     if 'syn' in request.GET:
         syn = request.GET['syn']
@@ -439,106 +391,26 @@ def hybrid(request):
     else:
         primary = 'N'
 
-    if alpha != '':
-        hybrid_list = hybrid_list.filter(species__istartswith=alpha)
+    talpha = ''
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if talpha != '':
+        hybrid_list = hybrid_list.filter(species__istartswith=talpha)
     total = len(hybrid_list)
     # hybrid_list = hybrid_list.order_by('genus', 'species')
     if total > max_items:
         hybrid_list = hybrid_list[0:max_items]
         msg = "List too long. Only show first " + str(max_items) + " items"
         total = max_items
-    family_list = get_family_list()
+    family_list = get_family_list(request, alpha)
     write_output(request, str(family))
     context = {
         'genus': genus, 'hybrid_list': hybrid_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
+        'family_list': family_list, 'alpha': alpha, 'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path': path, 'primary': primary,
     }
     return render(request, "common/hybrid.html", context)
-
-def xhybrid(request):
-    path = resolve(request.path).url_name
-    path = 'genera'
-    genus = ''
-    role = getRole(request)
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-    if genus:
-        try:
-            genus = Genus.objects.get(genus=genus)
-        except Genus.DoesNotExist:
-            genus = ''
-    if family and family.family == 'Orchidaceae':
-        url = "%s?role=%s&family=%s" % (reverse('orchidaceae:hybrid'), role, family)
-        if genus:
-            url = url + "&genus=" + str(genus)
-        return HttpResponseRedirect(url)
-
-    syn = ''
-    primary = ''
-    msg = ''
-    max_items = 3000
-    alpha = ''
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
-
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
-    if 'primary' in request.GET:
-        primary = request.GET['primary']
-
-    if genus:
-        hybrid_list = Species.objects.filter(type='hybrid').filter(genus=genus)
-    elif family:
-        hybrid_list = Species.objects.filter(type='hybrid')
-        genus_list = Genus.objects.filter(family=family)
-        if subtribe:
-            genus_list = genus_list.filter(subtribe=subtribe)
-        elif tribe:
-            genus_list = genus_list.filter(tribe=tribe)
-        elif subfamily:
-            genus_list = genus_list.filter(subfamily=subfamily)
-        genus_list = genus_list.values_list('genus', flat=True)
-        hybrid_list = hybrid_list.filter(genus__in=genus_list)
-    else:
-        # app = 'other'
-        # Species = apps.get_model(app, 'Species')
-        hybrid_list = Species.objects.filter(type='hybrid')
-
-
-    if syn == 'N':
-        hybrid_list = hybrid_list.exclude(status='synonym')
-        syn = 'N'
-    else:
-        syn = 'Y'
-    if primary == 'Y':
-        hybrid_list = hybrid_list.filter(hybrid__seed_type='species').filter(hybrid__pollen_type='species')
-        primary = 'Y'
-    else:
-        primary = 'N'
-
-    if alpha != '':
-        hybrid_list = hybrid_list.filter(species__istartswith=alpha)
-    total = len(hybrid_list)
-    # hybrid_list = hybrid_list.order_by('genus', 'species')
-    if total > max_items:
-        hybrid_list = hybrid_list[0:max_items]
-        msg = "List too long. Only show first " + str(max_items) + " items"
-        total = max_items
-    family_list = get_family_list()
-    write_output(request, str(family))
-    context = {
-        'genus': genus, 'hybrid_list': hybrid_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
-        'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
-        'msg': msg, 'path': path, 'primary': primary,
-    }
-    return render(request, "common/hybrid.html", context)
-
 
 
 def information(request, pid):
@@ -636,9 +508,7 @@ def information(request, pid):
         elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
             seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
             if seed_obj:
-                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).order_by('-rank',
-                                                                                                          'quality',
-                                                                                                          '?')[0: 3]
+                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 3]
                 assert isinstance(seed_obj, object)
                 if seed_obj.seed_id:
                     ss_type = seed_obj.seed_id.type
@@ -689,12 +559,11 @@ def information(request, pid):
                 if img:
                     x.img = img.image_file
     write_output(request, str(family))
-    family_list = get_family_list()
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'title': 'information', 'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
-               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'family_list': family_list,
+               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'role': role, 'ancspc_list': ancspc_list,
                }
@@ -890,9 +759,8 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
 
     write_output(request, str(family))
-    family_list = get_family_list()
     context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
-               'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'family_list': family_list,
+               'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'role': role, 'title': 'photos', 'namespace': 'common',
@@ -905,6 +773,9 @@ def browse(request):
     num_show = 5
     page_length = 20
     my_full_list = []
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
     elif 'family' in request.GET:
@@ -912,24 +783,16 @@ def browse(request):
     else:
         family = 'Orchidaceae'
 
-
     if family and family != 'other':
         family = Family.objects.get(family=family)
         app = family.application
     else:
         app = 'other'
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
-        elif len(alpha) > 1:
-            alpha = alpha[0].upper()
-
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     # reqsubgenus = reqsection = reqsubsection = reqseries = ''
     # subgenus_obj = section_obj = subsection_obj = series_obj = ''
     # subgenus_list = section_list = subsection_list = series_list = []
-    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = alpha = total = ''
+    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
     display = ''
     seed_genus = pollen_genus = seed = pollen = ''
     reqgenus = ''
@@ -994,6 +857,8 @@ def browse(request):
             pollen = request.GET['pollen']
     if 'genus' in request.GET:
         reqgenus = request.GET['genus']
+        if reqgenus == '------':
+            reqgenus = ''
 
     # genus, pid_list, intragen_list = getPartialPid(reqgenus, type, 'accepted', app)
 
@@ -1006,6 +871,13 @@ def browse(request):
 
     pid_list = Species.objects.filter(type=type)
     pid_list = pid_list.exclude(status='synonym')
+
+    if subfamily:
+        pid_list = pid_list.filter(gen__subfamily=subfamily)
+    if subtribe:
+        pid_list = pid_list.filter(gen__subtribe=subtribe)
+    elif tribe:
+        pid_list = pid_list.filter(gen__tribe=tribe)
 
     if reqgenus:
         try:
@@ -1047,12 +919,6 @@ def browse(request):
             if pollen:
                 pid_list = pid_list.filter(Q(hybrid__seed_species=pollen) | Q(hybrid__pollen_species=pollen))
 
-        if alpha:
-            if reqgenus:
-                pid_list = pid_list.filter(species__istartswith=alpha)
-            else:
-                pid_list = pid_list.filter(genus__istartswith=alpha)
-
         pid_list = pid_list.order_by('genus', 'species')
         total = len(pid_list)
         page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
@@ -1074,7 +940,7 @@ def browse(request):
                 my_full_list.append(x)
 
 
-    family_list = get_family_list()
+    family_list = get_family_list(request, alpha)
 
     genus_list = Genus.objects.all()
     if family:
@@ -1085,10 +951,10 @@ def browse(request):
         else:
             genus_list = genus_list.filter(num_hybimage__gt=0)
     write_output(request, str(family))
-    context = {'family':family, 'family_list': family_list,
+    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'family_list': family_list,
         'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-        'page': page, 'alpha': alpha, 'alpha_list': alpha_list, 'total': total,
+        'page': page, 'total': total, 'alpha_list': alpha_list, 'alpha': alpha,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
         'title': 'browse', 'section': 'list', 'role': role,
@@ -1200,8 +1066,9 @@ def search_gen(request):
         send_url = '/'
         return HttpResponseRedirect(send_url)
 
+    # TODO:  WHERE IS THIS SENT TO????
     if not fuzzy and family and family.family == 'Orchidaceae':
-        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_match'), role, family, spc_string)
+        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_special'), role, family, spc_string)
         return HttpResponseRedirect(send_url)
 
     # if suprageneric rank requested
@@ -1307,16 +1174,20 @@ def search_gen(request):
     path = 'information'
     if request.user == 'chariya':
         path = 'photos'
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'family': family, 'alpha_list': alpha_list, 'alpha': alpha, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy,
                'title': 'search', 'role': role, 'path': path}
     return django.shortcuts.render(request, "common/search_species.html", context)
+
 
 def search_spc(request):
     min_score = 20
@@ -1359,7 +1230,7 @@ def search_spc(request):
         return HttpResponseRedirect(send_url)
 
     if not fuzzy and family and family.family == 'Orchidaceae':
-        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_match'), role, family, spc_string)
+        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_special'), role, family, spc_string)
         return HttpResponseRedirect(send_url)
 
     # if suprageneric rank requested
@@ -1465,16 +1336,20 @@ def search_spc(request):
     path = 'information'
     if request.user == 'chariya':
         path = 'photos'
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy,
                'title': 'search', 'role': role, 'path': path}
     return django.shortcuts.render(request, "common/search_species.html", context)
+
 
 def search_hyb(request):
     min_score = 20
@@ -1517,7 +1392,7 @@ def search_hyb(request):
         return HttpResponseRedirect(send_url)
 
     if not fuzzy and family and family.family == 'Orchidaceae':
-        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_match'), role, family, spc_string)
+        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_special'), role, family, spc_string)
         return HttpResponseRedirect(send_url)
 
     # if suprageneric rank requested
@@ -1623,174 +1498,20 @@ def search_hyb(request):
     path = 'information'
     if request.user == 'chariya':
         path = 'photos'
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy,
                'title': 'search', 'role': role, 'path': path}
     return django.shortcuts.render(request, "common/search_species.html", context)
 
-def xsearch_species(request):
-    min_score = 20
-    genus_string = ''
-    family = ''
-    subfamily = ''
-    tribe = ''
-    subtribe = ''
-    genus_list = []
-    match_list = []
-    perfect_list = []
-    fuzzy_list = []
-    fuzzy = ''
-    if 'fuzzy' in request.GET:
-        fuzzy = request.GET['fuzzy'].strip()
-    # If no match found, perform fuzzy match
-
-    role = getRole(request)
-    if 'family' in request.GET:
-        family = request.GET['family']
-    elif 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-
-    if family and family != 'other':
-        family = Family.objects.get(pk=family)
-        app = family.application
-    else:
-        family = ''
-        app = 'other'
-    # For other family search across all other families
-    # if app == 'other':
-    #     family = ''
-
-    if 'spc_string' in request.GET:
-        spc_string = request.GET['spc_string'].strip()
-        if ' ' not in spc_string:
-            genus_string = spc_string
-    else:
-        send_url = '/'
-        return HttpResponseRedirect(send_url)
-
-    if not fuzzy and family and family.family == 'Orchidaceae':
-        send_url = "%s?role=%s&app=orchidaceae&family=%s&spc_string=%s" % (reverse('common:search_match'), role, family, spc_string)
-        return HttpResponseRedirect(send_url)
-
-    # if suprageneric rank requested
-    if 'subfamily' in request.GET:
-        subfamily = request.GET['subfamily'].strip()
-    if subfamily:
-        subfamily = Subfamily.objects.get(subfamily=subfamily)
-    if 'tribe' in request.GET:
-        tribe = request.GET['tribe'].strip()
-    if tribe:
-        tribe = Tribe.objects.get(tribe=tribe)
-    if 'subtribe' in request.GET:
-        subtribe = request.GET['subtribe'].strip()
-    if subtribe:
-        subtribe = Subtribe.objects.get(subtribe=subtribe)
-
-
-    spc = spc_string
-    if family:
-        if family.family == 'Cactaceae':
-            species_list = get_species_list('cactaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Orchidaceae':
-            species_list = get_species_list('orchidaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Bromeliaceae':
-            species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
-        else:
-            # logger.error("1 subfamily = " + str(subfamily))
-            species_list = get_species_list('other')
-            species_list = species_list.filter(gen__family=family.family)
-            # logger.error("2 subfamily = " + str(subfamily))
-            # logger.error("3 species_list = " )
-    else:
-        # In case of app = other, search will scan through every family in the app.
-        species_list = get_species_list('other')
-    # logger.error("4 species_list = "+ " --- " + spc_string)
-
-    # Perform conventional match
-    if not fuzzy:
-        if genus_string:  # Seach genus table
-            CaGenus = apps.get_model('cactaceae', 'Genus')
-            OrGenus = apps.get_model('orchidaceae', 'Genus')
-            OtGenus = apps.get_model('other', 'Genus')
-            BrGenus = apps.get_model('bromeliaceae', 'Genus')
-            genus_list = []
-            cagenus_list = CaGenus.objects.all()
-            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            orgenus_list = OrGenus.objects.all()
-            orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            brgenus_list = BrGenus.objects.all()
-            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            otgenus_list = OtGenus.objects.all()
-            otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            genus_list = cagenus_list.union(orgenus_list).union(otgenus_list).union(brgenus_list)
-            search_list = []
-            for x in genus_list:
-                if x['genus']:
-                    score = fuzz.ratio(x['genus'], genus_string)
-                    if score >= min_score:
-                        search_list.append([x, score])
-
-            search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
-            del search_list[5:]
-            genus_list = search_list
-
-        # spc_string = spc_string.replace('.', '')
-        spc_string = spc_string.replace(' mem ', ' Memoria ')
-        words = spc_string.split()
-        grex = spc_string.split(' ', 1)
-        if len(grex) > 1:
-            grex = grex[1]
-        else:
-             grex = grex[0]
-        subgrex = grex.rsplit(' ', 1)[0]
-        perfect_list = species_list.filter(binomial=spc_string)
-        if len(perfect_list) == 0:
-            if len(words) == 1:
-                match_list = species_list.filter(Q(species__icontains=spc_string) | Q(infraspe__icontains=spc_string))
-            else:
-                match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
-                # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            # logger.error("4 match_list = " )
-            if len(match_list) == 0:
-                if not genus_list:
-                    fuzzy = 1
-                    url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
-                    return HttpResponseRedirect(url)
-
-    # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
-    else:
-        first_try = species_list.filter(species=spc)
-        min_score = 60
-        for x in species_list:
-            if x.binomial:
-                score = fuzz.ratio(x.binomial, spc)
-                if score >= min_score:
-                    fuzzy_list.append([x, score])
-        fuzzy_list.sort(key=lambda k: (-k[1], k[0].binomial))
-        del fuzzy_list[20:]
-    path = 'information'
-    if request.user == 'chariya':
-        path = 'photos'
-    family_list = get_family_list()
-
-    write_output(request, spc_string)
-    context = {'spc_string': spc_string, 'genus_list': genus_list,
-               'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
-               'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-               'app': app, 'fuzzy': fuzzy,
-               'title': 'search', 'role': role, 'path': path}
-    return django.shortcuts.render(request, "common/search_species.html", context)
 
 def search_match(request):
     # from itertools import chain
@@ -1979,16 +1700,293 @@ def search_match(request):
         # logger.error("16 match_list = "  + " " + str(request.user))
 
     match_list.sort(key=lambda k: (-k[1], k[0].name()))
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
     family = Family.objects.get(pk='Orchidaceae')
     write_output(request, spc_string)
 
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': 'orchidaceae', 'title': 'search', 'role': role, 'path': 'information'}
     return django.shortcuts.render(request, "common/search_match.html", context)
+
+
+def search_orchid(request):
+    # from itertools import chain
+    Family = apps.get_model('core', 'Family')
+    Genus = apps.get_model('orchidaceae', 'Genus')
+    Species = apps.get_model('orchidaceae', 'Species')
+
+    family = 'Orchidaceae'
+    if 'family' in request.GET:
+        family = request.GET['family']
+    elif 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+
+    role = 'pub'
+    if 'role' in request.GET:
+        role = request.GET['role']
+    if 'spc_string' in request.GET:
+        spc_string = request.GET['spc_string'].strip()
+    else:
+        spc_string = ''
+    keyword = spc_string
+
+    if family != 'Orchidaceae':
+        url = "%s?role=%s&family=%s&spc_string=%s" % (
+        reverse('common:search_species'), role, family, spc_string)
+        return HttpResponseRedirect(url)
+    genus = ''
+    tail = ''
+    spcount = ''
+    y = ''
+    search_list = ()
+    partial_spc = ()
+    partial_hyb = ()
+    result_list = []
+    spc_list = []
+    hyb_list = []
+
+    if request.user.is_authenticated:
+        write_output(request, keyword)
+    if keyword:
+        rest = keyword.split(' ', 1)
+        if len(rest) > 1:
+            tail = rest[1]
+        keys = keyword.split()
+        if len(keys[0]) < 3 or keys[0].endswith('.'):
+            keys = keys[1:]
+            x = keys
+        else:
+            keyword = ' '.join(keys)
+            x = keys[0]            # This could be genus or species (or hybrid)
+
+        if len(x) > 7:
+            x = x[: -2]  # Allow for some ending variation
+        elif len(x) > 5:
+            x = x[: -1]
+
+        if len(keys) > 1:
+            y = keys[1]            # This could be genus or species (or hybrid)
+
+        if len(y) > 7:
+            y = y[: -2]  # Allow for some ending variation
+        elif len(y) > 5:
+            y = y[: -1]
+
+        if keys:
+            genus = Genus.objects.filter(genus__iexact=keys[0])
+            if len(genus) == 0:
+                genus = ''
+        else:
+            genus = ''
+        if genus and len(genus) > 0:
+            genus = genus[0].genus
+        else:
+            genus = ''
+
+        temp_list = Species.objects.exclude(status__iexact='pending')
+        if spc_list:
+            temp_list = temp_list.filter(pid__in=spc_list)
+        if hyb_list:
+            temp_list = temp_list.filter(pid__in=hyb_list)
+
+        if len(keys) == 1:
+            search_list = temp_list.filter(species__icontains=keys[0]).order_by('status', 'genus', 'species')
+            mylist = search_list.values('pid')
+            partial_spc = temp_list.filter(species__icontains=x).exclude(pid__in=mylist).order_by(
+                'status', 'genus', 'species')
+
+        elif len(keys) == 2:
+            search_list = temp_list.filter(species__iexact=keys[1]).order_by('status', 'genus', 'species')
+            mylist = search_list.values('pid')
+            partial_spc = temp_list.filter(Q(species__icontains=x) | Q(infraspe__icontains=y)
+                                           | Q(species__icontains=y)).exclude(pid__in=mylist).order_by(
+                'status', 'genus', 'species')
+
+        elif len(keys) == 3:
+            search_list = temp_list.filter((Q(species__iexact=keys[0]) & Q(infraspe__iexact=keys[2])) |
+                                           (Q(genus__iexact=keys[0]) & Q(species__iexact=keys[1]) &
+                                            Q(infraspe__iexact=keys[2]))).order_by('status', 'genus', 'species')
+            mylist = search_list.values('pid')
+            partial_spc = temp_list.filter(Q(species__icontains=x) | Q(species__icontains=keys[1])).exclude(
+                pid__in=mylist).order_by('status', 'genus', 'species')
+
+        elif len(keys) >= 4:
+            search_list = temp_list.filter((Q(species__iexact=keys[0]) & Q(infraspe__iexact=keys[2]))
+                                           | (Q(genus__iexact=keys[0]) & Q(species__iexact=keys[1])
+                                              & Q(infraspe__iexact=keys[2]))).order_by('status', 'genus', 'species')
+            mylist = search_list.values('pid')
+            partial_spc = temp_list.filter(Q(species__icontains=keys[1]) | Q(infraspe__icontains=keys[3])).exclude(
+                pid__in=mylist).order_by('status', 'genus', 'species')
+        spcount = len(search_list)
+
+        all_list = list(chain(search_list, partial_hyb, partial_spc))
+        for x in all_list:
+            short_grex = x.short_grex().lower()
+            score = fuzz.ratio(short_grex, keyword)     # compare against entire keyword
+            if score < 60:
+                score = fuzz.ratio(short_grex, keys[0])  # match against the first term after genus
+
+            # if score < 100:
+            grex = x.grex()
+            score1 = fuzz.ratio(grex.lower(), keyword.lower())
+            if score1 == 100:
+                score1 = 200
+            if score1 > score:
+                score = score1
+            if score >= 60:
+                result_list.append([x, score])
+
+    result_list.sort(key=lambda k: (-k[1], k[0].name()))
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
+    family = Family.objects.get(pk='Orchidaceae')
+
+    context = {'result_list': result_list, 'keyword': keyword, 'fuzzy': '1',
+               'tail': tail, 'genus': genus, 'spcount': spcount, 'spc_string': spc_string,
+               'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
+               'level': 'search_match', 'title': 'search_match', 'role': role, 'namespace': 'search', }
+    return django.shortcuts.render(request, "common/search_orchid.html", context)
+
+
+def search_fuzzy(request):
+    min_score = 60
+    spc_string = ''
+    result_list = []
+    spc_list = []
+    hyb_list = []
+    Family = apps.get_model('core', 'Family')
+    Genus = apps.get_model('orchidaceae', 'Genus')
+    Alliance = apps.get_model('orchidaceae', 'Alliance')
+    Species = apps.get_model('orchidaceae', 'Species')
+
+    family = 'Orchidaceae'
+    if 'family' in request.GET:
+        family = request.GET['family']
+    elif 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+
+    role = 'pub'
+    if 'role' in request.GET:
+        role = request.GET['role']
+
+    if request.GET.get('spc_string'):
+        spc_string = request.GET['spc_string'].strip()
+    send_url = '/common/search_orchid/?spc_string=' + spc_string + "&role=" + role
+
+    if family != 'Orchidaceae':
+        url = "%s?role=%s&family=%s&spc_string=%s" % (
+        reverse('common:search_species'), role, family, spc_string)
+        return HttpResponseRedirect(url)
+
+    logger.error(">>> Family = " + family)
+    grexlist = Species.objects.exclude(status='pending')
+    # Filter for partner specific list.
+    if spc_list:
+        grexlist = grexlist.filter(pid__in=spc_list)
+    if hyb_list:
+        grexlist = grexlist.filter(pid__in=hyb_list)
+
+    perfect_list = grexlist
+    keyword = spc_string.lower()
+    rest = keyword.split(' ', 1)
+
+    if len(rest) > 1:
+        # First get genus by name (could be abbrev.)
+        genus = rest[0]
+        abrev = genus
+        if not genus.endswith('.'):
+            abrev = genus + '.'
+        # Then find genus in Genus class, start with accepted if exists.
+        matched_gen = Genus.objects.filter(Q(genus=rest[0]) | Q(abrev=abrev)).order_by('status')
+
+        if not matched_gen:
+            return HttpResponseRedirect(send_url)
+
+        # Genus found, get genus object
+        genus_obj = matched_gen[0]
+        keyword = rest[1]
+        # If genus is a synonym, get accepted name
+        if genus_obj.status == 'synonym':
+            matched_gen = Genus.objects.filter(Q(genus=genus_obj.gensyn.acc_id) | Q(abrev=genus_obj.gensyn.acc.abrev))
+            if matched_gen:
+                genus_obj = matched_gen[0]
+            else:
+                # For synonym genus, use conventional search
+                return HttpResponseRedirect(send_url)
+
+        # Get alliance associated to the genus_obj
+        alliance_obj = Alliance.objects.filter(gen=genus_obj.pid)
+        if alliance_obj:
+            # Then create genus_list of all genus associated to the alliance.
+            genus_list = list(Alliance.objects.filter(alid=alliance_obj[0].alid.pid).values_list('gen'))
+
+            # Then create the search space of species/hybrids in all genera associated to each alliances.
+            grexlist = grexlist.filter(gen__in=genus_list)
+        else:
+            # If alliance does not exist, just search on the genus alone
+            grexlist = grexlist.filter(gen=genus_obj.pid)
+    else:
+        return HttpResponseRedirect(send_url)
+
+    # Compute fuzzy score for all species in grexlist
+    for x in grexlist:
+        # If the first word is genus hint, compare species and the tail
+        score = fuzz.ratio(x.short_grex().lower(), keyword)
+        if score >= min_score:
+            result_list.append([x, score])
+
+    # Add the perfect match and set score 100%.
+    # At this point, the first word is related to a genus
+    perfect_list = perfect_list.filter(species__iexact=rest[1])
+    perfect_pid = perfect_list.values_list('pid', flat=True)
+
+    perfect_items = []
+    for x in perfect_pid:
+        s = Species.objects.get(pk=x)
+        y = [s, 100]
+        perfect_items.append(y)
+
+    species_temp = []
+    for x in result_list:
+        if x[0].pid not in perfect_pid:
+            species_temp.append(x)
+
+    # result_list = [item for item in result_list if item[0] not in perfect_pid]
+    result_list = species_temp + perfect_items
+
+    for i in range(len(result_list)):
+        if genus_obj != '':
+            if result_list[i][0].gen.pid == genus_obj.pid:
+                if result_list[i][1] == 100:
+                    result_list[i][1] = 200
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
+    family = Family.objects.get(pk='Orchidaceae')
+
+    result_list.sort(key=lambda k: (-k[1], k[0].name()))
+    # context = {'result_list': result_list, 'keyword': keyword,
+    #            'tail': tail, 'genus': genus, 'spcount': spcount, 'spc_string': spc_string,
+    #            'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
+    #            'level': 'search_match', 'title': 'search_match', 'role': role, 'namespace': 'search', }
+    context = {'result_list': result_list, 'len': len(result_list), 'spc_string':  spc_string, 'genus': genus,
+               'alliance_obj': alliance_obj, 'genus_obj': genus_obj,
+               'min_score': min_score, 'keyword': keyword,
+               'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
+               'level': 'search', 'title': 'fuzzy', 'role': role, 'namespace': 'search',
+
+               }
+    return django.shortcuts.render(request, "common/search_orchid.html", context)
+
 
 def search_species(request):
     min_score = 20
@@ -2006,23 +2004,6 @@ def search_species(request):
         fuzzy = request.GET['fuzzy'].strip()
     # If no match found, perform fuzzy match
 
-    role = getRole(request)
-    if 'family' in request.GET:
-        family = request.GET['family']
-    elif 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-
-
-    if family and family != 'other':
-        family = Family.objects.get(pk=family)
-        app = family.application
-    else:
-        family = ''
-        app = 'other'
-    # For other family search across all other families
-    if app == 'other':
-        family = ''
-
     if 'spc_string' in request.GET:
         spc_string = request.GET['spc_string'].strip()
         if ' ' not in spc_string:
@@ -2033,139 +2014,16 @@ def search_species(request):
         send_url = '/'
         return HttpResponseRedirect(send_url)
 
-    # if suprageneric rank requested
-    if 'subfamily' in request.GET:
-        subfamily = request.GET['subfamily'].strip()
-    if subfamily:
-        subfamily = Subfamily.objects.get(subfamily=subfamily)
-    if 'tribe' in request.GET:
-        tribe = request.GET['tribe'].strip()
-    if tribe:
-        tribe = Tribe.objects.get(tribe=tribe)
-    if 'subtribe' in request.GET:
-        subtribe = request.GET['subtribe'].subtribe()
-    if subtribe:
-        subtribe = Subtribe.objects.get(subtribe=subtribe)
-
-
-    spc = spc_string
-    if family:
-        if family.family == 'Cactaceae':
-            species_list = get_species_list('cactaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Orchidaceae':
-            species_list = get_species_list('orchidaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Bromeliaceae':
-            species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
-        else:
-            species_list = get_species_list('other')
-            species_list = species_list.filter(gen__family=family.family)
-    else:
-        # In case of app = other, search will scan through every family in the app.
-        species_list = get_species_list('other')
-
-
-    # Perform conventional match
-    if not fuzzy:
-        if genus_string:  # Seach genus table
-            CaGenus = apps.get_model('cactaceae', 'Genus')
-            OrGenus = apps.get_model('orchidaceae', 'Genus')
-            OtGenus = apps.get_model('other', 'Genus')
-            BrGenus = apps.get_model('bromeliaceae', 'Genus')
-            genus_list = []
-            cagenus_list = CaGenus.objects.all()
-            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            orgenus_list = OrGenus.objects.all()
-            orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            brgenus_list = BrGenus.objects.all()
-            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            otgenus_list = OtGenus.objects.all()
-            otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
-            genus_list = cagenus_list.union(orgenus_list).union(otgenus_list).union(brgenus_list)
-            search_list = []
-            for x in genus_list:
-                if x['genus']:
-                    score = fuzz.ratio(x['genus'].lower(), genus_string)
-                    if score >= min_score:
-                        search_list.append([x, score])
-
-            search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
-            del search_list[5:]
-            genus_list = search_list
-
-        # spc_string = spc_string.replace('.', '')
-        spc_string = spc_string.replace(' mem ', ' Memoria ')
-        spc_string = spc_string.replace(' Mem ', ' Memoria ')
-        words = spc_string.split()
-        grex = spc_string.split(' ', 1)
-        if len(grex) > 1:
-            grex = grex[1]
-        else:
-             grex = grex[0]
-        subgrex = grex.rsplit(' ', 1)[0]
-        perfect_list = species_list.filter(binomial=spc_string)
-        if len(perfect_list) == 0:
-            if len(words) == 1:
-                match_list = species_list.filter(Q(species__icontains=spc_string) | Q(infraspe__icontains=spc_string))
-            else:
-                match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
-                # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            if len(match_list) == 0:
-                if not genus_list:
-                    fuzzy = 1
-                    url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
-                    return HttpResponseRedirect(url)
-
-    # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
-    else:
-        first_try = species_list.filter(species=spc)
-        min_score = 60
-        for x in species_list:
-            if x.binomial:
-                score = fuzz.ratio(x.binomial, spc)
-                if score >= min_score:
-                    fuzzy_list.append([x, score])
-        fuzzy_list.sort(key=lambda k: (-k[1], k[0].binomial))
-        del fuzzy_list[20:]
-    path = 'information'
-    if request.user == 'chariya':
-        path = 'photos'
-    family_list = get_family_list()
-
-    write_output(request, spc_string)
-    context = {'spc_string': spc_string, 'genus_list': genus_list,
-               'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
-               'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-               'app': app, 'fuzzy': fuzzy,
-               'title': 'search', 'role': role, 'path': path}
-    return django.shortcuts.render(request, "common/search_species.html", context)
-
-def search(request):
-    min_score = 20
-    genus_string = ''
-    family = ''
-    subfamily = ''
-    tribe = ''
-    subtribe = ''
-    genus_list = []
-    match_list = []
-    perfect_list = []
-    fuzzy_list = []
-    fuzzy = ''
-    if 'fuzzy' in request.GET:
-        fuzzy = request.GET['fuzzy'].strip()
-    # If no match found, perform fuzzy match
-
     role = getRole(request)
     if 'family' in request.GET:
         family = request.GET['family']
     elif 'newfamily' in request.GET:
         family = request.GET['newfamily']
 
+    if family == 'Orchidaceae':
+        url = "%s?role=%s&family=Orchidaceae&spc_string=%s" % (
+        reverse('common:search_orchid'), role, spc_string)
+        return HttpResponseRedirect(url)
 
     if family and family != 'other':
         family = Family.objects.get(pk=family)
@@ -2177,14 +2035,6 @@ def search(request):
     if app == 'other':
         family = ''
 
-    if 'spc_string' in request.GET:
-        spc_string = request.GET['spc_string'].strip()
-        if ' ' not in spc_string:
-            genus_string = spc_string
-    else:
-        send_url = '/'
-        return HttpResponseRedirect(send_url)
-
     # if suprageneric rank requested
     if 'subfamily' in request.GET:
         subfamily = request.GET['subfamily'].strip()
@@ -2195,10 +2045,9 @@ def search(request):
     if tribe:
         tribe = Tribe.objects.get(tribe=tribe)
     if 'subtribe' in request.GET:
-        subtribe = request.GET['subtribe'].subtribe()
+        subtribe = request.GET['subtribe'].strip()
     if subtribe:
         subtribe = Subtribe.objects.get(subtribe=subtribe)
-
 
     spc = spc_string
     if family:
@@ -2214,7 +2063,6 @@ def search(request):
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
-
 
     # Perform conventional match
     if not fuzzy:
@@ -2240,7 +2088,7 @@ def search(request):
             search_list = []
             for x in genus_list:
                 if x['genus']:
-                    score = fuzz.ratio(x['genus'].lower(), genus_string)
+                    score = fuzz.ratio(x['genus'].lower(), genus_string.lower())
                     if score >= min_score:
                         search_list.append([x, score])
 
@@ -2258,18 +2106,24 @@ def search(request):
         else:
              grex = grex[0]
         subgrex = grex.rsplit(' ', 1)[0]
-        perfect_list = species_list.filter(binomial=spc_string)
+        perfect_list = species_list.filter(binomial__istartswith=spc_string)
+        logger.error(">>> 3. perfect_list = " + str(len(perfect_list)))
         if len(perfect_list) == 0:
             if len(words) == 1:
-                match_list = species_list.filter(Q(species__icontains=spc_string) | Q(infraspe__icontains=spc_string))
+                # Single word could be a genus or an epithet
+                match_list = species_list.filter(species__istartswith=grex)
+                logger.error(">>> 1. match_list = " + str(len(match_list)))
+                # match_list = species_list.filter(species__icontains=grex)
             else:
-                match_list = species_list.filter(Q(binomial__icontains=spc_string) | Q(binomial__icontains=grex))
+                match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
+                logger.error(">>> 2. match_list = " + str(len(match_list)))
                 # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
             if len(match_list) == 0:
                 if not genus_list:
                     fuzzy = 1
                     url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
                     return HttpResponseRedirect(url)
+        logger.error(">>> 3. match_list = " + str(len(match_list)))
 
     # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
     else:
@@ -2285,19 +2139,22 @@ def search(request):
     path = 'information'
     if request.user == 'chariya':
         path = 'photos'
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy,
                'title': 'search', 'role': role, 'path': path}
     return django.shortcuts.render(request, "common/search_species.html", context)
 
 
-def xsearch_species_fixthis(request):
+def search(request):
     CaGenus = apps.get_model('cactaceae', 'Genus')
     OrGenus = apps.get_model('orchidaceae', 'Genus')
     OtGenus = apps.get_model('other', 'Genus')
@@ -2406,8 +2263,8 @@ def xsearch_species_fixthis(request):
             species_list = species_list.filter(gen__family=family.family)
             # logger.error("2 subfamily = " + str(subfamily))
             # logger.error("3 species_list = ")
-        logger.error("3 >>> species_list = " + str(species_list[0].pid) )
-        logger.error("3 >>> species_list = " + str(species_list[1].pid) )
+        # logger.error("3 >>> species_list = " + str(species_list[0].pid) )
+        # logger.error("3 >>> species_list = " + str(species_list[1].pid) )
     else:
         # In case of app = other, search will scan through every family in the app.
         species_list = get_species_list('other')
@@ -2501,16 +2358,19 @@ def xsearch_species_fixthis(request):
     path = 'information'
     if request.user == 'chariya':
         path = 'photos'
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy,
                'title': 'search', 'role': role, 'path': path}
-    return django.shortcuts.render(request, "common/search_species.html", context)
+    return django.shortcuts.render(request, "common/search.html", context)
 
 
 def mypaginator(request, full_list, page_length, num_show):
@@ -2803,6 +2663,7 @@ def myphoto(request, pid):
     write_output(request, str(family))
     return render(request, 'common/myphoto.html', context)
 
+
 def myphoto_list(request):
     author, author_list = get_author(request)
     role = getRole(request)
@@ -2851,17 +2712,21 @@ def myphoto_list(request):
             else:
                 my_list = my_list.union(my_tmp_list)
 
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     context = {'my_list': my_list, 'family': family, 'app': app,
                'my_list': my_list,
                'role': role, 'brwspc': 'active', 'author': author,
                'author_list': author_list,
                'title': 'myphoto_list',
-               'family_list': family_list, 'mylist': 'active',
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'mylist': 'active',
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_list.html', context)
+
 
 @login_required
 def myphoto_browse_spc(request):
@@ -2900,7 +2765,10 @@ def myphoto_browse_spc(request):
         if img:
             my_list.append(img)
 
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     context = {'my_list': my_list, 'type': 'species', 'family': family, 'app': app,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
@@ -2909,7 +2777,7 @@ def myphoto_browse_spc(request):
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,  'myspc': 'active',
                'title': 'myphoto_browse',
-               'family_list': family_list,
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_browse_spc.html', context)
@@ -2955,14 +2823,17 @@ def myphoto_browse_hyb(request):
         if img:
             my_list.append(img)
 
-    family_list = get_family_list()
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
+    family_list = get_family_list(request, alpha)
 
     context = {'my_list': my_list, 'type': 'hybrid', 'family': family, 'app': app,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'role': role, 'brwhyb': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list, 'family_list': family_list, 'myhyb': 'active',
+               'author_list': author_list, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'myhyb': 'active',
                'title': 'myphoto_browse',
                }
     write_output(request, str(family))
@@ -3089,7 +2960,6 @@ def curate_newapproved(request):
                'app': app, 'title': 'curate_newapproved',
                }
     return render(request, 'common/curate_newapproved.html', context)
-
 
 
 # NOT USED

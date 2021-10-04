@@ -27,13 +27,13 @@
 
                     <div class="card-body border-top"  style="display:inline-block">
                             {% if message %}{{message}}<br>{% endif %}
-                                <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
-                                <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
-                                <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked&type=hybrid">Browse</a>
+                                <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
+                                <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N">Species list</a>
+                                <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&type=hybrid&genus={{genus}}&display=checked&type=hybrid">Browse</a>
 <!--                                {% if primary == 'Y' %}-->
-<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
+<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
 <!--                                {% else %}-->
-<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
+<!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
 <!--                                {% endif %}-->
 <!--                                {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}">Full species list</a>{% endif %}-->
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
@@ -44,6 +44,7 @@
                         {% if hybrid_list %}
                                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" name="family" value="{{family}}" />
+                                    <input type="hidden" name="alpha" value="{{alpha}}" />
                                     <input type="hidden" name="subfamily" value="{{subfamily}}" />
                                     <input type="hidden" name="tribe" value="{{tribe}}" />
                                     <input type="hidden" name="subtribe" value="{{subtribe}}" />
@@ -57,6 +58,7 @@
                                 </form>
                                 <form action="?" id="primary" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" name="family" value="{{family}}" />
+                                    <input type="hidden" name="alpha" value="{{alpha}}" />
                                     <input type="hidden" name="subfamily" value="{{subfamily}}" />
                                     <input type="hidden" name="tribe" value="{{tribe}}" />
                                     <input type="hidden" name="subtribe" value="{{subtribe}}" />
@@ -143,15 +145,6 @@
 <br>
 
 <script>
-var toggler = document.getElementsByClassName("caret");
-var i;
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
-
 // Sort table
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({

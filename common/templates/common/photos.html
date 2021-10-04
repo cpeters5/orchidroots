@@ -254,9 +254,9 @@ a:hover {
                     <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>
                 {% endif %}
             {% endif %}
-            {% if public_list %}
-        </div>
-        <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
+            {% if public_list or private_list or upload_list %}
+            </div>
+            <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
                 {% for image in public_list %}
                     <div class="imageitem">
                         {% if image.image_file %}
@@ -300,6 +300,80 @@ a:hover {
                         </div>
                     </div>
                 {% endfor %}
+                {% for image in private_list %}
+                    {% if image.author == user.photographer.author_id %}
+                    <div class="imageitem p-1 justify-content-center align-items-center">
+                        {% if image.image_file %}
+                            <div class="box">
+                                <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                    <h6><small>
+                                    {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                    {{image.get_displayname}}
+                                    {{image.text_data|default:''|safe}} </small></h6>">
+                                        <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                        <div class="text text-br">{{image.id}}</div>
+                                </a>
+                            </div>
+                            <br>
+                        {% else %}
+                            <a href="#">
+                            <dev class="box">
+                                <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
+                                <div class="text text-br">{{image.id}}</div>
+                            </dev>
+                            </a>
+                        {% endif %}
+                        <div class="imgcaption">
+                            {% include 'common/curate_links.html' %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+
+            {% for image in upload_list %}
+                {% if user.photographer.author_id == image.author.author_id %}
+                 <div class="imageitem p-1 justify-content-center align-items-center">
+                     {% if image.image_file_path %}
+                         <div class="box">
+                             <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                                  {{image.id}}: {{image.imgname}}
+                                  <br> {{image.get_displayname}}
+                                  <br>{{image.text_data|default:''|safe}}">
+                                  <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                  <div class="text text-br">{{image.id}}</div>
+                             </a>
+                         </div>
+                     {% else %}
+                                    <div class="box">
+                                        <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">
+                                        <div class="text">{{image.id}}</div>
+                                    </div>
+<!--                        Requested file does not exist-->
+                     {% endif %}
+                     <div style="font-size:10px">
+                        <a href="{{image.source_url}}">{{image.get_displayname}}</a>
+<!--                            Private and curate role may delete photos-->
+                        {% if role == "cur" or role == "pri" %}
+                            <br>
+                            {% if image.approved %}
+                                <b>Approved</b>
+                            {% elif role == 'cur' %}
+                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                            {% endif %}
+                            <a href="/common/deletephoto/{{image.id}}/{{image.pid_id}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
+                        {% endif %}
+                     </div>
+
+                 </div>
+                {% endif %}
+            {% endfor %}
+
+
+
+
+
+
             {% else %}
                 <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
             {% endif %}

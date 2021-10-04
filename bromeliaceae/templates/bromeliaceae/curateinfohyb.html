@@ -70,7 +70,7 @@ table {
                 <input type="hidden" name="pid" value="{{ species.pid }}" />
                 <input type="hidden" name="role" value="{{ role }}" />
                 <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                &nbsp;&nbsp;&nbsp;<a href="{% url 'common:photos' species.pid %}?role={{role}}">Cancel</a>
+                &nbsp;&nbsp;&nbsp;<a href="{% url 'common:photos' species.pid %}?family={{family.family}}&role={{role}}">Cancel</a>
                 {{spcform|crispy}}
 <!--                <hr>-->
                 {{form|crispy}}

@@ -16,7 +16,6 @@
         <div class="col-3 d-none d-lg-block" style="padding:0">
            {% include "common/taxonomy.html" %}
         </div>
-
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="padding:0; margin: 0">
@@ -30,37 +29,10 @@
                 <br>
                 <h6>Searching for "<i>{{spc_string}}</i>"</h6>
                 {% if genus_list or match_list or perfect_list %}
-                    {% if genus_list %}
-                    <br>
-                    <table style="width:95%">
-                        <tr>
-                            <th width="85%">Top approximate matches from genera in all families</th>
-                            <th>Family</th>
-<!--                            <th>Score</th>-->
-                        </tr>
-                        {% for genus in genus_list %}
-                        <tr>
-                            <td>
-                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
-                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
-                                {% endif %}
-                                species: {{genus.0.num_species|default:"0"}}
-                                hybrid: {{genus.0.num_hybrid|default:"0"}}
-                            </td>
-                            <td>{{genus.0.family}}</td>
-<!--                            <th>{{genus.1}}</th>-->
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {% endif %}
-                    <br>
                     <table width="95%">
                         <tr>
-                            <th width="85%">Matching species from {{family.family|default:'all families'}}</th>
+                            <th width="70%">Matching species from {{family.family|default:'all families'}}</th>
                             <th> num images</th>
-                            {% if not family %}
-                                <th>Family</th>
-                            {% endif %}
                         </tr>
 
                     {% if match_list or perfect_list %}
@@ -73,34 +45,32 @@
                                     {% elif x.status == 'synonym' %}
                                         {{ x.binomial }}
                                     {% else %}
-                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
+                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
                                     {% endif %}
                                     {{x.author|default:''}}
+                                    ({{x.gen.family}})
                                     {% if x.status == 'synonym' %}
-                                       (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                       (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
                                     {% endif %}
                                 </td>
                                 <td>
                                     {{x.num_image|default:''}}
                                 </td>
-                                {% if not family %}
-                                    <td>{{x.family}}</td>
-                                {% endif %}
                             </tr>
                             {% endfor %}
-                        {% endif %}
-                        {% if match_list %}
+                        {% elif match_list %}
                             {% for x in match_list %}
                             <tr>
                                 <td>
-                                    <a href="/common/{{path}}/{{x.pid}}/?family={{x.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
+                                    <a href="/common/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
                                     {{x.author|default:''}}
+                                    ({{x.gen.family}})
                                     {% if x.status == 'synonym' %}
-                                        (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                        (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
                                    {% endif %}
                                    {{x.num_image|default:''}}
                                 </td>
-                                <td>{{x.family}}</td>
+                                <td>{{x.gen.family.num_image}}</td>
                             </tr>
                             {% endfor %}
                         {% endif %}
@@ -108,6 +78,31 @@
                         <tr><td>No smatching species found</td></tr>
                     {% endif %}
                     </table>
+                    {% if genus_list %}
+                    <br>
+                    <table style="width:95%">
+                        <tr>
+                            <th width="70%">Approximately matched genera</th>
+                            <th>Current status</th>
+<!--                            <th>Score</th>-->
+                        </tr>
+                        {% for genus in genus_list %}
+                        <tr>
+                            <td>
+                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
+                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
+                                {% endif %}
+                                ({{genus.0.family}})
+                            </td>
+                            <td>
+                                species: {{genus.0.num_species|default:"0"}}
+                                hybrid: {{genus.0.num_hybrid|default:"0"}}
+                            </td>
+<!--                            <th>{{genus.1}}</th>-->
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
                 {% else %}
                     {% if fuzzy_list %}
                         <br>
@@ -116,15 +111,14 @@
                             {% endif %}
                         <table width="95%">
                             <tr>
-                                <th width="85%">Approximate matching Species from {{family.family|default:'all families'}}</th>
+                                <th width="70%">Approximate matching Species from {{family.family|default:'all families'}}</th>
                                 <th>Num. images</th>
-                                {% if not family %}<th>Family</th>{% endif %}
                             </tr>
                         {% for x in fuzzy_list %}
                             <tr>
                                 <td>
                                     {% if x.0.status != 'synonym' %}
-                                        <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{ x.0.binomial_it|safe }}</a>
+                                        <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.gen.family}}&species={{x.0.binomial}}">{{ x.0.binomial_it|safe }}</a>
                                         {{x.0.author|default:''}}
                                         {{x.0.year|default:''}}
                                         {{x.0.description|default:''}}
@@ -134,13 +128,11 @@
                                         {{x.0.year|default:''}}
                                         (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial_it|safe}}</a>)
                                     {% endif %}
+                                    ({{x.0.gen.family}})
                                 </td>
                                 <td>
                                     {{x.0.num_image|default:''}}
                                 </td>
-                                {% if not family %}
-                                    <td>{{x.0.family}}</td>
-                                {% endif %}
                             </tr>
                         {% endfor %}
                         </table>
@@ -163,20 +155,35 @@
                         <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
                     </div>
                 {% endif %}
+                <br>
+                <div class="btn btn-custom" onclick="history.back()">
+                    Go back
+                </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-var toggler = document.getElementsByClassName("caret");
-var i;
 
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 
 </script>
 {% endblock %}

@@ -576,7 +576,7 @@ seedparent, pollparent {
                 {% if display_items %}
                     <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
                         {% for image in display_items %}
-                            <div class="imageitem p-1 justify-content-center" style="margin:2px;">
+                            <div class="imageitem justify-content-center" style="margin:2px;">
                                 {% if image.image_file %}
                                     <div class="box">
                                     <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
@@ -602,8 +602,6 @@ seedparent, pollparent {
                                     {% else %}
                                         {{image.imginfo}}
                                     {% endif %}
-                                    {{image.name|default:""}}
-                                    {{image.awards|default:""}}
                                 </div>
                             </div>
                         {% endfor %}
@@ -867,27 +865,6 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
                 event.preventDefault();
                 $(this).ekkoLightbox();
             });
-
-
-// function myFunction() {
-//   // Get the checkbox
-//   var myCheck = document.querySelector('input[id="myCheck"]');
-//   var btn_mysubmit = document.getElementById("mysubmit");
-//   // Get the output text
-//   var text = document.getElementById("text");
-//
-//   // If the checkbox is checked, display the output text
-//   if (myCheck.checked == true){
-//     btn_mysubmit.disabled  = false;
-//   } else {
-//     btn_mysubmit.disabled  = true;
-//   }
-// }
-                        // function myFunction() {
-                        //     var x = document.getElementById("myCheck").defaultChecked;
-                        //     document.getElementById("demo").innerHTML = x;
-                        // }
-
 </script>
 
 

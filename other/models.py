@@ -44,8 +44,10 @@ class Genus(models.Model):
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_extinct = models.BooleanField(null=True, default=False)
+    is_parasitic = models.BooleanField(null=True, default=False)
     status = models.CharField(max_length=20, default='')
     type = models.CharField(max_length=20, default='')
+    common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True)
     distribution = models.TextField(null=True)
     text_data = models.TextField(null=True)
@@ -142,6 +144,7 @@ class Gensyn(models.Model):
     def __str__(self):
         return self.pid
 
+
 class GenusRelation(models.Model):
     gen = models.OneToOneField(Genus, db_column='gen',primary_key=True,on_delete=models.CASCADE)
     genus = models.CharField(max_length=50, default='')
@@ -168,8 +171,9 @@ class Species(models.Model):
     citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
-    is_parasite = models.BooleanField(null=True, default=False)
+    is_parasitic = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
+    conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
     year = models.IntegerField(null=True)
@@ -358,7 +362,7 @@ class Accepted(models.Model):
     url = models.CharField(max_length=200, null=True, blank=True)
     url_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    common_name = models.CharField(max_length=100, null=True, blank=True)
+    common_name = models.CharField(max_length=200, null=True, blank=True)
     local_name = models.CharField(max_length=100, null=True, blank=True)
     bloom_month = models.CharField(max_length=200, null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)

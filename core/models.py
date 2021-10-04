@@ -22,6 +22,9 @@ import math
 
 
 class Taxonomy(models.Model):
+    class Meta:
+        unique_together = (("taxon", "parent_name"),)
+        ordering = ['taxon','parent_name']
     taxon = models.CharField(db_column='taxon', max_length=50, default='',null=False, blank=False)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     parent_name = models.CharField(max_length=50, null=True)
@@ -30,12 +33,24 @@ class Taxonomy(models.Model):
     def __str__(self):
         return self.taxon
 
+class Taxonomy1(models.Model):
+    class Meta:
+        unique_together = (("taxon", "parent_name"),)
+        ordering = ['taxon','parent_name']
+    taxon = models.CharField(db_column='taxon', max_length=50, default='',null=False, blank=False)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    parent_name = models.CharField(max_length=50, null=True)
+    rank = models.CharField(max_length=20, null=True, blank=True)
+    level = models.IntegerField(null=True)
+    def __str__(self):
+        return self.taxon
 
 class Family(models.Model):
     family = models.CharField(primary_key=True, default='', db_column='family', max_length=50)
     author = models.CharField(max_length=200, null=True, blank=True)
     year = models.IntegerField(null=True)
     application = models.CharField(max_length=50, default='', null=True, blank=True)
+    common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True)
     source = models.CharField(max_length=20, null=True)
     active = models.BooleanField(null=True, default=False)
