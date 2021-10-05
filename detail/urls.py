@@ -1,5 +1,9 @@
 from django.urls import path
 from . import views
+from display.views import photos as display_photos, information as display_information
+from orchidaceae.views import ancestor as orchidaceae_ancestor, ancestrytree as orchidaceae_ancestrytree, \
+    progeny as orchidaceae_progeny, progenyimg as orchidaceae_progenyimg
+
 
 # TODO: Add a new page: Compare two species/hybrids
 # TODO: Add feature search page - search by color, features
@@ -12,45 +16,36 @@ urlpatterns = [
     path('compare/<int:pid>/', views.compare, name='compare'),
     path('compare/', views.compare, name='compare'),
     path('createhybrid/', views.createhybrid, name='createhybrid'),
-    path('information/<int:pid>/', views.information, name='information'),
-    path('information/', views.information, name='information'),
-
     path('comment/', views.comment, name='comment'),
     path('comments/', views.comments, name='comments'),
-    # path('myphoto/<int:pid>/', views.myphoto, name='myphoto'),
-    # path('myphoto/', views.myphoto, name='myphoto'),
-    # path('myphoto_browse_spc/', views.myphoto_browse_spc, name='myphoto_browse_spc'),
-    # path('myphoto_browse_hyb/', views.myphoto_browse_hyb, name='myphoto_browse_hyb'),
     path('curateinfospc/<int:pid>/', views.curateinfospc, name='curateinfospc'),
     path('curateinfospc/', views.curateinfospc, name='curateinfospc'),
     path('curateinfohyb/<int:pid>/', views.curateinfohyb, name='curateinfohyb'),
     path('curateinfohyb/', views.curateinfohyb, name='curateinfohyb'),
-    # path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
-    # path('curate_pending/', views.curate_pending, name='curate_pending'),
-    # path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
     path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
-
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
-    # path('deletephoto/<int:orid>/', views.deletephoto, name='deletephoto'),
-    # path('deletewebphoto/<int:pid>/', views.deletewebphoto, name='deletewebphoto'),
-    # path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
-    # Move to orchidaceae
-    path('ancestor/<int:pid>/', views.ancestor, name='ancestor'),
-    path('ancestor/', views.ancestor, name='ancestor'),
-    path('ancestrytree/<int:pid>/', views.ancestrytree, name='ancestrytree'),
-    path('ancestrytree/', views.ancestrytree, name='ancestrytree'),
-    path('progeny/<int:pid>/', views.progeny, name='progeny'),
-    path('progenyimg/<int:pid>/', views.progenyimg, name='progenyimg'),
-    # Moved to common
-    path('species/<int:pid>/', views.information, name='information'),
-    path('hybrid/<int:pid>/', views.information, name='information'),
-    path('<int:pid>/hybrid/', views.information, name='information'),
-    path('<int:pid>/species/', views.information, name='information'),
-    path('species_detail/<int:pid>/', views.information, name='information'),
-    path('hybrid_detail/<int:pid>/', views.information, name='information'),
-    path('<int:pid>/species_detail/', views.information, name='information'),
-    path('<int:pid>/hybrid_detail/', views.information, name='information'),
-    path('photos/<int:pid>/', views.information, name='information'),
+
+    # Redirect to orchidaceae
+    path('ancestor/<int:pid>/', orchidaceae_ancestor, name='ancestor'),
+    path('ancestor/', orchidaceae_ancestor, name='ancestor'),
+    path('ancestrytree/<int:pid>/', orchidaceae_ancestrytree, name='ancestrytree'),
+    path('ancestrytree/', orchidaceae_ancestrytree, name='ancestrytree'),
+    path('progeny/<int:pid>/', orchidaceae_progeny, name='progeny'),
+    path('progenyimg/<int:pid>/', orchidaceae_progenyimg, name='progenyimg'),
+
+    # Redirect to display
+    path('information/', display_information, name='information'),
+    path('information/<int:pid>/', display_information, name='information'),
+    path('photos/', display_photos, name='photos'),
+    path('photos/<int:pid>/', display_photos, name='photos'),
+    path('species/<int:pid>/', display_information, name='information'),
+    path('hybrid/<int:pid>/', display_information, name='information'),
+    path('<int:pid>/hybrid/', display_information, name='information'),
+    path('<int:pid>/species/', display_information, name='information'),
+    path('species_detail/<int:pid>/', display_information, name='information'),
+    path('hybrid_detail/<int:pid>/', display_information, name='information'),
+    path('<int:pid>/species_detail/', display_information, name='information'),
+    path('<int:pid>/hybrid_detail/', display_information, name='information'),
 ]

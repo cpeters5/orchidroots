@@ -29,95 +29,15 @@ from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, S
 
 alpha_list = config.alpha_list
 logger = logging.getLogger(__name__)
-
 User = get_user_model()
 Family = apps.get_model('core', 'Family')
 Subfamily = apps.get_model('core', 'Subfamily')
 Tribe = apps.get_model('core', 'Tribe')
 Subtribe = apps.get_model('core', 'Subtribe')
-
 Region = apps.get_model('core', 'Region')
 Subregion = apps.get_model('core', 'Subregion')
 Localregion = apps.get_model('core', 'Localregion')
 imgdir, hybdir, spcdir = imgdir()
-
-
-def information(request, pid):
-    role = getRole(request)
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    send_url = '/display/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
-    # print(send_url)
-    return HttpResponseRedirect(send_url)
-
-
-def photos(request, pid):
-    role = getRole(request)
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    send_url = '/detail/photos/' + str(pid) + '?family=' + str(family)
-    # print(send_url)
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def reidentify(request, orid, pid):
-    role = getRole(request)
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    send_url = '/detail/reidentify/' + str(orid) + "/" + str(pid) + '?family=' + str(family)
-    # print(send_url)
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def uploadfile(request, pid):
-    role = getRole(request)
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    send_url = '/detail/uploadfile/' + str(pid) + '?family=' + str(family)
-    # print(send_url)
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def uploadweb(request, pid, orid=None):
-    role = getRole(request)
-    species = Species.objects.get(pk=pid)
-    family = species.gen.family
-    if orid:
-        send_url = '/detail/uploadweb/' + str(pid) + '/' + str(orid) + '?family=' + str(family)
-    else:
-        send_url = '/detail/uploadweb/' + str(pid) + '?family=' + str(family)
-    # print(send_url)
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def curateinfohyb(request, pid=None):
-    if pid:
-        send_url = '/detail/curateinfohyb/' + str(pid) + '/?family=Orchidaceae'
-    else:
-        send_url = '/detail/curateinfohyb/?family=Orchidaceae'
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def curateinfospc(request, pid):
-    send_url = '/detail/curateinfospc/' + str(pid) + '?family=Orchidaceae'
-    return HttpResponseRedirect(send_url)
-
-
-def compare(request, pid):
-    send_url = '/detail/compare/' + str(pid) + '?family=Orchidaceae'
-    return HttpResponseRedirect(send_url)
-
-
-@login_required
-def createhybrid(request, pid):
-    send_url = '/detail/createhybrid/' + str(pid) + '?family=Orchidaceae'
-    return HttpResponseRedirect(send_url)
-
 
 @login_required
 def genera(request):
@@ -649,7 +569,6 @@ def ancestor(request, pid=None):
     return render(request, 'orchidaceae/ancestor.html', context)
 
 
-# All access - at least role = pub
 @login_required
 def ancestrytree(request, pid=None):
     if not pid:
@@ -901,7 +820,6 @@ def ancestrytree(request, pid=None):
     return render(request, 'orchidaceae/ancestrytree.html', context)
 
 
-# All access - at least role = pub
 @login_required
 def progeny_old(request, pid):
     alpha = ''
@@ -995,7 +913,6 @@ def progeny(request, pid):
     return render(request, 'orchidaceae/progeny.html', context)
 
 
-# All access - at least role = pub
 @login_required
 def progenyimg(request, pid=None):
     num_show = 5
@@ -1077,7 +994,6 @@ def valid_year(year):
         return year
 
 
-# TOBE REMOVE
 def mypaginator(request, full_list, page_length, num_show):
     page_list = []
     first_item = 0
@@ -1126,84 +1042,3 @@ def mypaginator(request, full_list, page_length, num_show):
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
-
-def xreidentify(request, orid, pid):
-    source_file_name = ''
-    role = getRole(request)
-    old_species = Species.objects.get(pk=pid)
-    old_family = old_species.gen.family
-    if role != 'cur':
-        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
-        return HttpResponseRedirect(url)
-
-    if old_species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        old_species = Species.objects.get(pk=pid)
-
-    form = SpeciesForm(request.POST or None)
-    if old_species.type == 'species':
-        old_img = SpcImages.objects.get(pk=orid)
-    else:
-        old_img = HybImages.objects.get(pk=orid)
-    if request.method == 'POST':
-        if form.is_valid():
-            new_pid = form.cleaned_data.get('species')
-            try:
-                new_species = Species.objects.get(pk=new_pid)
-            except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
-                return HttpResponseRedirect(url)
-
-            # If re-idenbtified to same genus. Just change pid
-            if new_species.genus == old_species.genus:
-                if old_species.type == 'species':
-                    new_img = SpcImages.objects.get(pk=old_img.id)
-                    new_img.pid = new_species.accepted
-                else:
-                    new_img = HybImages.objects.get(pk=old_img.id)
-                    new_img.pid = new_species.hybris
-                if source_file_name:
-                    new_img.source_file_name = source_file_name
-                new_img.pk = None
-            else :
-                if old_img.image_file:
-                    new_img = SpcImages(pid=new_species)
-                    from_path = os.path.join(settings.STATIC_ROOT, old_img.image_dir() + old_img.image_file)
-                    if new_species.gen.family.application == 'orchidaceae':
-                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family.application) + "/" + old_img.image_file)
-                    else:
-                        to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
-                    os.rename(from_path, to_path)
-                else:
-                    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, new_family)
-                    return HttpResponseRedirect(url)
-                if source_file_name:
-                    new_img.source_file_name = source_file_name
-            new_img.author = old_img.author
-            new_img.pk = None
-            new_img.source_url = old_img.source_url
-            new_img.image_url = old_img.image_url
-            new_img.image_file = old_img.image_file
-            new_img.name = old_img.name
-            new_img.awards = old_img.awards
-            new_img.variation = old_img.variation
-            new_img.form = old_img.form
-            new_img.text_data = old_img.text_data
-            new_img.description = old_img.description
-            new_img.created_date = old_img.created_date
-            # point to a new record
-            # Who requested this change?
-            new_img.user_id = request.user
-
-            # ready to save
-            new_img.save()
-
-            # Delete old record
-            # old_img.delete()
-
-            # write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
-            return HttpResponseRedirect(url)
-    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', }
-    return render(request, old_species.gen.family.application + '/reidentify.html', context)

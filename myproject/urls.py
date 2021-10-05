@@ -66,11 +66,11 @@ urlpatterns = [
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),
 
-    # old
+    # legacy applications
     path('natural/', include('detail.urls')),
     path('orchid/', include('orchidaceae.urls')),
     path('orchidlite/', include('detail.urls')),
-    path('orchidlist/', include('orchidlist.urls')),
+    # path('orchidlist/', include('orchidlist.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

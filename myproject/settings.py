@@ -94,7 +94,7 @@ INSTALLED_APPS = [
     'other',
 
     # Legacy
-    'orchidlist',
+    # 'orchidlist',
 
     # Third Party
     'allauth',

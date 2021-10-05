@@ -1,5 +1,10 @@
 from django.urls import path, re_path
 from . import views
+from display.views import photos as display_photos, information as display_information
+from detail.views import reidentify as detail_reidentify, uploadfile as detail_uploadfile, \
+    uploadweb as detail_uploadweb, curateinfospc as detail_curateinfospc, curateinfohyb as detail_curateinfohyb, \
+    compare as detail_compare, createhybrid as detail_createhybrid
+
 
 app_name = 'orchidaceae'
 urlpatterns = [
@@ -23,16 +28,20 @@ urlpatterns = [
     path('series/', views.series, name='series'),
     # path('browsegen/', views.browsegen, name='browsegen'),
 
+    # Redirect to display
+    path('information/', display_information, name='information'),
+    path('information/<int:pid>/', display_information, name='information'),
+    path('photos/', display_photos, name='photos'),
+    path('photos/<int:pid>/', display_photos, name='photos'),
+
     # Redirect to detail
-    path('information/<int:pid>/', views.information, name='information'),
-    path('photos/<int:pid>/', views.photos, name='photos'),
-    path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
-    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
-    path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
-    path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
-    path('curateinfospc/<int:pid>/', views.curateinfospc, name='curateinfospc'),
-    path('curateinfohyb/<int:pid>/', views.curateinfohyb, name='curateinfohyb'),
-    path('compare/<int:pid>/', views.compare, name='compare'),
-    path('createhybrid/', views.createhybrid, name='createhybrid'),
+    path('reidentify/<int:orid>/<int:pid>/', detail_reidentify, name='reidentify'),
+    path('uploadfile/<int:pid>/', detail_uploadfile, name='uploadfile'),
+    path('uploadweb/<int:pid>/', detail_uploadweb, name='uploadweb'),
+    path('uploadweb/<int:pid>/<int:orid>/', detail_uploadweb, name='uploadweb'),
+    path('curateinfospc/<int:pid>/', detail_curateinfospc, name='curateinfospc'),
+    path('curateinfohyb/<int:pid>/', detail_curateinfohyb, name='curateinfohyb'),
+    path('compare/<int:pid>/', detail_compare, name='compare'),
+    path('createhybrid/', detail_createhybrid, name='createhybrid'),
 
 ]

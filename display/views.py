@@ -31,7 +31,7 @@ redirect_message = 'species does not exist'
 # num_show = 5
 # page_length = 500
 
-def information(request, pid):
+def information(request, pid=None):
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     ps_list = pp_list = ss_list = sp_list = seedimg_list = pollimg_list = ()
@@ -47,6 +47,8 @@ def information(request, pid):
     seedimg_list = []
     pollimg_list = []
     distribution_list = []
+    if not pid:
+        pid = 0
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:

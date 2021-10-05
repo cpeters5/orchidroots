@@ -35,39 +35,54 @@ Synonym = []
 alpha_list = config.alpha_list
 f, sf, t, st = '', '', '', ''
 redirect_message = 'species does not exist'
+
 # num_show = 5
 # page_length = 500
 
 
-def xgetForms(request):
-    family, app = '', ''
-    if 'family' in request.GET:
-        family = request.GET['family']
-    elif 'family' in request.POST:
-        family = request.POST['family']
-    if family:
-        family = Family.objects.get(pk=family)
-    try:
-        app = Family.objects.get(pk=family)
-        app = app.application
-    except Family.DoesNotExist:
-        app = ''
-        family = ''
-    if app == 'orchidaceae':
-        from orchidaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
-    elif app == 'bromeliaceae':
-        from bromeliaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
-            HybridInfoForm, SpeciesForm, RenameSpeciesForm
-    elif app == 'cactaceae':
-        from cactaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
-            HybridInfoForm, SpeciesForm, RenameSpeciesForm
-    elif app == 'other':
-        from other.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
-            HybridInfoForm, SpeciesForm, RenameSpeciesForm
-    if app:
-        return UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
-    else:
-        return None,None,None,None,None,None,None,
+# def xgetForms(request):
+#     family, app = '', ''
+#     if 'family' in request.GET:
+#         family = request.GET['family']
+#     elif 'family' in request.POST:
+#         family = request.POST['family']
+#     if family:
+#         family = Family.objects.get(pk=family)
+#     try:
+#         app = Family.objects.get(pk=family)
+#         app = app.application
+#     except Family.DoesNotExist:
+#         app = ''
+#         family = ''
+#     if app == 'orchidaceae':
+#         from orchidaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
+#     elif app == 'bromeliaceae':
+#         from bromeliaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
+#             HybridInfoForm, SpeciesForm, RenameSpeciesForm
+#     elif app == 'cactaceae':
+#         from cactaceae.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
+#             HybridInfoForm, SpeciesForm, RenameSpeciesForm
+#     elif app == 'other':
+#         from other.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, \
+#             HybridInfoForm, SpeciesForm, RenameSpeciesForm
+#     if app:
+#         return UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
+#     else:
+#         return None,None,None,None,None,None,None,
+# def xgetAllSpecies():
+#     # Call this when Genus or Family is not provided
+#     OrSpecies = apps.get_model('orchidaceae', 'Species')
+#     BrSpecies = apps.get_model('bromeliaceae', 'Species')
+#     CaSpecies = apps.get_model('cactaceae', 'Species')
+#     OtSpecies = apps.get_model('other', 'Species')
+#     OrSpcImages = apps.get_model('orchidaceae', 'SpcImages')
+#     OrHybImages = apps.get_model('orchidaceae', 'HybImages')
+#     BrSpcImages = apps.get_model('bromeliaceae', 'SpcImages')
+#     CaSpcImages = apps.get_model('cactaceae', 'SpcImages')
+#     OtSpcImages = apps.get_model('other', 'SpcImages')
+#
+#     return OrSpecies, BrSpecies, CaSpecies, OtSpecies, OrSpcImages, OrHybImages, BrSpcImages, CaSpcImages, OtSpcImages
+
 
 def getAllGenera():
     # Call this when Family is not provided
@@ -77,20 +92,6 @@ def getAllGenera():
     OtGenus = apps.get_model('other', 'Genus')
     return OrGenus, BrGenus, CaGenus, OtGenus
 
-
-def xgetAllSpecies():
-    # Call this when Genus or Family is not provided
-    OrSpecies = apps.get_model('orchidaceae', 'Species')
-    BrSpecies = apps.get_model('bromeliaceae', 'Species')
-    CaSpecies = apps.get_model('cactaceae', 'Species')
-    OtSpecies = apps.get_model('other', 'Species')
-    OrSpcImages = apps.get_model('orchidaceae', 'SpcImages')
-    OrHybImages = apps.get_model('orchidaceae', 'HybImages')
-    BrSpcImages = apps.get_model('bromeliaceae', 'SpcImages')
-    CaSpcImages = apps.get_model('cactaceae', 'SpcImages')
-    OtSpcImages = apps.get_model('other', 'SpcImages')
-
-    return OrSpecies, BrSpecies, CaSpecies, OtSpecies, OrSpcImages, OrHybImages, BrSpcImages, CaSpcImages, OtSpcImages
 
 def getFamilyImage(family):
     SpcImages = apps.get_model(family.application, 'SpcImages')

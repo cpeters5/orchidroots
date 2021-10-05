@@ -21,7 +21,7 @@ num_img = 20
 
 @require_GET
 def robots_txt(request):
-    # only allow access to common
+    # only allow access to display
     lines = [
         "User-Agent: *",
         "Disallow: /admin/",
@@ -29,10 +29,10 @@ def robots_txt(request):
         "Disallow: /account/",
         "Disallow: /bromeliaceae/",
         "Disallow: /cactaceae/",
+        "Disallow: /common/",
         "Disallow: /core/",
         "Disallow: /documents/",
         "Disallow: /detail/",
-        "Disallow: /common/",
         "Disallow: /documents/",
         "Disallow: /donations/",
         "Disallow: /orchidaceae/",

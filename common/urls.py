@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from . import views
-
+from display.views import photos as display_photos, information as display_information
 app_name = 'common'
 urlpatterns = [
     # Top level
@@ -12,6 +12,12 @@ urlpatterns = [
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),
     path('browse/', views.browse, name='browse'),
+
+    # Redirect to display
+    path('information/', display_information, name='information'),
+    path('information/<int:pid>/', display_information, name='information'),
+    path('photos/', display_photos, name='photos'),
+    path('photos/<int:pid>/', display_photos, name='photos'),
 
     path('search_gen/', views.search_gen, name='search_gen'),
     path('search_spc/', views.search_spc, name='search_spc'),
