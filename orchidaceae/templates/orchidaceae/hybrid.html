@@ -253,7 +253,7 @@ option {
                     </thead>
                         {% for spc in my_list %}
                             <tr>
-                                <td align="left"><a href="{% url 'common:information' spc.pid %}?family={{spc.gen.family}}&role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
+                                <td align="left"><a href="{% url 'display:information' spc.pid %}?family={{spc.gen.family}}&role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
                                 <td>{{spc.author|default:''}}</td>
                                 <td>{{spc.originator|default:''}}</td>
                                 <td>{{spc.year|default:''}}</td>
@@ -261,26 +261,26 @@ option {
                                     {% if spc.status == 'synonym' %}
                                     Synonym of
                                         {% if spc.getAccepted %}
-                                            <a href="{% url 'common:information' spc.getAccepted.pid %}?family={{spc.gen.family}}&role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.getAccepted.pid %}?family={{spc.gen.family}}&role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
                                         {% else %}}
                                             {{spc.getAccepted.name|safe}}
                                         {% endif %}
                                     {% else %}
                                         {% if spc.hybrid.seed_id.type == 'species' %}
                                             {% if spc.hybrid.seed_id_id %}
-                                                <a href="{% url 'common:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                                <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                             {% else %}
                                                 <a href="#">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                             {% endif %}
                                         {% elif spc.hybrid.seed_id.type == 'hybrid' %}
-                                            <a href="{% url 'common:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                             ×
                                         {% if spc.hybrid.pollen_id.type == 'species' %}
-                                            <a href="{% url 'common:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% elif spc.hybrid.pollen_id.type == 'hybrid' %}
-                                            <a href="{% url 'common:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                     {% endif %}

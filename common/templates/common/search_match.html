@@ -39,9 +39,9 @@
                        {% if species.0.status == 'synonym' %}{{species.0.name|safe}}
                        {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
                           {% if role == "cur" %}
-                               <a href="{% url 'detail:photos' species.0.pid %}?role={{role}}">{{species.0.name|safe}}</a>
+                               <a href="{% url 'display:photos' species.0.pid %}?role={{role}}">{{species.0.name|safe}}</a>
                           {% else %}
-                               <a href="{% url 'detail:information' %}?pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
+                               <a href="{% url 'display:information' %}?pid={{species.0.pid}}&role={{role}}">{{species.0.name|safe}}</a>
                           {% endif %}
                        {%  else %}
                            {{species.0.name}}
@@ -55,9 +55,9 @@
                        {% if species.0.status == 'synonym' %}
                            {% if species.0.getAcc %}
                                {% if role == "cur" %}
-                                   <a href="{% url 'detail:photos' species.0.getAcc %}?role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                   <a href="{% url 'display:photos' species.0.getAcc %}?role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
                                {% else %}
-                                   <a href="{% url 'detail:information' %}?pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                   <a href="{% url 'display:information' %}?pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
                                 {% endif %}
                            {% else %}
                                 Error! Accepted name does not exist
@@ -65,9 +65,9 @@
                        {% elif species.0.type == 'hybrid' %}
                            {% if species.0.hybrid.seed_id %}
                                {% if role == "cur" %}
-                                   <a href="{% url 'detail:photos' species.0.hybrid.seed_id.pid %}?role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                   <a href="{% url 'display:photos' species.0.hybrid.seed_id.pid %}?role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
                                {% else %}
-                                   <a href="{% url 'detail:information' %}?pid={{species.0.hybrid.seed_id.pid}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
+                                   <a href="{% url 'display:information' %}?pid={{species.0.hybrid.seed_id.pid}}&role={{role}}">{{species.0.hybrid.seed_id.namecasual|safe}}</a>
                               {% endif %}
 
                             {%  else %}
@@ -76,9 +76,9 @@
                            ×
                            {% if species.0.hybrid.pollen_id %}
                                {% if role == "cur" %}
-                                   <a href="{% url 'detail:photos' species.0.hybrid.pollen_id.pid %}?role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                   <a href="{% url 'display:photos' species.0.hybrid.pollen_id.pid %}?role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
                                {% else %}
-                                   <a href="{% url 'detail:information' %}?pid={{species.0.hybrid.pollen_id.pid}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
+                                   <a href="{% url 'display:information' %}?pid={{species.0.hybrid.pollen_id.pid}}&role={{role}}">{{species.0.hybrid.pollen_id.namecasual|safe}}</a>
                               {% endif %}
 
                            {%  else %}

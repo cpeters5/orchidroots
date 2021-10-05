@@ -291,7 +291,7 @@ img{
                         {% if or_spclist %}
                             {% for x in or_spclist %}
                                 <div class="imageitem m-1 border">
-                                    <a href="{% url 'common:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
+                                    <a href="{% url 'display:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                     </a>
                                     <div class="imgcaption_top">{{x.pid.pid.binomial_it|safe}}</div>
@@ -301,7 +301,7 @@ img{
                         {% if or_hyblist %}
                             {% for x in or_hyblist %}
                                 <div class="imageitem m-1 border">
-                                    <a href="{% url 'common:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
+                                    <a href="{% url 'display:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                     </a>
                                     <div class="imgcaption_top">{{x.pid.binomial_it|safe}}</div>
@@ -311,7 +311,7 @@ img{
                         {% if br_spclist %}
                             {% for x in br_spclist %}
                                 <div class="imageitem m-1 border">
-                                    <a href="{% url 'common:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
+                                    <a href="{% url 'display:information' x.pid.pid_id %}?role={{role}}&family={{x.gen.family}}">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                     </a>
                                     <div class="imgcaption_top">{{x.pid.pid.binomial_it|safe}}</div>
@@ -321,7 +321,7 @@ img{
                         {% if ca_spclist %}
                             {% for x in ca_spclist %}
                                 <div class="imageitem m-1 border">
-                                    <a href=" url 'common:information' x.pid.pid %}?role={{role}}&family={{x.gen.family}}">
+                                    <a href=" url 'display:information' x.pid.pid %}?role={{role}}&family={{x.gen.family}}">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                     </a>
                                     <div class="imgcaption_top">{{x.pid.binomial_it|safe}}</div>
@@ -331,7 +331,7 @@ img{
                         {% if ot_spclist %}
                             {% for x in ot_spclist %}
                                 <div class="imageitem m-1 border">
-                                    <a href=" url 'common:information' x.pid.pid %}?role={{role}}&family={{x.gen.family}}">
+                                    <a href=" url 'display:information' x.pid.pid %}?role={{role}}&family={{x.gen.family}}">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
                                     </a>
                                     <div class="imgcaption_top">{{x.pid.binomial_it|safe}}</div>

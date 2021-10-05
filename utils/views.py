@@ -37,10 +37,8 @@ def change_family(request):
 def get_family_list(request, alpha):
     if alpha != '':
         family_list = Family.objects.filter(family__istartswith=alpha)
-        logger.error("family_list " + str(len(family_list)))
     else:
         family_list = Family.objects.all()
-        logger.error("family_list " + str(len(family_list)))
     favorite = Family.objects.filter(family__in=('Orchidaceae', 'Bromeliaceae', 'Cactaceae'))
     family_list = favorite.union(family_list)
     return family_list

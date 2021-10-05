@@ -45,12 +45,12 @@
                                     {% elif x.status == 'synonym' %}
                                         {{ x.binomial }}
                                     {% else %}
-                                        <a href="/common/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
+                                        <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
                                     {% endif %}
                                     {{x.author|default:''}}
                                     ({{x.gen.family}})
                                     {% if x.status == 'synonym' %}
-                                       (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                       (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
                                     {% endif %}
                                 </td>
                                 <td>
@@ -62,11 +62,11 @@
                             {% for x in match_list %}
                             <tr>
                                 <td>
-                                    <a href="/common/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
+                                    <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
                                     {{x.author|default:''}}
                                     ({{x.gen.family}})
                                     {% if x.status == 'synonym' %}
-                                        (syn. <a href="/common/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
+                                        (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
                                    {% endif %}
                                    {{x.num_image|default:''}}
                                 </td>
@@ -118,7 +118,7 @@
                             <tr>
                                 <td>
                                     {% if x.0.status != 'synonym' %}
-                                        <a href="/common/{{path}}/{{x.0.pid}}/?family={{x.0.gen.family}}&species={{x.0.binomial}}">{{ x.0.binomial_it|safe }}</a>
+                                        <a href="/display/{{path}}/{{x.0.pid}}/?family={{x.0.gen.family}}&species={{x.0.binomial}}">{{ x.0.binomial_it|safe }}</a>
                                         {{x.0.author|default:''}}
                                         {{x.0.year|default:''}}
                                         {{x.0.description|default:''}}
@@ -126,7 +126,7 @@
                                         {{ x.0.binomial_it|safe }}
                                         {{x.0.author|default:''}}
                                         {{x.0.year|default:''}}
-                                        (syn. <a href="/common/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial_it|safe}}</a>)
+                                        (syn. <a href="/display/{{path}}/{{x.0.getAcc}}/?family={{x.0.family}}&species={{x.0.binomial}}">{{x.0.getAccepted.binomial_it|safe}}</a>)
                                     {% endif %}
                                     ({{x.0.gen.family}})
                                 </td>

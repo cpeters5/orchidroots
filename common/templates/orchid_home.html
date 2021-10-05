@@ -213,7 +213,7 @@ img{
                             </div>
                         </a>
                         <div class="imgcaption">
-                            <a href="{% url 'common:information' orcimage.pid_id %}?family={{orcimage.gen.family}}&role={{role}}">
+                            <a href="{% url 'display:information' orcimage.pid_id %}?family={{orcimage.gen.family}}&role={{role}}">
                                 {{orcimage.pid.name|safe}} {% if orcfamily.application == 'other' %}({{orcimage.gen.family}}){% endif %}
                             </a>
                             <br>&#169;<a href="{{orcimage.source_url}}" target="_blank" >{{orcimage.get_displayname}}</a>
@@ -229,7 +229,7 @@ img{
                             </div>
                         </a>
                         <div class="imgcaption">
-                            <a href="{% url 'common:information' broimage.pid_id %}?family={{broimage.gen.family}}&role={{role}}">
+                            <a href="{% url 'display:information' broimage.pid_id %}?family={{broimage.gen.family}}&role={{role}}">
                                 {{broimage.pid.name|safe}} {% if brofamily.application == 'other' %}({{broimage.gen.family}}){% endif %}
                             </a>
                             <br>&#169;<a href="{{broimage.source_url}}" target="_blank" >{{broimage.get_displayname}},</a>
@@ -245,7 +245,7 @@ img{
                             </div>
                         </a>
                         <div class="imgcaption">
-                            <a href="{% url 'common:information' cacimage.pid_id %}?family={{cacimage.gen.family}}&role={{role}}">
+                            <a href="{% url 'display:information' cacimage.pid_id %}?family={{cacimage.gen.family}}&role={{role}}">
                                 {{cacimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{cacimage.gen.family}}){% endif %}
                             </a>
                             <br>&#169;<a href="{{cacimage.source_url}}" target="_blank" >{{cacimage.get_displayname}},</a>
@@ -263,7 +263,7 @@ img{
                                 </div>
                             </a>
                             <div class="imgcaption">
-                                <a href="{% url 'common:information' othimage.pid_id %}?family={{othimage.gen.family}}&role={{role}}">
+                                <a href="{% url 'display:information' othimage.pid_id %}?family={{othimage.gen.family}}&role={{role}}">
                                     {{othimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.gen.family}}){% endif %}
                                 </a>
                                 <br>&#169;<a href="{{othimage.source_url}}" target="_blank" >{{othimage.get_displayname}},</a>
@@ -282,7 +282,7 @@ img{
                                 </div>
                             </a>
                             <div class="imgcaption">
-                                <a href="{% url 'common:information' succulent_obj.pid_id %}?family={{succulent_obj.gen.family}}&role={{role}}">
+                                <a href="{% url 'display:information' succulent_obj.pid_id %}?family={{succulent_obj.gen.family}}&role={{role}}">
                                     {{succulent_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{succulent_obj.gen.family}}){% endif %}
                                 </a>
                                 <br>&#169;<a href="{{succulent_obj.source_url}}" target="_blank" >{{succulent_obj.get_displayname}},</a>
@@ -301,7 +301,7 @@ img{
                                 </div>
                             </a>
                             <div class="imgcaption">
-                                <a href="{% url 'common:information' carnivorous_obj.pid_id %}?family={{carnivorous_obj.gen.family}}&role={{role}}">
+                                <a href="{% url 'display:information' carnivorous_obj.pid_id %}?family={{carnivorous_obj.gen.family}}&role={{role}}">
                                     {{carnivorous_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{carnivorous_obj.gen.family}}){% endif %}
                                 </a>
                                 <br>&#169;<a href="{{carnivorous_obj.source_url}}" target="_blank" >{{carnivorous_obj.get_displayname}},</a>

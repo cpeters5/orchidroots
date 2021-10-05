@@ -11,9 +11,6 @@ urlpatterns = [
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),
-    path('information/<int:pid>/', views.information, name='information'),
-    path('photos/<int:pid>/', views.photos, name='photos'),
-    path('photos/', views.photos, name='photos'),
     path('browse/', views.browse, name='browse'),
 
     path('search_gen/', views.search_gen, name='search_gen'),

@@ -63,7 +63,7 @@
                     </tr>
                     {% for anc in anc_list %}
                     <tr class="center">
-                        <td class="border-rb" style="text-align: left"><a href="{% url 'common:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a></td>
+                        <td class="border-rb" style="text-align: left"><a href="{% url 'display:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a></td>
                         <td class="border-rb" style="text-align: right">{{anc.prettypct}}%</td>
                         <td class="border-rb " style="text-align: center">{% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}</td>
                     </tr>

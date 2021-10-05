@@ -9,7 +9,7 @@ def information(request, pid=None):
     role = getRole(request)
     family = 'Orchidaceae'
     if pid:
-        send_url = '/common/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
+        send_url = '/display/information/' + str(pid) + '/?family=' + str(family) + '&role=' + role
     else:
         send_url = '/'
     return HttpResponseRedirect(send_url)

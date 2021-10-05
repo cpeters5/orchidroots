@@ -67,12 +67,12 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        {{species.binomial_it|safe}} (syn. <a href="/common/{{path}}/{{species.getAccepted.pid}}/?family={{family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>)
+                                                        {{species.binomial_it|safe}} (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>)
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/common/{{path}}/{{species.pid}}/?family={{family}}"><i>{{species.name|safe}}</i></a>
+                                                    <a href="/display/{{path}}/{{species.pid}}/?family={{family}}"><i>{{species.name|safe}}</i></a>
                                                 {% endif %}
                                                 {{species.author|default:""}} {{species.year|default:""}}
                                             </td>
