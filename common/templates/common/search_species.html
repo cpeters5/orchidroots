@@ -27,16 +27,16 @@
                     {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&alpha=A&syn=N">Full species list</a>{% endif %}
                 </div>
                 <br>
-                <h6>Searching for "<i>{{spc_string}}</i>"</h6>
+                <h5>Searching for "<i>{{spc_string}}</i>" in {{app|title}} Family</h5>
                 {% if genus_list or match_list or perfect_list %}
-                    <table width="95%">
-                        <tr>
-                            <th width="70%">Matching species from {{family.family|default:'all families'}}</th>
-                            <th> num images</th>
-                        </tr>
 
                     {% if match_list or perfect_list %}
                         {% if perfect_list %}
+                        <table >
+                            <tr>
+                                <th >Matching species</th>
+                                <th> num images</th>
+                            </tr>
                             {% for x in perfect_list %}
                             <tr>
                                 <td>
@@ -53,12 +53,16 @@
                                        (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td style="text-align: center;">
                                     {{x.num_image|default:''}}
                                 </td>
                             </tr>
                             {% endfor %}
+                        </table>
+
                         {% elif match_list %}
+                        <table >
+                            <tr><td>No match found. Here are some approximately matched species</td></tr>
                             {% for x in match_list %}
                             <tr>
                                 <td>
@@ -73,45 +77,46 @@
                                 <td>{{x.gen.family.num_image}}</td>
                             </tr>
                             {% endfor %}
+                            {% if genus_list %}
+                            <tr><td>&nbsp;&nbsp;</td></tr>
+                            <tr>
+                                <td>Or try one of the following closely matched genera in other families<br>
+                                    <table style="width:95%">
+                                        {% for genus in genus_list %}
+                                        <tr>
+                                            <td>&nbsp;&nbsp;</td>
+                                            <td>
+                                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                                {% endif %}
+                                                ({{genus.0.family}})
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
                         {% endif %}
                     {% else %}
-                        <tr><td>No smatching species found</td></tr>
+                        <tr><td>No match found</td></tr>
+
                     {% endif %}
-                    </table>
-                    {% if genus_list %}
-                    <br>
-                    <table style="width:95%">
-                        <tr>
-                            <th width="70%">Approximately matched genera</th>
-                            <th>Current status</th>
-<!--                            <th>Score</th>-->
-                        </tr>
-                        {% for genus in genus_list %}
-                        <tr>
-                            <td>
-                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}</a>
-                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %} {% if genus.0.type == 'hybrid' %} ({{genus.0.description|default:''}}) {% endif %}
-                                {% endif %}
-                                ({{genus.0.family}})
-                            </td>
-                            <td>
-                                species: {{genus.0.num_species|default:"0"}}
-                                hybrid: {{genus.0.num_hybrid|default:"0"}}
-                            </td>
-<!--                            <th>{{genus.1}}</th>-->
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {% endif %}
+                                    <div style="padding: 0; margin-top: 20px;">
+                        Don't see what you are looking for?<br>
+                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
+                    </div>
+
                 {% else %}
                     {% if fuzzy_list %}
                         <br>
                             {% if match_list %}
                                 fuzzy matches
                             {% endif %}
-                        <table width="95%">
+                        <table style="width:95%">
                             <tr>
-                                <th width="70%">Approximate matching Species from {{family.family|default:'all families'}}</th>
+                                <th style="width: 70%">Approximate matching Species from {{family.family|default:'all families'}}</th>
                                 <th>Num. images</th>
                             </tr>
                         {% for x in fuzzy_list %}
@@ -150,10 +155,10 @@
                     </table>
                 {% endif %}
                 {% if not fuzzy %}
-                    <div style="padding: 0; margin-top: 20px;">
-                        Didn't see what you are looking for?<br>
-                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
-                    </div>
+<!--                    <div style="padding: 0; margin-top: 20px;">-->
+<!--                        Didn't see what you are looking for?<br>-->
+<!--                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
+<!--                    </div>-->
                 {% endif %}
                 <br>
                 <div class="btn btn-custom" onclick="history.back()">
