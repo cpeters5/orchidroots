@@ -38,13 +38,13 @@
                         {% if family.family == 'Orichidaceae' %}
                             <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&display=checked"><i>{{species.genus}}</i></a>
                         {% else %}
-                            <a href="{% url 'common:hybrid' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
+                            <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
                         {% endif %}
                     {% else %}
                         {% if family.family == 'Orichidaceae' %}
                             <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&display=checked"><i>{{species.genus}}</i></a>
                         {% else %}
-                            <a href="{% url 'common:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
+                            <a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&syn=N"><i>{{species.genus}}</i></a>
                         {% endif %}
                     {% endif %}
                     {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
