@@ -304,7 +304,7 @@ class Intragen (models.Model):
 
 
 class Species(models.Model):
-    pid = models.BigIntegerField(primary_key=True)
+    pid = models.BigAutoField(primary_key=True)
     source = models.CharField(max_length=10)
     genus = models.CharField(max_length=50)
     is_hybrid = models.CharField(max_length=1, null=True)
