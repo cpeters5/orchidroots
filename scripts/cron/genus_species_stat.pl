@@ -258,6 +258,7 @@ sub getSpcImages {
 	&getASPM($stmt);
 	my $prevgen = 0;
 	while (my @row = $sth->fetchrow_array()) {
+		next if not $row[1];
 		if ($row[2] != $prevgen and $prevgen != 0) {
 			$num_image_gen{$row[2]} = 0;
 			$num_spc_with_image{$row[2]} = 0;
