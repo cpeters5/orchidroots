@@ -287,24 +287,25 @@ img{
                         <form action="?" autocomplete="off" style="display:inline-block">
                             <input type="hidden" name="family" value="{{family}}" />
                             <input type="hidden" name="alpha" value="{{alpha}}" />
+                            <input type="hidden" name="talpha" value="{{talpha}}" />
                             <input type="hidden" name="role" value="{{ role }}" />
                             <input type="hidden" name="type" value="species" />
                             <input type="hidden" name="display" value="checked" />
                             <input list="genus_list" class="btn btn-custom" style="padding-top:2px;font-weight: bold" name="genus" onClick="this.setSelectionRange(0, this.value.length)" placeholder="Select a genus"/>
                         </form>
-                        <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
-                        <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&role={{role}}&genus={{genus}}&syn=N">Species list</a>
+                        <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
+                        <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&role={{role}}&genus={{genus}}&syn=N">Species list</a>
                         {% if seed_genus or pollen_genus or seed or pollen %}
-                            <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&role={{role}}&genus={{genus}}&syn=N&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Hybrid list</a>
+                            <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&role={{role}}&genus={{genus}}&syn=N&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Hybrid list</a>
                         {% else %}
-                            <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&role={{role}}&genus={{genus}}&syn=N">Hybrid list</a>
+                            <a class="btn btn-custom" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&role={{role}}&genus={{genus}}&syn=N">Hybrid list</a>
                         {% endif %}
                         {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family={{family}}">Detailed genera</a>{% endif %}
                         {% if app == 'orchidaceae' %}<a class="btn btn-custom" href="{% url 'orchidaceae:species' %}?family={{family}}">Detailed species</a>{% endif %}
                         {% if type == 'hybrid' %}
-                            <a class="btn btn-custom {% if type == 'species' %}selected{% endif %}" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&type=species&role={{role}}&genus={{genus}}&display={{display}}">Browse species</a>
+                            <a class="btn btn-custom {% if type == 'species' %}selected{% endif %}" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&type=species&role={{role}}&genus={{genus}}&display={{display}}">Browse species</a>
                         {% else %}
-                            <a class="btn btn-custom {% if type == 'hybrid' %}selected{% endif %}" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&type=hybrid&role={{role}}&genus={{genus}}&display={{display}}">Browse hybrids</a>
+                            <a class="btn btn-custom {% if type == 'hybrid' %}selected{% endif %}" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&type=hybrid&role={{role}}&genus={{genus}}&display={{display}}">Browse hybrids</a>
                         {% endif %}
                     </dev>
                     <datalist id="genus_list">
@@ -325,10 +326,10 @@ img{
                                         {% if subgenus_obj %}{{subgenus_obj.subgenus}}{% else %}Subgenus{% endif %}
                                     </button>
                                     <ul class="dropdown-menu scrollable-menu">
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&type=species&display={{display}}">Clear Subgenus</a>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&type=species&display={{display}}">Clear Subgenus</a>
                                         </li>
                                         {% for subgenus in subgenus_list %}
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&subgenus={{subgenus.subgenus}}&type={{type}}&display={{display}}">{{subgenus.subgenus}}</a></li>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&subgenus={{subgenus.subgenus}}&type={{type}}&display={{display}}">{{subgenus.subgenus}}</a></li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -339,9 +340,9 @@ img{
                                         {{section_obj.section|default:'Section'}}
                                     </button>
                                     <ul class="dropdown-menu scrollable-menu">
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&subgenus={{subgenus_obj.subgenus}}&type=species&display={{display}}">Clear Section</a>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&subgenus={{subgenus_obj.subgenus}}&type=species&display={{display}}">Clear Section</a>
                                         {% for section in section_list %}
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section.section}}&type={{type}}&display={{display}}">{{section.section}}</a></li>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section.section}}&type={{type}}&display={{display}}">{{section.section}}</a></li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -352,9 +353,9 @@ img{
                                         {{subsection_obj.subsection|default:"Subsection"}}
                                     </button>
                                     <ul class="dropdown-menu scrollable-menu">
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&type=species&display={{display}}">Clear Subsection</a>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&type=species&display={{display}}">Clear Subsection</a>
                                         {% for subsection in subsection_list %}
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection.subsection}}&type=species&display={{display}}">{{subsection.subsection}}</a></li>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection.subsection}}&type=species&display={{display}}">{{subsection.subsection}}</a></li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -365,9 +366,9 @@ img{
                                         <span style="color:black">{{series_obj.series|default:"Series"}}</span>
                                     </button>
                                     <ul class="dropdown-menu scrollable-menu">
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&type=species&display={{display}}">clear Series</a>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&type=species&display={{display}}">clear Series</a>
                                         {% for series in series_list %}
-                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&series={{series.series}}&type=species&display={{display}}">{{series.series}}</a></li>
+                                        <li class="dropdown-item"><a href="?genus={{genus}}&alpha={{alpha}}&talpha={{talpha}}&series={{series.series}}&type=species&display={{display}}">{{series.series}}</a></li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -378,9 +379,11 @@ img{
                     <form action="?" id="display" style="display:inline-block">
                         <input type="hidden" name="family" value="{{family}}" />
                         <input type="hidden" name="alpha" value="{{alpha}}" />
+                        <input type="hidden" name="talpha" value="{{talpha}}" />
                         <input type="hidden" name="type" value="{{type}}" />
                         <input type="hidden" name="role" value="{{role}}" />
-                        <input type="hidden" name="page" value="{{page}}" />
+                        <input type="hidden" name="prevdisplay" value="{{display}}" />
+<!--                        <input type="hidden" name="page" value="{{page}}" />-->
                         <input type="hidden" name="subgenus" value="{{subgenus_obj.subgenus}}" />
                         <input type="hidden" name="section" value="{{section_obj.section}}" />
                         <input type="hidden" name="subsection" value="{{subsection_obj.subsection}}" />
@@ -405,13 +408,13 @@ img{
                                     <div style="float:left">
                                         <ul class="pagination pagination-xs" style="text-align: center">
                                             {% if page > 1 %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&page=1&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&page=1&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
                                             {% else %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
                                             {% endif %}
 
                                             {% if page > 1 %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&page={{prev_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&page={{prev_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
                                             {% else %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
                                             {% endif %}
@@ -420,20 +423,20 @@ img{
                                                 {% if pg == page %}
                                                     <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
                                                 {% else %}
-                                                    <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&page={{pg}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}">{{pg}}</a></li>
+                                                    <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&page={{pg}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}">{{pg}}</a></li>
                                                 {% endif %}
                                             {% endfor %}
 
                                             {% if page == last_page %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
                                             {% else %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&page={{next_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&page={{next_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
                                             {% endif %}
 
                                             {% if page == last_page %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
                                             {% else %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&page={{last_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&page={{last_page}}&role={{role}}&genus={{genus}}&type={{type}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
                                             {% endif %}
                                       </ul>
 
@@ -448,6 +451,7 @@ img{
             <!--            <br>-->
                     {% if page_list %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
+                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                         {% for x in page_list %}
                             <div class="imageitem m-1 border">
                                 {% if role == 'cur' %}
