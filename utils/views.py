@@ -34,15 +34,18 @@ def change_family(request):
     }
     return path_list[path]
 
-def get_family_list(request, alpha):
+
+def get_family_list(request):
+    alpha = ''
+    if 'alpha' in request.GET:
+        alpha = request.GET['alpha']
     if alpha != '':
         family_list = Family.objects.filter(family__istartswith=alpha)
     else:
         family_list = Family.objects.all()
     favorite = Family.objects.filter(family__in=('Orchidaceae', 'Bromeliaceae', 'Cactaceae'))
     family_list = favorite.union(family_list)
-    return family_list
-
+    return family_list, alpha
 
 def getApp(request):
     return request.resolver_match.app_name
