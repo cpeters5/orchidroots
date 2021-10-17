@@ -100,10 +100,26 @@
                         </table>
                         {% endif %}
                     {% else %}
-                        <tr><td>No match found</td></tr>
-
+                        <tr><td>No match found.
+                            {% if genus_list %}
+                            Try another closely matched genera
+                                    <table style="width:95%">
+                                        {% for genus in genus_list %}
+                                        <tr>
+                                            <td>&nbsp;&nbsp;</td>
+                                            <td>
+                                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                                {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                                {% endif %}
+                                                ({{genus.0.family}})
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                            {% endif %}
+                        </td></tr>
                     {% endif %}
-                                    <div style="padding: 0; margin-top: 20px;">
+                    <div style="padding: 0; margin-top: 20px;">
                         Don't see what you are looking for?<br>
                         <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
                     </div>
@@ -148,7 +164,7 @@
                             {{family.family|default:app}} families. Please try switch to another family or choose "All Other families" to expand the search to families other than Orchidaceae, Cactaceae and Bromeliaceae.
                              or click on the "Aproximate search" button for imprecise matching
                         {% else %}
-                            Sorry, even imprecise search couldn't find close enough matches for your search criteria.  Please select a different family.
+                            Sorry, even imprecise search couldn't find close enough matches for your search criteria.  Please try searching in a different family .
                         {% endif %}
                         </b><br>
                     {% endif %}
