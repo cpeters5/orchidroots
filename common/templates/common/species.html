@@ -28,9 +28,9 @@
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
                         <dev style="font-size:16px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}">Genus list</a>
-                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&alpha={{alpha}}&syn=N">Hybrid list</a>
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}&talpha={{talpha}}">Genus list</a>
+                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&talpha={{talpha}}&syn=N">Hybrid list</a>
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&genus={{genus}}&display=checked">Browse</a>
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
                         </dev>
