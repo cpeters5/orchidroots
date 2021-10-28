@@ -1624,13 +1624,15 @@ def search_fuzzy(request):
 
 
 def search_species(request):
-    min_score = 20
+    min_score = 70
     genus_string = ''
+    single_word = ''
     family = ''
     subfamily = ''
     tribe = ''
     subtribe = ''
     genus_list = []
+    match_spc_list = []
     match_list = []
     perfect_list = []
     fuzzy_list = []
@@ -1642,6 +1644,7 @@ def search_species(request):
     if 'spc_string' in request.GET:
         spc_string = request.GET['spc_string'].strip()
         if ' ' not in spc_string:
+            single_word = True
             genus_string = spc_string
         elif spc_string.split()[0]:
             genus_string = spc_string.split()[0]
@@ -1701,24 +1704,22 @@ def search_species(request):
 
     # Perform conventional match
     if not fuzzy:
+        # exact match genus, and species from beginning of word
         if genus_string:  # Seach genus table
+            min_score = 80
+            # Try to match genus
             CaGenus = apps.get_model('cactaceae', 'Genus')
             OrGenus = apps.get_model('orchidaceae', 'Genus')
             OtGenus = apps.get_model('other', 'Genus')
             BrGenus = apps.get_model('bromeliaceae', 'Genus')
-            genus_list = []
             cagenus_list = CaGenus.objects.all()
-            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
+            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             orgenus_list = OrGenus.objects.all()
-            orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
+            orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             brgenus_list = BrGenus.objects.all()
-            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
+            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             otgenus_list = OtGenus.objects.all()
-            otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'source', 'status', 'type',
-                                               'description', 'num_species', 'num_hybrid')
+            otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             genus_list = cagenus_list.union(orgenus_list).union(otgenus_list).union(brgenus_list)
             search_list = []
             for x in genus_list:
@@ -1731,31 +1732,57 @@ def search_species(request):
             del search_list[5:]
             genus_list = search_list
 
-        # spc_string = spc_string.replace('.', '')
-        spc_string = spc_string.replace(' mem ', ' Memoria ')
-        spc_string = spc_string.replace(' Mem ', ' Memoria ')
-        words = spc_string.split()
-        grex = spc_string.split(' ', 1)
-        if len(grex) > 1:
-            grex = grex[1]
-        else:
-             grex = grex[0]
-        subgrex = grex.rsplit(' ', 1)[0]
-        if len(words) > 1:
-            perfect_list = species_list.filter(binomial__istartswith=spc_string)
-        if len(perfect_list) == 0:
-            if len(words) == 1:
-                # Single word could be a genus or an epithet
-                match_list = species_list.filter(species__istartswith=grex)
-                # match_list = species_list.filter(species__icontains=grex)
+            #Try to match species
+            CaSpecies = apps.get_model('cactaceae', 'Species')
+            OrSpecies = apps.get_model('orchidaceae', 'Species')
+            OtSpecies = apps.get_model('other', 'Species')
+            BrSpecies = apps.get_model('bromeliaceae', 'Species')
+            caspecies_list = CaSpecies.objects.filter(species__istartswith=spc_string)
+            caspecies_list = caspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            orspecies_list = OrSpecies.objects.filter(species__istartswith=spc_string)
+            orspecies_list = orspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            brspecies_list = BrSpecies.objects.filter(species__istartswith=spc_string)
+            brspecies_list = brspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            otspecies_list = OtSpecies.objects.filter(species__istartswith=spc_string)
+            otspecies_list = otspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            matched_species_list = caspecies_list.union(orspecies_list).union(otspecies_list).union(brspecies_list)
+            for x in matched_species_list:
+                if x['species']:
+                    score = fuzz.ratio(x['species'].lower(), spc_string.lower())
+                    if score >= min_score:
+                        match_spc_list.append([x, score])
+            match_spc_list.sort(key=lambda k: (-k[1], k[0]['species']))
+            # del match_spc_list[5:]
+
+        if not match_spc_list:
+            # if no species found (single word) search binomial in other families
+            # spc_string = spc_string.replace('.', '')
+            spc_string = spc_string.replace(' mem ', ' Memoria ')
+            spc_string = spc_string.replace(' Mem ', ' Memoria ')
+            spc_string = spc_string.replace(' mem. ', ' Memoria ')
+            spc_string = spc_string.replace(' Mem. ', ' Memoria ')
+            words = spc_string.split()
+            grex = spc_string.split(' ', 1)
+            if len(grex) > 1:
+                grex = grex[1]
             else:
-                match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
-                # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
-            if len(match_list) == 0:
-                if not genus_list:
-                    fuzzy = 1
-                    url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
-                    return HttpResponseRedirect(url)
+                 grex = grex[0]
+            subgrex = grex.rsplit(' ', 1)[0]
+            if len(words) > 1:
+                perfect_list = species_list.filter(binomial__istartswith=spc_string)
+            if len(perfect_list) == 0:
+                if len(words) == 1:
+                    # Single word could be a genus or an epithet
+                    match_list = species_list.filter(species__istartswith=grex)
+                    # match_list = species_list.filter(species__icontains=grex)
+                else:
+                    match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
+                    # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
+                if len(match_list) == 0:
+                    if not genus_list:
+                        fuzzy = 1
+                        url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
+                        return HttpResponseRedirect(url)
 
     # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
     else:
@@ -1774,11 +1801,11 @@ def search_species(request):
     family_list, alpha = get_family_list(request)
 
     write_output(request, spc_string)
-    context = {'spc_string': spc_string, 'genus_list': genus_list,
+    context = {'spc_string': spc_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
                'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-               'app': app, 'fuzzy': fuzzy,
+               'app': app, 'fuzzy': fuzzy, 'single_word': single_word,
                'title': 'search', 'role': role, 'path': path}
     return django.shortcuts.render(request, "common/search_species.html", context)
 
