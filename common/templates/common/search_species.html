@@ -28,40 +28,39 @@
                 </div>
                 <br>
                 <h5>Searching for "<i>{{spc_string}}</i>" species</h5>
-                {% if single_word %}
-                    {% if genus_list %}
-                    Approximately matched genera
-                            <table style="width:95%">
-                                {% for genus in genus_list %}
-                                <tr>
-                                    <td>&nbsp;&nbsp;</td>
-                                    <td>
-                                        {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
-                                        {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
-                                        {% endif %}
-                                        ({{genus.0.family}})
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    {% endif %}
-                    {% if match_spc_list %}
-                    <i>{{spc_string}}</i> species in BlueNanta
-                            <table style="width:95%">
-                                <tr><td>&nbsp;&nbsp;</td></tr>
-                                {% for species in match_spc_list %}
-                                <tr>
-                                    <td>&nbsp;&nbsp;</td>
-                                    <td><a href="/common/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}"><i>{{species.0.genus}}{%if species.o.type == 'species' %}} {{species.0.species}}</i>{% else %}</i> {{species.0.species}}{% endif %}
-                                    </a> {{species.0.author|default:''}} {{species.0.year|default:''}} {% if species.0.status == 'synonym' %}(syn.){% endif %}
-                                        ({{species.0.family}})
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                    {% endif %}
+                {% if genus_list %}
+                        <table style="width:95%">
+                            {% for genus in genus_list %}
+                            <tr>
+                                <td>&nbsp;&nbsp;</td>
+                                <td>
+                                    {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% endif %}
+                                    ({{genus.0.family}})
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                {% endif %}
 
-                {% elif perfect_list %}
+                {% if match_spc_list %}
+                <i>{{spc_string}}</i> species in BlueNanta
+                        <table style="width:95%">
+                            <tr><td>&nbsp;&nbsp;</td></tr>
+                            {% for species in match_spc_list %}
+                            <tr>
+                                <td>&nbsp;&nbsp;</td>
+                                <td><a href="/common/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}"><i>{{species.0.genus}}{%if species.o.type == 'species' %}} {{species.0.species}}</i>{% else %}</i> {{species.0.species}}{% endif %}
+                                </a> {{species.0.author|default:''}} {{species.0.year|default:''}} {% if species.0.status == 'synonym' %}(syn.){% endif %}
+                                    ({{species.0.family}})
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                {% endif %}
+
+                {% if perfect_list %}
                     <table >
                         <tr>
                             <th >Matching species</th>

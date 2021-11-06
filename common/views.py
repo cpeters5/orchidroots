@@ -355,6 +355,123 @@ def hybrid(request):
     return render(request, "common/hybrid.html", context)
 
 
+@login_required
+def uploadfile(request, pid):
+    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@orchidroots.org'
+        return HttpResponse(message)
+    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    role = getRole(request)
+
+    author, author_list = get_author(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    app = species.gen.family.application
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    role = getRole(request)
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            if isinstance(species, Species):
+                spc.pid = species.pid
+            spc.family = family
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, species.gen.family)
+            return HttpResponseRedirect(url)
+        else:
+            return HttpResponse('save failed')
+
+    context = {'form': form, 'species': species, 'web': 'active', 'family': species.gen.family,
+               'author_list': author_list, 'author': author,
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, app + '/uploadfile.html', context)
+
+
+@login_required
+def uploadcommonweb(request, pid, orid=None):
+    sender = 'web'
+    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    role = getRole(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponse(redirect_message)
+
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+
+    if request.method == 'POST':
+        form = UploadSpcWebForm(request.POST)
+
+        if form.is_valid():
+            print(">>> 2. form is valid")
+            spc = form.save(commit=False)
+            if not spc.author and not spc.credit_to:
+                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            print(">>> spc.author = " + str(spc.author))
+            print(">>> species.pid = " + str(species.pid))
+            spc.user_id = request.user
+            spc.pid = species
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            if orid and orid > 0:
+                spc.id = orid
+            # set rank to 0 if private status is requested
+            if spc.is_private is True or request.user.tier.tier < 3:
+                spc.rank = 0
+
+            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
+            if spc.author.user_id and request.user.tier.tier < 3:
+                if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
+                    spc.rank = 0
+            if spc.image_url == 'temp.jpg':
+                spc.image_url = None
+            if spc.image_file == 'None':
+                spc.image_file = None
+            if spc.created_date == '' or not spc.created_date:
+                spc.created_date = timezone.now()
+            spc.save()
+
+            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
+            write_output(request, species.textname())
+            return HttpResponseRedirect(url)
+
+    if not orid:  # upload, initialize author. Get image count
+        if species.type == 'species':
+            form = UploadSpcWebForm(initial={'author': request.user.photographer.author_id})
+        else:
+            form = UploadHybWebForm(initial={'author': request.user.photographer.author_id})
+        img = ''
+    else:  # update. initialize the form iwht current image
+        img = SpcImages.objects.get(pk=orid)
+        if not img.image_url:
+            sender = 'file'
+            img.image_url = "temp.jpg"
+        else:
+            sender = 'web'
+        form = UploadSpcWebForm(instance=img)
+
+    context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
+               'species': species, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadweb'}
+    return render(request, app + '/uploadweb.html', context)
+
+
 def rank_update(request, SpcImages):
     rank = 0
     if 'rank' in request.GET:
@@ -453,6 +570,7 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
         private_list = public_list = upload_list = []
 
     return private_list, public_list, upload_list, myspecies_list, myhybrid_list
+
 
 
 def browse(request):
@@ -1731,8 +1849,8 @@ def search_species(request):
             search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
             del search_list[5:]
             genus_list = search_list
-
-            #Try to match species
+        if single_word:
+            #Try to 0match species from all families
             CaSpecies = apps.get_model('cactaceae', 'Species')
             OrSpecies = apps.get_model('orchidaceae', 'Species')
             OtSpecies = apps.get_model('other', 'Species')
@@ -1756,7 +1874,199 @@ def search_species(request):
 
         if not match_spc_list:
             # if no species found (single word) search binomial in other families
-            # spc_string = spc_string.replace('.', '')
+            spc_string = spc_string.replace('.', '')
+            spc_string = spc_string.replace(' mem ', ' Memoria ')
+            spc_string = spc_string.replace(' Mem ', ' Memoria ')
+            spc_string = spc_string.replace(' mem. ', ' Memoria ')
+            spc_string = spc_string.replace(' Mem. ', ' Memoria ')
+            words = spc_string.split()
+            grex = spc_string.split(' ', 1)
+            if len(grex) > 1:
+                grex = grex[1]
+            else:
+                grex = grex[0]
+            # print("spc_string = " + spc_string)
+            # print("grex = " + grex)
+            if len(words) > 1:
+                perfect_list = species_list.filter(binomial__istartswith=spc_string)
+            # print("words = " + str(len(words)))
+            # print("species_list = " + str(len(species_list)))
+            # print("perfect_list = " + str(len(perfect_list)))
+            if len(perfect_list) == 0:
+                if len(words) == 1:
+                    # Single word could be a genus or an epithet
+                    match_list = species_list.filter(species__istartswith=grex)
+                    # match_list = species_list.filter(species__icontains=grex)
+                else:
+                    match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
+                    # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
+                if len(match_list) == 0:
+                    if not genus_list:
+                        fuzzy = 1
+                        url = "%s?role=%s&app=%s&family=%s&spc_string=%s&fuzzy=1" % (reverse('common:search_species'), role, app, family, spc_string)
+                        return HttpResponseRedirect(url)
+
+    # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
+    else:
+        first_try = species_list.filter(species=spc)
+        min_score = 60
+        for x in species_list:
+            if x.binomial:
+                score = fuzz.ratio(x.binomial, spc)
+                if score >= min_score:
+                    fuzzy_list.append([x, score])
+        fuzzy_list.sort(key=lambda k: (-k[1], k[0].binomial))
+        del fuzzy_list[20:]
+    path = 'information'
+    if role == 'cur':
+        path = 'photos'
+    family_list, alpha = get_family_list(request)
+
+    write_output(request, spc_string)
+    context = {'spc_string': spc_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+               'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
+               'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
+               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'app': app, 'fuzzy': fuzzy, 'single_word': single_word,
+               'title': 'search', 'role': role, 'path': path}
+    return django.shortcuts.render(request, "common/search_species.html", context)
+
+
+
+def xsearch_species(request):
+    min_score = 70
+    genus_string = ''
+    single_word = ''
+    family = ''
+    subfamily = ''
+    tribe = ''
+    subtribe = ''
+    genus_list = []
+    match_spc_list = []
+    match_list = []
+    perfect_list = []
+    fuzzy_list = []
+    fuzzy = ''
+    if 'fuzzy' in request.GET:
+        fuzzy = request.GET['fuzzy'].strip()
+    # If no match found, perform fuzzy match
+
+    if 'spc_string' in request.GET:
+        spc_string = request.GET['spc_string'].strip()
+        if ' ' not in spc_string:
+            single_word = True
+            genus_string = spc_string
+        elif spc_string.split()[0]:
+            genus_string = spc_string.split()[0]
+    else:
+        send_url = '/'
+        return HttpResponseRedirect(send_url)
+
+    role = getRole(request)
+    if 'family' in request.GET:
+        family = request.GET['family']
+    elif 'newfamily' in request.GET:
+        family = request.GET['newfamily']
+
+    if family == 'Orchidaceae':
+        url = "%s?role=%s&family=Orchidaceae&spc_string=%s" % (
+        reverse('common:search_orchid'), role, spc_string)
+        return HttpResponseRedirect(url)
+
+    if family and family != 'other':
+        family = Family.objects.get(pk=family)
+        app = family.application
+    else:
+        family = ''
+        app = 'other'
+    # For other family search across all other families
+    if app == 'other':
+        family = ''
+
+    # if suprageneric rank requested
+    if 'subfamily' in request.GET:
+        subfamily = request.GET['subfamily'].strip()
+    if subfamily:
+        subfamily = Subfamily.objects.get(subfamily=subfamily)
+    if 'tribe' in request.GET:
+        tribe = request.GET['tribe'].strip()
+    if tribe:
+        tribe = Tribe.objects.get(tribe=tribe)
+    if 'subtribe' in request.GET:
+        subtribe = request.GET['subtribe'].strip()
+    if subtribe:
+        subtribe = Subtribe.objects.get(subtribe=subtribe)
+
+    spc = spc_string
+    if family:
+        if family.family == 'Cactaceae':
+            species_list = get_species_list('cactaceae', family, subfamily, tribe, subtribe)
+        elif family.family == 'Orchidaceae':
+            species_list = get_species_list('orchidaceae', family, subfamily, tribe, subtribe)
+        elif family.family == 'Bromeliaceae':
+            species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
+        else:
+            species_list = get_species_list('other')
+            species_list = species_list.filter(gen__family=family.family)
+    else:
+        # In case of app = other, search will scan through every family in the app.
+        species_list = get_species_list('other')
+
+    # Perform conventional match
+    if not fuzzy:
+        # exact match genus, and species from beginning of word
+        if genus_string:  # Seach genus table
+            min_score = 80
+            # Try to match genus
+            CaGenus = apps.get_model('cactaceae', 'Genus')
+            OrGenus = apps.get_model('orchidaceae', 'Genus')
+            OtGenus = apps.get_model('other', 'Genus')
+            BrGenus = apps.get_model('bromeliaceae', 'Genus')
+            cagenus_list = CaGenus.objects.all()
+            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
+            orgenus_list = OrGenus.objects.all()
+            orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
+            brgenus_list = BrGenus.objects.all()
+            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
+            otgenus_list = OtGenus.objects.all()
+            otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
+            genus_list = cagenus_list.union(orgenus_list).union(otgenus_list).union(brgenus_list)
+            search_list = []
+            for x in genus_list:
+                if x['genus']:
+                    score = fuzz.ratio(x['genus'].lower(), genus_string.lower())
+                    if score >= min_score:
+                        search_list.append([x, score])
+
+            search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
+            del search_list[5:]
+            genus_list = search_list
+            print(">> 1 genus_list = " + str(len(genus_list)))
+        CaSpecies = apps.get_model('cactaceae', 'Species')
+        OrSpecies = apps.get_model('orchidaceae', 'Species')
+        OtSpecies = apps.get_model('other', 'Species')
+        BrSpecies = apps.get_model('bromeliaceae', 'Species')
+        caspecies_list = CaSpecies.objects.filter(species__istartswith=spc_string)
+        caspecies_list = caspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+        orspecies_list = OrSpecies.objects.filter(species__istartswith=spc_string)
+        orspecies_list = orspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+        brspecies_list = BrSpecies.objects.filter(species__istartswith=spc_string)
+        brspecies_list = brspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+        otspecies_list = OtSpecies.objects.filter(species__istartswith=spc_string)
+        otspecies_list = otspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+        species_list = caspecies_list.union(orspecies_list).union(otspecies_list).union(brspecies_list)
+        if single_word:
+            match_spc_list = species_list
+            #If search string is one word, then get species from all families
+            for x in matched_species_list:
+                if x['species']:
+                    score = fuzz.ratio(x['species'].lower(), spc_string.lower())
+                    if score >= min_score:
+                        match_spc_list.append([x, score])
+            match_spc_list.sort(key=lambda k: (-k[1], k[0]['species']))
+            print(">> 2 match_spc_list = " + str(len(matched_species_list)))
+            # del match_spc_list[5:]
+        else:
             spc_string = spc_string.replace(' mem ', ' Memoria ')
             spc_string = spc_string.replace(' Mem ', ' Memoria ')
             spc_string = spc_string.replace(' mem. ', ' Memoria ')
@@ -1769,7 +2079,13 @@ def search_species(request):
                  grex = grex[0]
             subgrex = grex.rsplit(' ', 1)[0]
             if len(words) > 1:
-                perfect_list = species_list.filter(binomial__istartswith=spc_string)
+                caperfect_list = caspecies_list.filter(binomial__istartswith=spc_string)
+                orperfect_list = orspecies_list.filter(binomial__istartswith=spc_string)
+                brperfect_list = brspecies_list.filter(binomial__istartswith=spc_string)
+                caperfect_list = caspecies_list.filter(binomial__istartswith=spc_string)
+
+
+                print(">> 3 perfect_list = " + str(len(perfect_list)))
             if len(perfect_list) == 0:
                 if len(words) == 1:
                     # Single word could be a genus or an epithet
@@ -1778,6 +2094,7 @@ def search_species(request):
                 else:
                     match_list = species_list.filter(Q(binomial__icontains=grex) | Q(binomial__icontains=grex))
                     # match_list = species_list.exclude(binomial=spc_string).filter(Q(binomial__icontains=spc_string) | Q(species__icontains=spc_string) | Q(species__icontains=grex) | Q(infraspe__icontains=words[-1]) | Q(binomial__icontains=grex) | Q(species__icontains=subgrex)  | Q(binomial__icontains=subgrex))
+                print(">> 4 match_list = " + str(len(match_list)))
                 if len(match_list) == 0:
                     if not genus_list:
                         fuzzy = 1
@@ -2076,7 +2393,7 @@ def deletephoto(request, orid, pid):
         return HttpResponse(message)
 
     try:
-        species = Species.objects.get(pk=image.pid_id)
+        species = Species.objects.get(pk=image.pid)
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
@@ -2206,11 +2523,11 @@ def approvemediaphoto(request, pid):
             if family.family == 'Orchidaceae':
                 spc = SpcImages(pid=species.accepted, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date)
+                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             else:
                 spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date)
+                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             spc.approved_by = request.user
             # hist = SpcImgHistory(pid=Accepted.objects.get(pk=pid), user_id=request.user, img_id=spc.id, action='approve file')
             if family.family == 'Orchidaceae':
@@ -2222,7 +2539,7 @@ def approvemediaphoto(request, pid):
         else:
             spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date)
+                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             spc.approved_by = request.user
             if family.family == 'Orchidaceae':
                 newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
@@ -2230,7 +2547,7 @@ def approvemediaphoto(request, pid):
                 newdir = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(family))
             image_file = "hyb_"
 
-        image_file = image_file + str(format(upl.pid_id, "09d")) + "_" + str(format(upl.id, "09d"))
+        image_file = image_file + str(format(upl.pid, "09d")) + "_" + str(format(upl.id, "09d"))
         new_name = os.path.join(newdir, image_file)
         if not os.path.exists(new_name + ext):
             try:
