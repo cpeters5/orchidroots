@@ -28,7 +28,7 @@
                         <input type="hidden" name="family" value="{{species.gen.family}}" />
                         <input type="hidden" name="role" value="{{role}}" />
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                        <a href="{% url 'display:photos' species.pid %}?role={{role}}&family=Cactaceae"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        <a href="{% url 'display:photos' species.pid %}?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                         {{form.author|as_crispy_field}}
                         {{form.originator|as_crispy_field}}
 
@@ -41,6 +41,9 @@
                                 {{form.image_file_path|as_crispy_field}}
                             </div>
                         </div>
+                         <div class="form-group col-md-5 mb-0">
+                            {{form.source_url|as_crispy_field}}
+                         </div>
 
                         <div class="form-row">
                             <div class="form-group col-md-6 mb-0">

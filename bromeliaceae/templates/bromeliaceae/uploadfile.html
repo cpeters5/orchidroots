@@ -28,7 +28,7 @@
                         <input type="hidden" name="family" value="Cactaceae" />
                         <input type="hidden" name="role" value="{{role}}" />
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                        <a href="{% url 'display:photos' species.pid %}?role={{role}}&family=Cactaceae"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        <a href="{% url 'display:photos' species.pid %}?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                         {{form.author|as_crispy_field}}
                         {{form.originator|as_crispy_field}}
 
