@@ -93,9 +93,6 @@ INSTALLED_APPS = [
     'cactaceae',
     'other',
 
-    # Legacy
-    # 'orchidlist',
-
     # Third Party
     'allauth',
     'allauth.account',
