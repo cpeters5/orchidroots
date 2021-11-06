@@ -23,7 +23,7 @@
     {% else %}
         <div class="tab-content clearfix" style="width:100%;background-color:white;margin:0 auto;border-left:0 solid lightgrey;border-right:0 solid lightgrey;border-bottom:1px solid lightgrey">
             <div class="container" style="width:90%;font-size:13px;">
-                <form method="post" action="{% url 'cactaceae:uploadfile' species.pid %}" enctype="multipart/form-data">
+                <form method="post" action="{% url 'common:uploadfile' species.pid %}" enctype="multipart/form-data">
                     {% csrf_token %}
                         <input type="hidden" name="family" value="Cactaceae" />
                         <input type="hidden" name="role" value="{{role}}" />

@@ -257,7 +257,7 @@ def getModels(request, family=None):
         Synonym = apps.get_model(app.lower(), 'Synonym')
         Distribution = apps.get_model(app.lower(), 'Distribution')
         SpcImages = apps.get_model(app.lower(), 'SpcImages')
-        UploadFile = apps.get_model(app.lower(), 'UploadFile')
+        UploadFile = apps.get_model('common', 'UploadFile')
     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
 

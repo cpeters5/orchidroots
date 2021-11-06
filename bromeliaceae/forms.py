@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from bromeliaceae.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
+from bromeliaceae.models import Species, Accepted, Hybrid, SpcImages, Genus
 from accounts.models import Photographer
 import copy
 
@@ -334,67 +334,6 @@ class AcceptedInfoForm(forms.ModelForm):
     def clean_description(self):
         description = self.cleaned_data.get("description")
         return description.replace("\"", "\'\'")
-
-
-class UploadFileForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=False,
-        widget=Select2Widget
-    )
-    # pid = forms.IntegerField(widget= forms.TextInput(attrs={'class':'Species', 'id':'pid'}))
-    def __init__(self, *args, **kwargs):
-        super(UploadFileForm, self).__init__(*args, **kwargs)
-        # Making UploadForm required
-        # self.fields['image_file_path'].required = True
-        self.fields['author'].required = True
-        # role = forms.CharField(required=True)
-
-    class Meta:
-        model = UploadFile
-        fields = (
-        'image_file_path', 'author', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
-        'location', 'image_file',)
-
-        labels = {
-            'author': "Your credit attribution name",
-            'image_file_path': 'Select image file',
-            'name': 'Clonal name',
-            'awards': 'Awards',
-            'variation': 'Varieties',
-            'forma': 'Form',
-            'originator': 'If author is not in the list, enter a name to be used for credit attribution here',
-            'description': 'Tags. Comma separated keywords to help in searching',
-            'text_data': 'Comment',
-            'location': 'Location',
-        }
-        widgets = {
-            # 'role': forms.HiddenInput(),
-            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'originator': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
-            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-        }
-        help_texts = {
-            #     'name': 'Clonal name of the plant',
-            #     'awards': 'Awards received, comma separated',
-            #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
-            #     'forma': 'E.g. color forms, peloric, region...',
-            #     'originator': 'e.g. hybridizer, cultivator, vender',
-            #     'description': 'Comma separated terms used for search',
-            #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
-            #     'location': 'Geolocation where this plant was originated from',
-            #     'image_file_path': _('Only JPG files are accepted, and file name MUST not have a leading undescore.'),
-        }
-        error_messages = {
-            'image_file_path': {
-                'required': _("Please select a file to upload."),
-            },
-        }
 
 
 class UploadSpcWebForm(forms.ModelForm):

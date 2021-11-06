@@ -36,6 +36,12 @@ urlpatterns = [
     path('curate_pending/', views.curate_pending, name='curate_pending'),
     path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
 
+    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
+
+    # upload from web threw error (species is not an instance)
+    path('uploadcommonweb/<int:pid>/', views.uploadweb, name='uploadweb'),
+    path('uploadcommonweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
+
     path('myphoto/<int:pid>/', views.myphoto, name='myphoto'),
     path('myphoto/', views.myphoto, name='myphoto'),
     path('myphoto_list/', views.myphoto_list, name='myphoto_list'),

@@ -35,7 +35,7 @@ from utils.views import write_output, is_int, getRole, get_author
 # import pytz
 # MPTT stuff
 # from django.views.generic.list_detail import object_list
-from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
+from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
 from accounts.models import User, Profile
 
@@ -57,7 +57,7 @@ Hybrid = apps.get_model(app, 'Hybrid')
 Synonym = apps.get_model(app, 'Synonym')
 SpcImages = apps.get_model(app, 'SpcImages')
 Distribution = apps.get_model(app, 'Distribution')
-UploadFile = apps.get_model(app, 'UploadFile')
+UploadFile = apps.get_model('common', 'UploadFile')
 MAX_HYB = 500
 list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
@@ -524,51 +524,6 @@ def reidentify(request, orid, pid):
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
     return render(request, app + '/reidentify.html', context)
-
-
-@login_required
-def uploadfile(request, pid):
-    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@orchidroots.org'
-        return HttpResponse(message)
-
-    author, author_list = get_author(request)
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    app = species.gen.family.application
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    role = getRole(request)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, species.textname())
-            spc = form.save(commit=False)
-            if isinstance(species, Species):
-                spc.pid = species
-
-            spc.type = species.type
-            spc.user_id = request.user
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, species.gen.family)
-            return HttpResponseRedirect(url)
-        else:
-            return HttpResponse('save failed')
-
-    context = {'form': form, 'species': species, 'web': 'active', 'family': species.gen.family,
-               'author_list': author_list, 'author': author,
-               'role': role, 'app': app, 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
 
 
 @login_required
