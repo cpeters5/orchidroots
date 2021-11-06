@@ -2,7 +2,8 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from cactaceae.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
+from common.models import UploadFile
+from cactaceae.models import Species, Accepted, Hybrid, SpcImages, Genus
 from accounts.models import Photographer
 import copy
 
@@ -353,10 +354,11 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadFile
         fields = (
-        'image_file_path', 'author', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
+        'image_file_path', 'author', 'source_url', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
         'location', 'image_file',)
 
         labels = {
+            'source_url': 'Link to source',
             'author': "Your credit attribution name",
             'image_file_path': 'Select image file',
             'name': 'Clonal name',
@@ -370,6 +372,7 @@ class UploadFileForm(forms.ModelForm):
         }
         widgets = {
             # 'role': forms.HiddenInput(),
+            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
