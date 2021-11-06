@@ -683,7 +683,7 @@ def approvemediaphoto(request, pid):
     if species.type == 'species':
         spc = SpcImages(pid=species.accepted, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                         source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                        description=upl.description, location=upl.location, created_date=upl.created_date)
+                        description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
         spc.approved_by = request.user
         hist = SpcImgHistory(pid=Accepted.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
                              action='approve file')
@@ -692,7 +692,7 @@ def approvemediaphoto(request, pid):
     else:
         spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                         source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                        description=upl.description, location=upl.location, created_date=upl.created_date)
+                        description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
         spc.approved_by = request.user
         hist = HybImgHistory(pid=Hybrid.objects.get(pk=pid), user_id=request.user, img_id=spc.id, action='approve file')
         newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
