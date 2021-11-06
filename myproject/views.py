@@ -31,7 +31,6 @@ def robots_txt(request):
         "Disallow: /cactaceae/",
         "Disallow: /common/",
         "Disallow: /core/",
-        "Disallow: /documents/",
         "Disallow: /detail/",
         "Disallow: /documents/",
         "Disallow: /donations/",
