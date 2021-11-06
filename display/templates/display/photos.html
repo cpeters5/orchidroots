@@ -227,7 +227,7 @@ a:hover {
                 {% endif %}
                 {% if app != 'orchidaceae' %}
                     <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadweb/{{species.pid}}/?family={{family}}&role={{role}}&tab=web">Upload url</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
+                    <a class="btn btn-xs mybtn btn-outline-primary" href="/common/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
                 {% endif %}
                 {% if role == 'cur' %}
                     <form class="" action="" id="author">
@@ -359,9 +359,9 @@ a:hover {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                             {% endif %}
-                            <a href="/common/deletephoto/{{image.id}}/{{image.pid_id}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
+                            <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
                         {% endif %}
                      </div>
 
@@ -447,9 +447,9 @@ a:hover {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                             {% endif %}
-                            <a href="/common/deletephoto/{{image.id}}/{{image.pid_id}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
+                            <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}" >Delete</a>
                         {% endif %}
                      </div>
 
