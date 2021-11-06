@@ -346,10 +346,11 @@ class UploadFileForm(forms.ModelForm):
         # role = forms.CharField(required=True)
     class Meta:
         model = UploadFile
-        fields = ('image_file_path','author','name','awards','variation','forma','originator','description','text_data','location','image_file',)
+        fields = ('image_file_path','author','source_url','name','awards','variation','forma','originator','description','text_data','location','image_file',)
 
         labels = {
             'author':"Your credit attribution name",
+            'source_url':'Link to source',
             'image_file_path':'Select image file',
             'name':'Clonal name',
             'awards':'Awards',
@@ -362,6 +363,7 @@ class UploadFileForm(forms.ModelForm):
         }
         widgets = {
             # 'role': forms.HiddenInput(),
+            'source_url':TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete':'off',}),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
