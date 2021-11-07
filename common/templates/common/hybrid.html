@@ -24,7 +24,7 @@
                         </div>
                             <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
                     </div>
-
+family = {{family}} = {{family.family}}
                     <div class="card-body border-top"  style="display:inline-block">
                             {% if message %}{{message}}<br>{% endif %}
                                 <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
@@ -88,12 +88,12 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="{% url 'display:information' species.getAcc %}?family={{family}}"><i>{{species.name|safe}} (syn.)</i></a>
+                                                        <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}"><i>{{species.name|safe}} (syn.)</i></a>
                                                     {% else %}
                                                         {{species.name|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="{% url 'display:information' species.pid %}?genus={{species.genus}}&family={{family}}&subfamily={{species.gen.get_subfamily}}&tribe={{species.gen.get_tribe}}&subtribe={{species.gen.get_subtribe}}"><i>{{species.genus}} {{species.species}}</i></a>
+                                                    <a href="{% url 'display:information' species.pid %}?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.get_subfamily}}&tribe={{species.gen.get_tribe}}&subtribe={{species.gen.get_subtribe}}"><i>{{species.genus}} {{species.species}}</i></a>
                                                         {{genus.author|default:""}}
                                                 {% endif %}
                                                 {{species.year|default:""}}
