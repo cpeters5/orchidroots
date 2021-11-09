@@ -39,8 +39,8 @@ urlpatterns = [
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
 
     # upload from web threw error (species is not an instance)
-    path('uploadcommonweb/<int:pid>/', views.uploadweb, name='uploadweb'),
-    path('uploadcommonweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
+    path('uploadcommonweb/<int:pid>/', views.uploadcommonweb, name='uploadcommonweb'),
+    path('uploadcommonweb/<int:pid>/<int:orid>/', views.uploadcommonweb, name='uploadcommonweb'),
 
     path('myphoto/<int:pid>/', views.myphoto, name='myphoto'),
     path('myphoto/', views.myphoto, name='myphoto'),

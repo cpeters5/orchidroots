@@ -52,10 +52,10 @@ class Family(models.Model):
     application = models.CharField(max_length=50, default='', null=True, blank=True)
     common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True)
+    order = models.CharField(max_length=20, null=True)
+    kingdom = models.CharField(max_length=20, null=True)
     source = models.CharField(max_length=20, null=True)
     active = models.BooleanField(null=True, default=False)
-    num_spcimage = models.IntegerField(null=True)
-    num_hybimage = models.IntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
