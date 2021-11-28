@@ -90,18 +90,18 @@ sub getFamImage {
 	}
 
 
-	foreach (sort keys %num_famspcimage) {
-		# print "$_\t$num_famspcimage{$_}\n";
-		$stmt = "update core_family set num_spcimage = $num_famspcimage{$_} where family = '$_';";
-		# print "$stmt\n";
-		&getASPM($stmt);
-	}
-	foreach (sort keys %num_famhybimage) {
-		$stmt = "update core_family set num_hybimage = $num_famhybimage{$_} where family = '$_';";
-		# print "$stmt\n";
-		&getASPM($stmt);
-
-	}
+	# foreach (sort keys %num_famspcimage) {
+	# 	# print "$_\t$num_famspcimage{$_}\n";
+	# 	$stmt = "update core_family set num_spcimage = $num_famspcimage{$_} where family = '$_';";
+	# 	# print "$stmt\n";
+	# 	&getASPM($stmt);
+	# }
+	# foreach (sort keys %num_famhybimage) {
+	# 	$stmt = "update core_family set num_hybimage = $num_famhybimage{$_} where family = '$_';";
+	# 	# print "$stmt\n";
+	# 	&getASPM($stmt);
+	#
+	# }
 }
 
 
@@ -131,7 +131,8 @@ sub procGenus {
 		$total = $num_hybrid{$pid} + $num_hybrid_total{$pid};
 		$stmt .= "num_hybrid_total = $total, " if $total;
         if ($num_hyb_with_image{$pid}) {
-            my $pct = sprintf("%.1f", $num_hyb_with_image{$pid} * 100 / $num_hybrid{$pid});
+			my $pct = 0;
+            $pct = sprintf("%.1f", $num_hyb_with_image{$pid} * 100 / $num_hybrid{$pid}) if $num_hybrid{$pid};
             $stmt .= "num_hyb_with_image = $num_hyb_with_image{$pid}, pct_hyb_with_image = $pct, ";
         }
 		$stmt =~ s/, $//;
@@ -209,6 +210,10 @@ sub getPID {
 	}
 
 	foreach (sort keys %genus) {
+		$num_species{$_} = 0 if not $num_species{$_};
+		$num_species_synonym{$_} = 0 if not $num_species_synonym{$_};
+		$num_hybrid{$_} = 0 if not $num_hybrid{$_};
+		$num_hybrid_synonym{$_} = 0 if not $num_hybrid_synonym{$_};
 		$num_synonym{$_} = $genus{$_} - $num_species{$_} - $num_hybrid{$_};
 		$num_species_total{$_} = $num_species{$_} + $num_species_synonym{$_};
 		$num_hybrid_total{$_} = $num_hybrid{$_} + $num_hybrid_synonym{$_};
