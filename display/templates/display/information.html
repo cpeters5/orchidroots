@@ -572,7 +572,7 @@ seedparent, pollparent {
                             <div class="imageitem justify-content-center" style="margin:2px;">
                                 <div class="box">
                                     <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
-                                        <img  class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{% if image.image_file %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
+                                        <img  class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% if image.image_file %}{% static image.image_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                         <div class="text text-br" ><span style="color:white">{{image.id}}</span></div>
                                     </a>
                                 </div>
@@ -614,7 +614,7 @@ seedparent, pollparent {
                                 {% for seed in seedimg_list %}
                                     <a href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
                                         {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
-                                            <img  class="d-none d-md-block thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% static seed.image_dir %}{% if seed.image_file %}{{seed.image_file}}{% else %}{{seed.image_url}}{% endif %}">
+                                            <img  class="d-none d-md-block thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% if seed.image_file %}{% static seed.image_dir %}{{seed.image_file}}{% else %}{{seed.image_url}}"{% endif %}>
                                     </a>
                                 {% endfor %}
                             {% else %}
@@ -640,7 +640,7 @@ seedparent, pollparent {
                                 {% for pol in pollimg_list %}
                                     <a class="d-none d-md-block" href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
                                                 {% if pol.text_data %}{{pol.text_data|safe}}{% endif %}</small></h6>">
-                                        <img  class="thumbnails thumbnails2" alt="{{pol.pid.pid.textname}}" src="{% static pol.image_dir %}{% if pol.image_file %}{{pol.image_file}}{% else %}{{pol.image_url}}{% endif %}">
+                                        <img  class="thumbnails thumbnails2" alt="{{pol.pid.pid.textname}}" src="{% if pol.image_file %}{% static pol.image_dir %}{{pol.image_file}}{% else %}{{pol.image_url}}{% endif %}">
                                     </a>
                                 {% endfor %}
                             {% else %}
