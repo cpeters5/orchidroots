@@ -259,26 +259,17 @@ a:hover {
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
                 {% for image in public_list %}
                     <div class="imageitem">
-                        {% if image.image_file %}
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                     <h6><small>
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     <br>{{image.text_data|default:''|safe}} </small></h6>">
                                 <div class="box">
-                                        <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{% if image.image_file %}{{image.image_file}}{% else %}}{{image.image_url}}{% endif %}">
                                         <div class="text text-br">{{image.id}}</div>
                                 </div>
                             </a>
                             <br>
-                        {% else %}
-                            <a href="#">
-                            <dev class="box">
-                                <img class="thumbnails" alt="" src="{{image.image_url}}">
-                                <div class="text text-br">{{image.id}}</div>
-                            </dev>
-                            </a>
-                        {% endif %}
                         <div class="imgcaption">
                             <div style="width:100%;word-wrap: break-word;">
                                 {% if role == 'cur' %}
@@ -296,7 +287,6 @@ a:hover {
                                     (private <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>)
                                 {% endif %}
                             </div>
-
                         </div>
                     </div>
                 {% endfor %}
