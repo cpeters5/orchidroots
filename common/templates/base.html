@@ -593,6 +593,9 @@ nav .search-container button:hover {
 }
 }
 
+.active1 {
+    background-color: #394ad5;
+}
 </style>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -675,10 +678,10 @@ nav .search-container button:hover {
 <div style="background-color:black; text-align: left;">
     <h3 class=" p-2 m4">
 
-            <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active{% endif %}" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromel.</a>
-            <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active{% endif %}" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
-            <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active{% endif %}" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchid</a>
-            <a class="btn btn-info fambtn {% if family.application == 'other' %}active{% endif %}" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromel.</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchid</a>
+            <a class="btn btn-info fambtn {% if family.application == 'other' %}active1{% endif %}" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
     </h3>
 
 

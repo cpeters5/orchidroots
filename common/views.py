@@ -182,7 +182,8 @@ def genera(request):
     context = {
         'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
+        'family_list': family_list,
+        'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
         'path': path
     }
     return render(request, "common/genera.html", context)
@@ -259,15 +260,16 @@ def species(request):
         species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
         total = max_items
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-    family_list, alpha = get_family_list(request)
+    # if 'alpha' in request.GET:
+    #     alpha = request.GET['alpha']
+    # family_list, alpha = get_family_list(request)
 
     write_output(request, str(family))
     context = {
         'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'alpha': alpha, 'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
+        # 'family_list': family_list, 'alpha': alpha,
+        'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path': path
     }
     return render(request, "common/species.html", context)
@@ -344,12 +346,13 @@ def hybrid(request):
         hybrid_list = hybrid_list[0:max_items]
         msg = "List too long. Only show first " + str(max_items) + " items"
         total = max_items
-    family_list, alpha = get_family_list(request)
+    # family_list, alpha = get_family_list(request)
     write_output(request, str(family))
     context = {
         'genus': genus, 'hybrid_list': hybrid_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'alpha': alpha, 'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
+        # 'family_list': family_list, 'alpha': alpha,
+        'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path': path, 'primary': primary,
     }
     return render(request, "common/hybrid.html", context)
@@ -748,7 +751,7 @@ def browse(request):
                 x.image_file = 'utils/images/noimage_light.jpg'
                 my_full_list.append(x)
 
-    family_list, alpha = get_family_list(request)
+    # family_list, alpha = get_family_list(request)
     genus_list = Genus.objects.all()
     if family:
         genus_list = genus_list.filter(family=family.family)
@@ -758,10 +761,11 @@ def browse(request):
         else:
             genus_list = genus_list.filter(num_hybimage__gt=0)
     write_output(request, str(family))
-    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'family_list': family_list,
+    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
         'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-        'page': page, 'total': total, 'alpha_list': alpha_list, 'alpha': alpha, 'talpha': talpha,
+        'page': page, 'total': total, 'talpha': talpha,
+        # 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
         'title': 'browse', 'section': 'list', 'role': role,
