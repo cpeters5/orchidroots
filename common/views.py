@@ -572,7 +572,6 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
     return private_list, public_list, upload_list, myspecies_list, myhybrid_list
 
 
-
 def browse(request):
     app = ''
     talpha = ''
@@ -1617,8 +1616,7 @@ def search_fuzzy(request):
     min_score = 60
     spc_string = ''
     result_list = []
-    spc_list = []
-    hyb_list = []
+    result_score = []
     Family = apps.get_model('core', 'Family')
     Genus = apps.get_model('orchidaceae', 'Genus')
     Alliance = apps.get_model('orchidaceae', 'Alliance')
@@ -1645,10 +1643,6 @@ def search_fuzzy(request):
 
     grexlist = Species.objects.exclude(status='pending')
     # Filter for partner specific list.
-    if spc_list:
-        grexlist = grexlist.filter(pid__in=spc_list)
-    if hyb_list:
-        grexlist = grexlist.filter(pid__in=hyb_list)
 
     perfect_list = grexlist
     keyword = spc_string.lower()
@@ -1697,41 +1691,28 @@ def search_fuzzy(request):
         # If the first word is genus hint, compare species and the tail
         score = fuzz.ratio(x.short_grex().lower(), keyword)
         if score >= min_score:
-            result_list.append([x, score])
+            result_list.append(x)
+            result_score.append([x, score])
 
     # Add the perfect match and set score 100%.
     # At this point, the first word is related to a genus
     perfect_list = perfect_list.filter(species__iexact=rest[1])
     perfect_pid = perfect_list.values_list('pid', flat=True)
 
-    perfect_items = []
-    for x in perfect_pid:
-        s = Species.objects.get(pk=x)
-        y = [s, 100]
-        perfect_items.append(y)
+    for x in perfect_list:
+        if x in result_list:
+            result_list.remove(x)
 
-    species_temp = []
-    for x in result_list:
-        if x[0].pid not in perfect_pid:
-            species_temp.append(x)
-
-    # result_list = [item for item in result_list if item[0] not in perfect_pid]
-    result_list = species_temp + perfect_items
-
-    for i in range(len(result_list)):
+    for i in range(len(result_score)):
         if genus_obj != '':
-            if result_list[i][0].gen.pid == genus_obj.pid:
-                if result_list[i][1] == 100:
-                    result_list[i][1] = 200
+            if result_score[i][0].gen.pid == genus_obj.pid:
+                if result_score[i][1] == 100:
+                    result_score[i][1] = 200
     family_list, alpha = get_family_list(request)
     family = Family.objects.get(pk='Orchidaceae')
 
-    result_list.sort(key=lambda k: (-k[1], k[0].name()))
-    # context = {'result_list': result_list, 'keyword': keyword,
-    #            'tail': tail, 'genus': genus, 'spcount': spcount, 'spc_string': spc_string,
-    #            'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
-    #            'level': 'search_match', 'title': 'search_match', 'role': role, 'namespace': 'search', }
-    context = {'result_list': result_list, 'len': len(result_list), 'spc_string':  spc_string, 'genus': genus,
+    result_score.sort(key=lambda k: (-k[1], k[0].name()))
+    context = {'result_list': result_list,'result_score': result_score, 'len': len(result_list), 'spc_string':  spc_string, 'genus': genus,
                'alliance_obj': alliance_obj, 'genus_obj': genus_obj,
                'min_score': min_score, 'keyword': keyword,
                'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
@@ -2351,7 +2332,7 @@ def mypaginator(request, full_list, page_length, num_show):
             page = int(page)
 
         try:
-            page_list = paginator.page(1)
+            page_list = paginator.page(page)
             last_page = paginator.num_pages
             if page > last_page:
                 page = last_page
