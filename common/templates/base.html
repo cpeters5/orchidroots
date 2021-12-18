@@ -110,35 +110,10 @@
 
 <style>
 
-body {
-    width:100%;
-    /*background-color: #efeeee;*/
-}
+
 img {
 max-width: 100%;
 display: block;
-}
-#wrapper {
-     width: 100%;
-     text-align: center;
-    background-color: black;
-    /*color: #92d028;*/
-
-}
-#pub2, #pri2, #pub3, #pri3, #cur3 {
-    float: left;
-}
-.rolebtn {
-    font-size:12px !important;
-}
-.rolebtn:hover {
-    background-color: #cad4f7;
-}
-#pub2, #pri2 {
-    width: 17%;
-}
-#pub3, #pri3, #cur3 {
-    width: 17%;
 }
 
 #log, #reg {
@@ -294,7 +269,7 @@ display: block;
   font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
   font-size: 20pt;
   color: #33f8ff;
-  line-height: 11px;
+  line-height: 13px;
 }
 
 .famfont {
@@ -505,7 +480,7 @@ nav input[type=text] {
   font-size: 14px;
   border: none;
     border-radius: 3px;
-    width: 220px;
+    width: 200px;
     height: 35px;
 }
 nav select {
@@ -595,7 +570,7 @@ nav .search-container button:hover {
   }
   .bannerfont {
     font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-    font-size: 20px;
+    font-size: 17px;
   }
 
   .search-btn {
@@ -610,40 +585,26 @@ nav .search-container button:hover {
     font-size: 11px;
 }
 .fambtn a {
-    font-size:13px !important;
+    font-size:10px !important;
+    width: 50px;
 }
 .fambtn1 a {
-    font-size:13px !important;
+    font-size:11px !important;
 }
 }
 
 </style>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <div class="container-fluid">
+    <div class="container" style="width:100% !important;">
         <div class="navbar-header">
-            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/?role={{role}}" style="color: #07f7ff;line-height: 11px; "><b>BlueNanta</b></a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/?role={{role}}" style="color: #07f7ff;"><b>BlueNanta {% if family %}<span style="color:#7ef51a;"> - {{family.family|default:''}}{% endif%}</span></b></a>
             <!-- Brand -->
         </div>
 <!-- Links -->
 
-        <div class="collapse navbar-collapse" id="nav-content" style="height:30px;">
-            <ul class="navbar-nav" style="line-height:25px !important;">
-                <li  class="nav-item">
-<!--                    <div  class="search-container">-->
-                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="family" value="{{ family.family }}" />
-                            <input type="hidden" name="role" value="{{ role }}" />
-                            <input class="searchbox" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
-                        </form>
-
-<!--                    </div>-->
-                </li>
-            </ul>
-            <ul class="navbar-nav ml-auto" style="line-height:25px !important;">
+        <div id="nav-content" style="height:30px;">
+            <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <div class="nav-item dropdown" style="float:right;">
@@ -680,6 +641,16 @@ nav .search-container button:hover {
                         <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
                     </li>
                 {% endif %}
+                <li  class="nav-item">
+<!--                    <div  class="search-container">-->
+                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
+                            <input type="hidden" name="family" value="{{ family.family }}" />
+                            <input type="hidden" name="role" value="{{ role }}" />
+                            <input class="searchbox" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                        </form>
+
+<!--                    </div>-->
+                </li>
             </ul>
         </div>
 <!-- Search -->
@@ -701,41 +672,13 @@ nav .search-container button:hover {
 
 
 
-<div id="wrapper" style="background-color:black; text-align: left;">
+<div style="background-color:black; text-align: left;">
     <h3 class=" p-2 m4">
-        {% if family.family == 'Bromeliaceae' %}
-            <div class="btn famfont">Bromeliaceae</div>
-            <a class="btn fambtn" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactaceae</a>
-            <a class="btn fambtn" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchidaceae</a>
-            <a class="btn fambtn1" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Other Families</a>
-        {% elif family.family == 'Cactaceae' %}
-            <a class="btn fambtn" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliaceae</a>
-            <a class="btn famfont" href="#">Cactaceae</a>
-            <a class="btn fambtn" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchidaceae</a>
-            <a class="btn fambtn1" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Other Families</a>
-        {% elif family.family == 'Orchidaceae' %}
-            <a class="btn fambtn" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliaceae</a>
-            <a class="btn fambtn" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactaceae</a>
-            <a class="btn famfont" href="#">Orchidaceae</a>
-            <a class="btn fambtn1" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Other Families</a>
-        {% elif family %}
-            <a class="btn fambtn" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliaceae</a>
-            <a class="btn fambtn" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactaceae</a>
-            <a class="btn fambtn" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchidaceae</a>
-            <a class="btn famfont" href="#">{{family.family}}</a>
-        {% elif app == 'other' %}
-            <a class="btn fambtn" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliaceae</a>
-            <a class="btn fambtn" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactaceae</a>
-            <a class="btn fambtn" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchidaceae</a>
-            <div class="btn famother">Other Families</div>
-        {% else %}
-<!--        # If no family nor app in the request-->
-            <a class="btn fambtn" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliaceae</a>
-            <a class="btn fambtn" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactaceae</a>
-            <a class="btn fambtn" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchidaceae</a>
-            <div class="btn famother">Other Families</div>
-<!--            <a class="btn fambtn1" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}">Other Families</a>-->
-        {% endif %}
+
+            <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active{% endif %}" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromel.</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active{% endif %}" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active{% endif %}" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchid</a>
+            <a class="btn btn-info fambtn {% if family.application == 'other' %}active{% endif %}" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
     </h3>
 
 
