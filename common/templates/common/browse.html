@@ -57,13 +57,13 @@ label {
     width: 250px;
     margin-right: 5px;
 }
-.imgcaption_top {
+.imgcaption {
     font-size: 11px;
     color: #0b51af;
-    height: 20px;
-    overflow: hidden;
+    height: 30px;
     margin:2px;
     text-align:center;
+    overflow-wrap: break-word;
 }
 
 .text-n {
@@ -76,20 +76,20 @@ label {
             /*Display square image*/
 .thumbnails {
    object-fit: cover;
-   overflow: hidden;
+   /*overflow: hidden;*/
+    overflow-wrap: break-word;
    height: 15vw;
    width : 15vw;
-   /*padding:2px;*/
-   padding:4px 1px 2px 1px;
-   margin:2px 0;
+   margin: 0 auto;
+    padding: 0;
 }
 
 .imageitem {
     display:inline-block;
     border:1px solid grey;
-    margin: 2px;
+    margin: 0 auto;
     width : 16vw;
-    /*height : 22vw;*/
+    height : auto;
     background-color: #eaeaea;
     border:1px solid lightgrey;
     text-align:center;
@@ -108,32 +108,42 @@ img{
 
 .btn {
     padding-top: 10px;
-    /*padding  : 10px 10px 8px 10px;*/
-    /*padding  : .5rem .5rem;*/
     font-size  : .8rem;
     line-height  : .65;
     border-radius : .2rem;
 }
 
+@media only screen and (min-width: 1500px) {
+    .text-n {
+        font-size: 12px;
+    }
+
+    .thumbnails {
+        height: 8vw;
+        width: 8vw;
+    }
+    .imageitem {
+        width : 8vw;
+    }
+    .imgcaption {
+        font-size: 11px;
+    }
+}
 @media only screen and (max-width: 830px) {
     .text-n {
         font-size:11px;
     }
 
     .thumbnails {
-       height: 18vw;
-       width : 18vw;
-       padding:2px 1px 3px 1px;
+       height: 19vw;
+       width : 19vw;
     }
-    .imgcaption_top {
+    .imgcaption {
         font-size: 12px;
     }
     .imageitem {
         width : 20vw;
     }
-    /*.btn {*/
-    /*    font-size:11px;*/
-    /*}*/
 }
 
 @media only screen and (max-width: 600px) {
@@ -149,21 +159,15 @@ img{
     }
 
     .thumbnails {
-       height: 26vw;
-       width : 26vw;
-       padding:2px 1px 3px 1px;
+       height: 30vw;
+       width : 30vw;
     }
-    .imgcaption_top {
+    .imgcaption {
         font-size: 11px;
     }
    .imageitem {
-        width : 28vw;
-       /*height: 28px;*/
+        width : 32vw;
     }
-    /*.btn {*/
-    /*    font-size:11px;*/
-    /*    padding:2px;*/
-    /*}*/
 }
 
     .dropdown-item {
@@ -184,12 +188,10 @@ img{
 .pagination {
     font-size:11px;
     padding:2px 6px;
-    /*margin-top: 5px;*/
     margin-block-end: 5px;
 }
 .pagination a{
     padding:2px 6px;
-    /*margin-top: 5px;*/
 }
 .pagination a.hover {
     background-color: #f5f9f9;
@@ -450,17 +452,17 @@ img{
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                         {% for x in page_list %}
-                            <div class="imageitem m-1 border">
+                            <div class="imageitem border ">
                                 {% if role == 'cur' %}
                                 <a href="{% url 'display:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
-                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
+                                    <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                 </a>
                                 {% else %}
                                 <a href="{% url 'display:information' x.pid %}?role={{role}}&family={{x.gen.family}}">
-                                    <img class="thumbnails" alt="" src="{% static x.image_dir %}{{x.image_file}}" class="img-fluid fullimg">
+                                    <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                 </a>
                                 {% endif %}
-                                <div class="imgcaption_top">{{x.binomial_it|safe}}</div>
+                                <div class="imgcaption">{{x.binomial|safe}}</div>
                             </div>
                         {% endfor %}
                         </div>

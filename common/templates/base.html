@@ -267,9 +267,9 @@ display: block;
 
 .bannerfont {
   font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-  font-size: 20pt;
+  font-size: 18pt;
   color: #33f8ff;
-  line-height: 13px;
+  /*line-height: 13px;*/
 }
 
 .famfont {
@@ -603,11 +603,17 @@ nav .search-container button:hover {
         <div class="navbar-header">
             <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/?role={{role}}" style="color: #07f7ff;"><b>BlueNanta {% if family %}<span style="color:#7ef51a;"> - {{family.family|default:''}}{% endif%}</span></b></a>
             <!-- Brand -->
-        </div>
 <!-- Links -->
 
-        <div id="nav-content" style="height:30px;">
             <ul class="navbar-nav " style="line-height:25px !important;">
+                <li  class="nav-item">
+                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
+                            <input type="hidden" name="family" value="{{ family.family }}" />
+                            <input type="hidden" name="role" value="{{ role }}" />
+                            <input class="searchbox" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                        </form>
+
+                </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <div class="nav-item dropdown" style="float:right;">
@@ -644,16 +650,6 @@ nav .search-container button:hover {
                         <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
                     </li>
                 {% endif %}
-                <li  class="nav-item">
-<!--                    <div  class="search-container">-->
-                        <form class="form-inline" id="searchspc" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="family" value="{{ family.family }}" />
-                            <input type="hidden" name="role" value="{{ role }}" />
-                            <input class="searchbox" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
-                        </form>
-
-<!--                    </div>-->
-                </li>
             </ul>
         </div>
 <!-- Search -->
