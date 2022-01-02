@@ -54,6 +54,8 @@ for row in cur:
 
     fname = "%s_%09d_%09d.jpg" % (type, row[0], row[2])
     print(fname)
+    time.sleep(15)
+    print(str(i))
 
     try:
         print(url)
