@@ -308,6 +308,22 @@ img{
                             </div>
                         </div>
                     {% endif %}
+
+                    <div class="imageitem">
+                        <div class="imgtitle" style="background-color:#eee; color: #0a6aa1;">{{sponsopr.title}}</div>
+                        <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                            <div class="box">
+                                <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
+                            </div>
+                        </a>
+                        <div class="imgcaption">
+                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                {{sponsor.title|safe}} - {{sponsor.pitch}}
+                            </a>
+
+                        </div>
+                    </div>
+
                </div>
 
 

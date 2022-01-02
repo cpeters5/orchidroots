@@ -22,7 +22,7 @@ from utils import config
 from utils.views import write_output, getRole, paginator, get_author, get_family_list, getModels
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Subgenus, Section, Subsection, Series, Intragen, HybImages
-from accounts.models import User, Photographer
+from accounts.models import User, Photographer, Sponsor
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
 
@@ -50,6 +50,9 @@ def getFamilyImage(family):
 
 
 def orchid_home(request):
+    ads_insert = 0
+    sponsor = ''
+
     role = getRole(request)
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
@@ -85,12 +88,17 @@ def orchid_home(request):
     except:
         succulent_obj = ''
 
+    # 3 major families + 3 other families + succulent + carnivorous
+    ads_insert = int(random.random() * 8) + 1
+    sponsor = Sponsor.objects.all().order_by('?')[0:1][0]
+
     # get random carnivorous
     sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     carnivorous_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
     context = {'orcimage': orcimage, 'broimage': broimage, 'cacimage': cacimage,
                'other_list': other_list, 'succulent_obj': succulent_obj, 'carnivorous_obj': carnivorous_obj,
-        'title': 'orchid_home', 'role': role }
+               'ads_insert': ads_insert, 'sponsor': sponsor,
+                'title': 'orchid_home', 'role': role }
     return render(request, 'orchid_home.html', context)
 
 
@@ -580,6 +588,8 @@ def browse(request):
     talpha = ''
     num_show = 5
     page_length = 20
+    ads_insert = 0
+    sponsor = ''
     my_full_list = []
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
@@ -732,6 +742,10 @@ def browse(request):
         page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
             = mypaginator(request, pid_list, page_length, num_show)
 
+        if len(page_list) > 5:
+            ads_insert = int(random.random() * len(page_list)) + 1
+            sponsor = Sponsor.objects.all().order_by('?')[0:1][0]
+
         # if switch display, restart pagination
         if 'prevdisplay' in request.GET:
             page = 1
@@ -765,6 +779,7 @@ def browse(request):
         'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
         'page': page, 'total': total, 'talpha': talpha,
+        'ads_insert': ads_insert, 'sponsor': sponsor,
         # 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,

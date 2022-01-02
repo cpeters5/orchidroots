@@ -236,6 +236,32 @@ class Donation(BaseModel):
         return self.user.username
 
 
+class Sponsor(models.Model):
+    sid = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=100, default='', unique=True)
+    author = models.CharField(max_length=200, default='')
+    sponsor_url = models.URLField(max_length=200, default='')
+    pitch = models.CharField(max_length=200, null=True)
+    is_active = models.BooleanField(default=True)
+    status = models.CharField(max_length=20, null=True)
+    address = models.TextField(null=True)
+    country_code = models.CharField(max_length=2, null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True)
+    image_file = models.CharField(max_length=100)
+    image_file_path = models.ImageField(upload_to='utils/images/sponsor')
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        # verbose_name_plural = "Anni"
+        ordering = ('title',)
+
+
 class Partner(BaseModel):
     partner_id = models.CharField(max_length=50, primary_key=True)
     author = models.ForeignKey(Photographer, db_column='author', on_delete=models.SET_NULL, null=True, blank=True)

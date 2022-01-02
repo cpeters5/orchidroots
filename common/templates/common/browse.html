@@ -58,22 +58,14 @@ label {
     margin-right: 5px;
 }
 .imgcaption {
-    font-size: 11px;
+    font-size: 13px;
     color: #0b51af;
-    height: 30px;
+    height: 40px;
     margin:2px;
     text-align:center;
     overflow-wrap: break-word;
 }
 
-.text-n {
-    font-size:13px;
-}
-.check {
-    margin:0;
-    padding:0;
-}
-            /*Display square image*/
 .thumbnails {
    object-fit: cover;
    /*overflow: hidden;*/
@@ -113,27 +105,19 @@ img{
     border-radius : .2rem;
 }
 
-@media only screen and (min-width: 1500px) {
-    .text-n {
-        font-size: 12px;
-    }
-
+@media only screen and (min-width: 1800px) {
     .thumbnails {
-        height: 8vw;
-        width: 8vw;
+        height: 10vw;
+        width: 10vw;
     }
     .imageitem {
-        width : 8vw;
+        width : 10vw;
     }
     .imgcaption {
-        font-size: 11px;
+        font-size: 15px;
     }
 }
 @media only screen and (max-width: 830px) {
-    .text-n {
-        font-size:11px;
-    }
-
     .thumbnails {
        height: 19vw;
        width : 19vw;
@@ -152,10 +136,6 @@ img{
     }
     .custom-link{
         line-height:12px;
-    }
-     .text-n {
-        font-size:11px;
-        padding: 0;
     }
 
     .thumbnails {
@@ -186,7 +166,7 @@ img{
     /*background-color:lightgrey;*/
 }
 .pagination {
-    font-size:11px;
+    font-size:14px;
     padding:2px 6px;
     margin-block-end: 5px;
 }
@@ -237,7 +217,7 @@ img{
     <!--Title-->
    <div class="row" style="width:100%; margin:0 auto;">
 <!--Main table       -->
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div class="col" style="text-align:left;margin-top:25px;">
             <div class="card">
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
@@ -441,7 +421,7 @@ img{
 
                                     </div>
                                 {% endif %}
-                                <div class="text-n" style="float:left">
+                                <div style="float:left">
                                     ({{first}}-{{last}} of {{total}})<br>
                                 </div>
                             </div>
@@ -453,6 +433,12 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                         {% for x in page_list %}
                             <div class="imageitem border ">
+                                {% if forloop.counter == ads_insert %}
+                                <a href="{{sponsor.sponsor_url}}" target="_blank">
+                                    <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
+                                </a>
+                                <div class="imgcaption">{{sponsor.title|safe}} - {{sponsor.pitch}}</div>
+                                {% else %}
                                 {% if role == 'cur' %}
                                 <a href="{% url 'display:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
                                     <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
@@ -463,6 +449,7 @@ img{
                                 </a>
                                 {% endif %}
                                 <div class="imgcaption">{{x.binomial|safe}}</div>
+                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>
