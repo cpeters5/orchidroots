@@ -6,7 +6,7 @@
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div class="col" style="text-align:left;margin-top:25px;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        <dev style="font-size:16px;">
+                        <dev style="font-size:13px;">
                             <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}&talpha={{talpha}}">Genus list</a>
                             <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&talpha={{talpha}}&syn=N">Hybrid list</a>
                             <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family.family}}&alpha={{alpha}}&talpha={{talpha}}&genus={{genus}}&display=checked">Browse</a>
@@ -46,14 +46,11 @@
                                 </form>
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
-                                <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
+                                <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <tr>
                                             <th class="spc_column">Species</th>
 <!--                                            <th>Higher taxonomic levels</th>-->
-                                            {% if user.tier.tier > 3 %}
-                                                <th>pid</th>
-                                            {% endif %}
                                             <th class="d-none d-lg-table-cell">Decription</th>
                                             <th>#images</th>
                                         </tr>
@@ -63,23 +60,16 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        {{species.binomial_it|safe}} (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>)
+                                                        {{species.binomial_it|safe}} (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
+                                                            <i>{{species.getAccepted.binomial_it|safe}}</i></a> {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %})
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a>
+                                                    <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a> {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}} {{species.year|default:""}}
                                             </td>
-                                            {% if user.tier.tier > 3 %}
-                                                {% if species.status == 'synonym' %}
-                                                    <td>{{species.getAcc}}</td>
-                                                {% else %}
-                                                    <td>{{species.pid}}</td>
-                                                {% endif %}
-
-                                            {% endif %}
 
 <!--                                            <td>-->
 <!--                                                <a href="?genus={{species.genus}}&family={{species.gen.family}}">{{species.gen.family}}</a>-->
