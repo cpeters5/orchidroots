@@ -27,6 +27,9 @@
     background-color: blue;
     color: white;
 }
+.hidden {
+    display: none;
+}
 </style>
 <br>
         {% if title != 'curate_newupload' and title != 'curate_pending' and title != 'myphoto_browse' %}
@@ -60,17 +63,22 @@
                     {% else %}
                         na
                     {% endif %}
-
                     ×
-
                     {% if species.hybrid.pollen_id.pid %}
                         {{species.hybrid.registered_pollen_name_long|safe}}</a>
                     {% else %}
                         na
                     {% endif %}
                     <br>
-                    <br>
                 {% endif %}
+
+                {% if species.accepted.comment %}
+                    <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
+                        {{species.accepted.comment|safe}}
+                    </div>
+                {% endif %}
+                <br>
+
                     {% if user.tier.tier > 2 %}
                          <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
                          <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'common:myphoto' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
@@ -92,3 +100,31 @@
         {% endif %}
         <div style="clear:left;"></div>
 
+<script>
+function showMore(id){
+    document.getElementById(id+'Overflow').className='';
+    document.getElementById(id+'MoreLink').className='hidden';
+    document.getElementById(id+'LessLink').className='';
+}
+
+function showLess(id){
+    document.getElementById(id+'Overflow').className='hidden';
+    document.getElementById(id+'MoreLink').className='';
+    document.getElementById(id+'LessLink').className='hidden';
+}
+
+var len = 200;
+var shrinkables = document.getElementsByClassName('shrinkable');
+if (shrinkables.length > 0) {
+    for (var i = 0; i < shrinkables.length; i++){
+        var fullText = shrinkables[i].innerHTML;
+        if(fullText.length > len){
+            var trunc = fullText.substring(0, len).replace(/\w+$/, '');
+            var remainder = "";
+            var id = shrinkables[i].id;
+            remainder = fullText.substring(len, fullText.length);
+            shrinkables[i].innerHTML = '<span>' + trunc + '<span class="hidden" id="' + id + 'Overflow">'+ remainder +'</span></span>&nbsp;<a id="' + id + 'MoreLink" href="#!" onclick="showMore(\''+ id + '\');">... More</a><a class="hidden" href="#!" id="' + id + 'LessLink" onclick="showLess(\''+ id + '\');">Less</a>';
+        }
+    }
+}
+</script>
