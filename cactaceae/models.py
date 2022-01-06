@@ -32,6 +32,7 @@ TYPE_CHOICES = [('species', 'species'), ('hybrid', 'hybrid')]
 
 class Genus(models.Model):
     pid = models.BigIntegerField(primary_key=True)
+    orig_pid = models.BigIntegerField(null=True, default=0)
     is_hybrid = models.CharField(max_length=1, null=True)
     genus = models.CharField(max_length=50, default='', unique=True)
     author = models.CharField(max_length=200, default='')
@@ -156,6 +157,7 @@ class Gensyn(models.Model):
     def __str__(self):
         return self.pid
 
+
 class GenusRelation(models.Model):
     gen = models.OneToOneField(Genus, db_column='gen',primary_key=True,on_delete=models.CASCADE)
     genus = models.CharField(max_length=50, default='')
@@ -169,6 +171,7 @@ class GenusRelation(models.Model):
 
 class Species(models.Model):
     pid = models.BigIntegerField(primary_key=True)
+    orig_pid = models.BigIntegerField(null=True, default=0)
     source = models.CharField(max_length=10)
     genus = models.CharField(max_length=50)
     is_hybrid = models.CharField(max_length=1, null=True)

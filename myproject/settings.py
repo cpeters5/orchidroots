@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'robots',  # use myproject/robots.txt
     'jquery',
+    'reset_migrations',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
