@@ -158,6 +158,10 @@ class GenusRelation(models.Model):
 
 
 class Species(models.Model):
+    # enfoirce uniqueness when all records are filled.
+    # Otherwise, use script to ensure uniqueness if not null.
+    # class Meta:
+    #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
     orig_pid = models.CharField(max_length=20, null=True)
     source = models.CharField(max_length=10)
@@ -324,8 +328,14 @@ class Species(models.Model):
         elif self.source == 'RHS':
             return "http://apps.rhs.org.uk/horticulturaldatabase/orchidregister/orchiddetails.asp?ID=" + str(
                 self.pid - 100000000)
+        elif self.source == 'POWO' and self.orig_pid:
+            return "https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:" + self.orig_pid
+        elif self.source == 'PL' and self.orig_pid:
+            return "http://www.theplantlist.org/tpl1.1/record/" + self.orig_pid
+        elif self.source == 'IPNI' and self.orig_pid:
+            return "https://www.ipni.org/n/" + self.orig_pid
         else:
-            return "#"
+            return None
 
     def get_best_img(self):
         img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(

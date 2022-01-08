@@ -53,8 +53,10 @@
                     {% endif %}
                     {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
                     {% if species.year %}{{species.year}}{% endif %}
-                    {% if  species.source == 'RHS' or species.source == 'Kew' %}
+                    {% if species.sourceurl != None %}
                         <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
+                    {% else %}
+                        ({{species.source}})
                     {% endif %}
                     </h1>
                 {% if species.type == 'hybrid' %}
