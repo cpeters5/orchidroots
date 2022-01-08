@@ -20,6 +20,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 import re
 import math
 
+STATUS_CHOICES = [('accepted', 'accepted'), ('registered', 'registered'), ('nonregistered', 'nonregistered'),
+                  ('unplaced', 'unplaced'), ('published', 'published'), ('trade', 'trade')]
 
 class Taxonomy(models.Model):
     class Meta:
@@ -55,6 +57,7 @@ class Family(models.Model):
     description = models.TextField(null=True)
     order = models.CharField(max_length=20, null=True)
     kingdom = models.CharField(max_length=20, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     source = models.CharField(max_length=20, null=True)
     active = models.BooleanField(null=True, default=False)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
