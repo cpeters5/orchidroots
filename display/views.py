@@ -34,14 +34,11 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    ps_list = pp_list = ss_list = sp_list = seedimg_list = pollimg_list = ()
+    ps_list = pp_list = ss_list = sp_list = ()
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
         return HttpResponseRedirect(url)
-    offspring_list = []
-    offspring_count = 0
-    offspring_test = ''
     max_items = 3000
     ancspc_list = []
     seedimg_list = []
@@ -123,54 +120,43 @@ def information(request, pid=None):
     if species.type == 'hybrid':
         if accepted.seed_id and accepted.seed_id.type == 'species':
             seed_obj = Species.objects.get(pk=accepted.seed_id.pid)
-            seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7). \
-                               order_by('-rank', 'quality', '?')[0: 3]
+            seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
             seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
             if seed_obj:
-                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 3]
+                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
                 assert isinstance(seed_obj, object)
                 if seed_obj.seed_id:
                     ss_type = seed_obj.seed_id.type
                     if ss_type == 'species':
-                        ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).order_by(
-                            '-rank', 'quality', '?')[: 1]
+                        ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                     elif ss_type == 'hybrid':
-                        ss_list = HybImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).order_by(
-                            '-rank', 'quality', '?')[: 1]
+                        ss_list = HybImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 if seed_obj.pollen_id:
                     sp_type = seed_obj.pollen_id.type
                     if sp_type == 'species':
-                        sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(
-                            rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+                        sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
                     elif sp_type == 'hybrid':
-                        sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(
-                            rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+                        sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
         # Pollen
         if accepted.pollen_id and accepted.pollen_id.type == 'species':
             pollen_obj = Species.objects.get(pk=accepted.pollen_id.pid)
-            pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).order_by('-rank', 'quality',
-                                                                                                    '?')[0: 3]
+            pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif accepted.pollen_id and accepted.pollen_id.type == 'hybrid':
             pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
-            pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7). \
-                               order_by('-rank', 'quality', '?')[0: 3]
+            pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
             if pollen_obj.seed_id:
                 ps_type = pollen_obj.seed_id.type
                 if ps_type == 'species':
-                    ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
+                    ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif ps_type == 'hybrid':
-                    ps_list = HybImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
+                    ps_list = HybImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
             if pollen_obj.pollen_id:
                 pp_type = pollen_obj.pollen_id.type
                 if pp_type == 'species':
-                    pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
+                    pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif pp_type == 'hybrid':
-                    pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7). \
-                                  order_by('-rank', 'quality', '?')[: 1]
+                    pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
 
         ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
         if ancspc_list:
