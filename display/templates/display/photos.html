@@ -220,11 +220,9 @@ a:hover {
         <div  class="p-2 justify-content-center align-items-center">
         {% if msg %}<span style="text-align:center; color: red">{{msg}}</span>{% endif %}
             {% if user.tier.tier > 1 and role != 'pub' %}
-                {% if user.tier.tier > 3 and role == 'cur' %}
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
-                {% endif %}
+                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
+                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
+                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
                 {% if app != 'orchidaceae' %}
                     <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadweb/{{species.pid}}/?family={{family}}&role={{role}}&tab=web">Upload url</a>
                     <a class="btn btn-xs mybtn btn-outline-primary" href="/common/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
