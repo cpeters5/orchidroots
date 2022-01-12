@@ -32,6 +32,7 @@ def robots_txt(request):
         "Disallow: /common/",
         "Disallow: /core/",
         "Disallow: /detail/",
+        "Disallow: /display/information/",
         "Disallow: /documents/",
         "Disallow: /donations/",
         "Disallow: /orchidaceae/",
