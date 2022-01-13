@@ -90,7 +90,7 @@ oauthlib==3.0.1
 opencv-contrib-python==4.5.2.52
 paypalrestsdk==1.13.1
 pilkit==2.0
-Pillow==8.3.2
+Pillow==9.0.0
 pipenv==2022.1.8
 prompt-toolkit==3.0.24
 pycparser==2.20
