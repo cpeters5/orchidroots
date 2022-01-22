@@ -318,18 +318,15 @@ class Species(models.Model):
 
     def sourceurl(self):
         if self.source == 'Kew':
-            return "https://wcsp.science.kew.org/namedetail.do?name_id=" + str(self.pid)
-        elif self.source == 'RHS':
-            return "http://apps.rhs.org.uk/horticulturaldatabase/orchidregister/orchiddetails.asp?ID=" + str(
-                self.pid - 100000000)
+            return "https://wcsp.science.kew.org/namedetail.do?name_id=" + str(self.orig_pid)
+        elif self.source == 'BCR':
+            return "https://registry.bsi.org/index.php?genus=AECHMEA&id=" + str(self.orig_pid)
         elif self.source == 'POWO' and self.orig_pid:
             return "https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:" + self.orig_pid
         elif self.source == 'PL' and self.orig_pid:
             return "http://www.theplantlist.org/tpl1.1/record/" + self.orig_pid
         elif self.source == 'IPNI' and self.orig_pid:
             return "https://www.ipni.org/n/" + self.orig_pid
-        elif self.source == 'NCBI' and self.orig_pid:
-            return "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=" + self.orig_pid
         else:
             return None
 

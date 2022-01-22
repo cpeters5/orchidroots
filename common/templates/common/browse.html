@@ -437,7 +437,7 @@ img{
                                 <a href="{{sponsor.sponsor_url}}" target="_blank">
                                     <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
                                 </a>
-                                <div class="imgcaption">{{sponsor.title|safe}} - {{sponsor.pitch}}</div>
+                                <div class="imgcaption">{{sponsor.pitch}}: {{sponsor.description}}</div>
                                 {% else %}
                                 {% if role == 'cur' %}
                                 <a href="{% url 'display:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
