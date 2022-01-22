@@ -242,6 +242,7 @@ class Sponsor(models.Model):
     author = models.CharField(max_length=200, default='')
     sponsor_url = models.URLField(max_length=200, default='')
     pitch = models.CharField(max_length=200, null=True)
+    description = models.CharField(max_length=500, null=True)
     is_active = models.BooleanField(default=True)
     status = models.CharField(max_length=20, null=True)
     address = models.TextField(null=True)
