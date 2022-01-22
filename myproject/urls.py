@@ -16,8 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic import TemplateView
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -34,6 +35,8 @@ urlpatterns = [
     # path('dispatch', dispatch, name='dispatch'),
     path('documents/', include('documents.urls')),
     # path('index/', index, name='index'),
+    # path('ads/', include('ads.urls')),
+    # path("ads.txt", RedirectView.as_view(url=staticfiles_storage.url("ads.txt")),),
 
     # User accounts
     path('accounts/', include('allauth.urls')),
@@ -52,7 +55,7 @@ urlpatterns = [
         name="account_reset_password_from_key",
     ),
 
-    # High level
+    # Landing
     path('', orchid_home, name='orchid_home'),
     # path('', ode, name='ode'),
 

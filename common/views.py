@@ -61,6 +61,9 @@ def orchid_home(request):
         return HttpResponseRedirect(url)
 
     num_samples = 5
+    # 3 major families + succulent + carnivorous
+    # (3 other families form the last row.)
+    num_blocks = 5
     orcfamily = Family.objects.get(pk='Orchidaceae')
     orcimage = getFamilyImage(orcfamily)
 
@@ -88,9 +91,8 @@ def orchid_home(request):
     except:
         succulent_obj = ''
 
-    # 3 major families + 3 other families + succulent + carnivorous
-    ads_insert = int(random.random() * 8) + 1
-    sponsor = Sponsor.objects.all().order_by('?')[0:1][0]
+    ads_insert = int(random.random() * num_blocks) + 1
+    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
     # get random carnivorous
     sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
@@ -744,7 +746,7 @@ def browse(request):
 
         if len(page_list) > 5:
             ads_insert = int(random.random() * len(page_list)) + 1
-            sponsor = Sponsor.objects.all().order_by('?')[0:1][0]
+            sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
         # if switch display, restart pagination
         if 'prevdisplay' in request.GET:
