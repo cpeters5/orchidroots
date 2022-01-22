@@ -917,6 +917,8 @@ def progeny(request, pid):
 def progenyimg(request, pid=None):
     num_show = 5
     page_length = 30
+    min_pct = 30
+    
     role = getRole(request)
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
@@ -937,7 +939,7 @@ def progenyimg(request, pid=None):
         return HttpResponse(message)
     genus = species.genus
 
-    des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt=20)
+    des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt= min_pct)
     des_list = des_list.order_by('-pct')
 
     img_list = []
@@ -951,10 +953,12 @@ def progenyimg(request, pid=None):
             y.image_file = y.image_file
             y.author = y.author
             y.source_url = y.source_url
-            y.pollen = offspring.pollen_id.pid
-            y.seed = offspring.seed_id.pid
-            y.seed_name = offspring.seed_id.namecasual()
-            y.pollen_name = offspring.pollen_id.namecasual()
+            if offspring.pollen_id:
+                y.pollen = offspring.pollen_id.pid
+                y.pollen_name = offspring.pollen_id.namecasual()
+            if offspring.seed_id:
+                y.seed = offspring.seed_id.pid
+                y.seed_name = offspring.seed_id.namecasual()
             img_list.append(y)
 
     total = len(img_list)

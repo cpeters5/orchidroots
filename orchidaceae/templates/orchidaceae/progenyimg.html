@@ -113,9 +113,19 @@ img{
                     </div>
                     <div class="imgcaption">
                         {{x.name|safe}} ({{x.pct}}%)<br>
-                        (<a href="{% url 'detail:information' x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
+                        (
+                        {% if x.seed %}
+                            <a href="{% url 'detail:information' x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
+                        {% else %}
+                            na
+                        {% endif %}
                         ×
-                        <a href="{% url 'detail:information' x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>)
+                        {% if x.pollen %}
+                            <a href="{% url 'detail:information' x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>
+                        {% else %}
+                            na
+                        {% endif %}
+                        )
                         <br>Photo: <a href="{{x.source_url}}">{{x.author}}
                     </div>
                 </div>
