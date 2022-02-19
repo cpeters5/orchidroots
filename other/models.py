@@ -323,7 +323,9 @@ class Species(models.Model):
             return str(self.species)
 
     def sourceurl(self):
-        if self.source == 'APNI' and self.orig_pid:
+        if self.source == 'AlgaeBase' and self.orig_pid:
+            return "https://www.algaebase.org/search/species/detail/?species_id=" + self.orig_pid
+        elif self.source == 'APNI' and self.orig_pid:
             return "https://biodiversity.org.au/nsl/services/rest/name/apni/" + self.orig_pid + "/api/apni-format"
         elif self.source == 'EOL' and self.orig_pid:
             return "https://eol.org/pages/" + self.orig_pid
@@ -341,6 +343,8 @@ class Species(models.Model):
             return "http://www.theplantlist.org/tpl1.1/record/" + self.orig_pid
         elif self.source == 'POWO' and self.orig_pid:
             return "https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:" + self.orig_pid
+        elif self.source == 'Tropicos' and self.orig_pid:
+            return "http://http://legacy.tropicos.org/Name/" + self.orig_pid
         else:
             return None
 
