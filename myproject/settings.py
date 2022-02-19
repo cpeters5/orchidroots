@@ -386,7 +386,7 @@ ANYMAIL = {
     "MAILGUN_API_URL": env.str("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
 DEFAULT_FROM_EMAIL = "admin@mail.orchidroots.org"  # if you don't already have this in settings
-SERVER_EMAIL = "admin@mail.orchidroots.org"
+SERVER_EMAIL = "admin@orchidroots.org"
 
 STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY', default='')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')
