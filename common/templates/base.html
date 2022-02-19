@@ -44,7 +44,10 @@
 	<link rel="{% static '/utils/css/style.css' %}">
 	<link rel="{% static '/utils/css/index.css' %}">
 
-<!--    Get rid of apple-touch error caused by requests from cellphone. Doesn't work anyway oh what to do??? -->
+    <!--adsense-->
+<!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037211149077083" crossorigin="anonymous"></script>-->
+
+    <!--    Get rid of apple-touch error caused by requests from cellphone. Doesn't work anyway oh what to do??? -->
 <!--    <link rel="apple-touch-icon" href="apple-touch-icon.png">-->
 <!--    <link rel="icon" sizes="196x196" href="apple-touch-icon.png">-->
 <!--    <link rel="icon" sizes="120x120" href="apple-touch-icon.png">-->
@@ -82,6 +85,26 @@
     }
 
     .navbar-nav > li > a {padding-top:0 !important; padding-bottom:0 !important;}
+
+    /* adsense component*/
+    .infeed {
+        border: 1px solid lightgrey;
+    }
+  @media (min-width: 350px) {
+      .infeed {
+          height: 40px;
+      }
+  }
+ @media (min-width: 500px) {
+    .infeed {
+      height: 20px;
+    }
+  }
+ @media (min-width: 800px) {
+    .infeed {
+        height: 50px;
+    }
+  }
 
 </style>
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -709,7 +732,16 @@ nav .search-container button:hover {
 </html>
 
 
-
+<ins class="adsbygoogle infeed"
+     style="display:block;"
+     data-ad-format="fluid"
+     data-ad-layout="image-top"
+     data-ad-layout-key="xxxxxxxx"
+     data-ad-client="ca-pub-12345"
+     data-ad-slot="123456"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
 
 
 
