@@ -161,6 +161,7 @@ sub processSynonym {
 
 	foreach (sort keys %synonym) {
 		$stmt = "update " . $app . "_species set num_image = $synonym{$_} where pid = $_;";
+print "pid = $_\n $stmt\n" if $_ == 300000910282;
 		&getASPM($stmt);
 	}
 }
@@ -183,9 +184,8 @@ sub getPID {
 			$num_hybrid{$row[2]} = 0;
 			$num_hybrid_synonym{$row[2]} = 0;
 			$num_image_gen{$row[2]} = 0;
-			$num_image{$row[0]} = 0;
 		}
-
+        $num_image{$row[0]} = 0;
 		$genus{$row[2]}++;
 		if ($row[1] eq 'species') {
 			if ($row[3] eq 'synonym') {
