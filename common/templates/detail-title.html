@@ -59,6 +59,10 @@
                         ({{species.source}})
                     {% endif %}
                     </h1>
+                {% if species.status == 'synonym' %}
+                    syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>
+                    <br>
+                {% endif %}
                 {% if species.type == 'hybrid' %}
                     {% if species.hybrid.seed_id.pid %}
                         {{species.hybrid.registered_seed_name_long|safe}}</a>
@@ -74,7 +78,7 @@
                     <br>
                 {% endif %}
                 {% if species.accepted.common_name %}
-                    <h6>Common names: {{species.accepted.common_name}}</h6>
+                    <h5>{{species.accepted.common_name}}</h5>
                 {% endif %}
                 {% if species.accepted.comment %}
                     <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
