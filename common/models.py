@@ -34,3 +34,20 @@ class UploadFile(models.Model):
     def __str__(self):
         return self.pid.name()
 
+
+class DataSource(models.Model):
+    source = models.CharField(max_length=20, primary_key=True)
+    organization = models.CharField(max_length=1000, null=True, blank=True)
+    source_home = models.CharField(max_length=1000, null=True, blank=True)
+    source_url = models.CharField(max_length=1000, null=True, blank=True)
+    source_name = models.CharField(max_length=100, null=True, blank=True)
+    short_description = models.CharField(max_length=100, null=True, blank=True)
+    citing = models.TextField(null=True)
+    description = models.TextField(null=True)
+    collaboration = models.TextField(null=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.source
+
