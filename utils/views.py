@@ -261,7 +261,7 @@ def getModels(request, family=None):
     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
 
-def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages, role):
+def getmyphotos(author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role):
     # Get species and hybrid lists that the user has at least one photo
     myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
     myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
@@ -278,11 +278,26 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
 
     # Get list for display
     if species:
-        if app == 'orchidaceae' and species.type == 'hybrid':
-            public_list = HybImages.objects.filter(pid=species.pid)  # public photos
+        req_pid = species.pid
+        pid = species.pid
+        syn_list = ()
+        if species.status == 'synonym':
+            pid = species.getAcc()
+            species = Species.objects.get(pk=pid)
         else:
-            public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
-        upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
+            # Get images of synonyms
+            syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+        if app == 'orchidaceae' and species.type == 'hybrid':
+            if req_pid != pid:      # input pid is a synonym, just get images of the requested synonym
+                public_list = HybImages.objects.filter(pid=req_pid)  # public photos
+            else:                   # input pid is an accepted species, include images of its synonyms
+                public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+        else:
+            if req_pid != pid:
+                public_list = SpcImages.objects.filter(pid=req_pid)  # public photos
+            else:
+                public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
             upload_list = upload_list.filter(author=author) # Private photos

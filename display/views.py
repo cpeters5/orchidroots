@@ -52,9 +52,9 @@ def information(request, pid=None):
         return HttpResponseRedirect('/')
 
     # If pid is a synonym, convert to accept
+    given_pid = pid
     if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
+        pid = species.getAcc()
         species = Species.objects.get(pk=pid)
 
     genus = species.gen
@@ -64,14 +64,14 @@ def information(request, pid=None):
     if species.gen.family.family == 'Orchidaceae':
         if species.type == 'species':
             accepted = species.accepted
-            images_list = SpcImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
+            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
             distribution_list = Distribution.objects.filter(pid=species.pid)
         else:
             accepted = species.hybrid
-            images_list = HybImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
+            images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
 
     else:
-        images_list = SpcImages.objects.filter(pid=species.pid).order_by('-rank', 'quality', '?')
+        images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
         if species.type == 'species':
             accepted = species.accepted
         else:
@@ -202,22 +202,9 @@ def photos(request, pid=None):
         url = "%s?role=%s&family=%s" % (reverse('common:myphoto', args=(species.pid,)), role, family)
         return HttpResponseRedirect(url)
 
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
     variety = ''
     tail = ''
-
-    if family.family == 'Orchidaceae' and species.type == 'hybrid':
-        all_list = HybImages.objects.filter(pid=species.pid)
-    else:
-        all_list = SpcImages.objects.filter(pid=species.pid)
-
-    # Get private photos
-
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages, role)
+    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
     # Happened when a curator request an author photos
     # if role == 'cur':
     #     if author:
