@@ -52,26 +52,31 @@ def information(request, pid=None):
         return HttpResponseRedirect('/')
 
     # If pid is a synonym, convert to accept
-    given_pid = pid
+    req_pid = pid
+    req_species = species
+    genus = species.gen
+    display_items = []
+    synonym_list = Synonym.objects.filter(acc=pid)
+    pid = species.pid
+    syn_list = ()
     if species.status == 'synonym':
         pid = species.getAcc()
         species = Species.objects.get(pk=pid)
-
-    genus = species.gen
-
-    display_items = []
-    synonym_list = Synonym.objects.filter(acc=pid)
-    if species.gen.family.family == 'Orchidaceae':
-        if species.type == 'species':
-            accepted = species.accepted
-            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
-            distribution_list = Distribution.objects.filter(pid=species.pid)
-        else:
-            accepted = species.hybrid
-            images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
-
     else:
-        images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid=given_pid)).order_by('-rank', 'quality', '?')
+        # Get images of synonyms
+        syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+
+    if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
+        if req_pid != pid:  # req_pid is a synonym, just show the synonym
+            images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
+        else:
+            images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
+        accepted = species.hybrid
+    else:
+        if req_pid != pid:  # req_pid is a synonym, just show the synonym
+            images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
+        else:               # req_pid is accepted species, show the accepted photos and all of its synonyms photos
+            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
         if species.type == 'species':
             accepted = species.accepted
         else:
@@ -164,6 +169,10 @@ def information(request, pid=None):
                 img = x.aid.get_best_img()
                 if img:
                     x.img = img.image_file
+    if req_species.status == 'synonym':
+        # if request pid is a synopnym, return the synonym instance
+        species = req_species
+
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'title': 'information', 'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
