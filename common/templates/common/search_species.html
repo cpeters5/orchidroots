@@ -31,10 +31,14 @@
                             <tr>
                                 <td>&nbsp;&nbsp;</td>
                                 <td>
-                                    {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}<a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
-                                    {% else %}<a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}
+                                        <a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% else %}
+                                        <a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
                                     {% endif %}
-                                    ({{genus.0.family}})
+                                    {% if genus.0.family != family.family %}
+                                        (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}">Search {{genus.0.family}} family</a>)
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
