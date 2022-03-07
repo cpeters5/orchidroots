@@ -950,9 +950,9 @@ def progenyimg(request, pid=None):
             y.name = offspring.pid.namecasual()
             y.pct = x.pct
             y.image_dir = y.image_dir()
-            y.image_file = y.image_file
-            y.author = y.author
-            y.source_url = y.source_url
+            # y.image_file = y.image_file
+            # y.author = y.author
+            # y.source_url = y.source_url
             if offspring.pollen_id:
                 y.pollen = offspring.pollen_id.pid
                 y.pollen_name = offspring.pollen_id.namecasual()
