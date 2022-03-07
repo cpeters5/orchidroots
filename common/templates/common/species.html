@@ -60,13 +60,16 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        {{species.binomial_it|safe}} (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
-                                                            <i>{{species.getAccepted.binomial_it|safe}}</i></a> {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %})
+                                                        <a href="/display/{{path}}/{{species.getAcc}}/?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
+                                                        (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
+                                                            <i>{{species.getAccepted.binomial_it|safe}}</i></a>
+                                                        {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %})
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a> {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
+                                                    <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a>
+                                                    {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}} {{species.year|default:""}}
                                             </td>

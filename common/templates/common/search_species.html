@@ -36,8 +36,12 @@
                                     {% else %}
                                         <a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {{genus.0.year|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
                                     {% endif %}
-                                    {% if genus.0.family != family.family %}
-                                        (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}">Search {{genus.0.family}} family</a>)
+                                    {% if genus.0.family == 'Orchidaceae' or genus.0.family == 'Bromeliaceae' or genus.0.family == 'Cactaceae' %}
+                                        {% if genus.0.family != family %}
+                                            (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{genus.0.family}}">Search {{genus.0.family}} family</a>)
+                                        {% endif %}
+                                    {% elif app != 'other' %}
+                                            (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app=other">Search {{genus.0.family}} family</a>)
                                     {% endif %}
                                 </td>
                             </tr>
@@ -70,13 +74,7 @@
                         {% for x in perfect_list %}
                         <tr>
                             <td>
-                                {% if x.status == 'synonym' and x.type == 'species' %}
-                                    <i>{{ x.binomial }}</i>
-                                {% elif x.status == 'synonym' %}
-                                    {{ x.binomial }}
-                                {% else %}
                                     <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
-                                {% endif %}
                                 {{x.author|default:''}}
                                 ({{x.gen.family}})
                                 {% if x.status == 'synonym' %}

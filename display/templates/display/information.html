@@ -508,7 +508,7 @@ seedparent, pollparent {
                                 {% if synonym_list.count > 0 %}
                                     <ul style="list-style-type:none; padding: 0 2px; margin-bottom: 10px;">
                                     {% for synonym in synonym_list %}
-                                        <li>{{ synonym.spid.name|safe }}<i> {{ synonym.spid.author }}</i> {{synonym.spid.year|default:''}}
+                                        <li><a href="/display/information/{{synonym.spid.pid}}/?family={{species.gen.family}}">{{ synonym.spid.name|safe }}</a><i> {{ synonym.spid.author }}</i> {{synonym.spid.year|default:''}}
                                     {% endfor %}
                                     </ul>
                                 {% else %}
