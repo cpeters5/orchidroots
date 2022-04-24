@@ -2427,7 +2427,8 @@ def deletephoto(request, orid, pid):
     elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
         # Requested from all upload photos
         url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
-    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+    url = "%s?role=%s&family=%s" % (reverse('display:curate_newupload'), role, family)
+    # url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
 
     # Finally remove file if exist
     if os.path.isfile(filename):
