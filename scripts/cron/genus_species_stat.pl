@@ -204,7 +204,7 @@ sub getPID {
 			}
 		}
         else {
-            print "What type is this $row[0]\t$row[1]\t$row[2]\n";
+            print "What type is this: pid $row[0]\ttype: $row[1]\tgen: $row[2]\n";
         }
 		$prevgen = $row[2];
 	}
