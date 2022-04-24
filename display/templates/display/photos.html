@@ -281,8 +281,8 @@ a:hover {
                                         <br>{{image.get_displayname }}
                                     {% endif %}
                                 {% endif %}
-                                {% if role == 'pri' and image.rank == 0 %}
-                                    (private <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>)
+                                {% if role == 'pri' %}
+                                    <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>
                                 {% endif %}
                             </div>
                         </div>
