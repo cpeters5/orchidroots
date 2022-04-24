@@ -60,7 +60,7 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/display/{{path}}/{{species.getAcc}}/?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
+                                                        <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
                                                         (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
                                                             <i>{{species.getAccepted.binomial_it|safe}}</i></a>
                                                         {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %})
