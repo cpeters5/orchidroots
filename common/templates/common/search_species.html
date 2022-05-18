@@ -56,7 +56,7 @@
                             {% for species in match_spc_list %}
                             <tr>
                                 <td>&nbsp;&nbsp;</td>
-                                <td><a href="/common/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}"><i>{{species.0.genus}}{%if species.o.type == 'species' %}} {{species.0.species}}</i>{% else %}</i> {{species.0.species}}{% endif %}
+                                <td><a href="/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}"><i>{{species.0.genus}}{%if species.o.type == 'species' %}} {{species.0.species}}</i>{% else %}</i> {{species.0.species}}{% endif %}
                                 </a> {{species.0.author|default:''}} {{species.0.year|default:''}} {% if species.0.status == 'synonym' %}(syn.){% endif %}
                                     ({{species.0.family}})
                                 </td>
