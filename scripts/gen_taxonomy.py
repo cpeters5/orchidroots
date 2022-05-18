@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import urllib
 import pymysql
+import mysql.connector
+
 from urllib.request import urlopen
 
 conn = pymysql.connect(host='134.209.46.210', port=3306, user='chariya', passwd='Imh#r3r3', db='bluenanta')
