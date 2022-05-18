@@ -383,6 +383,7 @@ class Accepted(models.Model):
     infraspr = models.CharField(max_length=20, null=True)
     infraspe = models.CharField(max_length=50, null=True)
     distribution = models.TextField(blank=True)
+    introduced = models.TextField(blank=True)
     is_type = models.BooleanField(null=True, default=False)
     physiology = models.CharField(max_length=200, null=True, blank=True)
     url = models.CharField(max_length=200, null=True, blank=True)
