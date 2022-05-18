@@ -30,7 +30,7 @@
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' species.pid %}?role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                         {{form.author|as_crispy_field}}
-                        {{form.originator|as_crispy_field}}
+                        {{form.credit_to|as_crispy_field}}
 
         <!--                <hr  class="my-4">-->
                         <div class="form-row">

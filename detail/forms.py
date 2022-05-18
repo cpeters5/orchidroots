@@ -346,7 +346,7 @@ class UploadFileForm(forms.ModelForm):
         # role = forms.CharField(required=True)
     class Meta:
         model = UploadFile
-        fields = ('image_file_path','author','source_url','name','awards','variation','forma','originator','description','text_data','location','image_file',)
+        fields = ('image_file_path','author','source_url','name','awards','variation','forma','credit_to','description','text_data','location','image_file',)
 
         labels = {
             'author':"Your credit attribution name",
@@ -356,7 +356,7 @@ class UploadFileForm(forms.ModelForm):
             'awards':'Awards',
             'variation':'Varieties',
             'forma':'Form',
-            'originator':'If author is not in the list, enter a name to be used for credit attribution here',
+            'credit_to':'If author is not in the list, enter a name to be used for credit attribution here',
             'description':'Tags. Comma separated keywords to help in searching',
             'text_data':'Comment',
             'location':'Location',
@@ -368,7 +368,7 @@ class UploadFileForm(forms.ModelForm):
             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
-            'originator': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
+            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px',}),
             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
@@ -378,7 +378,7 @@ class UploadFileForm(forms.ModelForm):
         #     'awards': 'Awards received, comma separated',
         #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
         #     'forma': 'E.g. color forms, peloric, region...',
-        #     'originator': 'e.g. hybridizer, cultivator, vender',
+        #     'credit_to': 'e.g. hybridizer, cultivator, vender',
         #     'description': 'Comma separated terms used for search',
         #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
         #     'location': 'Geolocation where this plant was originated from',
