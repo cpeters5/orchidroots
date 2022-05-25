@@ -97,7 +97,7 @@ plumber==1.6
 pycparser==2.20
 Pygments==2.7.4
 pyguetzli==1.0.8
-PyJWT==1.7.1
+PyJWT==2.4.0
 PyMySQL==0.9.3
 pyOpenSSL==19.1.0
 pypi==2.1
