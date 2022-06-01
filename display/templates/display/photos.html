@@ -263,7 +263,7 @@ a:hover {
                                     {{image.get_displayname}}
                                     <br>{{image.text_data|default:''|safe}} </small></h6>">
                                 <div class="box">
-                                        <img class="thumbnails" alt="{{image.pid.pid.textname}}" src={% if image.image_file %}"{% static image.image_dir %}{{image.image_file}}"{% else %}"{{image.image_url}}"{% endif %}>
+                                        <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% if image.image_file %}{% static image.image_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                         <div class="text text-br">{{image.id}}</div>
                                 </div>
                             </a>
