@@ -7,6 +7,10 @@ from .models import User, Profile
 from .forms import UserAdminCreationForm, UserAdminChangeForm
 from .models import User, Profile, Photographer
 
+# Disable admin nav_sidebar which is messed up after update to django 3.2.3
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
+
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserAdminChangeForm
@@ -36,16 +40,16 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-# class ProfileAdmin(BaseUserAdmin):
-#     search_fields = ('fullname','user','photo_credit','specialty',)
-#     list_display = ('fullname', 'user', 'photo_credit','specialty','country')
+class ProfileAdmin(BaseUserAdmin):
+    search_fields = ('fullname','user','photo_credit','specialty',)
+    list_display = ('fullname', 'user', 'photo_credit','specialty','country')
 
 
 class PhotographerAdmin(admin.ModelAdmin):
     pass
     list_display = ('author_id','fullname','user_id','displayname','expertise')
     list_filter = ('expertise',)
-    fields = ['author_id',('fullname','displayname'),('affiliation','status'),'url']
+    fields = [('fullname','displayname', 'author_id','affiliation','status','url')]
     ordering = ['fullname']
     search_fields = ['author_id','fullname']
 

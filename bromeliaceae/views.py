@@ -31,7 +31,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, is_int, getRole, get_author
+from utils.views import write_output, is_int, getRole
 # import pytz
 # MPTT stuff
 # from django.views.generic.list_detail import object_list

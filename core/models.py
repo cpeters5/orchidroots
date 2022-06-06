@@ -35,6 +35,7 @@ class Taxonomy(models.Model):
     def __str__(self):
         return self.taxon
 
+
 class Taxonomy1(models.Model):
     class Meta:
         unique_together = (("taxon", "parent_name"),)
@@ -47,6 +48,7 @@ class Taxonomy1(models.Model):
     def __str__(self):
         return self.taxon
 
+
 class Family(models.Model):
     family = models.CharField(primary_key=True, default='', db_column='family', max_length=50)
     orig_pid = models.CharField(max_length=20, null=True)
@@ -54,7 +56,7 @@ class Family(models.Model):
     year = models.IntegerField(null=True)
     application = models.CharField(max_length=50, default='', null=True, blank=True)
     common_name = models.CharField(max_length=200, null=True, blank=True)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     order = models.CharField(max_length=20, null=True)
     kingdom = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
@@ -71,11 +73,11 @@ class Family(models.Model):
 
 
 class Subfamily(models.Model):
-    family = models.ForeignKey(Family, default='', db_column='family', on_delete=models.DO_NOTHING)
+    family = models.ForeignKey(Family, null=True, blank=True, db_column='family', on_delete=models.DO_NOTHING)
     subfamily = models.CharField(primary_key=True, max_length=50, default='', db_column='subfamily')
-    author = models.CharField(max_length=200, blank=True, default = '')
-    year = models.IntegerField(null=True)
-    description = models.TextField(null=True)
+    author = models.CharField(max_length=200, blank=True, default='')
+    year = models.IntegerField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     num_genus   = models.IntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
@@ -91,10 +93,10 @@ class Tribe(models.Model):
     family = models.ForeignKey(Family, default='', db_column='family', on_delete=models.DO_NOTHING)
     tribe = models.CharField(primary_key=True, default='', db_column='tribe', max_length=50)
     author = models.CharField(max_length=200, blank=True)
-    year = models.IntegerField(null=True)
+    year = models.IntegerField(null=True, blank=True)
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', on_delete=models.DO_NOTHING)
-    status = models.CharField(max_length=50, null=True)
-    description = models.TextField(null=True)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     num_genus   = models.IntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
@@ -114,7 +116,7 @@ class Subtribe(models.Model):
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', on_delete=models.DO_NOTHING)
     tribe = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', on_delete=models.DO_NOTHING)
     status = models.CharField(max_length=50, null=True)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     num_genus   = models.IntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)

@@ -1,6 +1,61 @@
 from django.contrib import admin
-# from .core import (Family, Subfamily, Tribe, Subtribe, Country, Continent, Region, SubRegion, LocalRegion, GeoLocation,
+from .models import (Family, Subfamily, Tribe, Subtribe)
+# from .models import (Country, Continent, Region, SubRegion, LocalRegion, GeoLocation,
 #                    GeoLoc, Subgenus, Section, Subsection, Series)
+
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
+
+class SubfamilyInline(admin.TabularInline):
+    model = Subfamily
+
+class FamilyAdmin(admin.ModelAdmin):
+    pass
+    list_display = ('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'order', 'orig_pid',)
+    fields = [('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'order', 'orig_pid', 'description',)]
+    ordering = ['family']
+    search_fields = ['family','kingdom', 'order']
+    # inlines = [SubfamilyInline]
+
+
+# class TribeInline(admin.TabularInline):
+#     model = Tribe
+#     exclude = ['num_genus', 'description', 'status']
+
+class SubfamilyAdmin(admin.ModelAdmin):
+    pass
+    list_display = ('subfamily', 'family', 'author','year',)
+    list_filter = ('family',)
+    fields = [('subfamily', 'family', 'author','year','description',)]
+    ordering = ['subfamily']
+    search_fields = ['subfamily', 'family__family']
+    # inlines = [TribeInline]
+
+
+# class SubtribeInline(admin.TabularInline):
+#     model = Subtribe
+
+
+class TribeAdmin(admin.ModelAdmin):
+    pass
+    list_display = ('tribe', 'subfamily', 'family', 'author','year',)
+    list_filter = ('family', 'subfamily')
+    fields = [('tribe', 'family', 'subfamily', 'author','year','description',)]
+    ordering = ['family', 'subfamily', 'tribe']
+    search_fields = ['family__family', 'subfamily__subfamily', 'tribe']
+    # inlines = [SubtribeInline]
+
+
+class SubtribeAdmin(admin.ModelAdmin):
+    pass
+    list_display = ('family', 'subfamily', 'tribe', 'subtribe', 'author','year',)
+    list_filter = ('family', 'subfamily', 'tribe', )
+    fields = [('family', 'subfamily', 'tribe', 'subtribe', 'author','year','description',)]
+    ordering = ['family', 'subfamily', 'tribe', 'subtribe']
+    search_fields = ['subtribe']
+
+
+
 # class SubgenusAdmin(admin.ModelAdmin):
 #     list_display = ('subgenus','genus','source','year')
     # list_filter = ('source')
@@ -14,10 +69,10 @@ from django.contrib import admin
     # )
 
 # Genera
-# admin.site.register(Family)
-# admin.site.register(Subfamily)
-# admin.site.register(Tribe)
-# admin.site.register(Subtribe)
+admin.site.register(Family, FamilyAdmin)
+admin.site.register(Subfamily, SubfamilyAdmin)
+admin.site.register(Tribe, TribeAdmin)
+admin.site.register(Subtribe, SubtribeAdmin)
 # admin.site.register(Subgenus,SubgenusAdmin)
 # admin.site.register(Section)
 # admin.site.register(Subsection)

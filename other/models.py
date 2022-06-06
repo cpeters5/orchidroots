@@ -26,35 +26,35 @@ QUALITY = (
 )
 
 STATUS_CHOICES = [('accepted', 'accepted'), ('registered', 'registered'), ('nonregistered', 'nonregistered'),
-                  ('unplaced', 'unplaced'), ('published', 'published'), ('trade', 'trade')]
+                  ('unplaced', 'unplaced'), ('published', 'published'), ('trade', 'trade'), ('synonym', 'synonym')]
 TYPE_CHOICES = [('species', 'species'), ('hybrid', 'hybrid')]
 
 
 class Genus(models.Model):
     pid = models.BigAutoField(primary_key=True)
-    orig_pid = models.CharField(max_length=20, null=True)
+    orig_pid = models.CharField(max_length=20, null=True, blank=True)
     is_hybrid = models.CharField(max_length=1, null=True)
     genus = models.CharField(max_length=50, default='', unique=True)
-    author = models.CharField(max_length=200, default='')
+    author = models.CharField(max_length=200, blank=True)
     citation = models.CharField(max_length=200, default='')
     cit_status = models.CharField(max_length=20, null=True)
-    family = models.ForeignKey(Family, null=True, db_column='family', related_name='otfamily', on_delete=models.DO_NOTHING)
-    subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', related_name='poolsubfamily', on_delete=models.DO_NOTHING)
-    tribe = models.ForeignKey(Tribe, null=True, default='', db_column='tribe', related_name='pooltribe', on_delete=models.DO_NOTHING)
-    subtribe = models.ForeignKey(Subtribe, null=True, default='', db_column='subtribe', related_name='poolsubtribe', on_delete=models.DO_NOTHING)
+    family = models.ForeignKey(Family, null=True, blank=True, db_column='family', related_name='otfamily', on_delete=models.DO_NOTHING)
+    subfamily = models.ForeignKey(Subfamily, null=True, blank=True, db_column='subfamily', related_name='poolsubfamily', on_delete=models.DO_NOTHING)
+    tribe = models.ForeignKey(Tribe, null=True, blank=True, db_column='tribe', related_name='pooltribe', on_delete=models.DO_NOTHING)
+    subtribe = models.ForeignKey(Subtribe, null=True, blank=True, db_column='subtribe', related_name='poolsubtribe', on_delete=models.DO_NOTHING)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_extinct = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
-    status = models.CharField(max_length=20, default='')
+    status = models.CharField(max_length=20, blank=True)
     type = models.CharField(max_length=20, default='')
     common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True)
     distribution = models.TextField(null=True)
     text_data = models.TextField(null=True)
-    source = models.CharField(max_length=50, default='')
-    abrev = models.CharField(max_length=50, default='')
-    year = models.IntegerField(null=True)
+    source = models.CharField(max_length=50, blank=True)
+    abrev = models.CharField(max_length=50, blank=True)
+    year = models.IntegerField(null=True, blank=True)
     num_species = models.IntegerField(null=True, default=0)
     num_species_synonym = models.IntegerField(null=True, default=0)
     num_species_total = models.IntegerField(null=True, default=0)
@@ -159,6 +159,9 @@ class GenusRelation(models.Model):
         x = self.parentlist.split('|')
         return x
 
+class TestSpecies(models.Model):
+    pid = models.BigAutoField(primary_key=True)
+    genus = models.CharField(max_length=50)
 
 class Species(models.Model):
     # enfoirce uniqueness when all records are filled.
@@ -166,14 +169,14 @@ class Species(models.Model):
     # class Meta:
     #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
-    orig_pid = models.CharField(max_length=20, null=True)
-    source = models.CharField(max_length=10)
-    genus = models.CharField(max_length=50)
+    orig_pid = models.CharField(max_length=20, null=True, blank=True)
+    source = models.CharField(max_length=10, blank=True)
+    genus = models.CharField(max_length=50, null=True, blank=True)
     is_hybrid = models.CharField(max_length=1, null=True)
-    species = models.CharField(max_length=50)
-    infraspr = models.CharField(max_length=20, null=True)
-    infraspe = models.CharField(max_length=50, null=True)
-    author = models.CharField(max_length=200)
+    species = models.CharField(max_length=50, null=True, blank=True)
+    infraspr = models.CharField(max_length=20, null=True, blank=True)
+    infraspe = models.CharField(max_length=50, null=True, blank=True)
+    author = models.CharField(max_length=200, blank=True)
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=500, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcotfamily', on_delete=models.DO_NOTHING)
@@ -185,7 +188,7 @@ class Species(models.Model):
     conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
-    year = models.IntegerField(null=True)
+    year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True)
     distribution = models.TextField(blank=True)
     physiology = models.CharField(max_length=200, blank=True)
@@ -633,8 +636,8 @@ class Synonym(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
-    def __str__(self):
-        return self.spid.name()
+    # def __str__(self):
+    #     return self.spid.name()
 
 
 class SpcImages(models.Model):
