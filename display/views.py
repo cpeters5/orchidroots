@@ -14,11 +14,11 @@ from itertools import chain
 import django.shortcuts
 from django.apps import apps
 from fuzzywuzzy import fuzz, process
-from utils.views import write_output, getRole, get_author, getModels, getmyphotos
+from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
-from accounts.models import User
+from accounts.models import User, Photographer
 
 epoch = 1740
 alpha_list = string.ascii_uppercase
@@ -193,7 +193,12 @@ def photos(request, pid=None):
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
         return HttpResponseRedirect(url)
 
-    author, author_list = get_author(request)
+    author = get_reqauthor(request)
+    if not author or author == 'anonymous':
+        author = None
+    if request.user.username == 'chariya':
+        print("1 author = " + str(author))
+    author_list = Photographer.objects.all().order_by('displayname')
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
         if pid:
@@ -213,7 +218,7 @@ def photos(request, pid=None):
 
     variety = ''
     tail = ''
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
+    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
     # Happened when a curator request an author photos
     # if role == 'cur':
     #     if author:
@@ -259,7 +264,9 @@ def photos(request, pid=None):
         public_list = public_list.order_by('-rank', 'quality', '?')
         if private_list:
             private_list = private_list.order_by('created_date')
-
+    if author:
+        public_list = public_list.filter(author=author)
+        private_list = private_list.filter(author=author)
     write_output(request, str(family))
     context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,

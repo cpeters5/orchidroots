@@ -31,7 +31,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, is_int, getRole
+from utils.views import write_output, is_int, getRole, get_reqauthor
 from common.views import getmyphotos
 
 # import pytz
@@ -749,7 +749,8 @@ def uploadfile(request, pid):
                 'Please delete one or more of your photos before uploading a new one.'
         return HttpResponse(message)
 
-    author, author_list = get_author(request)
+    author = get_reqauthor(request)
+    author_list = Photographer.objects.all().order_by('displayname')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -793,7 +794,6 @@ def get_author(request):
     if not request.user.is_authenticated or request.user.tier.tier < 2:
         return None, None
 
-    author_list = Photographer.objects.exclude(user_id__isnull=True).order_by('displayname')
     author = None
     if request.user.tier.tier > 2 and 'author' in request.GET:
         author = request.GET['author']
@@ -806,7 +806,7 @@ def get_author(request):
             author = Photographer.objects.get(user_id=request.user)
         except Photographer.DoesNotExist:
             author = Photographer.objects.get(author_id='anonymous')
-    return author, author_list
+    return author
 
 
 @login_required

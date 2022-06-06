@@ -76,6 +76,24 @@ def get_author(request):
     #         author = Photographer.objects.get(author_id='anonymous')
     return author, author_list
 
+def get_reqauthor(request):
+    author = None
+    if request.user.is_authenticated:
+        if request.user.tier.tier > 2:
+            if 'author' in request.GET:
+                author = request.GET['author']
+            if author == "---" or author == '':
+                author = None
+            if author is not None:
+                author = Photographer.objects.get(pk=author)
+        elif request.user.tier.tier > 1:
+            try:
+                author = Photographer.objects.get(user_id=request.user)
+            except Photographer.DoesNotExist:
+                author = None
+    return author
+
+
 
 def imgdir():
     imgdir = 'utils/images/'
@@ -261,20 +279,27 @@ def getModels(request, family=None):
     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
 
-def getmyphotos(author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role):
+def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role):
     # Get species and hybrid lists that the user has at least one photo
+    if request.user.username == 'chariya' and author:
+        print("2 author = " + str(author))
     myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
     myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
-
-    my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    if app == 'orchidaceae':
-        my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    else:
-        my_hyb_list = []
+    my_spc_list = []
+    my_hyb_list = []
+    my_upl_list = []
+    if request.user.username == 'chariya':
+        print("2.1 myspecies_list = " + str(len(myspecies_list)))
+    if author and author.author_id != '' and author is not None:
+        my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
+        my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+        if app == 'orchidaceae':
+            my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
     # list for dropdown select
-    myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
-    myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
+        myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
+        myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
+    if request.user.username == 'chariya':
+        print("2.2 myspecies_list = " + str(len(myspecies_list)))
 
     # Get list for display
     if species:
@@ -303,8 +328,8 @@ def getmyphotos(author, app, species, Species, Synonym, UploadFile, SpcImages, H
             upload_list = upload_list.filter(author=author) # Private photos
             private_list = private_list.filter(author=author) # Private photos
 
-        # Display all rank > 0 or rank = 0 if author matches
-        public_list  = public_list.filter(Q(rank__gt=0) | Q(author=author))
+        if not author or author == 'anonymous' :  # Display only rank > 0
+            public_list  = public_list.filter(rank__gt=0)
     else:
         private_list = public_list = upload_list = []
 
