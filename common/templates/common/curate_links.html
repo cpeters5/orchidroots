@@ -66,12 +66,12 @@
     {% if user.get_author == image.author and user.tier.tier <= 2 %}
         <a href='/{{app}}/uploadweb/{{species.pid}}/{{image.id}}/?role={{role}}&tab={{tab}}&family={{image.gen.family}}'>Update</a> |
         {% if image.rank == 0 %}
-            <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum&family={{image.gen.family}}" >Delete</a> |
+            <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum&family={{image.gen.family}}&next=photos" >Delete</a> |
         {% endif %}
     {% elif user.tier.tier > 2 %}
         <a href='/{{app}}/uploadweb/{{species.pid}}/{{image.id}}/?role={{role}}&tab={{tab}}&family={{image.gen.family}}'>Update</a> |
         {% if image.rank == 0 %}
-            <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum&family={{image.gen.family}}" >Delete</a> |
+            <a href="{% url 'common:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum&family={{image.gen.family}}&next=photos" >Delete</a> |
         {% endif %}
         <a href="/{{app}}/reidentify/{{image.id}}/{{species.pid}}/?role={{role}}&tab=sum&gen={{species.gen.pid}}&family={{image.gen.family}}">Reidentify</a>
     {% endif %}

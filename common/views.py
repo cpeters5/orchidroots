@@ -402,8 +402,7 @@ def uploadfile(request, pid):
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, species.gen.family)
+            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse('save failed')
@@ -2385,8 +2384,7 @@ def mypaginator(request, full_list, page_length, num_show):
 @login_required
 def deletephoto(request, orid, pid):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    spcall = Species.objects.all()
-
+    next = ''
 
     try:
         image = UploadFile.objects.get(pk=orid)
@@ -2419,6 +2417,8 @@ def deletephoto(request, orid, pid):
     area = ''
     if 'area' in request.GET:
         area = request.GET['area']
+    if 'next' in request.GET:
+        next = request.GET['next']
     role = getRole(request)
 
     if area == 'allpending':
@@ -2427,7 +2427,10 @@ def deletephoto(request, orid, pid):
     elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
         # Requested from all upload photos
         url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
-    url = "%s?role=%s&family=%s" % (reverse('display:curate_newupload'), role, family)
+    if next == 'photos':
+        url = "%s?role=%s&family=%s" % (reverse('display:photos'), role, family)
+    else:
+        url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
     # url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
 
     # Finally remove file if exist
