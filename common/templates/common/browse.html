@@ -448,7 +448,10 @@ img{
                                     <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                 </a>
                                 {% endif %}
-                                <div class="imgcaption">{{x.binomial|safe}}</div>
+                                <div class="imgcaption">
+                                    {{x.binomial|safe}}
+                                    {% if x.status == 'synonym' %}<br><span style="font-size:11px">(syn. {{x.getAccepted.binomial_it|safe}})</span>{% endif %}
+                                </div>
                                 {% endif %}
                             </div>
                         {% endfor %}

@@ -687,7 +687,7 @@ def browse(request):
         Species = apps.get_model(app.lower(), 'Species')
 
     pid_list = Species.objects.filter(type=type)
-    pid_list = pid_list.exclude(status='synonym')
+    # pid_list = pid_list.exclude(status='synonym')
 
     if subfamily:
         pid_list = pid_list.filter(gen__subfamily=subfamily)
