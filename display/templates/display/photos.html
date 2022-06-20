@@ -223,10 +223,6 @@ a:hover {
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
-                {% if app != 'orchidaceae' %}
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="/{{app}}/uploadweb/{{species.pid}}/?family={{family}}&role={{role}}&tab=web">Upload url</a>
-                    <a class="btn btn-xs mybtn btn-outline-primary" href="/common/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}&tab=loc">upload file</a>
-                {% endif %}
                 {% if role == 'cur' %}
                     <form class="" action="" id="author">
                         <input type="hidden" name="genus" value="{{genus}}" />
