@@ -392,7 +392,7 @@ class Accepted(models.Model):
     url = models.CharField(max_length=200, null=True, blank=True)
     url_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    common_name = models.CharField(max_length=200, null=True, blank=True)
+    common_name = models.CharField(max_length=500, null=True, blank=True)
     local_name = models.CharField(max_length=100, null=True, blank=True)
     bloom_month = models.CharField(max_length=200, null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)
