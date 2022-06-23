@@ -3,14 +3,10 @@
 {% include "base.html" %}
 {% block body %}
 
-<div style="min-height:200px;background-color:white;width: 100%;">
+<div style="min-height:200px;background-color:white;width: 90%; margin: 0 auto;">
    <div style="clear:both"></div>
-   <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col-2 d-none d-lg-block" style="padding:0">
-            {% include "common/taxonomy.html" %}
-        </div>
 <!--Main table       -->
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div style="text-align:left;font-size:13px;margin-top: 20px;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--            Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
@@ -40,16 +36,16 @@
                                 <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <th>Genus</th>
-                                        <th>Family Subfamily Tribe Subtribe</th>
+                                        <th class="d-none d-lg-table-cell hidden-xs">Family Subfamily Tribe Subtribe</th>
                                         <th>#images</th>
                                     </thead>
                                         {% for genus in genus_list %}
                                         <tr><td>
                                                 <a href="{% url 'common:species' %}?alpha={{alpha}}&talpha={{talpha}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
-                                                {{genus.author|default:""}} {{genus.year|default:""}}
+                                                {{genus.author|default:""}}
                                             </td>
 
-                                            <td>
+                                            <td class="d-none d-lg-table-cell hidden-xs">
                                                 {{genus.family}} {% if genus.subfamily %} {{genus.subfamily}} {% endif %} {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
                                             </td>
                                             <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
