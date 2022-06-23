@@ -29,21 +29,6 @@
 
 </style>
 <div style="width:100%;word-wrap: break-word;text-align:left;padding-left:5px;">
-    {% if not user.is_authenticated or user.tier.tier < 3 %}
-        {% if image.source_url %}
-            <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-        {% else %}
-            {{image.imgname|safe}}
-        {% endif %}
-        <br>
-    {% endif %}
-    Photo:
-    {% if image.source_url %}
-        <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
-    {% else %}
-        {{image.get_displayname}}
-    {% endif %}
-    <br>
     {% if user.tier.tier > 2 and role == 'cur' %}
     Rank:
         {% if image.rank == 0 %}<span style="color:red">0</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="private" href='?rank=0&role={{role}}&id={{image.id}}&family={{image.gen.family}}'>0</a>{% endif %} |
