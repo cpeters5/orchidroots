@@ -32,6 +32,8 @@ redirect_message = 'species does not exist'
 # page_length = 500
 
 def information(request, pid=None):
+    # As of June 2022, synonym will have its own display page
+    # NOTE: seed and pollen id must all be accepted.
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     ps_list = pp_list = ss_list = sp_list = ()
@@ -59,28 +61,34 @@ def information(request, pid=None):
     synonym_list = Synonym.objects.filter(acc=pid)
     pid = species.pid
     syn_list = ()
-    if species.status == 'synonym':
-        pid = species.getAcc()
-        species = Species.objects.get(pk=pid)
-    else:
-        # Get images of synonyms
-        syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+    accepted = {}
+    syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
 
     if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
         if req_pid != pid:  # req_pid is a synonym, just show the synonym
             images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
         else:
             images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
-        accepted = species.hybrid
+        if species.status != 'synonym':
+            accepted = species.hybrid
+        else:
+            accid = species.getAcc()
+            accepted = Species.objects.get(pk=accid).hybrid
     else:
         if req_pid != pid:  # req_pid is a synonym, just show the synonym
             images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
         else:               # req_pid is accepted species, show the accepted photos and all of its synonyms photos
             images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
-        if species.type == 'species':
-            accepted = species.accepted
+        accid = 0
+        if species.status == 'synonym':
+            accid = species.getAcc()
+            myspecies = Species.objects.get(pk=accid)
         else:
-            accepted = species.hybrid
+            myspecies = species
+        if myspecies.type == 'species':
+            accepted = myspecies.accepted
+        else:
+            accepted = myspecies.hybrid
 
     # Build display in main table
     if images_list:
@@ -113,9 +121,9 @@ def information(request, pid=None):
     pollen_list = Hybrid.objects.filter(pollen_id=species.pid)
     # Remove duplicates. i.e. if both parents are synonym.
     temp_list = pollen_list
-    for x in temp_list:
-        if x.seed_status() == 'syn' and x.pollen_status() == 'syn':
-            pollen_list = pollen_list.exclude(pid=x.pid_id)
+    # for x in temp_list:
+    #     if x.seed_status() == 'syn' and x.pollen_status() == 'syn':
+    #         pollen_list = pollen_list.exclude(pid=x.pid_id)
     pollen_list = pollen_list.order_by('seed_genus', 'seed_species')
     offspring_list = chain(list(seed_list), list(pollen_list))
     offspring_count = len(seed_list) + len(pollen_list)
@@ -265,7 +273,6 @@ def photos(request, pid=None):
         if private_list:
             private_list = private_list.order_by('created_date')
     if author:
-        public_list = public_list.filter(author=author)
         private_list = private_list.filter(author=author)
     write_output(request, str(family))
     context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
