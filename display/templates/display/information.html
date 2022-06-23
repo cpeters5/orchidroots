@@ -530,11 +530,13 @@ seedparent, pollparent {
                                         {% for off in offspring_list %}
                                          <tr >
                                              <td class="border-lb" style="text-align: left">
-                                                 <a href="{% url 'display:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
+                                                 {% if off.pid %}<a href="{% url 'display:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
                                                  <span style="font-zize:11px">
                                                      {{off.pid.name |safe}}
                                                      {% if off.pid.num_image > 0 %} *{% endif %}
                                                  </span>
+                                                 {% else %}{{off.pid.pid}}
+                                                 {% endif %}
                                                  </a> </td>
                                              <td class="border-rb" style="text-align: left;">
                                                  {% if off.seed_id %}
@@ -577,8 +579,9 @@ seedparent, pollparent {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
+                                    {{image.pid.name|safe}}<br>
                                     {% if image.source_url %}
-                                        &#169; <a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}}</a>
+                                        Photo: <a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}}</a>
                                     {% else %}
                                         {{image.get_displayname}}
                                     {% endif %}
