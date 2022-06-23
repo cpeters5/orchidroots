@@ -562,18 +562,6 @@ class Hybrid(models.Model):
             return name
         return None
 
-    def seed_status(self):
-        if self.seed_id:
-            if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
-                return 'syn'
-        return None
-
-    def pollen_status(self):
-        if self.pollen_id:
-            if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
-                return 'syn'
-        return None
-
     def hybrid_type(self):
         if self.is_hybrid:
             return 'natural'
