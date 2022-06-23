@@ -11,7 +11,10 @@ urlpatterns = [
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),
+    path('commonname/', views.commonname, name='commonname'),
+    path('distribution/', views.distribution, name='distribution'),
     path('browse/', views.browse, name='browse'),
+    path('taxonomy/', views.taxonomy, name='taxonomy'),
 
     # Redirect to display
     path('information/', display_information, name='information'),
@@ -27,6 +30,7 @@ urlpatterns = [
     path('search_fuzzy/', views.search_fuzzy, name='search_fuzzy'),
     path('search_match/', views.search_match, name='search_match'),
     path('search/', views.search, name='search'),
+    path('research/', views.research, name='research'),
 
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),
     path('deletewebphoto/<int:pid>/', views.deletewebphoto, name='deletewebphoto'),

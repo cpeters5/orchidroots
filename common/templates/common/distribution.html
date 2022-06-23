@@ -1,0 +1,157 @@
+{% load static %}
+{% load testtags %}
+{% include "base.html" %}
+{% block body %}
+<style>
+    .alphalist {
+    font-size:11px;
+    padding:2px 6px;
+    margin-top: 5px;
+    margin-block-end: 2px;
+    }
+    .alphalist a{
+        padding:2px 6px;
+        margin: 0;
+    }
+    .alphalist a.hover {
+        background-color: #f5f9f9;
+    }
+
+    .alphalist a.active {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .alphalist ul {
+        margin: 0;
+        padding: 0 !important;
+        list-style-type: none;
+        list-style-image: none;
+    }
+
+    .alphalist li
+    {
+        float: left;
+        display:inline-block;
+        margin: 1px 1px 0 0;
+        width: 20px;
+        /*margin: 20px 0;*/
+    }
+    .thisthumbnails {
+       object-fit: cover;
+       overflow: hidden;
+       height: 50px !important;
+       width : 50px !important;
+       padding:2px;
+        margin:5px auto;
+}
+</style>
+
+
+<div style="min-height:200px;background-color:white;width: 100%;">
+   <div style="clear:both"></div>
+   <div class="row" style="width:98%; margin:0 auto;">
+        <div class="col" style="text-align:left;margin-top:25px;">
+<!--            If family is requested, then populate right section with genus list-->
+<!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
+                <div class="card m-1">
+                    <div class="card-header border">
+                        <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
+                            {{distribution|title}} Native Species &nbsp;&nbsp;
+                            <form action="{% url 'common:distribution' %}" id=otcname autocomplete="off">
+                                <input type="hidden" form="otcname" name="role" value="{{ role }}" />
+                                <input type="hidden" form="otcname" name="family" value="other" />
+                                <input name="distribution" class="custom-select" placeholder="Select other country or state" style="text-align:center">
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
+                        {% if species_list %}
+<div style="clear:left">
+                        <div style="width:100%">
+                            <ul class="alphalist text-n" style="display:inline-block !important">
+                            <!--Alphabetical-->
+                                {% for opt in alpha_list %}
+                                    {% if talpha == opt %}
+                                        <li class="page-item active"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&distribution={{distribution}}" >{{opt}}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not talpha or talpha == "ALL" %}
+                                <li class="page-item active" style="width: 40px;"><a class="page-link" href="#">All </a></li>
+                                        {% else %}
+                                <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&distribution={{distribution}}">All </a></li>
+                                        {% endif %}
+                            </ul>
+                        </div>
+</div>
+
+
+
+                            <!--main table-->
+                                <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="spc_column">Species</th>
+<!--                                            <th>Higher taxonomic levels</th>-->
+                                            <th style="min-width:100px"></th>
+                                            <th class="d-none d-lg-table-cell hidden-xs">Distribution</th>
+                                        </tr>
+                                    </thead>
+                                        {% for species in species_list %}
+                                        <tr>
+                                            <td><a href="/display/photos/{{species.pid.pid}}/?family={{species.pid.gen.family}}"><i>{{species.pid.name|safe}}</i></a> ({{species.pid.gen.family}}) </td>
+                                            <td><img style="object-fit: cover; overflow: hidden; height: 100px; width: 100px;" alt="" src="{% static species.pid.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                            <td class="d-none d-lg-table-cell hidden-xs"> {{species.distribution}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                </table>
+                        {% else %}
+                            None!
+                        {% endif %}
+
+                    </div>
+                </div>
+        </div>
+   </div>
+</div>
+<br>
+<br>
+
+<script>
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 20,
+        "pagingType": "full",
+
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter species list'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
+});
+</script>
+
+
+{% endblock %}
