@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
@@ -420,6 +421,16 @@ class Accepted(models.Model):
     def __str__(self):
         return self.pid.name()
 
+    def get_best_img(self):
+        spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
+        print("spid list = " + str(len(spid_list)))
+        img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+                'quality', '-rank', '?')
+        if len(img) > 0:
+            img = img[0:1][0]
+            return img
+        return None
+
 
 class Hybrid(models.Model):
     pid = models.OneToOneField(
@@ -521,18 +532,6 @@ class Hybrid(models.Model):
             if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
                 name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
             return name
-        return None
-
-    def seed_status(self):
-        if self.seed_id:
-            if self.seed_id and self.seed_id.textname() != self.seed_genus + ' ' + self.seed_species:
-                return 'syn'
-        return None
-
-    def pollen_status(self):
-        if self.pollen_id:
-            if self.pollen_id and self.pollen_id.textname() != self.pollen_genus + ' ' + self.pollen_species:
-                return 'syn'
         return None
 
     def hybrid_type(self):
