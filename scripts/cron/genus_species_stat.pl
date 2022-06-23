@@ -22,7 +22,7 @@ my ($sth, $sth1);
 my @apps = (
 	'bromeliaceae',
 	'cactaceae',
-	'orchidaceae',
+	# 'orchidaceae',  # Processed in Orchidaceae domain
 	'other'
 );
 my $date = strftime "%Y-%m-%d:%H:%M-%S", localtime;
@@ -56,8 +56,9 @@ foreach my $app (@apps) {
 	print "$app - Processing species\n" if $debug;
 	procSpecies($app);
 
-	print "$app - process synonym pid\n" if $debug;
-	processSynonym($app);
+	# Synonyms now have its own detailed view
+	# print "$app - process synonym pid\n" if $debug;
+	# processSynonym($app);
 }
 print "Process Family\n" if $debug;
 getFamImage();
@@ -156,6 +157,7 @@ sub procSpecies {
 
 
 sub processSynonym {
+	# Set num image for each synonym = num inage of its accepted species
 	my $app = shift;
 	my $i = 0;
 
@@ -223,6 +225,7 @@ sub getPID {
 
 
 sub getSynonymPid {
+	# Set num image for synonym to be the same as its accepted species
 	my $app = shift;
 	foreach (keys %num_image) {
 		$stmt = "select spid, acc_id from " . $app . "_synonym where acc_id = $_ ";
