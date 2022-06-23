@@ -283,8 +283,8 @@ def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, Spc
     # Get species and hybrid lists that the user has at least one photo
     if request.user.username == 'chariya' and author:
         print("2 author = " + str(author))
-    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
-    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+    myspecies_list = Species.objects.filter(type='species')
+    myhybrid_list = Species.objects.filter(type='hybrid')
     my_spc_list = []
     my_hyb_list = []
     my_upl_list = []
@@ -306,12 +306,7 @@ def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, Spc
         req_pid = species.pid
         pid = species.pid
         syn_list = ()
-        if species.status == 'synonym':
-            pid = species.getAcc()
-            species = Species.objects.get(pk=pid)
-        else:
-            # Get images of synonyms
-            syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+        syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
         if app == 'orchidaceae' and species.type == 'hybrid':
             if req_pid != pid:      # input pid is a synonym, just get images of the requested synonym
                 public_list = HybImages.objects.filter(pid=req_pid)  # public photos
