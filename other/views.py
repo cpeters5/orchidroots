@@ -547,10 +547,11 @@ def uploadweb(request, pid, orid=None):
     family = species.gen.family
     app = family.application
 
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
+    # We now allow synonym view
+    # if species.status == 'synonym':
+    #     synonym = Synonym.objects.get(pk=pid)
+    #     pid = synonym.acc_id
+    #     species = Species.objects.get(pk=pid)
 
     role = getRole(request)
 
