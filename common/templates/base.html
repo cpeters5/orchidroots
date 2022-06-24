@@ -687,10 +687,10 @@ nav .search-container button:hover {
             <a class="btn btn-info fambtn {% if family.application == 'other' or app == 'other' %}active1{% endif %}" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
         {% else %}
         <!--     Deactivated for pages pages with no family info    -->
-            <button class="btn btn-info fambtn">Bromeliads</button>
-            <button class="btn btn-info fambtn">Cactus</button>
-            <button class="btn btn-info fambtn">Orchids</button>
-            <button class="btn btn-info fambtn">Others</button>
+            <a class="btn btn-info fambtn" href="#">Bromeliads</a>
+            <a class="btn btn-info fambtn" href="#">Cactus</a>
+            <a class="btn btn-info fambtn" href="#">Orchids</a>
+            <a class="btn btn-info fambtn" href="#">Others</a>
         {% endif %}
             &nbsp;&nbsp;<a class="btn btn-info fambtn {% if title == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
         <!--        <input type="button" value="Click here" style="float: right;">-->
