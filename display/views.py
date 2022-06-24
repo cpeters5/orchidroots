@@ -34,9 +34,10 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
-    # role = getRole(request)
-    # Information is strictly public role
-    role = 'pub'
+    role = getRole(request)
+    # Information request role must be either cur or pub.
+    if not role or role != 'cur':
+        role = 'pub'
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     ps_list = pp_list = ss_list = sp_list = ()
     if 'newfamily' in request.GET:
@@ -198,6 +199,10 @@ def information(request, pid=None):
 def photos(request, pid=None):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     role = getRole(request)
+    # For photos view request role must be either cur or pub.
+    # if not role or role != 'cur':
+    #     role = 'pub'
+
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
@@ -221,14 +226,12 @@ def photos(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
-
-    if role == 'pri':
-        url = "%s?role=%s&family=%s" % (reverse('common:myphoto', args=(species.pid,)), role, family)
-        return HttpResponseRedirect(url)
-
     variety = ''
     tail = ''
     private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
+    # if role != 'cur':
+    #     private_list = {}
+
     # Happened when a curator request an author photos
     # if role == 'cur':
     #     if author:
@@ -274,7 +277,7 @@ def photos(request, pid=None):
         public_list = public_list.order_by('-rank', 'quality', '?')
         if private_list:
             private_list = private_list.order_by('created_date')
-    if author:
+    if private_list and author:
         private_list = private_list.filter(author=author)
     write_output(request, str(family))
     context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,

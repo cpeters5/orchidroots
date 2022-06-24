@@ -19,6 +19,7 @@
     display:inline-block;
     margin:2px;
     width : 17vw;
+    height: 20vw;
     background-color: #f7f7f7;
     border:1px solid lightgrey;
     text-align:center;
@@ -37,7 +38,7 @@
     display: inline-block;
     text-align: center;
     color: white;
-    margin: 5px auto;
+    margin: 0 auto;
     width:100%;
 }
         /*Display square image*/
@@ -83,12 +84,14 @@ div.text-bl a {
     color: #2fffff;
 }
 
-
+.mybtn {
+    font-size: 12px;
+}
 
 @media only screen and (max-width: 800px){
    .imageitem {
-        width: 30vw;
-        /*height : 250px;*/
+        width: 28vw;
+        height: 40vw;
     }
   .imageitem-tiny {
         width: 18vw;
@@ -98,7 +101,7 @@ div.text-bl a {
         font-size: 10px;
     }
    .box {
-        width: 35vw;
+        width: 27vw;
         font-size: 10px;
         /*margin-left:-3px;*/
        margin: 0 auto;
@@ -112,18 +115,20 @@ div.text-bl a {
     }
 }
 
-@media only screen and (max-width: 600px){
+@media only screen and (max-width: 500px){
     .imageitem {
         width: 36vw;
+        height: 38vw;
     }
     .box {
-        width: 35vw;
+        width: 28vw;
+        height: 28vw;
         font-size: 10px;
         margin-left:-3px;
     }
     .thumbnails {
-       height: 110px !important;
-       width : 95% !important;
+       height: 24vw !important;
+       width: 20vw;
     }
     .imageitem-tiny {
         width: 19vw;
@@ -151,6 +156,10 @@ div.text-bl a {
     }
     div.text {
         font-size: 10px;
+    }
+
+    .mybtn {
+        font-size: 11px !important;
     }
 }
 
@@ -253,23 +262,22 @@ a:hover {
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
                 {% for image in public_list %}
                     <div class="imageitem">
+                        <div class="box">
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     <br>{{image.text_data|default:''|safe}}">
-                                <div class="box">
                                         <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% if image.image_file %}{% static image.image_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                         <div class="text text-br">{{image.id}}</div>
-                                </div>
                             </a>
+                        </div>
                         <div class="imgcaption">
                             <div style="width:100%;word-wrap: break-word;">
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-                                        <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
+                                        - <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
                                     {% else %}
-                                        {{image.imgname|safe}}
-                                        <br>{{image.get_displayname }}
+                                        {{image.imgname|safe}} - {{image.get_displayname }}
                                     {% endif %}
                                 {% if role == 'cur' %}
                                     {% include 'common/curate_links.html' %}
@@ -297,69 +305,74 @@ a:hover {
                             </div>
                             <br>
                         {% else %}
-                            <a href="#">
-                            <dev class="box">
-                                <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
-                                <div class="text text-br">{{image.id}}</div>
-                            </dev>
-                            </a>
+                            <div class="box">
+                                <a href="#">
+                                    <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
+                                    <div class="text text-br">{{image.id}} {{image.imgname|safe}} - {{image.get_displayname }}
+                                    </div>
+                                </a>
+                            </div>
                         {% endif %}
                         <div class="imgcaption">
                             {% include 'common/curate_links.html' %}
                         </div>
                     </div>
+                                {% if role == 'pri' %}
+                                    <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{species.gen.family}}&id={{image.id}}&role={{role}}&next=photos" >Delete</a>
+                                {% endif %}
                     {% endif %}
                 {% endfor %}
 
-
-            {% for image in upload_list %}
-                {% if user.photographer.author_id == image.author.author_id %}
-                 <div class="imageitem p-1 justify-content-center align-items-center">
-                     {% if image.image_file_path %}
-                         <div class="box">
-                             <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
-                                  {{image.id}}: {{image.imgname}}
-                                  <br> {{image.get_displayname}}
-                                  <br>{{image.text_data|default:''|safe}}">
-                                  <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
-                                  <div class="text text-br">{{image.id}}</div>
-                             </a>
-                         </div>
-                     {% else %}
-                                    <div class="box">
-                                        <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">
-                                        <div class="text">{{image.id}}</div>
+                {% for image in upload_list %}
+                    {% if user.photographer.author_id == image.author.author_id %}
+                     <div class="imageitem">
+                         {% if image.image_file_path %}
+                             <div class="box">
+                                 <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                                      {{image.id}}: {{image.imgname}}
+                                      <br> {{image.get_displayname}}
+                                      <br>{{image.text_data|default:''|safe}}">
+                                      <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                      <div class="text text-br">{{image.id}}
+                                      </div>
+                                 </a>
+                                 </div>
+                         {% else %}
+                             <div class="box">
+                                 <a href="#">
+                                    <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid" style="width:100%;">
+                                    <div class="text text-br">{{image.id}}
                                     </div>
-<!--                        Requested file does not exist-->
-                     {% endif %}
-                     <div style="font-size:10px">
-                        <a href="{{image.source_url}}">{{image.get_displayname}}</a>
-<!--                            Private and curate role may delete photos-->
-                        {% if role == "cur" or role == "pri" %}
-                            <br>
-                            {% if image.approved %}
-                                <b>Approved</b>
-                            {% elif role == 'cur' %}
-                                <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                 </a>
+                             </div>
+    <!--                        Requested file does not exist-->
+                         {% endif %}
+                         <br>
+                         <div style="font-size:10px">
+                            <a href="{{image.source_url}}">{{image.get_displayname}}</a>
+    <!--                            Private and curate role may delete photos-->
+                            {% if role == "cur" or image.author.author_id == user.photographer.author_id %}
+                                {{image.author.displayname}}
+                             <br>
+                                {% if image.approved %}
+                                    <b>Approved</b>
+                                {% elif role == 'cur' %}
+                                    <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                {% endif %}
+                                <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
                             {% endif %}
-                            <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
-                        {% endif %}
+                         </div>
+
                      </div>
-
-                 </div>
-                {% endif %}
-            {% endfor %}
-
-
-
-
-
+                    {% endif %}
+                {% endfor %}
 
             {% else %}
                 <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
             {% endif %}
        </div>
     </div>
+
     {% if private_list and role == 'cur' %}
     <div class="p-2 border" style="margin-top:10px;background:white;">
         <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
@@ -395,7 +408,7 @@ a:hover {
     </div>
     {% endif %}
 
-    {% if upload_list or msg %}
+    {% if role == 'cur' and upload_list %}
     <div class="p-2 border" style="background:white; margin-top:10px;">
         <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
             <div class="font-weight-bold text-center text-info" ><h6> Uploaded Files</h6></div>
@@ -439,6 +452,11 @@ a:hover {
         </div>
     </div>
     {% endif %}
+
+    {% if msg %}
+        <h6>{{msg|default:''}}</h6>
+    {% endif %}
+
 </div>
 
 
