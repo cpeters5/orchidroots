@@ -34,7 +34,9 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
-    role = getRole(request)
+    # role = getRole(request)
+    # Information is strictly public role
+    role = 'pub'
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     ps_list = pp_list = ss_list = sp_list = ()
     if 'newfamily' in request.GET:

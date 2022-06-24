@@ -103,7 +103,7 @@
                                     </thead>
                                         {% for species in species_list %}
                                         <tr>
-                                            <td><a href="/display/photos/{{species.pid.pid}}/?family={{species.pid.gen.family}}"><i>{{species.pid.name|safe}}</i></a> ({{species.pid.gen.family}}) </td>
+                                            <td><a href="/display/photos/{{species.pid.pid}}/?family={{species.pid.gen.family}}&role={{role}}"><i>{{species.pid.name|safe}}</i></a> ({{species.pid.gen.family}}) </td>
                                             <td><img style="object-fit: cover; overflow: hidden; height: 100px; width: 100px;" alt="" src="{% static species.pid.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                                             <td class="d-none d-lg-table-cell hidden-xs"> {{species.distribution}}</td>
                                         </tr>

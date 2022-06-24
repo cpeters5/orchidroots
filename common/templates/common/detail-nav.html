@@ -29,7 +29,7 @@
     <div class="nav3">
         <ul class="nav nav-tabs navbar-expand-lg" >
             {% if species %}
-                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role={{role}}">Summary<br></a></li>
+                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role=pub">Summary<br></a></li>
                 <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}">Photos<br></a></li>
                 <li class="nav-item"><a class="nav-link {{sbs}}" href="/{{species.gen.family.application}}/compare/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>
                 <li class="nav-item dropdown">

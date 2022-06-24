@@ -51,7 +51,7 @@
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
                             Species with common name {{commonname}}
                         <form action="{% url 'common:commonname' %}" id=otcname autocomplete="off">
-                            <input type="hidden" form="otcname" name="role" value="{{ role }}" />
+                            <input type="hidden" form="otcname" name="role" value={{role}} />
                             <input type="hidden" form="otcname" name="family" value="other" />
                             <input name="commonname" class="custom-select" placeholder="other common name" style="text-align:center">
                         </form>
@@ -94,7 +94,7 @@
                                     </thead>
                                         {% for species in species_list %}
                                         <tr>
-                                            <td><a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.pid.name|safe}}</i></a></td>
+                                            <td><a href="/display/photos/{{species.pid.pid}}/?family={{species.pid.family}}&role={{role}}"><i>{{species.pid.name|safe}}</i></a></td>
                                             <td>{{species.common_name}}</td>
                                         </tr>
                                         {% endfor %}
