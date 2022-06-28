@@ -13,6 +13,7 @@ urlpatterns = [
     path('hybrid/', views.hybrid, name='hybrid'),
     path('commonname/', views.commonname, name='commonname'),
     path('distribution/', views.distribution, name='distribution'),
+    path('browsegen/', views.browsegen, name='browsegen'),
     path('browse/', views.browse, name='browse'),
     path('taxonomy/', views.taxonomy, name='taxonomy'),
 

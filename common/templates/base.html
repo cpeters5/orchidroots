@@ -30,6 +30,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
@@ -544,22 +545,25 @@ nav .search-container button {
 nav .search-container button:hover {
   background: #ccc;
 }
-.search-btn {
-    width: 150px !important;
-    height:40px !important;
-    font-size: 13px;
-}
-.search-btn1 {
-    width: 40px;
-    height:40px;
-    font-size: 12px;
-}
+/*.search-btn {*/
+/*    width: 150px !important;*/
+/*    height:40px !important;*/
+/*    font-size: 13px;*/
+/*}*/
+/*.search-btn1 {*/
+/*    width: 40px;*/
+/*    height:40px;*/
+/*    font-size: 12px;*/
+/*}*/
 .fambtn {
     /*font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;*/
     font-size:13px !important;
     display:inline;
     margin: 0 2px;
     border: 0;
+}
+.disabled-link {
+  pointer-events: none;
 }
 
 @media screen and (max-width: 600px) {
@@ -582,26 +586,25 @@ nav .search-container button:hover {
     font-size: 17px;
   }
 
-  .search-btn {
-     width: 100px !important;
-     height:30px !important;
-      font-size: 11px;
+  /*.search-btn {*/
+  /*   width: 100px !important;*/
+  /*   height:30px !important;*/
+  /*    font-size: 11px;*/
 
-  }
-    .search-btn1 {
-        width: 30px !important;
-        height:30px !important;
-        font-size: 11px;
-    }
+  /*}*/
+  /*  .search-btn1 {*/
+  /*      width: 30px !important;*/
+  /*      height:30px !important;*/
+  /*      font-size: 11px;*/
+  /*  }*/
     .fambtn {
         font-size: 10px;
-        padding: 6px;
+        padding: 4px !important;
     }
-
 }
 
 .active1 {
-    background-color: #394ad5;
+    background-color: #394ad5 !important;
 }
 </style>
 
@@ -681,18 +684,18 @@ nav .search-container button:hover {
 <div class="p-1" style="background-color:black; font-size: 11px;">
     <div class=" p-2">
         {% if family %}
-            <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="?newfamily=Bromeliaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliads</a>
-            <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="?newfamily=Cactaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
-            <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="?newfamily=Orchidaceae&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchids</a>
-            <a class="btn btn-info fambtn {% if family.application == 'other' or app == 'other' %}active1{% endif %}" href="?newfamily=&app=other&role={{cur}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %} {% if from_path == 'photos' or from_path == 'information' %}disabled-link{% endif %}" href="?newfamily=Bromeliaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliads</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %} {% if from_path == 'photos' or from_path == 'information' %}disabled-link{% endif %}" href="?newfamily=Cactaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
+            <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %} {% if from_path == 'photos' or from_path == 'information' %}disabled-link{% endif %}" href="?newfamily=Orchidaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchids</a>
+            <a class="btn btn-info fambtn {% if family.application == 'other' or app == 'other' %}active1{% endif %} {% if from_path == 'photos' or from_path == 'information' %}disabled-link{% endif %}" href="?newfamily=&app=other&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
         {% else %}
         <!--     Deactivated for pages pages with no family info    -->
-            <a class="btn btn-info fambtn" href="#">Bromeliads</a>
-            <a class="btn btn-info fambtn" href="#">Cactus</a>
-            <a class="btn btn-info fambtn" href="#">Orchids</a>
-            <a class="btn btn-info fambtn" href="#">Others</a>
+            <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Bromeliaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Bromeliads</a>
+            <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Cactaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Cactus</a>
+            <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Orchidaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Orchids</a>
+            <a class="btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="{{full_path}}?{% if spc_string %}spc_string={{spc_string}}{% endif %}&display=checked">Others</a>
         {% endif %}
-            &nbsp;&nbsp;<a class="btn btn-info fambtn {% if title == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
+            &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
         <!--        <input type="button" value="Click here" style="float: right;">-->
     </div>
 

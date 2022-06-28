@@ -1,11 +1,6 @@
 {% load static %}
 {% include "base.html" %}
 {% block body %}
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
 <style>
 .card {
     background-color: rgba(246, 244, 248, 0.99);
@@ -58,162 +53,186 @@
     border: 1px solid lightgrey;
 }
 
-    @media only screen and (max-width: 600px) {
-    }
-    .card-body {
-        font-size: 13px;
-        margin: 10px 5px;
-        text-align: center;
-    }
+@media only screen and (max-width: 600px) {
+
+}
+.card-body {
+    font-size: 13px;
+    margin: 10px 5px;
+    text-align: center;
+}
 form {
     display: inline-block; //Or display: inline;
 }
-      /*label {*/
-      /*  display: inline-block;*/
-      /*  width: 200px;*/
-      /*  text-align: right;*/
-      /*}*/
-      resformcontrol {
-          width: 100%;
+  /*label {*/
+  /*  display: inline-block;*/
+  /*  width: 200px;*/
+  /*  text-align: right;*/
+  /*}*/
+  resformcontrol {
+      width: 100%;
 
-      }
-      resinput {
-          width: 200px;
-          text-align:left;
-      }
+  }
+  resinput {
+      width: 210px;
+      text-align:left;
+  }
+.abtn {
+    width: 205px !important;
+    margin: auto;
+    height: 60px !important;
+    text-align:center;
+}
+.labelfor {
+    text-align:center;
 
+}
 </style>
+
+
 <div class="container-fluid" style="margin: 0 auto;width: 90%">
-        <br>
-        <a class="btn btn-xs p-2 m-2 custom-link border" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
-        <br>
-        <div class="card m-3 ">
+    <br>
+    {% if family == 'Bromeliaceae' %}
+        <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family=Bromeliaceae&role={{role}}" style="text-align:center"><h4>Bromeliaceae</h4></a>
             </div>
-            <div class="card-body">
-                <form class="form-inline" id="brsearch" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                   <div class="form-floating mb-3 mt-3">
+            <div class="card-body" style="margin: auto;">
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Bromeliaceae&display=checked">List Bromeliaceae genera</a>
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Bromeliaceae">Browse Bromeliaceae genera</a>
+                <br>
+                <form class="rescontrol" action="/common/search_species/" style="display:inline-block;">
+                   <div class="form-floating">
                     <input type="hidden" name="family" value="Bromeliaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
-                    <input class="form-control resinput m-2" id="brsc" form="brsearch" type="text" name="spc_string" placeholder="Search Bromeliads">
-                    <label for="brsc">&nbsp;Search Bromeliaceae</label>
+                    <input class="form-control resinput" id="brsc" type="text" name="spc_string" placeholder="Search Bromeliads" style="margin: 4px 0">
+                    <label class="labelfor" for="brsc">&nbsp;Keyword search Bromeliaceae</label>
                    </div>
                 </form>
-                <form class="rescontrol" action="{% url 'common:species' %}" id=brgenus autocomplete="off">
-                   <div class="form-floating mb-3 mt-3">
-                    <input type="hidden" form="brgenus" name="role" value="{{ role }}" />
-                    <input type="hidden" form="brgenus" name="family" value="Bromeliaceae" />
-                    <input class="form-control resinput m-2" id="brgen" form="brgenus" type="text" name="genus" placeholder="input a Bromeliad genus">
-                    <label for="brgen">&nbsp;List species of (enter a genus) </label>
+                <form class="rescontrol" action="{% url 'common:species' %}"  style="display:inline-block;">
+                   <div class="form-floating">
+                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Bromeliaceae" />
+                    <input class="form-control resinput" id="listsp" type="text" name="genus" placeholder="input a Bromeliad genus" style="margin: 4px 0">
+                    <label class="labelfor" for="listsp">&nbsp;Enter a genus to list species</label>
                    </div>
                 </form>
-            </div>
+
+             </div>
         </div>
 
-        <div class="card m-3 ">
+    {% elif family == 'Cactaceae' %}
+        <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family=Cactaceae&role={{role}}" style="text-align:center"><h4>Cactaceae</h4></a>
             </div>
-            <div class="card-body">
-                <form class="form-inline" id="casearch" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                   <div class="form-floating mb-1 mt-1">
+            <div class="card-body" style="margin: auto;">
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Cactaceae&display=checked" style="text-align:center">Browse Cactaceae genera</a>
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Cactaceae" style="text-align:center">List Cactaceae genera</a>
+                <br>
+                <form action="/common/search_species/" style="display:inline-block;">
+                   <div class="form-floating">
                     <input type="hidden" name="family" value="Cactaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
-                    <input class="form-control resinput m-2" id="casc" form="casearch" type="text" name="spc_string" placeholder="Search Cactaceae">
-                    <label for="casc">&nbsp;Search Cactaceae</label>
+                    <input class="form-control resinput" id="casc" type="text" name="spc_string" placeholder="Search Cactaceae" style="margin: 4px 0">
+                    <label for="casc">&nbsp;Keyword search Cactaceae</label>
                    </div>
                 </form>
                 <form action="{% url 'common:species' %}" id=cagenus>
-                   <div class="form-floating mb-1 mt-1">
+                   <div class="form-floating">
                     <input type="hidden" form="cagenus" name="role" value="{{ role }}" />
-                    <input type="hidden" form="cagenus" name="family" value="Bromeliaceae" />
-                    <input class="form-control resinput m-2" id="cagen" form="cagenus" type="text" name="genus" placeholder="input a Cactaceae genus">
-                    <label for="cagen">&nbsp;List species of (enter a genus)</label>
+                    <input type="hidden" form="cagenus" name="family" value="Cactaceae" />
+                    <input class="form-control resinput" id="cagen" form="cagenus" type="text" name="genus" placeholder="input a Cactaceae genus" style="margin: 4px 0">
+                    <label for="cagen">&nbsp;Enter a genus to list species</label>
                    </div>
                 </form>
             </div>
 
         </div>
 
-        <div class="card m-3 ">
+    {% elif family == 'Orchidaceae' %}
+        <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family=Orchidaceae&role={{role}}" style="text-align:center"><h4>Orchidaceae</h4></a>
             </h4>
             </div>
-            <div class="card-body">
-                <form class="form-inline" id="orsearch" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                   <div class="form-floating mb-1 mt-1">
+            <div class="card-body" style="margin: auto;">
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Orchidaceae&display=checked">Browse Orchidaceae genera</a>
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Orchidaceae">List Orchidaceae genera</a>
+                <br>
+                <form class="rescontrol" id="orsearch" action="/common/search_species/" style="display:inline-block;">
+                   <div class="form-floating">
                     <input type="hidden" name="family" value="Orchidaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
-                    <input class="form-control resinput m-2" id="orsc" form="orsearch" type="text" name="spc_string" placeholder="Search Orchidaceae">
-                    <label for="orsc">&nbsp;Search Orchidaceae</label>
+                    <input class="form-control resinput" id="orsc" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0">
+                    <label for="orsc">&nbsp;Keyword search Orchidaceae</label>
                    </div>
                 </form>
 
-            <form class="rescontrol" action="{% url 'common:species' %}" id=orspecies>
-                <div class="form-floating mb-1 mt-1">
-                <input type="hidden" form="orspecies" name="role" value="{{ role }}" />
-                <input type="hidden" form="orspecies" name="family" value="Orchidaceae" />
-                <input class="form-control resinput m-2" id="orgen" name="genus" placeholder="Search genus">
-                <label for="orgen">&nbsp;List species of (enter a genus)</label>
-                </div>
-            </form>
-            <form class="rescontrol" action="{% url 'common:hybrid' %}" id=orhybrid>
-                <div class="form-floating mb-1 mt-1">
-                <input type="hidden" form="orhybrid" name="role" value="{{ role }}" />
-                <input type="hidden" form="orhybrid" name="family" value="Orchidaceae" />
-                <input class="form-control resinput m-2" id="orhyb" name="genus" placeholder="Search genus">
-                <label for="orhyb">&nbsp;List hybrids of - enter a genus</label>
-                </div>
-            </form>
+                <form class="rescontrol" action="{% url 'common:species' %}" style="display:inline-block;">
+                    <div class="form-floating">
+                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Orchidaceae" />
+                    <input class="form-control resinput" id="orgen" name="genus" placeholder="Search genus" style="margin: 4px 0">
+                    <label for="orgen">&nbsp;Enter a genus to list species</label>
+                    </div>
+                </form>
+                <form class="rescontrol" action="{% url 'common:hybrid' %}" style="display:inline-block;">
+                    <div class="form-floating">
+                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Orchidaceae" />
+                    <input class="form-control resinput" id="orhyb" name="genus" placeholder="Search genus" style="margin: 4px 0">
+                    <label for="orhyb">&nbsp;Enter a genus to list hybrids</label>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <div class="card m-3 ">
+    {% else %}
+        <div class="card">
             <div class="card-header">
-                <a href="{% url 'common:genera' %}?family=other&role={{role}}" style="text-align:center"><h4>All Other Families</h4></a>
+                <a href="{% url 'common:genera' %}?app=other&role={{role}}" style="text-align:center"><h4>All Other Families</h4></a>
             </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <form class="form-inline" id="otsearch" action="/common/search_species/" style="display:inline-block; margin-top: 5px;">
-                       <div class="form-floating mb-1 mt-1">
+            <div class="card-body" style="margin: auto;">
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked" style="text-align:center">Browse genera</a>
+                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other" style="text-align:center">List genera</a>
+                <br>
+                    <form class="rescontrol" action="/common/search_species/" style="display:inline-block;">
+                       <div class="form-floating">
                         <input type="hidden" name="family" value="other" />
                         <input type="hidden" name="role" value="{{ role }}" />
-                        <input class="form-control resinput m-2" id="otsc" form="otsearch" type="text" name="spc_string" placeholder="Search Orchidaceae">
-                        <label for="otsc">&nbsp;Search other families</label>
+                        <input class="form-control resinput" id="otsc" type="text" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0;">
+                        <label for="otsc">&nbsp;Keyword search other families</label>
                        </div>
                     </form>
-                    <form class="form-inline" id=otgenus action="{% url 'common:species' %}" style="display:inline-block;" >
-                        <div class="form-floating mb-1 mt-1">
+                    <form class="rescontrol" id=otgenus action="{% url 'common:species' %}" style="display:inline-block;" >
+                        <div class="form-floating">
                         <input type="hidden" form="otgenus" name="role" value="{{ role }}" />
                         <input type="hidden" form="otgenus" name="family" value="other" />
-                        <input class="form-control resinput m-1" id="otgen" name="genus" placeholder="Search genus">
-                        <label for="otgen">&nbsp;List species of (enter a genus)</label>
+                        <input class="form-control resinput" id="otgen" name="genus" placeholder="Search genus" style="margin: 4px 0;">
+                        <label for="otgen">&nbsp;Enter a genus to list species</label>
                         </div>
                     </form>
-                </div>
 
-                <div class="form-group">
-                    <form class="form-inline" id=otcname action="{% url 'common:commonname' %}" style="display:inline-block;">
-                        <div class="form-floating mb-1 mt-1">
+                    <form class="rescontrol" id=otcname action="{% url 'common:commonname' %}" style="display:inline-block;">
+                        <div class="form-floating">
                         <input type="hidden" form="otcname" name="role" value="{{ role }}" />
                         <input type="hidden" form="otcname" name="family" value="other" />
-                        <input class="form-control m-1" id="otcn" name="commonname" placeholder="Search by common name">
-                        <label for="otcn">&nbsp;Search by common name</label>
+                        <input class="form-control" id="otcn" name="commonname" placeholder="Search by common name" style="margin: 4px 0;">
+                        <label for="otcn">&nbsp;Filter by common name</label>
                         </div>
                     </form>
-                    <form class="form-inline" id=otdist action="{% url 'common:distribution' %}" style="display:inline-block;">
-                        <div class="form-floating mb-1 mt-1">
+                    <form class="rescontrol" id=otdist action="{% url 'common:distribution' %}" style="display:inline-block;">
+                        <div class="form-floating">
                         <input type="hidden" form="otdist" name="role" value="{{ role }}" />
                         <input type="hidden" form="otdist" name="family" value="other" />
-                        <input class="form-control m-1" id="otds" name="distribution" placeholder="Filter by distribution">
-                            <label for="otds">&nbsp;Search by countries or states</label>
+                        <input class="form-control" id="otds" name="distribution" placeholder="Filter by distribution" style="margin: 4px 0;">
+                            <label for="otds">&nbsp;Filter by country or state</label>
                         </div>
                     </form>
             </div>
         </div>
-
+    {% endif %}
 </div>
 
 {% endblock %}

@@ -1,0 +1,345 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+.custom-select{
+    /*margin-right:200px;*/
+    /*background-color: #f9f9f9;*/
+    color: #100d0d;
+    width:200px;
+    /*height:50px;*/
+    font-size:13px;
+    background: none;
+}
+
+.select-p2 {
+    font-size: 13px;
+    color: white;
+}
+.card {
+    background-color: white;
+}
+
+.custom-select:hover {
+    text-decoration: none;
+    /*background-color: #8887bd;*/
+    color: black;
+}
+
+.custom-select:active {
+    text-decoration: none;
+    background-color: #8887bd;
+    color: black;
+}
+
+.custom-link{
+    margin-right:3px;
+    background-color: #f9f9f9;
+    color: #292929;
+    width:200px;
+    border: 1px solid lightgrey;
+    /*height:50px;*/
+    font-size:13px;
+}
+
+.infra-filter{
+    width:120px;
+    height:28px;
+    font-size:12px;
+}
+
+ul.b {list-style-type: disc;}
+
+label {
+    display: inline-block;
+    /*float: left;*/
+    width: 250px;
+    margin-right: 5px;
+}
+.imgcaption {
+    font-size: 13px;
+    color: #0b51af;
+    height: 40px;
+    margin:2px;
+    text-align:center;
+    overflow-wrap: break-word;
+}
+
+.thumbnails {
+   object-fit: cover;
+   /*overflow: hidden;*/
+    overflow-wrap: break-word;
+   height: 15vw;
+   width : 15vw;
+   margin: 0 auto;
+    padding: 0;
+}
+
+.imageitem {
+    display:inline-block;
+    border:1px solid grey;
+    margin: 0 auto;
+    width : 16vw;
+    height : auto;
+    background-color: #eaeaea;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+img{
+    width:100%;
+}
+
+.selected {
+    background-color: #bac4e8;
+    border: 1px solid #808080;
+    color: black;
+}
+
+
+.btn {
+    padding-top: 10px;
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+@media only screen and (min-width: 1800px) {
+    .thumbnails {
+        height: 10vw;
+        width: 10vw;
+    }
+    .imageitem {
+        width : 10vw;
+    }
+    .imgcaption {
+        font-size: 15px;
+    }
+}
+@media only screen and (max-width: 830px) {
+    .thumbnails {
+       height: 19vw;
+       width : 19vw;
+    }
+    .imgcaption {
+        font-size: 12px;
+    }
+    .imageitem {
+        width : 20vw;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .custom-select{
+        line-height:12px;
+    }
+    .custom-link{
+        line-height:12px;
+    }
+
+    .thumbnails {
+       height: 30vw;
+       width : 30vw;
+    }
+    .imgcaption {
+        font-size: 11px;
+    }
+   .imageitem {
+        width : 32vw;
+    }
+}
+
+    .dropdown-item {
+        font-size: 11px;
+        color: #606060;
+        line-height: 1.6;
+    }
+    .dropdown-item > a {
+        color: #606060;
+        line-height: normal;
+    }
+.card {
+    background-color: white;
+}
+.card-header {
+    /*background-color:lightgrey;*/
+}
+.pagination {
+    font-size:14px;
+    padding:2px 6px;
+    margin-block-end: 5px;
+}
+.pagination a{
+    padding:2px 6px;
+}
+.pagination a.hover {
+    background-color: #f5f9f9;
+}
+
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+</style>
+
+<div style="min-height:200px;background-color:white;width: 98%;">
+    <!--Title-->
+   <div class="row" style="width:100%; margin:0 auto;">
+<!--Main table       -->
+        <div class="col" style="text-align:left;margin-top:25px;">
+            <div class="card">
+                <div class="card-header">
+                    <span style="color:darkgreen; font-size:22px;font-weight:normal">
+                        Browse images of
+                        {% if family %}
+                            {{family.family}}
+                            {% if subfamily %}
+                                subfamily {{subfamily.subfamily}}
+                            {% endif %}
+                            {% if tribe %}
+                                tribe {{tribe.tribe}}
+                                {% if subtribe %}
+                                    subtribe {{subtribe.subtribe}}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <dev style="font-size:16px;">
+                        <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
+                    </dev>
+
+            <!--Filter-->
+                    <br>
+                    <form action="?" id="display" style="display:inline-block">
+                        <input type="hidden" name="family" value="{{family}}" />
+                        <input type="hidden" name="talpha" value="{{talpha}}" />
+                        <input type="hidden" name="role" value="{{role}}" />
+                        <input type="hidden" name="prevdisplay" value="{{display}}" />
+                        {% if display %}
+                        <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Uncheck to include species without images</span>
+                        {% else %}
+                        <input type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Check to hide species without images</span>
+                        {% endif %}
+                    </form>
+
+                <!-- Display -->
+                    <div class="container justify-content-left align-items-center" style="margin-top:10px; padding:0; text-align: left;">
+                        {% if page_list %}
+                            <div class="container justify-content-center align-items-center" style="margin:0 auto; padding:0; text-align: left;">
+                                {% if last_page > 1 %}
+                                    <div style="float:left">
+                                        <ul class="pagination pagination-xs" style="text-align: center">
+                                            {% if page > 1 %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page=1&role={{role}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
+                                            {% endif %}
+
+                                            {% if page > 1 %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{prev_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
+                                            {% endif %}
+
+                                            {% for pg in page_range %}
+                                                {% if pg == page %}
+                                                    <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{pg}}&role={{role}}&display={{display}}">{{pg}}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {% if page == last_page %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{next_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
+                                            {% endif %}
+
+                                            {% if page == last_page %}
+                                                <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{last_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
+                                            {% endif %}
+                                      </ul>
+
+                                    </div>
+                                {% endif %}
+                                <div style="float:left">
+                                    ({{first}}-{{last}} of {{total}})<br>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+            <!--            <br>-->
+                    {% if page_list %}
+                        <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
+                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                        {% for x in page_list %}
+                            <div class="imageitem border ">
+                                {% if forloop.counter == ads_insert %}
+                                    <a href="{{sponsor.sponsor_url}}" target="_blank">
+                                        <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
+                                    </a>
+                                    <div class="imgcaption">xx{{sponsor.pitch}}: {{sponsor.description}}</div>
+                                {% else %}
+                                    <a href="{% url 'common:browse' %}?tab=sum&role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
+                                        <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
+                                    </a>
+                                    <div class="imgcaption">
+                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}}
+                                        {% if x.imgobj.status == 'synonym' %}<br><span style="font-size:11px">(syn. x{{x.imgobj.getAccepted.binomial_it|safe}})</span>{% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="margin:0 auto; text-align: center; min-height:200px;">
+                        <h7>No images available</h7>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+   </div>
+</div>
+
+
+
+
+{% endblock %}
