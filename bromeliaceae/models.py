@@ -129,6 +129,15 @@ class Genus(models.Model):
         # verbose_name_plural = "Anni"
         ordering = ('genus',)
 
+    def get_best_img(self):
+        img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+                'quality', '-rank', '?')
+
+        if img.count() > 0:
+            img = img[0:1][0]
+            return img
+        return None
+
 
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
