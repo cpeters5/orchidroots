@@ -11,19 +11,18 @@
 .nav2 {
     font-size: 13px;
 }
+.nav-link {
+    color: black !important;
+}
 .nav3 {
     font-size: 12px;
 }
-.nav-link {
-    color: black !important;
-}
 @media only screen and (max-width: 500px) {
-
-.nav-link {
-    font-size: 11px;
-    width: 45px;
-    color: black !important;
-}
+    .nav-link {
+        font-size: 11px;
+        width: 45px;
+        color: black !important;
+    }
 }
 </style>
 
@@ -39,9 +38,9 @@
                     </a>
                     <div class="nav2 dropdown-menu">
                     {% if family.family != 'Orchidaceae' %}
-                        <a class="dropdown-item" href="/common/uploadfile/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;;">upload file</span></a>
+                        <a class="dropdown-item" href="/{{app}}/uploadfile/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;;">upload file</span></a>
                         {% if user.tier.tier > 2 %}
-                            <a class="dropdown-item" href="/common/uploadweb/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
+                            <a class="dropdown-item" href="/{{app}}/uploadweb/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                         {% endif %}
                     {% else %}
                         <span style="color: red">You will be redirected to OrchidRoots</span>
