@@ -51,7 +51,7 @@
                                         <tr>
                                             <th class="spc_column">Species</th>
 <!--                                            <th>Higher taxonomic levels</th>-->
-                                            <th class="d-none d-lg-table-cell">Decription</th>
+                                            <th class="d-none d-lg-table-cell">Common Name</th>
                                             <th>#images</th>
                                         </tr>
                                     </thead>
@@ -63,7 +63,7 @@
                                                         <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
                                                         (syn. <a href="/display/{{path}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
                                                             <i>{{species.getAccepted.binomial_it|safe}}</i></a>
-                                                        {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %})
+                                                        {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %}
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
@@ -71,7 +71,7 @@
                                                     <a href="/display/{{path}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
-                                                {{species.author|default:""}} {{species.year|default:""}}
+                                                {{species.author|default:""}}
                                             </td>
 
 <!--                                            <td>-->
@@ -80,7 +80,7 @@
 <!--                                                {% if species.gen.tribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}"> {{species.gen.tribe}}</a> {% endif %}-->
 <!--                                                {% if species.gen.subtribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}&subtribe={{species.gen.subtribe}}">{{species.gen.subtribe}}</a> {% endif %}-->
 <!--                                            </td>-->
-                                            <td class="d-none d-lg-table-cell">{{species.get_description|default:""}}</td>
+                                            <td class="d-none d-lg-table-cell">{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
                                             <td style="text-align:center">{{species.num_image|default:""}}</td>
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
