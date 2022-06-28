@@ -18,6 +18,11 @@ from accounts.models import Photographer
 logger = logging.getLogger(__name__)
 
 
+def pathinfo(request):
+    path  = request.path.split('/')[2:][0]
+    return path
+
+
 def change_family(request):
     path = request.path
     path_list = {
@@ -191,7 +196,7 @@ def getRole(request):
     return 'pub'
 
 def getModels(request, family=None):
-    subfamily, tribe, subtribe = '', '', ''
+    app, subfamily, tribe, subtribe = '', '', '', ''
     if not family:
         if 'family' in request.GET:
             family = request.GET['family']
@@ -204,6 +209,7 @@ def getModels(request, family=None):
                 app = 'other'
             else:
                 family = newfamily
+
     if family != 'other':
         try:
             family = Family.objects.get(pk=family)
@@ -281,15 +287,11 @@ def getModels(request, family=None):
 
 def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role):
     # Get species and hybrid lists that the user has at least one photo
-    if request.user.username == 'chariya' and author:
-        print("2 author = " + str(author))
     myspecies_list = Species.objects.filter(type='species')
     myhybrid_list = Species.objects.filter(type='hybrid')
     my_spc_list = []
     my_hyb_list = []
     my_upl_list = []
-    if request.user.username == 'chariya':
-        print("2.1 myspecies_list = " + str(len(myspecies_list)))
     if author and author.author_id != '' and author is not None:
         my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
         my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
@@ -298,8 +300,6 @@ def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, Spc
     # list for dropdown select
         myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
         myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
-    if request.user.username == 'chariya':
-        print("2.2 myspecies_list = " + str(len(myspecies_list)))
 
     # Get list for display
     if species:

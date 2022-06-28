@@ -14,7 +14,7 @@ from itertools import chain
 import django.shortcuts
 from django.apps import apps
 from fuzzywuzzy import fuzz, process
-from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos
+from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos, pathinfo
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -31,9 +31,11 @@ redirect_message = 'species does not exist'
 # num_show = 5
 # page_length = 500
 
+
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
+    from_path = pathinfo(request)
     role = getRole(request)
     # Information request role must be either cur or pub.
     if not role or role != 'cur':
@@ -192,6 +194,7 @@ def information(request, pid=None):
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'role': role, 'ancspc_list': ancspc_list,
+               'from_path': from_path,
                }
     return render(request, "display/information.html", context)
 
@@ -202,6 +205,7 @@ def photos(request, pid=None):
     # For photos view request role must be either cur or pub.
     # if not role or role != 'cur':
     #     role = 'pub'
+    from_path = pathinfo(request)
 
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
@@ -285,5 +289,6 @@ def photos(request, pid=None):
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'role': role, 'title': 'photos', 'namespace': 'display',
+               'from_path': from_path,
                }
     return render(request, 'display/photos.html', context)
