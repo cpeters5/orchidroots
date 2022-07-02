@@ -23,23 +23,6 @@ def pathinfo(request):
     return path
 
 
-def change_family(request):
-    path = request.path
-    path_list = {
-            '': '',
-            'browse': 'browse',
-            '/common/genera/': '/common/genera/',
-            'species': 'species',
-            'hybrid': 'hybrid',
-            '/common/search_species/': '/common/search_species/',
-            'curate_newupload': 'curate_newupload',
-            'myphoto': 'myphoto_browspc',
-            'myphoto_browspc': 'myphoto_browspc',
-            'myphoto_browsehyb': 'myphoto_browsehyb'
-    }
-    return path_list[path]
-
-
 def get_family_list(request):
     alpha = ''
     if 'alpha' in request.GET:
@@ -52,8 +35,10 @@ def get_family_list(request):
     family_list = favorite.union(family_list)
     return family_list, alpha
 
+
 def getApp(request):
     return request.resolver_match.app_name
+
 
 def write_output(request, detail=None):
     if str(request.user) != 'chariya' and request.user.is_authenticated:
