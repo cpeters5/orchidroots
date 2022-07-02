@@ -313,7 +313,7 @@ img{
                                     <a href="{{sponsor.sponsor_url}}" target="_blank">
                                         <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
                                     </a>
-                                    <div class="imgcaption">xx{{sponsor.pitch}}: {{sponsor.description}}</div>
+                                    <div class="imgcaption">{{sponsor.pitch}}: {{sponsor.description}}</div>
                                 {% else %}
                                     <a href="{% url 'common:browse' %}?tab=sum&role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
