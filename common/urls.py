@@ -23,14 +23,7 @@ urlpatterns = [
     path('photos/', display_photos, name='photos'),
     path('photos/<int:pid>/', display_photos, name='photos'),
 
-    path('search_gen/', views.search_gen, name='search_gen'),
-    path('search_spc/', views.search_spc, name='search_spc'),
-    path('search_hyb/', views.search, name='search_hyb'),
-    path('search_species/', views.search_species, name='search_species'),
-    path('search_orchid/', views.search_orchid, name='search_orchid'),
-    path('search_fuzzy/', views.search_fuzzy, name='search_fuzzy'),
-    path('search_match/', views.search_match, name='search_match'),
-    path('search/', views.search, name='search'),
+    # path('search/', views.search, name='search'),
     path('research/', views.research, name='research'),
 
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),

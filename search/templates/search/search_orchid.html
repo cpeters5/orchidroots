@@ -27,7 +27,7 @@
             {% if fuzzy %}
             <span class="btn-group large" style="font-size: 16px; color:darkblue; vertical-align:middle">Search Results "<i>{{spc_string}}</i>"</span>
                 <div style="font-size: 14px;margin-bottom:10px;" align="center">
-                     <a class="btn btn-primary btn-sm" type="button" href="{% url 'common:search_fuzzy' %}?family={{family.family}}&spc_string={{spc_string}}&role={{role}}"><span >APPROXIMATE SEARCH</span></a>
+                     <a class="btn btn-primary btn-sm" type="button" href="{% url 'search:search_fuzzy' %}?family={{family.family}}&spc_string={{spc_string}}&role={{role}}"><span >APPROXIMATE SEARCH</span></a>
                 </div>
             {% else %}
                 <span class="btn-group large" style="font-size: 16px; color:darkblue; vertical-align:middle">"{{spc_string}}" approximate matches</span>

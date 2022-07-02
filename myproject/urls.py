@@ -59,6 +59,8 @@ urlpatterns = [
     path('', orchid_home, name='orchid_home'),
     # path('', ode, name='ode'),
 
+    path('search/', include('search.urls')),
+
     # Family specific
     path('core/', include('core.urls')),
     path('common/', include('common.urls')),
@@ -69,7 +71,7 @@ urlpatterns = [
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),
 
-    # legacy applications
+                  # legacy applications
     path('natural/', include('detail.urls')),
     path('orchid/', include('orchidaceae.urls')),
     path('orchidlite/', include('detail.urls')),

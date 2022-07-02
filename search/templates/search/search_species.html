@@ -42,10 +42,10 @@
                                     {% endif %}
                                     {% if genus.0.family == 'Orchidaceae' or genus.0.family == 'Bromeliaceae' or genus.0.family == 'Cactaceae' %}
                                         {% if genus.0.family != family %}
-                                            (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{genus.0.family}}">Search {{genus.0.family}} family</a>)
+                                            (<a href="{% url 'search:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{genus.0.family}}">Search {{genus.0.family}} family</a>)
                                         {% endif %}
                                     {% elif app != 'other' %}
-                                            (<a href="{% url 'common:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app=other">Search {{genus.0.family}} family</a>)
+                                            (<a href="{% url 'search:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app=other">Search {{genus.0.family}} family</a>)
                                     {% endif %}
                                 </td>
                             </tr>
@@ -145,7 +145,7 @@
                 {% if not fuzzy %}
                     <div style="padding: 0; margin-top: 20px;">
                         Didn't see what you are looking for?<br>
-                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'common:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
+                        <a class="btn btn-custom" style="width: 150px;" href="{% url 'search:search_species' %}?family={{family}}&spc_string={{spc_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>
                     </div>
                 {% endif %}
                 <br>

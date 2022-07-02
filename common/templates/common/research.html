@@ -101,7 +101,7 @@ form {
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Bromeliaceae&display=checked">List Bromeliaceae genera</a>
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Bromeliaceae">Browse Bromeliaceae genera</a>
                 <br>
-                <form class="rescontrol" action="/common/search_species/" style="display:inline-block;">
+                <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
                     <input type="hidden" name="family" value="Bromeliaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
@@ -130,7 +130,7 @@ form {
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Cactaceae&display=checked" style="text-align:center">Browse Cactaceae genera</a>
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Cactaceae" style="text-align:center">List Cactaceae genera</a>
                 <br>
-                <form action="/common/search_species/" style="display:inline-block;">
+                <form action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
                     <input type="hidden" name="family" value="Cactaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
@@ -160,7 +160,7 @@ form {
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Orchidaceae&display=checked">Browse Orchidaceae genera</a>
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Orchidaceae">List Orchidaceae genera</a>
                 <br>
-                <form class="rescontrol" id="orsearch" action="/common/search_species/" style="display:inline-block;">
+                <form class="rescontrol" id="orsearch" action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
                     <input type="hidden" name="family" value="Orchidaceae" />
                     <input type="hidden" name="role" value="{{ role }}" />
@@ -197,7 +197,7 @@ form {
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked" style="text-align:center">Browse genera</a>
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other" style="text-align:center">List genera</a>
                 <br>
-                    <form class="rescontrol" action="/common/search_species/" style="display:inline-block;">
+                    <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
                        <div class="form-floating">
                         <input type="hidden" name="family" value="other" />
                         <input type="hidden" name="role" value="{{ role }}" />
@@ -209,6 +209,7 @@ form {
                         <div class="form-floating">
                         <input type="hidden" form="otgenus" name="role" value="{{ role }}" />
                         <input type="hidden" form="otgenus" name="family" value="other" />
+                        <input type="hidden" form="otgenus" name="from_path" value="{{from_path}}" />
                         <input class="form-control resinput" id="otgen" name="genus" placeholder="Search genus" style="margin: 4px 0;">
                         <label for="otgen">&nbsp;Enter a genus to list species</label>
                         </div>

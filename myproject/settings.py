@@ -86,7 +86,7 @@ INSTALLED_APPS = [
     'display',
     'documents',
     'donation',
-    # 'search',
+    'search',
     # 'utils',
 
     'bromeliaceae',
