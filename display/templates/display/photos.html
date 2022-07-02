@@ -24,10 +24,11 @@
     border:1px solid lightgrey;
     text-align:center;
 }
-.imageitem-tiny {
+.imageitem-cur {
     display:inline-block;
     margin:2px;
-    width : 14vw;
+    width : 17vw;
+    height: 24vw;
     background-color: #f7f7f7;
     border:1px solid lightgrey;
     text-align:center;
@@ -63,7 +64,15 @@
 .imgcaption {
     font-size: 10px;
     text-align: center;
-    height:70px;
+    /*height:60px;*/
+    margin-top: -7px;
+    /*overflow: hidden;*/
+}
+.imgcaption-cur {
+    font-size: 10px;
+    text-align: center;
+    /*height:80px;*/
+    margin-top: -7px;
     /*overflow: hidden;*/
 }
 
@@ -89,27 +98,35 @@ div.text-bl a {
 }
 
 @media only screen and (max-width: 800px){
-   .imageitem {
+    .imageitem {
+        width: 28vw;
+        height: 36vw;
+    }
+    .imageitem-cur {
         width: 28vw;
         height: 40vw;
-    }
-  .imageitem-tiny {
-        width: 18vw;
-        /*height : 250px;*/
     }
     .imgcaption {
         font-size: 10px;
     }
-   .box {
+    .imgcaption-cur {
+        font-size: 9px;
+    }
+    .box {
         width: 27vw;
+        height: 27vw;
         font-size: 10px;
         /*margin-left:-3px;*/
        margin: 0 auto;
     }
     .thumbnails {
-       height: 190px !important;
-       width : 95% !important;
+       height: 26vw !important;
+       width: 26vw !important;
     }
+    /*.thumbnails {*/
+    /*   height: 190px !important;*/
+    /*   width : 95% !important;*/
+    /*}*/
     div.text {
         font-size: 10px;
     }
@@ -118,20 +135,21 @@ div.text-bl a {
 @media only screen and (max-width: 500px){
     .imageitem {
         width: 36vw;
-        height: 38vw;
+        height: 44vw;
     }
     .box {
-        width: 28vw;
-        height: 28vw;
+        width: 34vw;
+        height: 34vw;
         font-size: 10px;
         margin-left:-3px;
     }
     .thumbnails {
-       height: 24vw !important;
-       width: 20vw;
+       height: 30vw !important;
+       width: 30vw !important;
     }
-    .imageitem-tiny {
-        width: 19vw;
+    .imageitem-cur {
+        width: 36vw;
+        height: 56vw !important;
         padding:2px;
         margin:5px auto;
     }
@@ -147,12 +165,15 @@ div.text-bl a {
         margin:3px auto;
 
     }
-
-
     .imgcaption {
        width : 34vw;
         font-size: 9px;
         height: 59px;
+    }
+    .imgcaption-cur {
+       width : 34vw;
+        font-size: 9px;
+        height: 62px;
     }
     div.text {
         font-size: 10px;
@@ -257,11 +278,13 @@ a:hover {
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>
             {% endif %}
         {% endif %}
+        </div>
+
+<!--            Main section-->
         {% if public_list or private_list or upload_list %}
-            </div>
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
                 {% for image in public_list %}
-                    <div class="imageitem">
+                    <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         <div class="box">
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
@@ -271,13 +294,13 @@ a:hover {
                                         <div class="text text-br">{{image.id}}</div>
                             </a>
                         </div>
-                        <div class="imgcaption">
+                        <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                             <div style="width:100%;word-wrap: break-word;">
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-                                        - <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
+                                        <br><a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
                                     {% else %}
-                                        {{image.imgname|safe}} - {{image.get_displayname }}
+                                        {{image.imgname|safe}}<br>{{image.get_displayname }}
                                     {% endif %}
                                 {% if role == 'cur' %}
                                     {% include 'common/curate_links.html' %}
@@ -291,7 +314,7 @@ a:hover {
                 {% endfor %}
                 {% for image in private_list %}
                     {% if image.author == user.photographer.author_id %}
-                    <div class="imageitem p-1 justify-content-center align-items-center">
+                    <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %} p-1 justify-content-center align-items-center">
                         {% if image.image_file %}
                             <div class="box">
                                 <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
@@ -308,7 +331,7 @@ a:hover {
                             <div class="box">
                                 <a href="#">
                                     <img class="thumbnails" alt="" src="{{image.image_url}}" class="img-fluid">
-                                    <div class="text text-br">{{image.id}} {{image.imgname|safe}} - {{image.get_displayname }}
+                                    <div class="text text-br">{{image.id}} {{image.imgname|safe}}<br>{{image.get_displayname }}
                                     </div>
                                 </a>
                             </div>
@@ -330,7 +353,7 @@ a:hover {
                              <div class="box">
                                  <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
                                       {{image.id}}: {{image.imgname}}
-                                      <br> {{image.get_displayname}}
+                                      <br>{{image.get_displayname}}
                                       <br>{{image.text_data|default:''|safe}}">
                                       <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                       <div class="text text-br">{{image.id}}
@@ -378,7 +401,7 @@ a:hover {
         <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
             <div class="font-weight-bold text-center text-info" ><h4>Private Photos</h4></div>
             {% for image in private_list %}
-                <div class="imageitem p-1 justify-content-center align-items-center">
+                <div class="imageitem-cur p-1 justify-content-center align-items-center">
                     {% if image.image_file %}
                         <div class="box">
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
@@ -399,7 +422,7 @@ a:hover {
                         </dev>
                         </a>
                     {% endif %}
-                    <div class="imgcaption">
+                    <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                         {% include 'common/curate_links.html' %}
                     </div>
                 </div>
@@ -415,7 +438,7 @@ a:hover {
             <h6>{{msg|default:''}}</h6>
             <br>
             {% for image in upload_list %}
-                 <div class="imageitem-tiny" style="display:inline-block">
+                 <div class="imageitem-cur" style="display:inline-block">
                      {% if image.image_file_path %}
                           <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
                                    {{image.id}}: {{image.imgname}}
