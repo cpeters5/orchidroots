@@ -100,7 +100,7 @@ def orchid_home(request):
     context = {'orcimage': orcimage, 'broimage': broimage, 'cacimage': cacimage,
                'other_list': other_list, 'succulent_obj': succulent_obj, 'carnivorous_obj': carnivorous_obj,
                'ads_insert': ads_insert, 'sponsor': sponsor,
-                'title': 'orchid_home', 'role': role }
+                'role': role }
     return render(request, 'orchid_home.html', context)
 
 
@@ -131,7 +131,7 @@ def ode(request):
                'br_spclist': br_spclist,
                'ca_spclist': ca_spclist,
                'ot_spclist': ot_spclist,
-               'title': 'ode', 'role': role }
+               'role': role }
     return render(request, 'ode.html', context)
 
 
@@ -199,7 +199,7 @@ def genera(request):
         'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
         'family_list': family_list,
-        'title': 'taxonomy', 'alpha_list': alpha_list, 'alpha': alpha,
+        'alpha_list': alpha_list, 'alpha': alpha,
         'path': path
     }
     return render(request, "common/genera.html", context)
@@ -209,16 +209,13 @@ def genera(request):
 def species(request):
     # path = resolve(request.path).url_name
     from_path = ''
-    if 'from_path' in request.GET:
-        from_path = request.GET['from_path']
-    print(">>> pathinfo(request) = " + pathinfo(request))
-    print(">>> from_path = " + from_path)
+    genus_obj = ''
+    from_path = pathinfo(request)
     genus = ''
     talpha = ''
-    reqgenus = ''
-    path = 'information'
+    path_link = 'information'
     if str(request.user) == 'chariya':
-        path = 'photos'
+        path_link = 'photos'
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'genus' in request.GET:
@@ -289,9 +286,8 @@ def species(request):
     context = {
         'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        # 'family_list': family_list, 'alpha': alpha,
-        'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
-        'msg': msg, 'path': path
+        'alpha_list': alpha_list, 'talpha': talpha,
+        'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
     return render(request, "common/species.html", context)
 
@@ -372,8 +368,7 @@ def hybrid(request):
     context = {
         'genus': genus, 'hybrid_list': hybrid_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        # 'family_list': family_list, 'alpha': alpha,
-        'title': 'taxonomy', 'alpha_list': alpha_list, 'talpha': talpha,
+        'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path': path, 'primary': primary,
     }
     return render(request, "common/hybrid.html", context)
@@ -420,7 +415,7 @@ def uploadfile(request, pid):
 
     context = {'form': form, 'species': species, 'web': 'active', 'family': species.gen.family,
                'author_list': author_list, 'author': author,
-               'role': role, 'app': app, 'title': 'uploadfile'}
+               'role': role, 'app': app,}
     return render(request, app + '/uploadfile.html', context)
 
 
@@ -490,7 +485,7 @@ def uploadcommonweb(request, pid, orid=None):
 
     context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
                'species': species, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadweb'}
+               'role': role, 'app': app,}
     return render(request, app + '/uploadweb.html', context)
 
 
@@ -891,10 +886,9 @@ def browse(request):
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
         'page': page, 'total': total, 'talpha': talpha,
         'ads_insert': ads_insert, 'sponsor': sponsor,
-        # 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-        'title': 'browse', 'section': 'list', 'role': role,
+        'role': role,
     }
 
     return render(request, 'common/browse.html', context)
@@ -978,7 +972,6 @@ def research(request):
 
 
 def commonname(request):
-    specieslist = []
     talpha = ''
     family = 'other'
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
@@ -987,13 +980,13 @@ def commonname(request):
     else:
         role = 'pub'
 
-    context = {'level': 'research', 'title': 'research', 'role': role,}
+    context = {'role': role,}
     if 'commonname' in request.GET:
         commonname = request.GET['commonname']
         if commonname == '':
             render(request, "common/research.html", context)
 
-        specieslist = Accepted.objects.filter().filter(common_name__icontains=commonname).order_by('species')
+        specieslist = Accepted.objects.filter(common_name__icontains=commonname).order_by('species')
         if 'talpha' in request.GET:
             talpha = request.GET['talpha']
         if talpha != '':
@@ -1001,7 +994,7 @@ def commonname(request):
         total = len(specieslist)
 
         context = {'species_list': specieslist, 'commonname': commonname, 'role': role,
-                   'level': 'commonname', 'title': 'commonname', 'app': 'other',
+                   'app': 'other',
                    'talpha': talpha, 'alpha_list': alpha_list}
         write_output(request, str(commonname))
         return render(request, "common/commonname.html", context)
@@ -1010,7 +1003,6 @@ def commonname(request):
 
 
 def distribution(request):
-    specieslist = []
     talpha = ''
     family = 'other'
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
@@ -1019,26 +1011,24 @@ def distribution(request):
     else:
         role = 'pub'
 
-    context = {'level': 'research', 'title': 'distribution', 'role': role,}
     if 'distribution' in request.GET:
         distribution = request.GET['distribution']
         if distribution == '':
-            render(request, "common/research.html", context)
+            render(request, "common/research.html", {'role': role,})
 
-        specieslist = Accepted.objects.filter().filter(distribution__icontains=distribution).order_by('species')
+        specieslist = Accepted.objects.filter(distribution__icontains=distribution)
         if 'talpha' in request.GET:
             talpha = request.GET['talpha']
         if talpha != '':
             specieslist = specieslist.filter(species__istartswith=talpha)
         total = len(specieslist)
-
+        specieslist = specieslist.order_by('species')
         context = {'species_list': specieslist, 'distribution': distribution, 'role': role,
-                   'level': 'distribution', 'title': 'distribution', 'app': 'other',
-                   'talpha': talpha, 'alpha_list': alpha_list}
+                   'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list}
         write_output(request, str(distribution))
         return render(request, "common/distribution.html", context)
 
-    return render(request, "common/research.html", context)
+    return render(request, "common/research.html", {'role': role,})
 
 
 def mypaginator(request, full_list, page_length, num_show):
@@ -1333,7 +1323,7 @@ def myphoto(request, pid):
     context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
                'pri': 'active', 'role': role, 'author': author, 'family': family,
-               'title': 'myphoto', 'app': family.application,
+               'app': family.application,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto.html', context)
@@ -1393,7 +1383,6 @@ def myphoto_list(request):
                'my_list': my_list,
                'role': role, 'brwspc': 'active', 'author': author,
                'author_list': author_list,
-               'title': 'myphoto_list',
                'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'mylist': 'active',
                }
     write_output(request, str(family))
@@ -1437,16 +1426,12 @@ def myphoto_browse_spc(request):
         if img:
             my_list.append(img)
 
-    family_list, alpha = get_family_list(request)
-
     context = {'my_list': my_list, 'type': 'species', 'family': family, 'app': app,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'role': role, 'brwspc': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'author_list': author_list,  'myspc': 'active',
-               'title': 'myphoto_browse',
-               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_browse_spc.html', context)
@@ -1455,6 +1440,8 @@ def myphoto_browse_spc(request):
 @login_required
 def myphoto_browse_hyb(request):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    if not family:
+        family = 'other'
     role = getRole(request)
     if role == 'pub':
         send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
@@ -1470,13 +1457,14 @@ def myphoto_browse_hyb(request):
             author = Photographer.objects.get(author_id='anonymous')
 
     private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(author, app, '', Species, UploadFile, SpcImages, HybImages, role)
-    if family.family == 'Orchidaceae':
-        pid_list = HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
+
+    if family and family == 'other':
+        pid_list = SpcImages.objects.filter(author=author).filter(gen__family__application='other').filter(pid__type='hybrid').values_list('pid', flat=True).distinct()
     else:
-        if family and family != 'other':
-            pid_list = SpcImages.objects.filter(author=author).filter(gen__family=family.family).values_list('pid', flat=True).distinct()
+        if family.family == 'Orchidaceae':
+            pid_list = HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
         else:
-            pid_list = SpcImages.objects.filter(author=author).filter(gen__family__application='other').values_list('pid', flat=True).distinct()
+            pid_list = SpcImages.objects.filter(author=author).filter(gen__family=family.family).filter(pid__type='hybrid').values_list('pid', flat=True).distinct()
 
     img_list = Species.objects.filter(pid__in=pid_list)
     if img_list:
@@ -1492,15 +1480,12 @@ def myphoto_browse_hyb(request):
         if img:
             my_list.append(img)
 
-    family_list, alpha = get_family_list(request)
-
     context = {'my_list': my_list, 'type': 'hybrid', 'family': family, 'app': app,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'role': role, 'brwhyb': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'myhyb': 'active',
-               'title': 'myphoto_browse',
+               'author_list': author_list,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_browse_hyb.html', context)
@@ -1526,7 +1511,7 @@ def curate_newupload(request):
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': 'curate_newupload', 'section': 'Curator Corner',
+               'app': app,
                }
     return render(request, "common/curate_newupload.html", context)
 
@@ -1571,13 +1556,12 @@ def curate_pending(request):
 
     role = getRole(request)
     write_output(request, str(family))
-    title = 'curate_pending'
     context = {'file_list': page_list, 'type': ortype, 'family': family,
                'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': title,
+               'app': app,
                }
     return render(request, 'common/curate_pending.html', context)
 
@@ -1629,79 +1613,8 @@ def curate_newapproved(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': 'curate_newapproved',
+               'app': app,
                }
     return render(request, 'common/curate_newapproved.html', context)
 
 
-# NOT USED
-# def home(request):
-#     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-#     randgenus = Genus.objects.exclude(status='synonym').extra(where=["num_spc_with_image + num_hyb_with_image > 0"]
-#                                                               ).values_list('pid', flat=True).order_by('?')
-#     # Number of visits to this view, as counted in the session variable.
-#     # num_visits = request.session.get('num_visits', 0)
-#     # request.session['num_visits'] = num_visits + 1
-#     randimages = []
-#     for e in randgenus:
-#         if len(randimages) >= num_img:
-#             break
-#         if SpcImages.objects.filter(gen=e):
-#             img = SpcImages.objects.filter(gen=e).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?'
-#                                                                                                  )[0:1]
-#             if img and len(img):
-#                 randimages.append(img[0])
-#
-#     random.shuffle(randimages)
-#     role = getRole(request)
-#     context = {'title': 'orchid_home', 'role': role, 'randimages': randimages, 'tab': 'sum', }
-#     return render(request, 'home.html', context)
-#
-# def subfamily(request):
-#     # -- List Genuses
-#     f = ''
-#     if 'f' in request.GET:
-#         f = request.GET['f']
-#     subfamily_list = Subfamily.objects.filter(family=f).order_by('subfamily')
-#     context = {'subfamily_list': subfamily_list, 'alpha_list': alpha_list, 'title': 'subfamilies', 'f': f}
-#     return render(request, 'core/subfamily.html', context)
-#
-# def tribe(request):
-#     f, sf = '', ''
-#     if 'f' in request.GET:
-#         f = request.GET['f']
-#     subfamily_list = Subfamily.objects.filter(family=f)
-#     tribe_list = Tribe.objects.order_by('tribe').filter(family=f)
-#     if 'sf' in request.GET:
-#         sf = request.GET['sf']
-#         if sf:
-#             sf_obj = Subfamily.objects.get(pk=sf)
-#             if sf_obj:
-#                 tribe_list = tribe_list.filter(subfamily=sf)
-#     context = {'tribe_list': tribe_list, 'title': 'tribes', 'f': f, 'sf': sf, 'subfamily_list': subfamily_list, }
-#     return render(request, 'core/tribe.html', context)
-#
-# def subtribe(request):
-#     f, sf, t = '', '', ''
-#     if 'f' in request.GET:
-#         f = request.GET['f']
-#     subfamily_list = Subfamily.objects.filter(family=f)
-#     tribe_list = Tribe.objects.order_by('tribe').filter(family=f)
-#     subtribe_list = Subtribe.objects.filter(family=f).order_by('subtribe')
-#     if 'sf' in request.GET:
-#         sf = request.GET['sf']
-#         if sf:
-#             sf_obj = Subfamily.objects.get(pk=sf)
-#             if sf_obj:
-#                 subtribe_list = subtribe_list.filter(subfamily=sf)
-#     if 't' in request.GET:
-#         t = request.GET['t']
-#         if t:
-#             t_obj = Tribe.objects.get(pk=t)
-#             if t_obj:
-#                 subtribe_list = subtribe_list.filter(tribe=t)
-#
-#     context = {'subtribe_list': subtribe_list, 'title': 'subtribes', 'f': f, 't': t, 'sf': sf,
-#                'subfamily_list': subfamily_list, 'tribe_list': tribe_list, }
-#     return render(request, 'core/subtribe.html', context)
-#

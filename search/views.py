@@ -344,7 +344,7 @@ def search_species(request):
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
                'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'app': app, 'fuzzy': fuzzy, 'single_word': single_word,
-               'title': 'search', 'role': role, 'path': path, 'full_path': full_path}
+               'role': role, 'path': path, 'full_path': full_path}
     return render(request, "search/search_species.html", context)
 
 
@@ -515,7 +515,7 @@ def search_fuzzy(request):
                'alliance_obj': alliance_obj, 'genus_obj': genus_obj,
                'min_score': min_score, 'keyword': keyword,
                'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
-               'level': 'search', 'title': 'fuzzy', 'role': role, 'namespace': 'search',
+               'role': role, 'namespace': 'search',
 
                }
     return render(request, "search/search_orchid.html", context)

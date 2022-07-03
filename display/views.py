@@ -185,10 +185,9 @@ def information(request, pid=None):
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
-
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
-               'title': 'information', 'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
+               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
@@ -233,21 +232,6 @@ def photos(request, pid=None):
     variety = ''
     tail = ''
     private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
-    # if role != 'cur':
-    #     private_list = {}
-
-    # Happened when a curator request an author photos
-    # if role == 'cur':
-    #     if author:
-    #         public_list = all_list.filter(rank__gt=0).filter(author=author)
-    #         private_list = all_list.filter(rank=0).filter(author=author)
-    # else:  # anonymous
-    #     public_list = all_list.filter(rank__gt=0)
-
-    # upload_list = UploadFile.objects.filter(pid=species.pid)
-    # if role != 'cur':
-    #     if author:
-    #         upload_list = upload_list.filter(author=author)
     if app == 'orchidaceae' and species.type == 'hybrid':
         rank_update(request, HybImages)
         quality_update(request, HybImages)
@@ -288,7 +272,6 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'role': role, 'title': 'photos', 'namespace': 'display',
-               'from_path': from_path,
+               'role': role, 'from_path': from_path,
                }
     return render(request, 'display/photos.html', context)

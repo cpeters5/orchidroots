@@ -149,7 +149,7 @@ def compare(request, pid):
                        'spcimg1_list': spcimg1_list,
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
-                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                       'tab': 'sbs', 'sbs': 'active', 'role': role}
             return render(request, app + '/compare.html', context)
         if spc2:
             species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
@@ -159,7 +159,7 @@ def compare(request, pid):
                            'spcimg1_list': spcimg1_list,
                            'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message2': message,
-                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                           'tab': 'sbs', 'sbs': 'active', 'role': role}
                 return render(request, app + '/compare.html', context)
             elif len(species2) > 1:
                 if infraspe2 and infraspr2:
@@ -179,14 +179,14 @@ def compare(request, pid):
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
                                'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message2': message, 'family': family,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                               'tab': 'sbs', 'sbs': 'active', 'role': role}
                     return render(request,  app + '/compare.html', context)
                 else:  # length = 0
                     message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
                                'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message1': message, 'family': family,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+                               'tab': 'sbs', 'sbs': 'active', 'role': role}
                     return render(request, app + '/compare.html', context)
             else:
                 species2 = species2[0]
@@ -226,7 +226,7 @@ def compare(request, pid):
                'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
-               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
+               'tab': 'sbs', 'sbs': 'active', 'role': role}
     return render(request, app + '/compare.html', context)
 
 
@@ -354,7 +354,7 @@ def curate_newupload(request):
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days, 'family': family,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': 'curate_newupload', 'section': 'Curator Corner',
+               'app': app, 'section': 'Curator Corner',
                }
     return render(request, "common/curate_newupload.html", context)
 
@@ -393,13 +393,12 @@ def curate_pending(request):
 
     role = getRole(request)
     write_output(request)
-    title = 'curate_pending'
     context = {'file_list': page_list, 'type': ortype,
                'tab': 'pen', 'role': role, 'pen': 'active', 'days': days, 'family': family,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': title,
+               'app': app,
                }
     return render(request, 'common/curate_pending.html', context)
 
@@ -448,7 +447,7 @@ def curate_newapproved(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'title': 'curate_newapproved',
+               'app': app,
                }
     return render(request, 'common/curate_newapproved.html', context)
 
@@ -604,7 +603,7 @@ def uploadweb(request, pid, orid=None):
 
     context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
                'species': species, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadweb'}
+               'role': role, 'app': app,}
     return render(request, app + '/uploadweb.html', context)
 
 
@@ -709,7 +708,7 @@ def curateinfospc(request, pid):
         accepted = Accepted.objects.get(pk=species.pid)
         form = AcceptedInfoForm(instance=accepted)
         context = {'form': form, 'genus': genus, 'species': species, 'app': app, 'family': family,
-                   'title': 'curateinfo', 'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
+                   'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
                    'role': role,}
         return render(request, app + '/curateinfospc.html', context)
 
@@ -774,7 +773,7 @@ def curateinfohyb(request, pid):
         spcform = RenameSpeciesForm(instance=accepted)
 
         context = {'form': form, 'spcform': spcform, 'genus': genus, 'species': species,
-                   'tab': 'inh', tab: 'active', 'title': 'curateinfo', 'role': role, 'family': family,
+                   'tab': 'inh', tab: 'active', 'role': role, 'family': family,
                    }
         return render(request, app + '/curateinfohyb.html', context)
 
