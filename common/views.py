@@ -986,15 +986,16 @@ def commonname(request):
         if commonname == '':
             render(request, "common/research.html", context)
 
-        specieslist = Accepted.objects.filter(common_name__icontains=commonname).order_by('species')
+        species_list = Accepted.objects.filter(common_name__icontains=commonname).order_by('species')
+        genus_list = Genus.objects.filter(common_name__icontains=commonname).order_by('genus')
         if 'talpha' in request.GET:
             talpha = request.GET['talpha']
         if talpha != '':
-            specieslist = specieslist.filter(species__istartswith=talpha)
-        total = len(specieslist)
+            species_list = species_list.filter(species__istartswith=talpha)
+        total = len(species_list)
 
-        context = {'species_list': specieslist, 'commonname': commonname, 'role': role,
-                   'app': 'other',
+        context = {'species_list': species_list, 'commonname': commonname, 'role': role,
+                   'app': 'other', 'genus_list': genus_list,
                    'talpha': talpha, 'alpha_list': alpha_list}
         write_output(request, str(commonname))
         return render(request, "common/commonname.html", context)
@@ -1016,14 +1017,14 @@ def distribution(request):
         if distribution == '':
             render(request, "common/research.html", {'role': role,})
 
-        specieslist = Accepted.objects.filter(distribution__icontains=distribution)
+        species_list = Accepted.objects.filter(distribution__icontains=distribution)
         if 'talpha' in request.GET:
             talpha = request.GET['talpha']
         if talpha != '':
-            specieslist = specieslist.filter(species__istartswith=talpha)
-        total = len(specieslist)
-        specieslist = specieslist.order_by('species')
-        context = {'species_list': specieslist, 'distribution': distribution, 'role': role,
+            species_list = species_list.filter(species__istartswith=talpha)
+        total = len(species_list)
+        species_list = species_list.order_by('species')
+        context = {'species_list': species_list, 'distribution': distribution, 'role': role,
                    'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list}
         write_output(request, str(distribution))
         return render(request, "common/distribution.html", context)
