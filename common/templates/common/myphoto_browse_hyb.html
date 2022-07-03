@@ -164,7 +164,7 @@ img{
                         {% else %}
                             <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
 
-                                <h5>Your photo collection is empty!</h5>
+                                <h5>Your photo collection for {{family}} {% if family == 'other' %}families {% else%}family {% endif %} is empty!</h5>
                                 To build your collection you may start uploading photos as follows:
                                 <ul>
                                     <li>Click on the "Private" button if it is not highlighted. This means you are now in your private view</li>
