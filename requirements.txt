@@ -25,7 +25,7 @@ defusedxml==0.6.0
 distlib==0.3.1
 dj-paypal==0.15.3
 dj-stripe==2.3.0
-Django==3.2
+Django==3.2.14
 django-allauth==0.42.0
 django-anymail==7.2
 django-appconf==1.0.4
