@@ -154,11 +154,16 @@ def taxonomy(request):
 
 @login_required
 def genera(request):
+    myspecies = ''
+    author = ''
     path = resolve(request.path).url_name
     role = getRole(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     family_list, alpha = get_family_list(request)
-
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
     if family:
         if subtribe:
             genus_list = Genus.objects.filter(subtribe=subtribe)
@@ -182,6 +187,12 @@ def genera(request):
         # genus_list = list(chain(otgenus_list, brgenus_list, cagenus_list)) #, orgenus_list))
         # genus_list = sorted(allgenus_list, key=operator.attrgetter('genus'))
         genus_list = otgenus_list
+    # If private request
+    if myspecies and author:
+        pid_list = SpcImages.objects.filter(author_id=author).values_list('gen', flat=True).distinct()
+        genus_list = genus_list.filter(pid__in=pid_list)
+
+
     # Complete building genus list
     # Define sort
     talpha = ''
@@ -198,7 +209,7 @@ def genera(request):
     context = {
         'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list,
+        'family_list': family_list, 'myspecies': myspecies,
         'alpha_list': alpha_list, 'alpha': alpha,
         'path': path
     }
@@ -208,7 +219,8 @@ def genera(request):
 @login_required
 def species(request):
     # path = resolve(request.path).url_name
-    from_path = ''
+    myspecies = ''
+    author = ''
     genus_obj = ''
     from_path = pathinfo(request)
     genus = ''
@@ -225,6 +237,10 @@ def species(request):
                 genus_obj = Genus.objects.get(genus=genus)
             except Genus.DoesNotExist:
                 genus_obj = ''
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
 
     # If Orchidaceae, go to full table.
     if family and family.family == 'Orchidaceae':
@@ -271,6 +287,11 @@ def species(request):
         talpha = request.GET['talpha']
     if talpha != '':
         species_list = species_list.filter(species__istartswith=talpha)
+    if myspecies and author:
+        pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+        species_list = species_list.filter(pid__in=pid_list)
+
+
     total = len(species_list)
     msg = ''
 
@@ -286,7 +307,7 @@ def species(request):
     context = {
         'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'alpha_list': alpha_list, 'talpha': talpha,
+        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
     return render(request, "common/species.html", context)
@@ -294,6 +315,8 @@ def species(request):
 
 @login_required
 def hybrid(request):
+    myspecies = ''
+    author = ''
     path = resolve(request.path).url_name
     path = 'genera'
     genus = ''
@@ -312,6 +335,10 @@ def hybrid(request):
         if genus:
             url = url + "&genus=" + str(genus)
         return HttpResponseRedirect(url)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
 
     hybrid_list = []
     syn = ''
@@ -357,6 +384,13 @@ def hybrid(request):
         talpha = request.GET['talpha']
     if talpha != '':
         hybrid_list = hybrid_list.filter(species__istartswith=talpha)
+    if myspecies and author:
+        if family and family.family == 'Orchidaceae':
+            pid_list = HybImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+        else:
+            pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+        hybrid_list = hybrid_list.filter(pid__in=pid_list)
+
     total = len(hybrid_list)
     # hybrid_list = hybrid_list.order_by('genus', 'species')
     if total > max_items:
@@ -368,7 +402,7 @@ def hybrid(request):
     context = {
         'genus': genus, 'hybrid_list': hybrid_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'alpha_list': alpha_list, 'talpha': talpha,
+        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
         'msg': msg, 'path': path, 'primary': primary,
     }
     return render(request, "common/hybrid.html", context)
@@ -690,6 +724,8 @@ def browsegen(request):
 
 def browse(request):
     app = ''
+    myspecies = ''
+    author = ''
     family = ''
     newfamily = ''
     talpha = ''
@@ -711,6 +747,10 @@ def browse(request):
         app = 'other'
 
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request, family)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
 
     # reqsubgenus = reqsection = reqsubsection = reqseries = ''
     # subgenus_obj = section_obj = subsection_obj = series_obj = ''
@@ -842,6 +882,9 @@ def browse(request):
                 pid_list = pid_list.filter(Q(hybrid__seed_species=seed) | Q(hybrid__pollen_species=seed))
             if pollen:
                 pid_list = pid_list.filter(Q(hybrid__seed_species=pollen) | Q(hybrid__pollen_species=pollen))
+        if myspecies and author:
+            my_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+            pid_list = pid_list.filter(pid__in=my_list)
 
         pid_list = pid_list.order_by('genus', 'species')
         total = len(pid_list)
@@ -853,8 +896,8 @@ def browse(request):
             sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
         # if switch display, restart pagination
-        if 'prevdisplay' in request.GET:
-            page = 1
+        # if 'prevdisplay' in request.GET:
+        #     page = 1
 
         for x in page_list:
             if x.get_best_img():
@@ -884,7 +927,7 @@ def browse(request):
     context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
         'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-        'page': page, 'total': total, 'talpha': talpha,
+        'page': page, 'total': total, 'talpha': talpha, 'myspecies': myspecies,
         'ads_insert': ads_insert, 'sponsor': sponsor,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,

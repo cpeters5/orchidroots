@@ -30,6 +30,7 @@ from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, S
 alpha_list = config.alpha_list
 logger = logging.getLogger(__name__)
 User = get_user_model()
+Photographer = apps.get_model('accounts', 'Photographer')
 Family = apps.get_model('core', 'Family')
 Subfamily = apps.get_model('core', 'Subfamily')
 Tribe = apps.get_model('core', 'Tribe')
@@ -260,6 +261,8 @@ def getPrev(request,arg, prev):
 
 @login_required
 def species(request):
+    myspecies = ''
+    author = ''
     role = getRole(request)
     family = ''
     if 'newfamily' in request.GET:
@@ -312,6 +315,10 @@ def species(request):
         subtribe = request.GET['subtribe']
         if subtribe:
             tribe_obj = Subtribe.objects.get(subtribe=subtribe)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
 
     if alpha != 'ALL':
         alpha = alpha[0: 1]
@@ -344,6 +351,9 @@ def species(request):
             if alpha:
                 if len(alpha) == 1:
                     this_species_list = this_species_list.filter(species__istartswith=alpha)
+            if myspecies and author:
+                pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+                this_species_list = this_species_list.filter(pid__in=pid_list)
 
             total = len(this_species_list)
 
@@ -367,7 +377,7 @@ def species(request):
                'tribe': tribe, 'tribe_list': tribe_list,
                'subtribe': subtribe, 'subtribe_list': subtribe_list,
                'msg': msg,
-               'syn': syn,
+               'syn': syn, 'myspecies': myspecies,
                'title': 'taxonomy', 'type': 'species'
                }
     return render(request, 'orchidaceae/species.html', context)
@@ -375,6 +385,9 @@ def species(request):
 
 @login_required
 def hybrid(request):
+    myspecies = ''
+    myauthor = ''
+    primary = ''
     role = getRole(request)
     family = ''
     if 'newfamily' in request.GET:
@@ -386,6 +399,10 @@ def hybrid(request):
         send_url = '/common/hybrid/?family=' + str(family) + '&role=' + role
         # print(send_url)
         return HttpResponseRedirect(send_url)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            myauthor = Photographer.objects.get(user_id=request.user)
 
     type = 'hybrid'
     family = Family.objects.get(family='Orchidaceae')
@@ -408,6 +425,8 @@ def hybrid(request):
         pollen = request.GET['pollen']
     seed_genus, prev_seed_genus = getPrev(request, 'seed_genus', 'prev_seed_genus')
     pollen_genus, prev_pollen_genus = getPrev(request, 'pollen_genus', 'prev_pollen_genus')
+    if 'primary' in request.GET:
+        primary = request.GET['primary']
     if 'syn' in request.GET:
         syn = request.GET['syn']
     if 'author' in request.GET:
@@ -456,6 +475,10 @@ def hybrid(request):
             if pollen:
                 this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=pollen)
                                                              | Q(hybrid__pollen_species__icontains=pollen))
+        if primary and primary == 'Y':
+            this_species_list = this_species_list.filter(hybrid__seed_id__type='species').filter(hybrid__pollen_type='species')
+        else:
+            primary = 'N'
 
         # Building pid ;list
 
@@ -472,7 +495,10 @@ def hybrid(request):
             if year_valid:
                 year = int(year)
                 this_species_list = this_species_list.filter(year=year)
-
+            # If private request
+            if myspecies and myauthor:
+                pid_list = HybImages.objects.filter(author_id=myauthor).values_list('pid', flat=True).distinct()
+                this_species_list = this_species_list.filter(pid__in=pid_list)
             if this_species_list:
                 total = len(this_species_list)
             else:
@@ -487,10 +513,11 @@ def hybrid(request):
     write_output(request, str(reqgenus))
     context = {'my_list': this_species_list, 'genus_list': genus_list, 'family': family,
                'total': total, 'alpha_list': alpha_list, 'alpha': alpha,
-               'genus': reqgenus, 'year': year, 'syn': syn,
+               'genus': reqgenus, 'genobj': genus, 'year': year, 'syn': syn,
                'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
                'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
                'role': role, 'title': 'taxonomy', 'msg': msg,
+               'myspecies': myspecies, 'primary': primary,
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 

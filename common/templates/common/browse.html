@@ -222,6 +222,8 @@ img{
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
                         Sample images of
+                        <span style="color:blue">
+                            <i>
                         {% if family %}
                             {{family.family}}
                             {% if subfamily %}
@@ -234,7 +236,6 @@ img{
                                 {% endif %}
                             {% endif %}
                         {% endif %}
-
                         {% if type == 'hybrid' %}
                             {% if seed_genus or seed or pollen_genus or pollen %}
                                 {% if seed_genus or seed %}
@@ -254,8 +255,10 @@ img{
                         {% else %}
                             {{genus}}
                         {% endif %}
-                        {% if genus %}
-                            {{type|title}}
+                            </i>
+                    </span>
+                        {% if type %}
+                            {{type}}
                         {% endif %}
 <!--                        {% if type == 'hybrid' %}Hybrids{% else %}Species{% endif %}-->
                         {% if not family %} in Other Families {% endif %}
@@ -357,16 +360,15 @@ img{
                     <br>
                     <form action="?" id="display" style="display:inline-block">
                         <input type="hidden" name="family" value="{{family}}" />
-                        <input type="hidden" name="alpha" value="{{alpha}}" />
                         <input type="hidden" name="talpha" value="{{talpha}}" />
                         <input type="hidden" name="type" value="{{type}}" />
                         <input type="hidden" name="role" value="{{role}}" />
-                        <input type="hidden" name="prevdisplay" value="{{display}}" />
+<!--                        <input type="hidden" name="prevdisplay" value="{{display}}" />-->
 <!--                        <input type="hidden" name="page" value="{{page}}" />-->
-                        <input type="hidden" name="subgenus" value="{{subgenus_obj.subgenus}}" />
-                        <input type="hidden" name="section" value="{{section_obj.section}}" />
-                        <input type="hidden" name="subsection" value="{{subsection_obj.subsection}}" />
-                        <input type="hidden" name="series" value="{{series_obj.series}}" />
+<!--                        <input type="hidden" name="subgenus" value="{{subgenus_obj.subgenus}}" />-->
+<!--                        <input type="hidden" name="section" value="{{section_obj.section}}" />-->
+<!--                        <input type="hidden" name="subsection" value="{{subsection_obj.subsection}}" />-->
+<!--                        <input type="hidden" name="series" value="{{series_obj.series}}" />-->
                         <input type="hidden" name="genus" value="{{genus}}" />
                         <input type="hidden" name="seed_genus" value="{{seed_genus}}" />
                         <input type="hidden" name="pollen_genus" value="{{pollen_genus}}" />
@@ -378,7 +380,24 @@ img{
                         <input type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Check to hide species without images</span>
                         {% endif %}
                 </form>
-
+                &nbsp;
+                <form action="?" id="myspecies" style="display:inline-block">
+                    <input type="hidden" name="family" value="{{family}}" />
+                    <input type="hidden" name="talpha" value="{{talpha}}" />
+                    <input type="hidden" name="type" value="{{type}}" />
+                    <input type="hidden" name="role" value="{{role}}" />
+                    <input type="hidden" name="genus" value="{{genus}}" />
+                    <input type="hidden" name="seed_genus" value="{{seed_genus}}" />
+                    <input type="hidden" name="pollen_genus" value="{{pollen_genus}}" />
+                    <input type="hidden" name="seed" value="{{seed}}" />
+                    <input type="hidden" name="pollen" value="{{pollen}}" />
+                    <input type="hidden" name="display" value="{{display}}" />
+                    {% if myspecies %}
+                    <input type="checkbox" class="form-check-input" name="myspecies" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
+                    {% else %}
+                    <input type="checkbox" class="form-check-input" name="myspecies" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
+                    {% endif %}
+                </form>
                 <!-- Display -->
                     <div class="container justify-content-left align-items-center" style="margin-top:10px; padding:0; text-align: left;">
                         {% if page_list %}

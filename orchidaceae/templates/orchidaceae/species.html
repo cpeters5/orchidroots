@@ -169,10 +169,9 @@ option {
             <h4>
                 {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} Species
                 {% if genus.num_hybrid > 0 %}
-                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Hybrid List</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
                 {% endif %}
                 <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse</a>
-                <a class="btn btn-custom" style="margin:0 8px;" href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus}}&alpha={{alpha}}&syn=N">Goto hybrid list</a>
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                     <input type="hidden" name="genus" value="{{genus}}" />
                     <input type="hidden" name="family" value="{{family}}" />
@@ -180,14 +179,31 @@ option {
                     <input type="hidden" name="tribe" value="{{tribe}}" />
                     <input type="hidden" name="subtribe" value="{{subtribe}}" />
                     <input type="hidden" name="alpha" value="{{alpha}}" />
+                    <input type="hidden" name="myspecies" value="{{myspecies}}" />
                     {% if syn == 'N' %}
-                        <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;">
-                        <span style="margin-left:35px;font-size:13px;">Uncheck to show synonyms</span>
+                        <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                        <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
                     {% else %}
-                        <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left: 5px;">
-                        <span style="margin-left:35px;font-size:13px;">Check to hide synonyms</span>
+                        <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                        <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
                     {% endif %}
                 </form>
+                <form action="?" id="myspecies" style="display:inline-block">
+                    <input type="hidden" name="genus" value="{{genus}}" />
+                    <input type="hidden" name="family" value="{{family}}" />
+                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
+                    <input type="hidden" name="tribe" value="{{tribe}}" />
+                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
+                    <input type="hidden" name="alpha" value="{{alpha}}" />
+                    <input type="hidden" name="role" value="{{role}}" />
+                    <input type="hidden" name="syn" value="{{syn}}" />
+                    {% if myspecies %}
+                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>
+                    {% else %}
+                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>
+                    {% endif %}
+                </form>
+
             </h4>
 
             <span style="color: red;">{{msg|default:''}}</span>

@@ -221,7 +221,9 @@ img{
             <div class="card">
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
-                        Browse images of
+                        Sample images of
+                        <span style="color:blue">
+                            <i>
                         {% if family %}
                             {{family.family}}
                             {% if subfamily %}
@@ -234,6 +236,8 @@ img{
                                 {% endif %}
                             {% endif %}
                         {% endif %}
+                            </i>
+                        </span>
                     </span>
                 </div>
                 <div class="card-body">
@@ -319,7 +323,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}}
+                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}} {{x}}
                                         {% if x.imgobj.status == 'synonym' %}<br><span style="font-size:11px">(syn. x{{x.imgobj.getAccepted.binomial_it|safe}})</span>{% endif %}
                                     </div>
                                 {% endif %}

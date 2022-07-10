@@ -19,14 +19,28 @@
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Species list</a>
+                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&myspecies={{myspecies}}">Species list</a>
                             {% if not genus or genus.num_hybrid > 0 %}
-                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Hybrid list</a>
+                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
                             {% endif %}
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
                                 <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&alpha={{alpha}}&role={{role}}">Go to full genus list</a>
                             {% endif %}
+                            <form action="?" id="myspecies" style="display:inline-block">
+                                <input type="hidden" name="family" value="{{family}}" />
+                                <input type="hidden" name="talpha" value="{{talpha}}" />
+                                <input type="hidden" name="type" value="{{type}}" />
+                                <input type="hidden" name="role" value="{{role}}" />
+                                {% if myspecies %}
+                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My genera</span>
+                                {% else %}
+                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My genera</span>
+                                {% endif %}
+                            </form>
+
+
+
                         </div>
                         <!--   Main table-->
                         {% if genus_list %}

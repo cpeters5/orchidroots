@@ -26,7 +26,7 @@ dictop==0.2.1
 distlib==0.3.1
 dj-paypal==0.15.3
 dj-stripe==2.3.0
-Django==3.2.13
+Django==3.2.14
 django-admin-global-sidebar==0.2.0
 django-ads==1.1.1
 django-allauth==0.42.0
