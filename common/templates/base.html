@@ -685,10 +685,10 @@ nav .search-container button:hover {
     <div class=" p-2">
         {% if from_path == 'species' or from_path == 'photos' or from_path == 'information' %}
 <!--        Disable family changes when in low level view.-->
-            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="#">Bromeliads</a>
-            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="#">Cactus</a>
-            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="#">Orchids</a>
-            <a class="disabled-link btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="#">Others</a>
+<!--            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="#">Bromeliads</a>-->
+<!--            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="#">Cactus</a>-->
+<!--            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="#">Orchids</a>-->
+<!--            <a class="disabled-link btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="#">Others</a>-->
         {% else %}
             {% if family %}
                 <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="?newfamily=Bromeliaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliads</a>
