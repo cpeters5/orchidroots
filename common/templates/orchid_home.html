@@ -209,7 +209,7 @@ img{
                     {% endif %}
                     <div class="imageitem">
                         <div class="imgtitle">{{orcimage.gen.family}}</div>
-                        <a href="{% url 'common:browse' %}?family={{orcimage.gen.family}}&genus={{orcimage.gen.genus}}&role={{role}}&display=checked">
+                        <a href="{% url 'common:browsegen' %}?family={{orcimage.gen.family}}&role={{role}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="{{orcimage.pid.pid.textname}}" src="{% static orcimage.image_dir %}{{orcimage.image_file}}">
                                 <div class="text text-br">{{image.id}}</div>
@@ -243,7 +243,7 @@ img{
 
                     <div class="imageitem">
                         <div class="imgtitle">{{broimage.gen.family}}</div>
-                        <a href="{% url 'common:browse' %}?family={{broimage.gen.family}}&genus=&role={{role}}&display=checked">
+                        <a href="{% url 'common:browsegen' %}?family={{broimage.gen.family}}&role={{role}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="{{broimage.pid.pid.textname}}" src="{% static broimage.image_dir %}{{broimage.image_file}}">
                                 <div class="text text-br">{{image.id}}</div>
@@ -278,7 +278,7 @@ img{
 
                     <div class="imageitem">
                         <div class="imgtitle">{{cacimage.gen.family}}</div>
-                        <a href="{% url 'common:browse' %}?family={{cacimage.gen.family}}&genus=&role={{role}}&display=checked">
+                        <a href="{% url 'common:browsegen' %}?family={{cacimage.gen.family}}&role={{role}}&display=checked">
                             <div class="box">
                                 <img class="thumbnails" alt="{{cacimage.pid.pid.textname}}" src="{% static cacimage.image_dir %}{{cacimage.image_file}}">
                                 <div class="text text-br">{{image.id}}</div>
@@ -315,7 +315,7 @@ img{
                     {% if succulent_obj %}
                        <div class="imageitem">
                             <div class="imgtitle">Succulent</div>
-                            <a href="{% url 'common:browse' %}?family={{succulent_obj.gen.family}}&genus=&role={{role}}&display=checked&group=succulent">
+                            <a href="{% url 'common:browsegen' %}?family={{succulent_obj.gen.family}}&role={{role}}&display=checked&group=succulent">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{succulent_obj.pid.pid.textname}}" src="{% static succulent_obj.image_dir %}{{succulent_obj.image_file}}">
                                     <div class="text text-br">{{image.id}}</div>
@@ -352,7 +352,7 @@ img{
                     {% if carnivorous_obj %}
                        <div class="imageitem">
                             <div class="imgtitle">Carnivorous</div>
-                            <a href="{% url 'common:browse' %}?family={{carnivorous_obj.gen.family}}&genus=&role={{role}}&display=checked&group=carnivorous">
+                            <a href="{% url 'common:browsegen' %}?family={{carnivorous_obj.gen.family}}&role={{role}}&display=checked&group=carnivorous">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static carnivorous_obj.image_dir %}{{carnivorous_obj.image_file}}">
                                     <div class="text text-br">{{image.id}}</div>
@@ -389,7 +389,7 @@ img{
                     {% for othimage in other_list %}
                        <div class="imageitem">
                             <div class="imgtitle">{{othimage.gen.family}}</div>
-                            <a href="{% url 'common:browse' %}?family={{othimage.gen.family}}&genus=&role={{role}}&display=checked">
+                            <a href="{% url 'common:browsegen' %}?family={{othimage.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{othimage.pid.pid.textname}}" src="{% static othimage.image_dir %}{{othimage.image_file}}">
                                     <div class="text text-br">{{image.id}}</div>
