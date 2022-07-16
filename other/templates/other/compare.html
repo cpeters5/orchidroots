@@ -294,14 +294,14 @@ input[type=text] {
                         <div style="padding:10px;">
                             <form action="?" id="compare">
                             <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
-                            <input type="hidden" name="role" value="{{role}}" />
-                            <input type="hidden" name="pid" value="{{species.pid}}" />
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" value="{{genus2}}" placeholder="Genus" title=""/>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" value="{{species2.species}}" placeholder="Species"  title=""/>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" value="{{species2.infraspr|default_if_none:' '}}" placeholder="infraspecific rank" title=""/>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" value="{{species2.infraspe|default_if_none:' '}}" placeholder="infraspecific value" title=""/>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="author2" onfocus="this.select()" value="{{species2.author|default_if_none:' '}}" placeholder="Author" title=""/>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="year2" onfocus="this.select()" value="{{species2.year|default_if_none:' '}}" placeholder="year" title=""/>
+                            <input type="hidden" name="role" value="{{role}}">
+                            <input type="hidden" name="pid" value="{{species.pid}}">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" value="{{genus2}}" placeholder="Genus" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" value="{{species2.species}}" placeholder="Species"  title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" value="{{species2.infraspr|default_if_none:' '}}" placeholder="infraspecific rank" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" value="{{species2.infraspe|default_if_none:' '}}" placeholder="infraspecific value" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="author2" onfocus="this.select()" value="{{species2.author|default_if_none:' '}}" placeholder="Author" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="year2" onfocus="this.select()" value="{{species2.year|default_if_none:' '}}" placeholder="year" title="">
                             </form>
                         </div>
                         <div class="d-flex justify-content-center" style="display:inline-block;text-align:center">

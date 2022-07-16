@@ -49,11 +49,11 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            Species with common name {{commonname}}
+                            Species with common name {{commonname}}&nbsp;&nbsp;
                         <form action="{% url 'common:commonname' %}" id=otcname autocomplete="off">
-                            <input type="hidden" form="otcname" name="role" value={{role}} />
-                            <input type="hidden" form="otcname" name="family" value="other" />
-                            <input name="commonname" class="custom-select" placeholder="other common name" style="text-align:center">
+                            <input type="hidden" form="otcname" name="role" value={{role}}>
+                            <input type="hidden" form="otcname" name="family" value="other">
+                            <input name="commonname" class="form-control" placeholder="other common name" style="text-align:center">
                         </form>
                         </div>
 

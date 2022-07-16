@@ -1017,12 +1017,14 @@ def research(request):
 def commonname(request):
     talpha = ''
     family = 'other'
+    role = ''
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'role' in request.GET:
         role = request.GET['role']
-    else:
-        role = 'pub'
+    # else:
+    #     role = 'pub'
 
+    print(">>> role = " + str(role))
     context = {'role': role,}
     if 'commonname' in request.GET:
         commonname = request.GET['commonname']
@@ -1036,7 +1038,7 @@ def commonname(request):
         if talpha != '':
             species_list = species_list.filter(species__istartswith=talpha)
         total = len(species_list)
-
+        print(">>> role = " + str(role))
         context = {'species_list': species_list, 'commonname': commonname, 'role': role,
                    'app': 'other', 'genus_list': genus_list,
                    'talpha': talpha, 'alpha_list': alpha_list}
@@ -1165,7 +1167,6 @@ def deletephoto(request, orid, pid):
     if 'next' in request.GET:
         next = request.GET['next']
     role = getRole(request)
-
     if area == 'allpending':
         # bulk delete by curators from all_pending tab
         url = "%s&page=%s&type=%s&days=%d&family=" % (reverse('common:curate_pending'), page, ortype, days, family)
@@ -1173,10 +1174,9 @@ def deletephoto(request, orid, pid):
         # Requested from all upload photos
         url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
     if next == 'photos':
-        url = "%s?role=%s&family=%s" % (reverse('display:photos'), role, family)
+        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
     else:
         url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
-    # url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
 
     # Finally remove file if exist
     if os.path.isfile(filename):

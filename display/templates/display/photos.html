@@ -255,9 +255,9 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
             {% if role == 'cur' %}
                 <form class="" action="" id="author">
-                    <input type="hidden" name="genus" value="{{genus}}" />
-                    <input type="hidden" name="family" value="{{species.gen.family}}" />
-                    <input type="hidden" name="role" value="{{role}}" />
+                    <input type="hidden" name="genus" value="{{genus}}" >
+                    <input type="hidden" name="family" value="{{species.gen.family}}" >
+                    <input type="hidden" name="role" value="{{role}}" >
                     <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0 auto;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip" data-placement="bottom" title="author">
                         {% if not author %}
                             <option disabled selected>Select an author</option>

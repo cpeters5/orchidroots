@@ -103,16 +103,16 @@ form {
                 <br>
                 <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
-                    <input type="hidden" name="family" value="Bromeliaceae" />
-                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Bromeliaceae">
+                    <input type="hidden" name="role" value="{{ role }}">
                     <input class="form-control resinput" id="brsc" type="text" name="spc_string" placeholder="Search Bromeliads" style="margin: 4px 0">
                     <label class="labelfor" for="brsc">&nbsp;Keyword search Bromeliaceae</label>
                    </div>
                 </form>
                 <form class="rescontrol" action="{% url 'common:species' %}"  style="display:inline-block;">
                    <div class="form-floating">
-                    <input type="hidden" name="role" value="{{ role }}" />
-                    <input type="hidden" name="family" value="Bromeliaceae" />
+                    <input type="hidden" name="role" value="{{ role }}">
+                    <input type="hidden" name="family" value="Bromeliaceae">
                     <input class="form-control resinput" id="listsp" type="text" name="genus" placeholder="input a Bromeliad genus" style="margin: 4px 0">
                     <label class="labelfor" for="listsp">&nbsp;Enter a genus to list species</label>
                    </div>
@@ -132,16 +132,16 @@ form {
                 <br>
                 <form action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
-                    <input type="hidden" name="family" value="Cactaceae" />
-                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Cactaceae">
+                    <input type="hidden" name="role" value="{{ role }}">
                     <input class="form-control resinput" id="casc" type="text" name="spc_string" placeholder="Search Cactaceae" style="margin: 4px 0">
                     <label for="casc">&nbsp;Keyword search Cactaceae</label>
                    </div>
                 </form>
                 <form action="{% url 'common:species' %}" id=cagenus>
                    <div class="form-floating">
-                    <input type="hidden" form="cagenus" name="role" value="{{ role }}" />
-                    <input type="hidden" form="cagenus" name="family" value="Cactaceae" />
+                    <input type="hidden" form="cagenus" name="role" value="{{ role }}">
+                    <input type="hidden" form="cagenus" name="family" value="Cactaceae">
                     <input class="form-control resinput" id="cagen" form="cagenus" type="text" name="genus" placeholder="input a Cactaceae genus" style="margin: 4px 0">
                     <label for="cagen">&nbsp;Enter a genus to list species</label>
                    </div>
@@ -162,8 +162,8 @@ form {
                 <br>
                 <form class="rescontrol" id="orsearch" action="/search/search_species/" style="display:inline-block;">
                    <div class="form-floating">
-                    <input type="hidden" name="family" value="Orchidaceae" />
-                    <input type="hidden" name="role" value="{{ role }}" />
+                    <input type="hidden" name="family" value="Orchidaceae" >
+                    <input type="hidden" name="role" value="{{ role }}" >
                     <input class="form-control resinput" id="orsc" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0">
                     <label for="orsc">&nbsp;Keyword search Orchidaceae</label>
                    </div>
@@ -171,16 +171,16 @@ form {
 
                 <form class="rescontrol" action="{% url 'common:species' %}" style="display:inline-block;">
                     <div class="form-floating">
-                    <input type="hidden" name="role" value="{{ role }}" />
-                    <input type="hidden" name="family" value="Orchidaceae" />
+                    <input type="hidden" name="role" value="{{ role }}" >
+                    <input type="hidden" name="family" value="Orchidaceae" >
                     <input class="form-control resinput" id="orgen" name="genus" placeholder="Search genus" style="margin: 4px 0">
                     <label for="orgen">&nbsp;Enter a genus to list species</label>
                     </div>
                 </form>
                 <form class="rescontrol" action="{% url 'common:hybrid' %}" style="display:inline-block;">
                     <div class="form-floating">
-                    <input type="hidden" name="role" value="{{ role }}" />
-                    <input type="hidden" name="family" value="Orchidaceae" />
+                    <input type="hidden" name="role" value="{{ role }}" >
+                    <input type="hidden" name="family" value="Orchidaceae" >
                     <input class="form-control resinput" id="orhyb" name="genus" placeholder="Search genus" style="margin: 4px 0">
                     <label for="orhyb">&nbsp;Enter a genus to list hybrids</label>
                     </div>
@@ -199,17 +199,17 @@ form {
                 <br>
                     <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
                        <div class="form-floating">
-                        <input type="hidden" name="family" value="other" />
-                        <input type="hidden" name="role" value="{{ role }}" />
+                        <input type="hidden" name="family" value="other" >
+                        <input type="hidden" name="role" value="{{ role }}" >
                         <input class="form-control resinput" id="otsc" type="text" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0;">
                         <label for="otsc">&nbsp;Keyword search other families</label>
                        </div>
                     </form>
                     <form class="rescontrol" id=otgenus action="{% url 'common:species' %}" style="display:inline-block;" >
                         <div class="form-floating">
-                        <input type="hidden" form="otgenus" name="role" value="{{ role }}" />
-                        <input type="hidden" form="otgenus" name="family" value="other" />
-                        <input type="hidden" form="otgenus" name="from_path" value="{{from_path}}" />
+                        <input type="hidden" form="otgenus" name="role" value="{{ role }}" >
+                        <input type="hidden" form="otgenus" name="family" value="other" >
+                        <input type="hidden" form="otgenus" name="from_path" value="{{from_path}}" >
                         <input class="form-control resinput" id="otgen" name="genus" placeholder="Search genus" style="margin: 4px 0;">
                         <label for="otgen">&nbsp;Enter a genus to list species</label>
                         </div>
@@ -217,16 +217,16 @@ form {
 
                     <form class="rescontrol" id=otcname action="{% url 'common:commonname' %}" style="display:inline-block;">
                         <div class="form-floating">
-                        <input type="hidden" form="otcname" name="role" value="{{ role }}" />
-                        <input type="hidden" form="otcname" name="family" value="other" />
+                        <input type="hidden" form="otcname" name="role" value="{{ role }}" >
+                        <input type="hidden" form="otcname" name="family" value="other" >
                         <input class="form-control" id="otcn" name="commonname" placeholder="Search by common name" style="margin: 4px 0;">
                         <label for="otcn">&nbsp;Filter by common name</label>
                         </div>
                     </form>
                     <form class="rescontrol" id=otdist action="{% url 'common:distribution' %}" style="display:inline-block;">
                         <div class="form-floating">
-                        <input type="hidden" form="otdist" name="role" value="{{ role }}" />
-                        <input type="hidden" form="otdist" name="family" value="other" />
+                        <input type="hidden" form="otdist" name="role" value="{{ role }}" >
+                        <input type="hidden" form="otdist" name="family" value="other" >
                         <input class="form-control" id="otds" name="distribution" placeholder="Filter by distribution" style="margin: 4px 0;">
                             <label for="otds">&nbsp;Filter by country or state</label>
                         </div>

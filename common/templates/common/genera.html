@@ -28,10 +28,10 @@
                                 <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&alpha={{alpha}}&role={{role}}">Go to full genus list</a>
                             {% endif %}
                             <form action="?" id="myspecies" style="display:inline-block">
-                                <input type="hidden" name="family" value="{{family}}" />
-                                <input type="hidden" name="talpha" value="{{talpha}}" />
-                                <input type="hidden" name="type" value="{{type}}" />
-                                <input type="hidden" name="role" value="{{role}}" />
+                                <input type="hidden" name="family" value="{{family}}" >
+                                <input type="hidden" name="talpha" value="{{talpha}}" >
+                                <input type="hidden" name="type" value="{{type}}" >
+                                <input type="hidden" name="role" value="{{role}}" >
                                 {% if myspecies %}
                                 <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My genera</span>
                                 {% else %}

@@ -59,8 +59,8 @@
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
                             {{distribution|title}} Native Species &nbsp;&nbsp;
                             <form action="{% url 'common:distribution' %}" id=otcname autocomplete="off">
-                                <input type="hidden" form="otcname" name="role" value="{{ role }}" />
-                                <input type="hidden" form="otcname" name="family" value="other" />
+                                <input type="hidden" form="otcname" name="role" value="{{ role }}" >
+                                <input type="hidden" form="otcname" name="family" value="other" >
                                 <input name="distribution" class="custom-select" placeholder="Select other country or state" style="text-align:center">
                             </form>
                         </div>

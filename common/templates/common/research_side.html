@@ -4,8 +4,8 @@
                 </form>
             <br>
                  <form action="{% url 'common:research' %}" id="genus" autocomplete="off">
-                    <input type="hidden" form="genus" name="role" value="{{ role }}" />
-                    <input type="hidden" form="genus" name="family" value="{{ family }}" />
+                    <input type="hidden" form="genus" name="role" value="{{ role }}" >
+                    <input type="hidden" form="genus" name="family" value="{{ family }}" >
                     <input name="genus" value="{{genus|title}}" class="custom-select" placeholder="Enter a new genus" style="text-align:center">
                 </form>
             <br>

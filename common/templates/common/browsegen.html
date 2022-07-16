@@ -248,10 +248,10 @@ img{
             <!--Filter-->
                     <br>
                     <form action="?" id="display" style="display:inline-block">
-                        <input type="hidden" name="family" value="{{family}}" />
-                        <input type="hidden" name="talpha" value="{{talpha}}" />
-                        <input type="hidden" name="role" value="{{role}}" />
-                        <input type="hidden" name="prevdisplay" value="{{display}}" />
+                        <input type="hidden" name="family" value="{{family}}" >
+                        <input type="hidden" name="talpha" value="{{talpha}}" >
+                        <input type="hidden" name="role" value="{{role}}" >
+                        <input type="hidden" name="prevdisplay" value="{{display}}" >
                         {% if display %}
                         <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Uncheck to include species without images</span>
                         {% else %}

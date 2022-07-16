@@ -32,8 +32,8 @@
                      {% csrf_token %}
                      <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                  {% endif %}
-                     <input type="hidden" name="role" value="{{role}}" />
-                     <input type="hidden" name="image_file" value="{{img.image_file }}" />
+                     <input type="hidden" name="role" value="{{role}}" >
+                     <input type="hidden" name="image_file" value="{{img.image_file }}" >
                      <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
 
                      {{form.author|as_crispy_field}}
@@ -50,7 +50,7 @@
                                 {{form.image_url|as_crispy_field}}
                              </div>
                          {% else %}
-                             <input type="hidden" name="image_url" value="{{img.image_url }}" />
+                             <input type="hidden" name="image_url" value="{{img.image_url }}" >
                          {% endif %}
                          <div class="form-group col-md-2 mb-0">
                             {{form.rank|as_crispy_field}}
@@ -93,7 +93,7 @@
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                      </span>
-                     <input type="hidden" name="role" value="{{ role }}" />
+                     <input type="hidden" name="role" value="{{ role }}" >
                  </form>
              </div>
          </div>

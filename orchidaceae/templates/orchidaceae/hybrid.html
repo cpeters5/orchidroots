@@ -175,9 +175,9 @@ option {
                     <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:browse' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
                 {% endif %}
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
-                    <input type="hidden" name="genus" value="{{genus}}" />
-                    <input type="hidden" name="family" value="{{family.family}}" />
-                    <input type="hidden" name="alpha" value="{{alpha}}" />
+                    <input type="hidden" name="genus" value="{{genus}}" >
+                    <input type="hidden" name="family" value="{{family.family}}" >
+                    <input type="hidden" name="alpha" value="{{alpha}}" >
                     {% if syn == 'N' %}
                     <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
                     <span style="margin:0 30px;font-size:13px;">hide synonyms</span>
@@ -187,14 +187,14 @@ option {
                     {% endif %}
                 </form>
                 <form action="?" id="primary" style="display:inline-block; margin-top: 5px;">
-                    <input type="hidden" name="family" value="{{family}}" />
-                    <input type="hidden" name="role" value="{{role}}" />
-                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
-                    <input type="hidden" name="tribe" value="{{tribe}}" />
-                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
-                    <input type="hidden" name="genus" value="{{genus}}" />
-                    <input type="hidden" name="syn" value="{{syn}}" />
-                    <input type="hidden" name="myspecies" value="{{myspecies}}" />
+                    <input type="hidden" name="family" value="{{family}}" >
+                    <input type="hidden" name="role" value="{{role}}" >
+                    <input type="hidden" name="subfamily" value="{{subfamily}}" >
+                    <input type="hidden" name="tribe" value="{{tribe}}" >
+                    <input type="hidden" name="subtribe" value="{{subtribe}}" >
+                    <input type="hidden" name="genus" value="{{genus}}" >
+                    <input type="hidden" name="syn" value="{{syn}}" >
+                    <input type="hidden" name="myspecies" value="{{myspecies}}" >
                     {% if primary == 'Y' %}
                     <input type="checkbox" class="form-check-input" name="primary" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">primary hybrid</span>
                     {% else %}
@@ -203,12 +203,12 @@ option {
                 </form>
                 &nbsp;
                 <form action="?" id="myspecies" style="display:inline-block">
-                    <input type="hidden" name="family" value="{{family}}" />
-                    <input type="hidden" name="genus" value="{{genus}}" />
-                    <input type="hidden" name="alpha" value="{{alpha}}" />
-                    <input type="hidden" name="role" value="{{role}}" />
-                    <input type="hidden" name="primary" value="{{primary}}" />
-                    <input type="hidden" name="syn" value="{{syn}}" />
+                    <input type="hidden" name="family" value="{{family}}" >
+                    <input type="hidden" name="genus" value="{{genus}}" >
+                    <input type="hidden" name="alpha" value="{{alpha}}" >
+                    <input type="hidden" name="role" value="{{role}}" >
+                    <input type="hidden" name="primary" value="{{primary}}" >
+                    <input type="hidden" name="syn" value="{{syn}}" >
                     {% if myspecies %}
                     <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">Show My hybrids</span>
                     {% else %}
@@ -223,28 +223,28 @@ option {
         <div class="card-body d-flex flex-wrap" style="padding:0;">
             <!--Genus-->
             <form action="?" id="hybrid">
-                <input type="hidden" name="family" value="{{family.family}}" />
-                <input type="hidden" name="alpha" value="{{alpha}}" />
-                <input class="btn btn-custom p-1 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard"/>
+                <input type="hidden" name="family" value="{{family.family}}" >
+                <input type="hidden" name="alpha" value="{{alpha}}" >
+                <input class="btn btn-custom p-1 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard">
             </form>
             <!--            Others-->
-            <input class="btn btn-custom p-1 m-1" form="hybrid" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)"/>
-            <input class="btn btn-custom p-1 m-1" form="hybrid" name="year" value='{{year}}' placeholder="Year" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="YYYY"/>
-            <input class="btn btn-custom p-1 m-1" form="hybrid" name="author" value='{{author}}' placeholder="Registrant" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Registrant name match string"/>
-            <input class="btn btn-custom p-1 m-1" form="hybrid" name="originator" value='{{originator}}' placeholder="Originator" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Originator name match string"/>
+            <input class="btn btn-custom p-1 m-1" form="hybrid" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)">
+            <input class="btn btn-custom p-1 m-1" form="hybrid" name="year" value='{{year}}' placeholder="Year" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="YYYY">
+            <input class="btn btn-custom p-1 m-1" form="hybrid" name="author" value='{{author}}' placeholder="Registrant" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Registrant name match string">
+            <input class="btn btn-custom p-1 m-1" form="hybrid" name="originator" value='{{originator}}' placeholder="Originator" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Originator name match string">
             <button form="hybrid" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
             <form action="?" id="parents">
-                <input type="hidden" name="family" value="{{family.family}}" />
-                <input type="hidden" name="alpha" value="{{alpha}}" />
-                <input type="hidden" name="genus" value="" />
-                <input type="hidden" name="spc" value="" />
-                <input type="hidden" name="author" value="" />
-                <input type="hidden" name="originator" value="" />
+                <input type="hidden" name="family" value="{{family.family}}" >
+                <input type="hidden" name="alpha" value="{{alpha}}" >
+                <input type="hidden" name="genus" value="" >
+                <input type="hidden" name="spc" value="" >
+                <input type="hidden" name="author" value="" >
+                <input type="hidden" name="originator" value="" >
                 <input class="btn btn-custom p-1 m-1" form="parents" list="genus_list" name="seed_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center; background-image: none" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus">
-                <input class="btn btn-custom p-1 m-1" form="parents" name="seed" value='{{seed}}' data-toggle="tooltip" data-placement="bottom"  title="a parent species" placeholder="Parent sp. #1" onfocus="this.select()"/>
+                <input class="btn btn-custom p-1 m-1" form="parents" name="seed" value='{{seed}}' data-toggle="tooltip" data-placement="bottom"  title="a parent species" placeholder="Parent sp. #1" onfocus="this.select()">
                 <!--Pollen Genus-->
                 <input  class="btn btn-custom p-1 m-1" form="parents" list="genus_list" name="pollen_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus">
-                <input class="btn btn-custom p-1 m-1" form="parents" name="pollen" value='{{pollen}}' data-toggle="tooltip" data-placement="bottom"  title="another parent species"  placeholder="Parent sp. #2" onfocus="this.select()"/>
+                <input class="btn btn-custom p-1 m-1" form="parents" name="pollen" value='{{pollen}}' data-toggle="tooltip" data-placement="bottom"  title="another parent species"  placeholder="Parent sp. #2" onfocus="this.select()">
                 <button form="parents" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
             </form>
              <span style="color: red;">{{msg|default:''}}</span>

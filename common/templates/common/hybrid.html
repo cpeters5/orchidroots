@@ -37,14 +37,14 @@
 
                         <!--   Main table-->
                                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
-                                    <input type="hidden" name="family" value="{{family}}" />
-                                    <input type="hidden" name="role" value="{{role}}" />
-                                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
-                                    <input type="hidden" name="tribe" value="{{tribe}}" />
-                                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
-                                    <input type="hidden" name="genus" value="{{genus}}" />
-                                    <input type="hidden" name="myspecies" value="{{myspecies}}" />
-                                    <input type="hidden" name="primary" value="{{primary}}" />
+                                    <input type="hidden" name="family" value="{{family}}" >
+                                    <input type="hidden" name="role" value="{{role}}" >
+                                    <input type="hidden" name="subfamily" value="{{subfamily}}" >
+                                    <input type="hidden" name="tribe" value="{{tribe}}" >
+                                    <input type="hidden" name="subtribe" value="{{subtribe}}" >
+                                    <input type="hidden" name="genus" value="{{genus}}" >
+                                    <input type="hidden" name="myspecies" value="{{myspecies}}" >
+                                    <input type="hidden" name="primary" value="{{primary}}" >
                                     {% if syn == 'N' %}
                                     <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
                                     {% else %}
@@ -52,14 +52,14 @@
                                     {% endif %}
                                 </form>
                                 <form action="?" id="primary" style="display:inline-block; margin-top: 5px;">
-                                    <input type="hidden" name="family" value="{{family}}" />
-                                    <input type="hidden" name="role" value="{{role}}" />
-                                    <input type="hidden" name="subfamily" value="{{subfamily}}" />
-                                    <input type="hidden" name="tribe" value="{{tribe}}" />
-                                    <input type="hidden" name="subtribe" value="{{subtribe}}" />
-                                    <input type="hidden" name="genus" value="{{genus}}" />
-                                    <input type="hidden" name="syn" value="{{syn}}" />
-                                    <input type="hidden" name="myspecies" value="{{myspecies}}" />
+                                    <input type="hidden" name="family" value="{{family}}" >
+                                    <input type="hidden" name="role" value="{{role}}" >
+                                    <input type="hidden" name="subfamily" value="{{subfamily}}" >
+                                    <input type="hidden" name="tribe" value="{{tribe}}" >
+                                    <input type="hidden" name="subtribe" value="{{subtribe}}" >
+                                    <input type="hidden" name="genus" value="{{genus}}" >
+                                    <input type="hidden" name="syn" value="{{syn}}" >
+                                    <input type="hidden" name="myspecies" value="{{myspecies}}" >
                                     {% if primary == 'Y' %}
                                     <input type="checkbox" class="form-check-input" name="primary" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Show primary hybrid</span>
                                     {% else %}
@@ -68,12 +68,12 @@
                                 </form>
                                 &nbsp;
                                 <form action="?" id="myspecies" style="display:inline-block">
-                                    <input type="hidden" name="family" value="{{family}}" />
-                                    <input type="hidden" name="talpha" value="{{talpha}}" />
-                                    <input type="hidden" name="type" value="{{type}}" />
-                                    <input type="hidden" name="role" value="{{role}}" />
-                                    <input type="hidden" name="primary" value="{{primary}}" />
-                                    <input type="hidden" name="syn" value="{{syn}}" />
+                                    <input type="hidden" name="family" value="{{family}}" >
+                                    <input type="hidden" name="talpha" value="{{talpha}}" >
+                                    <input type="hidden" name="type" value="{{type}}" >
+                                    <input type="hidden" name="role" value="{{role}}" >
+                                    <input type="hidden" name="primary" value="{{primary}}" >
+                                    <input type="hidden" name="syn" value="{{syn}}" >
                                     {% if myspecies %}
                                     <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My hybrids</span>
                                     {% else %}

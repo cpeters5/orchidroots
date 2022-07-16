@@ -461,9 +461,9 @@ div.text-bl a {
                     <a class="button button1" style="display:block;float:left;margin:0;padding:0;height:25px;width:180px;font-size: 14px" href="{% url 'detail:comments' %}?sort=-latest&prev_sort=latest">Go to full list</a>
                     <textarea style="width: 100%; white-space: normal; poadding:5px; text-align: left; font-size: 13px; -moz-text-align-last: left;text-align-last: left;"  rows="6"  name="memo" form="commentform"></textarea>
                     {% csrf_token %}
-                    <input type="hidden" name="type" value="hybrid" />
-                    <input type="hidden" name="id" value="{{id}}" />
-                    <input type="hidden" name="pid" value="{{species.pid}}" />
+                    <input type="hidden" name="type" value="hybrid" >
+                    <input type="hidden" name="id" value="{{id}}" >
+                    <input type="hidden" name="pid" value="{{species.pid}}" >
                     <input type="submit" id="com_submit" >
 
                 </form>
