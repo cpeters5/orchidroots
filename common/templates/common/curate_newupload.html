@@ -1,6 +1,5 @@
 {% load static %}
 {% include "base.html" %}
-{% include "detail-title.html" %}
 {% block body %}
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
@@ -93,7 +92,18 @@ img{
             <div class="p-2" style="width:100%">
                 <div style="margin:0 auto; text-align: center;min-height:200px;">
                     <br>
+                    <h6>New Uploaded Photos</h6>
                     <br>
+                   <div>
+                    {% if user.tier.tier > 1 %}
+                        {% if role == 'cur' %}
+                            {% if role == 'cur' %}
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}">Recently approved</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?gen=&type={{species.type}}">All private photos</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    </div>
                     {% if file_list %}
                         {% if last_page > 1 %}
                             {% include "detail/paginator_upl.html" %}

@@ -106,31 +106,24 @@ div.text-br {
 }
 
 </style>
-{% include "detail-title.html" %}
-<div style="width:95%;margin:0 auto;">
-    <div class="row justify-content-center align-items-center" style="border:0 solid blue;font-size:11px;">
-        <h6>All Private Photos</h6>
-        <!--Instruction-->
-        <a class="btn btn-xs btn-primary" type="button" data-toggle="collapse" href="#Instruction" style="margin:20px;">Instruction</a>
-        <div id="Instruction" class="collapse" style="padding:0 20px;">
-            This page is accessible by users with curator role only. It shows all private photos, those with rank = 0.  These photos are uploaded and has not beeen approved to public view, or declared as private photo by user.
-            Also included are photos has been rejeected as questionable or replaced by a new photos better fit for public view. There are two entry points.
-            <ul>
-                <li>"All pending" link in Curator home page</li>
-                <li>"All pending" link in Curator detail page (Photo tab)</li>
-            </ul>
-            In this page you may review and approve or delete photos.  There is a switch to toggle between hybrid and species, and options to select the # of days photos were uploaded.
-            You may go back to Curate view at any time by clicking on the "Curator" button below the top navbar.
-        </div>
-    </div>
 
-    {% include "common/detail-nav.html" %}
 
-    <div class="tab-content clearfix" style="background-color: white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+<div class="border" style="clear:left;width:95%;margin:0 auto;">
+    <div class="clearfix" style="width:100%;margin:0 auto;">
         <div class="d-flex flex-row bd-highlight mb-3">
             <div class="p-2" style="width:100%">
                 <div style="margin:0 auto; text-align: center;min-height:200px;">
+                    <h4>Private Photos</h4>
                     <div class="btn-group">
+                        {% if user.tier.tier > 1 %}
+                            {% if role == 'cur' %}
+                                {% if role == 'cur' %}
+                                    <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}">Recently approved</a>
+                                {% endif %}
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?gen=&type={{species.type}}">New uploaded photos</a>
+                            {% endif %}
+                        {% endif %}
+
                         <div class="dropdown">
                             <button type="button" class="btn btn-outline-primary btn-xs dropdown-toggle" id="speciesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% if type == 'species' %}
@@ -180,12 +173,12 @@ div.text-br {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family.family}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a> ({{num_image}})
-                                    <br>Approved by {{image.user_id}}, {{image.created_date.date}}
+                                    <a href="{% url 'display:photos' image.pid_id %}?role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
+                                    <br>Approved by {{image.approved_by}}, {{image.created_date.date}}
                                     {% if image.source_url %}
-                                        <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                                        <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
                                     {% else %}
-                                        {{image.get_displayname}}
+                                        {{image.get_displayname }}
                                     {% endif %}
                                 </div>
                             </div>

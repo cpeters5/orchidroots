@@ -105,10 +105,19 @@ div.text-br {
 }
 
 </style>
-<br>
-<br>
-<div class="border" style="clear:left;width:95%;margin:10px auto;">
+<div class="border" style="clear:left;width:95%;">
+    <br>
     <div class="clear-fix" style="text-align:center;border:0 solid blue;font-size:11px;">
+                    <div>
+                    {% if user.tier.tier > 1 %}
+                        {% if role == 'cur' %}
+                            {% if role == 'cur' %}
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}">Recently approved</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?gen=&type={{species.type}}">All private photos</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    </div>
         <br>
         <br>
         <h6>New Approved Photos</h6>

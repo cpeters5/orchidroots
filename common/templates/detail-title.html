@@ -86,7 +86,7 @@
                     </div>
                 {% endif %}
                 <br>
-
+                {% if species.pid %}
                     {% if user.tier.tier > 2 %}
                          <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>
                          <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>
@@ -102,6 +102,7 @@
 <!--                        <br>-->
 <!--                        <h7 style="color: red;text-align: center">To upload a {{species.name|safe}} photo, click here <a href="https://orchidroots.com/detail/photos/{{species.pid}}/?family=Orchidaceae&role=pri">OrchidRoots</a></h7>-->
 <!--                    {% endif %}-->
+                {% endif %}
                </div>
                 <br>
             </div>

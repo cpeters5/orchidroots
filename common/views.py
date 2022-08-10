@@ -1582,9 +1582,9 @@ def curate_pending(request):
         days = 7
 
     if ortype == 'hybrid' and family and family.family == 'Orchidaceae':
-        file_list = SpcImages.objects.filter(rank=0)
+        file_list = SpcImages.objects.filter(rank=0).exclude(approved_by=1)
     else:
-        file_list = HybImages.objects.filter(rank=0)
+        file_list = HybImages.objects.filter(rank=0).exclude(approved_by=1)
 
     file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
     if days >= 30:
