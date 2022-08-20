@@ -30,7 +30,7 @@ from utils.views import robots_txt
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
-    # path("robots.txt", robots_txt),
+    path("robots.txt", robots_txt),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
     # path('dispatch', dispatch, name='dispatch'),
     path('documents/', include('documents.urls')),
