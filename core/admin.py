@@ -50,9 +50,9 @@ class SubtribeAdmin(admin.ModelAdmin):
     pass
     list_display = ('family', 'subfamily', 'tribe', 'subtribe', 'author','year',)
     list_filter = ('family', 'subfamily', 'tribe', )
-    fields = [('family', 'subfamily', 'tribe', 'subtribe', 'author','year','description',)]
-    ordering = ['family', 'subfamily', 'tribe', 'subtribe']
-    search_fields = ['subtribe']
+    fields = [('subtribe', 'family', 'subfamily', 'tribe', 'author','year','description',)]
+    ordering = ['subtribe', 'family', 'subfamily', 'tribe']
+    search_fields = ['subtribe', 'family__family', 'subfamily__subfamily', 'tribe__tribe']
 
 
 
