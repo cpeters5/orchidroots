@@ -583,52 +583,20 @@ class AncestorDescendant(models.Model):
         return percent.strip("0").strip(".")
 
 
-class Distribution(models.Model):
-    id = models.AutoField(primary_key=True, default=10)
-    pid = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid',related_name='othdist_pid')
-    source = models.CharField(max_length=10, blank=True)
-    region_id = models.ForeignKey(Region, db_column='region_id',related_name='othnatregion_id',null=True, on_delete=models.DO_NOTHING)
-    subregion_code = models.ForeignKey(SubRegion, db_column='subregion_code',related_name='othnatsubregion_id',null=True, on_delete=models.DO_NOTHING)
-    continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='oth_continent_id', null=True, blank=True,on_delete=models.DO_NOTHING)
-    orig_code = models.CharField(max_length=100, null=True)
-    distribution = models.CharField(max_length=500, null=True)
-    localregion_code = models.CharField(max_length=10, null=True)
-    localregion_id = models.ForeignKey(LocalRegion, db_column='localregion_id',related_name='othnatlocalregion_id', null=True, blank=True,on_delete=models.DO_NOTHING)
-    comment = models.CharField(max_length=500,blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    class Meta:
-        unique_together = (("pid", "region_id","subregion_code","localregion_id"),)
-
-    def name(self):
-        name = ''
-        if self.localregion_id and self.localregion_id.id > 0 and self.localregion_id.code != 'OO':
-            name = name + self.localregion_id.name
-            if self.subregion_code:
-                name = name + ', ' + self.subregion_code.name + ', ' + self.continent_id.name
-        elif self.subregion_code:
-            name = name + self.subregion_code.name + ', ' + self.continent_id.name
-        elif self.region_id:
-            name = name + self.region_id.name
-        elif self.continent_id:
-            name = name + self.continent_id.name
-        return name
+class Location(models.Model):
+    dist = models.CharField(max_length=200,unique=True, blank=True)
+    name = models.CharField(max_length=200,blank=True)
 
     def __str__(self):
-        return self.name()
+        return self.dist
 
-    def subname(self):
-        return self.subregion_code.name
 
-    def regname(self):
-        return self.region_id.name
+class Distribution(models.Model):
+    pid = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid', default='', related_name='othdist_pid')
+    dist = models.ForeignKey(Location, db_column='dist', default='', on_delete=models.CASCADE)
 
-    def locname(self):
-        return self.localregion_id.name
-
-    def conname(self):
-        return self.continent_id.name
+    class Meta:
+        unique_together = (("pid", "dist"),)
 
 
 class Synonym(models.Model):
