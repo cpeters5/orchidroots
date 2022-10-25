@@ -693,19 +693,20 @@ nav .search-container button:hover {
 <!--            <a class="disabled-link btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="#">Others</a>-->
         {% else %}
             {% if family %}
-                <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="?newfamily=Bromeliaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliads</a>
-                <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="?newfamily=Cactaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>
+<!--                <a class="btn btn-info fambtn {% if family.family == 'Bromeliaceae' %}active1{% endif %}" href="?newfamily=Bromeliaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Bromeliads</a>-->
+<!--                <a class="btn btn-info fambtn {% if family.family == 'Cactaceae' %}active1{% endif %}" href="?newfamily=Cactaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Cactus</a>-->
                 <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="?newfamily=Orchidaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchids</a>
-                <a class="btn btn-info fambtn {% if family.application == 'other' or app == 'other' %}active1{% endif %}" href="?newfamily=&app=other&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Others</a>
+                <a class="btn btn-info fambtn {% if family.family != 'Orchidaceae' and not from_path %}active1{% endif %}" href="?newfamily=&app=other&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Non-orchids</a>
             {% else %}
             <!--     Deactivated for pages pages with no family info    -->
-                <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Bromeliaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Bromeliads</a>
-                <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Cactaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Cactus</a>
+<!--                <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Bromeliaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Bromeliads</a>-->
+<!--                <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Cactaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Cactus</a>-->
                 <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Orchidaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Orchids</a>
-                <a class="btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="{{full_path}}?{% if spc_string %}spc_string={{spc_string}}{% endif %}&display=checked">Others</a>
+                <a class="btn btn-info fambtn {% if app == 'other' and not from_path %}active1{% endif %}" href="{{full_path}}?{% if spc_string %}spc_string={{spc_string}}{% endif %}&display=checked">Non-orchids</a>
             {% endif %}
         {% endif %}
             &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
+            &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>
         <!--        <input type="button" value="Click here" style="float: right;">-->
     </div>
 
