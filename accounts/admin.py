@@ -51,7 +51,7 @@ class PhotographerAdmin(admin.ModelAdmin):
     list_filter = ('expertise',)
     fields = [('fullname','displayname', 'author_id','affiliation','status','url')]
     ordering = ['fullname']
-    search_fields = ['author_id','fullname']
+    search_fields = ['author_id','fullname','displayname']
 
 
 
