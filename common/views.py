@@ -1050,31 +1050,72 @@ def commonname(request):
 
 def distribution(request):
     talpha = ''
-    family = 'other'
+    distribution = ''
+    commonname = ''
+    family = ''
+    genus = ''
+    commonname = ''
+    crit = 0
+    from_path = pathinfo(request)
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'role' in request.GET:
         role = request.GET['role']
     else:
         role = 'pub'
-
+    if 'family' in request.GET:
+        reqfamily = request.GET['family']
+        try:
+            family = Family.objects.get(family=reqfamily)
+            crit = 1
+        except Family.DoesNotExist:
+            family = ''
+    if 'genus' in request.GET:
+        reqgenus = request.GET['genus']
+        try:
+            genus = Genus.objects.get(genus=reqgenus)
+            crit = 1
+        except Genus.DoesNotExist:
+            genus = ''
     if 'distribution' in request.GET:
         distribution = request.GET['distribution']
-        if distribution == '':
-            render(request, "common/research.html", {'role': role,})
+        if distribution != '': crit = 1
+    if 'commonname' in request.GET:
+        commonname = request.GET['commonname']
+        if commonname != '': crit = 1
 
-        species_list = Accepted.objects.filter(distribution__icontains=distribution)
+    # if distribution == '' and commonname == '':
+    #     render(request, "common/research.html", {'role': role,})
+
+        # species_list = Accepted.objects.filter(distribution__icontains=distribution)
+    species_list = []
+    if crit:
+        print(family)
+        if family != '':
+            species_list = Species.objects.filter(family=family)
+        else:
+            species_list = Species.objects.filter(family__application='other')
+        if genus != '':
+            species_list = species_list.filter(genus=genus)
+
+        if distribution:
+            dist_list = Distribution.objects.filter(dist_id__dist__icontains=distribution).values_list('pid', flat=True)
+            species_list = species_list.filter(pid__in=dist_list)
+
+        if commonname:
+            name_list = Accepted.objects.filter(common_name__icontains=commonname).values_list('pid', flat=True)
+            species_list = species_list.filter(pid__in=name_list)
+
         if 'talpha' in request.GET:
             talpha = request.GET['talpha']
         if talpha != '':
             species_list = species_list.filter(species__istartswith=talpha)
         total = len(species_list)
         species_list = species_list.order_by('species')
-        context = {'species_list': species_list, 'distribution': distribution, 'role': role,
-                   'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list}
-        write_output(request, str(distribution))
-        return render(request, "common/distribution.html", context)
-
-    return render(request, "common/research.html", {'role': role,})
+    context = {'species_list': species_list, 'distribution': distribution, 'commonname': commonname,
+               'family': family, 'genus': genus,
+               'role': role, 'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list, 'from_path': from_path}
+    write_output(request, str(distribution))
+    return render(request, "common/distribution.html", context)
 
 
 def mypaginator(request, full_list, page_length, num_show):
@@ -1162,15 +1203,13 @@ def deletephoto(request, orid, pid):
     filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
     upl.delete()
     area = ''
-    if 'area' in request.GET:
-        area = request.GET['area']
     if 'next' in request.GET:
         next = request.GET['next']
     role = getRole(request)
     if area == 'allpending':
         # bulk delete by curators from all_pending tab
         url = "%s&page=%s&type=%s&days=%d&family=" % (reverse('common:curate_pending'), page, ortype, days, family)
-    elif area == 'curate_newupload':  # from curate_newupload (all rank 0)
+    elif next == 'curate_newupload':  # from curate_newupload (all rank 0)
         # Requested from all upload photos
         url = "%s?page=%s" % (reverse('common:curate_newupload'), page)
     if next == 'photos':

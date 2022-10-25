@@ -80,7 +80,7 @@ form {
 .abtn {
     width: 205px !important;
     margin: auto;
-    height: 60px !important;
+    height: 40px !important;
     text-align:center;
 }
 .labelfor {
@@ -189,48 +189,46 @@ form {
         </div>
     {% else %}
         <div class="card">
-            <div class="card-header">
-                <a href="{% url 'common:genera' %}?app=other&role={{role}}" style="text-align:center"><h4>All Other Families</h4></a>
-            </div>
-            <div class="card-body" style="margin: auto;">
-                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
-                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked" style="text-align:center">Browse genera</a>
-                <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other" style="text-align:center">List genera</a>
+            <div style="margin: auto;">
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked" style="text-align:center">Browse genera</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other" style="text-align:center">List genera</a>
                 <br>
                     <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
-                       <div class="form-floating">
+<!--                       <div class="form-floating">-->
                         <input type="hidden" name="family" value="other" >
                         <input type="hidden" name="role" value="{{ role }}" >
-                        <input class="form-control resinput" id="otsc" type="text" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0;">
-                        <label for="otsc">&nbsp;Keyword search other families</label>
-                       </div>
+                        <input class="form-control abtn" id="otsc" type="text" name="spc_string" placeholder="Search keyword" style="margin: 4px 0;">
+<!--                        <label for="otsc">&nbsp;Keyword search other families</label>-->
+<!--                       </div>-->
                     </form>
                     <form class="rescontrol" id=otgenus action="{% url 'common:species' %}" style="display:inline-block;" >
-                        <div class="form-floating">
+<!--                        <div class="form-floating">-->
                         <input type="hidden" form="otgenus" name="role" value="{{ role }}" >
                         <input type="hidden" form="otgenus" name="family" value="other" >
                         <input type="hidden" form="otgenus" name="from_path" value="{{from_path}}" >
-                        <input class="form-control resinput" id="otgen" name="genus" placeholder="Search genus" style="margin: 4px 0;">
-                        <label for="otgen">&nbsp;Enter a genus to list species</label>
-                        </div>
+                        <input class="form-control abtn" id="otgen" name="genus" placeholder="List species in a genus" style="margin: 4px 0;">
+<!--                        <label for="otgen">&nbsp;Enter a genus to list species</label>-->
+<!--                        </div>-->
                     </form>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:distribution' %}?role={{role}}" style="text-align:center">Native Plant Search</a>
 
-                    <form class="rescontrol" id=otcname action="{% url 'common:commonname' %}" style="display:inline-block;">
-                        <div class="form-floating">
-                        <input type="hidden" form="otcname" name="role" value="{{ role }}" >
-                        <input type="hidden" form="otcname" name="family" value="other" >
-                        <input class="form-control" id="otcn" name="commonname" placeholder="Search by common name" style="margin: 4px 0;">
-                        <label for="otcn">&nbsp;Filter by common name</label>
-                        </div>
-                    </form>
-                    <form class="rescontrol" id=otdist action="{% url 'common:distribution' %}" style="display:inline-block;">
-                        <div class="form-floating">
-                        <input type="hidden" form="otdist" name="role" value="{{ role }}" >
-                        <input type="hidden" form="otdist" name="family" value="other" >
-                        <input class="form-control" id="otds" name="distribution" placeholder="Filter by distribution" style="margin: 4px 0;">
-                            <label for="otds">&nbsp;Filter by country or state</label>
-                        </div>
-                    </form>
+<!--                    <form class="rescontrol" id=otcname action="{% url 'common:commonname' %}" style="display:inline-block;">-->
+<!--                        <div class="form-floating">-->
+<!--                        <input type="hidden" form="otcname" name="role" value="{{ role }}" >-->
+<!--                        <input type="hidden" form="otcname" name="family" value="other" >-->
+<!--                        <input class="form-control" id="otcn" name="commonname" placeholder="Search by common name" style="margin: 4px 0;">-->
+<!--                        <label for="otcn">&nbsp;Filter by common name</label>-->
+<!--                        </div>-->
+<!--                    </form>-->
+<!--                    <form class="rescontrol" id=otdist action="{% url 'common:distribution' %}" style="display:inline-block;">-->
+<!--                        <div class="form-floating">-->
+<!--                        <input type="hidden" form="otdist" name="role" value="{{ role }}" >-->
+<!--                        <input type="hidden" form="otdist" name="family" value="other" >-->
+<!--                        <input class="form-control" id="otds" name="distribution" placeholder="Filter by distribution" style="margin: 4px 0;">-->
+<!--                            <label for="otds">&nbsp;Filter by country or state</label>-->
+<!--                        </div>-->
+<!--                    </form>-->
             </div>
         </div>
     {% endif %}

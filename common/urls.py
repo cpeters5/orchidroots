@@ -11,7 +11,7 @@ urlpatterns = [
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),
-    path('commonname/', views.commonname, name='commonname'),
+    # path('commonname/', views.commonname, name='commonname'),
     path('distribution/', views.distribution, name='distribution'),
     path('browsegen/', views.browsegen, name='browsegen'),
     path('browse/', views.browse, name='browse'),
@@ -34,6 +34,7 @@ urlpatterns = [
     path('curate_pending/', views.curate_pending, name='curate_pending'),
     path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
 
+    # Only works for orchidaceae.
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
 
     # upload from web threw error (species is not an instance)

@@ -37,86 +37,91 @@
         width: 20px;
         /*margin: 20px 0;*/
     }
-    .thisthumbnails {
-       object-fit: cover;
-       overflow: hidden;
-       height: 50px !important;
-       width : 50px !important;
-       padding:2px;
-        margin:5px auto;
+    .imgsize {
+        object-fit: cover;
+        overflow: hidden;
+        height: 100px;
+        width: 100px;
+        margin: 0 auto;
+        display: block;
+    }
+    .imgcol{
+        min-width:100px;
+    }
+    @media screen and (max-width: 600px) {
+        .imgsize {
+            height: 70px;
+            width: 70px;
+        }
+        .imgcol {
+            min-width: 72px;
+        }
+    }
 }
 </style>
 
 
-<div style="min-height:200px;background-color:white;width: 100%;">
-   <div style="clear:both"></div>
-   <div class="row" style="width:98%; margin:0 auto;">
-        <div class="col" style="text-align:left;margin-top:25px;">
+<div style="min-height:200px;background-color:white;width: 90%; margin:auto">
 <!--            If family is requested, then populate right section with genus list-->
 <!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
-                <div class="card m-1">
-                    <div class="card-header border">
-                        <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            {{distribution|title}} Native Species &nbsp;&nbsp;
-                            <form action="{% url 'common:distribution' %}" id=otcname autocomplete="off">
-                                <input type="hidden" form="otcname" name="role" value="{{ role }}" >
-                                <input type="hidden" form="otcname" name="family" value="other" >
-                                <input name="distribution" class="custom-select" placeholder="Select other country or state" style="text-align:center">
-                            </form>
-                        </div>
-
-                    </div>
-
-                    <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        {% if species_list %}
-<div style="clear:left">
-                        <div style="width:100%">
-                            <ul class="alphalist text-n" style="display:inline-block !important">
-                            <!--Alphabetical-->
-                                {% for opt in alpha_list %}
-                                    {% if talpha == opt %}
-                                        <li class="page-item active"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
-                                    {% else %}
-                                        <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&distribution={{distribution}}" >{{opt}}</a></li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if not talpha or talpha == "ALL" %}
-                                <li class="page-item active" style="width: 40px;"><a class="page-link" href="#">All </a></li>
-                                        {% else %}
-                                <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&distribution={{distribution}}">All </a></li>
-                                        {% endif %}
-                            </ul>
-                        </div>
-</div>
-
-
-
-                            <!--main table-->
-                                <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th class="spc_column">Species</th>
-<!--                                            <th>Higher taxonomic levels</th>-->
-                                            <th style="min-width:100px"></th>
-                                            <th class="d-none d-lg-table-cell hidden-xs">Distribution</th>
-                                        </tr>
-                                    </thead>
-                                        {% for species in species_list %}
-                                        <tr>
-                                            <td><a href="/display/photos/{{species.pid.pid}}/?family={{species.pid.gen.family}}&role={{role}}"><i>{{species.pid.name|safe}}</i></a> ({{species.pid.gen.family}}) </td>
-                                            <td>{% if species.get_best_img %}<img style="object-fit: cover; overflow: hidden; height: 100px; width: 100px;" alt="" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">{% endif %}</td>
-                                            <td class="d-none d-lg-table-cell hidden-xs"> {{species.distribution}}</td>
-                                        </tr>
-                                        {% endfor %}
-                                </table>
-                        {% else %}
-                            None!
-                        {% endif %}
-
-                    </div>
-                </div>
+    <div class="card m-1">
+        <div class="card-header border">
+            <div class="card-title m-2" style="color:green; font-size:17px;">
+                <h4>{{distribution|title}} Native Species</h4>
+                Filter
+                <form action="{% url 'common:distribution' %}" id=otcname autocomplete="off">
+                    <input type="hidden" form="otcname" name="role" value="{{ role }}" >
+                    <input type="text" name="family" value="{{family}}" placeholder="family" style="text-align:center">
+                    <input type="text" name="genus" value="{{genus}}" placeholder="genus" style="text-align:center">
+                    <input type="text" name="distribution" value="{{distribution}}" placeholder="country or state" style="text-align:center">
+                    <input type="text" name="commonname" value="{{commonname}}" placeholder="common name" style="text-align:center">
+                    <button form="otcname" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="visibility:hidden"></button>
+               </form>
+            </div>
         </div>
-   </div>
+
+        <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
+            {% if species_list %}
+            <div style="clear:left; width:80%;">
+                    <ul class="alphalist text-n" style="display:inline-block !important">
+                    <!--Alphabetical-->
+                        {% for opt in alpha_list %}
+                            {% if talpha == opt %}
+                                <li class="page-item active"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&distribution={{distribution}}&family={{family}}&genus={{genus}}&commonname={{commonname}}" >{{opt}}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not talpha or talpha == "ALL" %}
+                        <li class="page-item active" style="width: 40px;"><a class="page-link" href="#">All </a></li>
+                                {% else %}
+                        <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&distribution={{distribution}}&family={{family}}&genus={{genus}}&commonname={{commonname}}">All </a></li>
+                                {% endif %}
+                    </ul>
+            </div>
+
+
+                <!--main table-->
+                    <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="spc_column">species</th>
+                                <th class="imgcol"></th>
+                            </tr>
+                        </thead>
+                            {% for species in species_list %}
+                            <tr>
+                                <td><a href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><i>{{species.name|safe}}</i></a> ({{species.gen.family}})<br>{{species.accepted.common_name|default:''}} </td>
+                                <td class="imgcol">{% if species.get_best_img %}<img class='imgsize' alt="" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                    </table>
+            {% else %}
+                None!
+            {% endif %}
+
+        </div>
+    </div>
 </div>
 <br>
 <br>
@@ -132,7 +137,7 @@ $(document).ready(function() {
         "bPaginate": true,
         // "pagingType": "simple", # only show previous/next
  	    "fnPreDrawCallback": function( oSettings ) {
-            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter species list'});//tips
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Search species'});//tips
         },
         // "dom": '<"top"i>rt<"bottom"flp><"clear">',
         // "dom": '<"top"flp>rt<"bottom"i><"clear">',
