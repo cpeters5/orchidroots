@@ -65,8 +65,6 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('common/', include('common.urls')),
     path('display/', include('display.urls')),
-    path('cactaceae/', include('cactaceae.urls')),
-    path('bromeliaceae/', include('bromeliaceae.urls')),
     path('other/', include('other.urls')),
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),

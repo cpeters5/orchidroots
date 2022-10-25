@@ -40,7 +40,7 @@
                                     {% else %}
                                         <a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
                                     {% endif %}
-                                    {% if genus.0.family == 'Orchidaceae' or genus.0.family == 'Bromeliaceae' or genus.0.family == 'Cactaceae' %}
+                                    {% if genus.0.family == 'Orchidaceae' %}
                                         {% if genus.0.family != family %}
                                             (<a href="{% url 'search:search_species' %}?family={{genus.0.family}}&spc_string={{spc_string}}&role={{role}}&app={{genus.0.family}}">Search {{genus.0.family}} family</a>)
                                         {% endif %}
@@ -137,7 +137,7 @@
                     <br><b>
                     {% if not genus_list and not perfect_list and not match_list %}
                         Your search returned no matches for
-                        {{family.family|default:app}} families. Please try switch to another family or choose "All Other families" to expand the search to families other than Orchidaceae, Cactaceae and Bromeliaceae.
+                        {{family.family|default:app}} families. Switch to another family or choose "All Other families" to expand the search to families other than Orchidaceae.
                          or click on the "Aproximate search" button for imprecise matching
                     {% endif %}
                     </b><br>

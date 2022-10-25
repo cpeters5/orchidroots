@@ -27,8 +27,6 @@ def robots_txt(request):
         "Disallow: /admin/",
         "Disallow: /accounts/",
         "Disallow: /account/",
-        "Disallow: /bromeliaceae/",
-        "Disallow: /cactaceae/",
         "Disallow: /common/",
         "Disallow: /core/",
         "Disallow: /detail/",

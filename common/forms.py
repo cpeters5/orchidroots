@@ -3,7 +3,7 @@ from django.forms import ModelForm, Textarea, TextInput, ValidationError, Checkb
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
 from common.models import UploadFile
-from cactaceae.models import Species, Accepted, Hybrid, SpcImages, Genus
+from other.models import Species, Accepted, Hybrid, SpcImages, Genus
 from accounts.models import Photographer
 import copy
 

@@ -87,12 +87,8 @@ INSTALLED_APPS = [
     'documents',
     'donation',
     'search',
-    # 'utils',
-
-    'bromeliaceae',
     'detail',
     'orchidaceae',
-    'cactaceae',
     'other',
 
     # Third Party

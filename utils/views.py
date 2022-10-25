@@ -31,7 +31,7 @@ def get_family_list(request):
         family_list = Family.objects.filter(family__istartswith=alpha)
     else:
         family_list = Family.objects.all()
-    favorite = Family.objects.filter(family__in=('Orchidaceae', 'Bromeliaceae', 'Cactaceae'))
+    favorite = Family.objects.filter(family__in=('Orchidaceae'))
     family_list = favorite.union(family_list)
     return family_list, alpha
 

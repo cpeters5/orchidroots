@@ -47,8 +47,6 @@
         <ul style="padding-left:5px">
             <li class="li-side"><span class="sidefont" style="color:lightseagreen"><b>Plant Families</b></span></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Orchidaceae' %}active{% endif %}" href="{% url 'common:browse' %}?family=Orchidaceae&role={{role}}&display=checked">Orchidaceae</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Bromeliaceae' %}active{% endif %}" href="{% url 'common:browse' %}?family=Bromeliaceae&role={{role}}&display=checked">Bromeliaceae</a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Cactaceae' %}active{% endif %}" href="{% url 'common:browse' %}?family=Cactaceae&role={{role}}&display=checked">Cactaceae</a></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.application == 'other' %}active{% endif %}" href="{% url 'common:browse' %}?family=Crassulaceae&role={{role}}&display=checked">Other families</a></li>
 <hr>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm" href="{% url 'donation:donateapp' %}">Donate</a></li>

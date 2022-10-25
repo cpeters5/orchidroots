@@ -20,9 +20,6 @@ my ($sth, $sth1);
 # use open qw(:locale);
 
 my @apps = (
-	'bromeliaceae',
-	'cactaceae',
-	# 'orchidaceae',  # Processed in Orchidaceae domain
 	'other'
 );
 my $date = strftime "%Y-%m-%d:%H:%M-%S", localtime;
@@ -72,16 +69,6 @@ sub getFamImage {
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
 		$num_famspcimage{$row[1]} = $row[0] if $row[0] and $row[0] > 0;
-	}
-	$stmt = "select sum(num_spcimage), family from bromeliaceae_genus group by 2 order by 2";
-	&getASPM($stmt);
-	while (my @row = $sth->fetchrow_array()) {
-		$num_famhybimage{$row[1]} = $row[0] if $row[0] and $row[0] > 0;
-	}
-	$stmt = "select sum(num_spcimage), family from cactaceae_genus group by 2 order by 2";
-	&getASPM($stmt);
-	while (my @row = $sth->fetchrow_array()) {
-		$num_famhybimage{$row[1]} = $row[0] if $row[0] and $row[0] > 0;
 	}
 	$stmt = "select sum(num_spcimage), sum(num_hybimage), family from orchidaceae_genus group by 3 order by 3";
 	&getASPM($stmt);

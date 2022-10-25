@@ -1,8 +1,6 @@
 User-agent: *
 Disallow: /admin/
 Disallow: /accounts/
-Disallow: /bromeliaceae/
-Disallow: /cactaceae/
 Disallow: /core/
 Disallow: /detail/
 Disallow: /documents/

@@ -38,10 +38,8 @@ alpha_list = config.alpha_list
 def getAllGenera():
     # Call this when Family is not provided
     OrGenus = apps.get_model('orchidaceae', 'Genus')
-    BrGenus = apps.get_model('bromeliaceae', 'Genus')
-    CaGenus = apps.get_model('cactaceae', 'Genus')
     OtGenus = apps.get_model('other', 'Genus')
-    return OrGenus, BrGenus, CaGenus, OtGenus
+    return OrGenus, OtGenus
 
 
 def getFamilyImage(family):
@@ -174,18 +172,13 @@ def genera(request):
         elif family:
             genus_list = Genus.objects.filter(family=family)
     else:
-        # No family (e.g. first landing on this page), show all genera except Orchidaceae, Bromeliaceae and Cactaceae
-        OrGenus, BrGenus, CaGenus, OtGenus = getAllGenera()
-        # brgenus_list = BrGenus.objects.all().order_by('genus')
-        # cagenus_list = CaGenus.objects.all().order_by('genus')
+        # No family (e.g. first landing on this page), show all non-Orchidaceae genera
+        OrGenus, OtGenus = getAllGenera()
         if alpha:
             fam_list = family_list.values_list('family', flat=True)
             otgenus_list = OtGenus.objects.filter(family__in=fam_list)
         else:
             otgenus_list = OtGenus.objects.all()
-        # orgenus_list = OrGenus.objects.all().order_by('genus')
-        # genus_list = list(chain(otgenus_list, brgenus_list, cagenus_list)) #, orgenus_list))
-        # genus_list = sorted(allgenus_list, key=operator.attrgetter('genus'))
         genus_list = otgenus_list
     # If private request
     if myspecies and author:
@@ -696,10 +689,7 @@ def browsegen(request):
                     if family.family == 'Orchidaceae':
                         x.image_dir = 'utils/images/' + str(x.type) + '/'
                     else:
-                        if family.family in ('Bromeliaceae', 'Cactaceae'):
-                            x.image_dir = 'utils/images/' + str(family.family) + '/'
-                        else:
-                            x.image_dir = 'utils/images/' + str(x.family) + '/'
+                        x.image_dir = 'utils/images/' + str(x.family) + '/'
                 else:
                     x.image_dir = 'utils/images/' + str(x.family) + '/'
 
@@ -1422,7 +1412,7 @@ def myphoto_list(request):
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
 
-    app_list = ['Orchidaceae', 'Bromeliaceae', 'Cactaceae', 'other']
+    app_list = ['Orchidaceae', 'other']
     my_hyb_list = []
     my_list = []
     if role == 'pub':

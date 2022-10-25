@@ -223,12 +223,8 @@ def search_species(request):
 
     spc = spc_string
     if family:
-        if family.family == 'Cactaceae':
-            species_list = get_species_list('cactaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Orchidaceae':
+        if family.family == 'Orchidaceae':
             species_list = get_species_list('orchidaceae', family, subfamily, tribe, subtribe)
-        elif family.family == 'Bromeliaceae':
-            species_list = get_species_list('bromeliaceae', family, subfamily, tribe, subtribe)
         else:
             species_list = get_species_list('other')
             species_list = species_list.filter(gen__family=family.family)
@@ -242,19 +238,13 @@ def search_species(request):
         if genus_string:  # Seach genus table
             min_score = 80
             # Try to match genus
-            CaGenus = apps.get_model('cactaceae', 'Genus')
             OrGenus = apps.get_model('orchidaceae', 'Genus')
             OtGenus = apps.get_model('other', 'Genus')
-            BrGenus = apps.get_model('bromeliaceae', 'Genus')
-            cagenus_list = CaGenus.objects.all()
-            cagenus_list = cagenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             orgenus_list = OrGenus.objects.all()
             orgenus_list = orgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
-            brgenus_list = BrGenus.objects.all()
-            brgenus_list = brgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
             otgenus_list = OtGenus.objects.all()
             otgenus_list = otgenus_list.values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
-            genus_list = cagenus_list.union(orgenus_list).union(otgenus_list).union(brgenus_list)
+            genus_list = (orgenus_list).union(otgenus_list)
             search_list = []
             for x in genus_list:
                 if x['genus']:
@@ -267,19 +257,13 @@ def search_species(request):
             genus_list = search_list
         if single_word:
             #Try to 0match species from all families
-            CaSpecies = apps.get_model('cactaceae', 'Species')
             OrSpecies = apps.get_model('orchidaceae', 'Species')
             OtSpecies = apps.get_model('other', 'Species')
-            BrSpecies = apps.get_model('bromeliaceae', 'Species')
-            caspecies_list = CaSpecies.objects.filter(species__istartswith=spc_string)
-            caspecies_list = caspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
             orspecies_list = OrSpecies.objects.filter(species__istartswith=spc_string)
             orspecies_list = orspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
-            brspecies_list = BrSpecies.objects.filter(species__istartswith=spc_string)
-            brspecies_list = brspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
             otspecies_list = OtSpecies.objects.filter(species__istartswith=spc_string)
             otspecies_list = otspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
-            matched_species_list = caspecies_list.union(orspecies_list).union(otspecies_list).union(brspecies_list)
+            matched_species_list = (orspecies_list).union(otspecies_list)
             for x in matched_species_list:
                 if x['species']:
                     score = fuzz.ratio(x['species'].lower(), spc_string.lower())
@@ -301,13 +285,8 @@ def search_species(request):
                 grex = grex[1]
             else:
                 grex = grex[0]
-            # print("spc_string = " + spc_string)
-            # print("grex = " + grex)
             if len(words) > 1:
                 perfect_list = species_list.filter(binomial__istartswith=spc_string)
-            # print("words = " + str(len(words)))
-            # print("species_list = " + str(len(species_list)))
-            # print("perfect_list = " + str(len(perfect_list)))
             if len(perfect_list) == 0:
                 if len(words) == 1:
                     # Single word could be a genus or an epithet
