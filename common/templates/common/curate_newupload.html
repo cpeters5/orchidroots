@@ -122,7 +122,7 @@ img{
                                     {% else %}
                                         <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{family.family}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
                                     {% endif %}
-                                    <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{family.family}}&role={{role}}&tab={{tab}}&page={{page}}&area=curate_newupload" >Delete</a>
+                                    <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{family.family}}&role={{role}}&tab={{tab}}&page={{page}}&next=curate_newupload" >Delete</a>
                                 </div>
                             </div>
                         {% endfor %}
