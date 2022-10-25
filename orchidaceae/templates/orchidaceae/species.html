@@ -307,8 +307,8 @@ option {
                         <td align="left">
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
-                                    (syn. {% if species.getAcc %}
-                                            <a href="{% url 'display:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
+                                    (syn. {% if species.getAcc %} {{species.getAccepted.pid}}
+                                            <a href="{ url 'display:photos' species.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
                                         {% else %}
                                             {{species.getAccepted.binomial|safe}}
                                         {% endif %}
