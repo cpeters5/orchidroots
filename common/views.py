@@ -44,13 +44,13 @@ def getAllGenera():
 
 def getFamilyImage(family):
     SpcImages = apps.get_model(family.application, 'SpcImages')
-    return SpcImages.objects.filter(rank__lt=7).filter(status='approved').order_by('-rank','quality', '?')[0:1][0]
+    return SpcImages.objects.filter(rank__lt=7).order_by('-rank','quality', '?')[0:1][0]
 
 
 def orchid_home(request):
     ads_insert = 0
     sponsor = ''
-
+    all_list = []
     role = getRole(request)
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
@@ -58,79 +58,53 @@ def orchid_home(request):
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
         return HttpResponseRedirect(url)
 
-    num_samples = 5
+    num_samples = 4
     # 3 major families + succulent + carnivorous
     # (3 other families form the last row.)
     num_blocks = 5
-    orcfamily = Family.objects.get(pk='Orchidaceae')
-    orcimage = getFamilyImage(orcfamily)
 
-    brofamily = Family.objects.get(pk='Bromeliaceae')
-    broimage = getFamilyImage(brofamily)
-    cacfamily = Family.objects.get(pk='Cactaceae')
-    cacimage = getFamilyImage(cacfamily)
+    # Get a sample image of orchids
+    SpcImages = apps.get_model('orchidaceae', 'SpcImages')
+    orcimage = SpcImages.objects.filter(rank__lt=7).order_by('-rank','quality', '?')[0:1][0]
+    all_list = all_list + [['orchidaceae', orcimage]]
 
     # Get random other families
     SpcImages = apps.get_model('other', 'SpcImages')
     Genus = apps.get_model('other', 'Genus')
     sample_families = Genus.objects.filter(num_spcimage__gt=0).distinct().values_list('family', flat=True).order_by('?')[0:num_samples]
-    other_list = []
     for fam in sample_families:
         try:
             other_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
         except:
             continue
-        other_list.append(other_obj)
-    del other_list[3:]
+        all_list = all_list + [[other_obj.pid.family, other_obj]]
+
     # get random suculents
     sample_genus = Genus.objects.filter(is_succulent=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     try:
         succulent_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
     except:
         succulent_obj = ''
-
-    ads_insert = int(random.random() * num_blocks) + 1
-    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    all_list = all_list + [['Succulent', succulent_obj]]
 
     # get random carnivorous
     sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     carnivorous_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
-    context = {'orcimage': orcimage, 'broimage': broimage, 'cacimage': cacimage,
-               'other_list': other_list, 'succulent_obj': succulent_obj, 'carnivorous_obj': carnivorous_obj,
-               'ads_insert': ads_insert, 'sponsor': sponsor,
-                'role': role }
+    all_list = all_list + [['Carnivorous', carnivorous_obj]]
+
+    # get random parasitic
+    sample_genus = Genus.objects.filter(is_parasitic=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
+    parasitic_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
+    all_list = all_list + [['Parasitic', parasitic_obj]]
+
+    ads_insert = int(random.random() * num_blocks) + 1
+    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    random.shuffle(all_list)
+
+    context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
+               'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj,
+               'ads_insert': ads_insert, 'sponsor': sponsor, 'role': role }
     return render(request, 'orchid_home.html', context)
-
-
-def ode(request):
-    author = 'JFowler'
-    role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-
-    author = Photographer.objects.get(pk=author)
-    OrSpcImg = apps.get_model('orchidaceae', 'SpcImages')
-    OrHybImg = apps.get_model('orchidaceae', 'HybImages')
-    BrImg = apps.get_model('bromeliaceae', 'SpcImages')
-    CaImg = apps.get_model('cactaceae', 'SpcImages')
-    OtImg = apps.get_model('other', 'SpcImages')
-
-    or_spclist = OrSpcImg.objects.filter(author=author)
-    or_Hyblist = OrHybImg.objects.filter(author=author)
-    br_spclist = BrImg.objects.filter(author=author)
-    ca_spclist = CaImg.objects.filter(author=author)
-    ot_spclist = OtImg.objects.filter(author=author)
-
-    context = {'author': author,
-               'or_spclist': or_spclist,
-               'or_Hyblist': or_Hyblist,
-               'br_spclist': br_spclist,
-               'ca_spclist': ca_spclist,
-               'ot_spclist': ot_spclist,
-               'role': role }
-    return render(request, 'ode.html', context)
 
 
 def require_get(view_func):
@@ -624,6 +598,7 @@ def browsegen(request):
     num_show = 5
     page_length = 20
     ads_insert = 0
+    start_ad = 3        # Minimum images to display sponsor ad.
     sponsor = ''
     my_full_list = []
     if 'talpha' in request.GET:
@@ -674,7 +649,7 @@ def browsegen(request):
         page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
             = mypaginator(request, pid_list, page_length, num_show)
 
-        if len(page_list) > 5:
+        if len(page_list) > start_ad:
             ads_insert = int(random.random() * len(page_list)) + 1
             sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
@@ -722,6 +697,7 @@ def browse(request):
     num_show = 5
     page_length = 20
     ads_insert = 0
+    start_ad = 3        # Minimum images to display sponsor ad.
     sponsor = ''
     my_full_list = []
     if 'talpha' in request.GET:
@@ -881,7 +857,7 @@ def browse(request):
         page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
             = mypaginator(request, pid_list, page_length, num_show)
 
-        if len(page_list) > 5:
+        if len(page_list) > start_ad:
             ads_insert = int(random.random() * len(page_list)) + 1
             sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 

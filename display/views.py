@@ -18,7 +18,7 @@ from utils.views import write_output, getRole, get_reqauthor, getModels, getmyph
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
-from accounts.models import User, Photographer
+from accounts.models import User, Photographer, Sponsor
 
 epoch = 1740
 alpha_list = string.ascii_uppercase
@@ -37,6 +37,8 @@ def information(request, pid=None):
     # NOTE: seed and pollen id must all be accepted.
     from_path = pathinfo(request)
     role = getRole(request)
+    ads_insert = ''
+    sponsor = ''
     # Information request role must be either cur or pub.
     if not role or role != 'cur':
         role = 'pub'
@@ -65,8 +67,6 @@ def information(request, pid=None):
     display_items = []
     synonym_list = Synonym.objects.filter(acc=pid)
     pid = species.pid
-    syn_list = ()
-    accepted = {}
     syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
 
     if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
@@ -185,6 +185,9 @@ def information(request, pid=None):
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
+    if len(display_items) > 0:
+        ads_insert = int(random.random() * len(display_items)) + 1
+        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
@@ -192,7 +195,7 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'role': role, 'ancspc_list': ancspc_list,
+               'app': app, 'role': role, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
                'from_path': from_path,
                }
     return render(request, "display/information.html", context)
@@ -205,7 +208,8 @@ def photos(request, pid=None):
     # if not role or role != 'cur':
     #     role = 'pub'
     from_path = pathinfo(request)
-
+    ads_insert = ''
+    sponsor = ''
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
@@ -214,8 +218,6 @@ def photos(request, pid=None):
     author = get_reqauthor(request)
     if not author or author == 'anonymous':
         author = None
-    if request.user.username == 'chariya':
-        print("1 author = " + str(author))
     author_list = Photographer.objects.all().order_by('displayname')
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
@@ -267,11 +269,19 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
+    if len(public_list) > 0:
+        ads_insert = int(random.random() * len(public_list)) + 1
+        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    if str(request.user) == 'chariya':
+        print("public_list", len(public_list))
+        print("ads_insert", ads_insert)
+        print("sponsor", sponsor)
     write_output(request, str(family))
     context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+               'ads_insert': ads_insert, 'sponsor': sponsor,
                'role': role, 'from_path': from_path,
                }
     return render(request, 'display/photos.html', context)

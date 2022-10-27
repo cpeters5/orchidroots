@@ -191,220 +191,57 @@ img{
 
                     <div class="clearfix"></div>
 
-                    {% if ads_insert == 1 %}
-                        <div class="imageitem" style="border:3px solid lightgreen;">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="imageitem">
-                        <div class="imgtitle">{{orcimage.gen.family}}</div>
-                        <a href="{% url 'common:browsegen' %}?family={{orcimage.gen.family}}&role={{role}}&display=checked">
-                            <div class="box">
-                                <img class="thumbnails" alt="{{orcimage.pid.pid.textname}}" src="{% static orcimage.image_dir %}{{orcimage.image_file}}">
-                                <div class="text text-br">{{image.id}}</div>
-                            </div>
-                        </a>
-                        <div class="imgcaption">
-                            <a href="{% url 'display:information' orcimage.pid_id %}?family={{orcimage.gen.family}}&role={{role}}">
-                                {{orcimage.pid.name|safe}} {% if orcfamily.application == 'other' %}({{orcimage.gen.family}}){% endif %}
-                            </a>
-                            <br>&#169;<a href="{{orcimage.source_url}}" target="_blank" >{{orcimage.get_displayname}}</a>
-                        </div>
-                    </div>
-
-
-                    {% if ads_insert == 2 %}
-                        <div class="imageitem aditem">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <div class="imageitem">
-                        <div class="imgtitle">{{broimage.gen.family}}</div>
-                        <a href="{% url 'common:browsegen' %}?family={{broimage.gen.family}}&role={{role}}&display=checked">
-                            <div class="box">
-                                <img class="thumbnails" alt="{{broimage.pid.pid.textname}}" src="{% static broimage.image_dir %}{{broimage.image_file}}">
-                                <div class="text text-br">{{image.id}}</div>
-                            </div>
-                        </a>
-                        <div class="imgcaption">
-                            <a href="{% url 'display:information' broimage.pid_id %}?family={{broimage.gen.family}}&role={{role}}">
-                                {{broimage.pid.name|safe}} {% if brofamily.application == 'other' %}({{broimage.gen.family}}){% endif %}
-                            </a>
-                            <br>&#169;<a href="{{broimage.source_url}}" target="_blank" >{{broimage.get_displayname}},</a>
-                        </div>
-                    </div>
-
-
-                    {% if ads_insert == 3 %}
-                        <div class="imageitem aditem">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-                    <div class="imageitem">
-                        <div class="imgtitle">{{cacimage.gen.family}}</div>
-                        <a href="{% url 'common:browsegen' %}?family={{cacimage.gen.family}}&role={{role}}&display=checked">
-                            <div class="box">
-                                <img class="thumbnails" alt="{{cacimage.pid.pid.textname}}" src="{% static cacimage.image_dir %}{{cacimage.image_file}}">
-                                <div class="text text-br">{{image.id}}</div>
-                            </div>
-                        </a>
-                        <div class="imgcaption">
-                            <a href="{% url 'display:information' cacimage.pid_id %}?family={{cacimage.gen.family}}&role={{role}}">
-                                {{cacimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{cacimage.gen.family}}){% endif %}
-                            </a>
-                            <br>&#169;<a href="{{cacimage.source_url}}" target="_blank" >{{cacimage.get_displayname}},</a>
-                        </div>
-                    </div>
-
-
-                    {% if ads_insert == 4 %}
-                        <div class="imageitem aditem">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-<!--                    Succulent genus-->
-                    {% if succulent_obj %}
-                       <div class="imageitem">
-                            <div class="imgtitle">Succulent</div>
-                            <a href="{% url 'common:browsegen' %}?family={{succulent_obj.gen.family}}&role={{role}}&display=checked&group=succulent">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{succulent_obj.pid.pid.textname}}" src="{% static succulent_obj.image_dir %}{{succulent_obj.image_file}}">
-                                    <div class="text text-br">{{image.id}}</div>
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{% url 'display:information' succulent_obj.pid_id %}?family={{succulent_obj.gen.family}}&role={{role}}">
-                                    {{succulent_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{succulent_obj.gen.family}}){% endif %}
-                                </a>
-                                <br>&#169;<a href="{{succulent_obj.source_url}}" target="_blank" >{{succulent_obj.get_displayname}},</a>
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-                    {% if ads_insert == 5 %}
-                        <div class="imageitem aditem">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
-
- <!--                    Carnivorous genus-->
-                    {% if carnivorous_obj %}
-                       <div class="imageitem">
-                            <div class="imgtitle">Carnivorous</div>
-                            <a href="{% url 'common:browsegen' %}?family={{carnivorous_obj.gen.family}}&role={{role}}&display=checked&group=carnivorous">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static carnivorous_obj.image_dir %}{{carnivorous_obj.image_file}}">
-                                    <div class="text text-br">{{image.id}}</div>
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{% url 'display:information' carnivorous_obj.pid_id %}?family={{carnivorous_obj.gen.family}}&role={{role}}">
-                                    {{carnivorous_obj.pid.name|safe}} {% if cacfamily.application == 'other' %}({{carnivorous_obj.gen.family}}){% endif %}
-                                </a>
-                                <br>&#169;<a href="{{carnivorous_obj.source_url}}" target="_blank" >{{carnivorous_obj.get_displayname}},</a>
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-                    {% if ads_insert == 6 %}
-                        <div class="imageitem aditem">
-                            <div class="imgtitle">{{sponsor.pitch}}</div>
-                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                <div class="box">
-                                    <img class="thumbnails" alt="{{carnivorous_obj.pid.pid.textname}}" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-                                </div>
-                            </a>
-                            <div class="imgcaption">
-                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                                    {{sponsor.description}}
-                                </a>
-
-                            </div>
-                        </div>
-                    {% endif %}
 
 <!--                    Other families-->
-                    {% for othimage in other_list %}
-                       <div class="imageitem">
-                            <div class="imgtitle">{{othimage.gen.family}}</div>
-                            <a href="{% url 'common:browsegen' %}?family={{othimage.gen.family}}&role={{role}}&display=checked">
+                    {% for othimage in all_list %}
+                        {% if ads_insert == forloop.counter %}
+                            <div class="imageitem aditem">
+                                <div class="imgtitle"><span style="font-size:15px;">{{sponsor.pitch}}</span></div>
+                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                    <div class="box">
+                                        <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
+                                    </div>
+                                </a>
+                                <div class="imgcaption">
+                                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                        {{sponsor.description}}
+                                    </a>
+
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="imageitem">
+                            <div class="imgtitle">{{othimage.0}}</div>
+                            <a href="{% url 'common:browsegen' %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
-                                    <img class="thumbnails" alt="{{othimage.pid.pid.textname}}" src="{% static othimage.image_dir %}{{othimage.image_file}}">
-                                    <div class="text text-br">{{image.id}}</div>
+                                    <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.image_dir %}{{othimage.1.image_file}}">
                                 </div>
                             </a>
                             <div class="imgcaption">
-                                <a href="{% url 'display:information' othimage.pid_id %}?family={{othimage.gen.family}}&role={{role}}">
-                                    {{othimage.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.gen.family}}){% endif %}
+                                <a href="{% url 'display:information' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}">
+                                    {{othimage.1.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.1.gen.family}}){% endif %}
                                 </a>
-                                <br>&#169;<a href="{{othimage.source_url}}" target="_blank" >{{othimage.get_displayname}},</a>
+                                <br><a href="{{othimage.1.source_url}}" target="_blank" >{{othimage.1.get_displayname}},</a>
                             </div>
                         </div>
                     {% endfor %}
 
 
+                <div class="card-body" style="text-align: left;font-size: 13px;">
+               <p>
+                   You are invited to submit an advertisement about your plant related business, a meeting announcement,
+                or anything else related to plants that you want the world to know about.  See the example above.
+               </p>
+                <p>
+                To submit your ad, email the following information to admin@orchidroots.org:
+
+                The name of your business, Title, Brief description, your orchidroots account name,
+                a jpg file (see example in the home page above), url of your website,
+                Brief address (country, state, city), Type of plants involved (genus, general, cactus, etc.),
+                start and end date (or indefinitely).
+                </p>
+                This ad is currently free. However, we encourage advertisers to donate to orchidRoots to support our work.
+                </div>
 
                </div>
 

@@ -451,13 +451,22 @@ img{
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                         {% for x in page_list %}
+                            {% if ads_insert == forloop.counter %}
+                                <div class="imageitem aditem border">
+                                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                        <div class="box">
+                                            <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
+                                        </div>
+                                    </a>
+                                    <div class="imgcaption">
+                                        <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                            {{sponsor.description}}
+                                        </a>
+
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="imageitem border ">
-                                {% if forloop.counter == ads_insert %}
-                                <a href="{{sponsor.sponsor_url}}" target="_blank">
-                                    <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
-                                </a>
-                                <div class="imgcaption">{{sponsor.pitch}}: {{sponsor.description}}</div>
-                                {% else %}
                                 {% if role == 'cur' %}
                                 <a href="{% url 'display:photos' x.pid %}?tab=sum&role={{role}}&family={{x.gen.family}}">
                                     <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
@@ -471,7 +480,6 @@ img{
                                     {{x.binomial|safe}}
                                     {% if x.status == 'synonym' %}<br><span style="font-size:11px">(syn. {{x.getAccepted.binomial_it|safe}})</span>{% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>

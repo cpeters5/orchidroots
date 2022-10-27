@@ -24,7 +24,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
-from common.views import orchid_home, ode
+from common.views import orchid_home
 from utils.views import robots_txt
 
 urlpatterns = [

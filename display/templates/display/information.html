@@ -571,6 +571,22 @@ seedparent, pollparent {
                 {% if display_items %}
                     <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
                         {% for image in display_items %}
+                            {% if ads_insert == forloop.counter %}
+                                <div class="imageitem aditem">
+<!--                                    <div class="imgtitle"><span style="font-size:15px;">{{sponsor.pitch}}</span></div>-->
+                                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                        <div class="box">
+                                            <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
+                                        </div>
+                                    </a>
+                                    <div class="imgcaption">
+                                        <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                            {{sponsor.description}}
+                                        </a>
+
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="imageitem justify-content-center" style="margin:2px;">
                                 <div class="box">
                                     <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">

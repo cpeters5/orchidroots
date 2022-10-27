@@ -284,6 +284,22 @@ a:hover {
         {% if public_list or private_list or upload_list %}
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
                 {% for image in public_list %}
+                    {% if ads_insert == forloop.counter %}
+                        <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %} aditem">
+    <!--                                    <div class="imgtitle"><span style="font-size:15px;">{{sponsor.pitch}}</span></div>-->
+                            <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                <div class="box">
+                                    <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
+                                </div>
+                            </a>
+                            <div class="imgcaption">
+                                <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                    {{sponsor.description}}
+                                </a>
+
+                            </div>
+                        </div>
+                    {% endif %}
                     <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         <div class="box">
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
@@ -401,7 +417,7 @@ a:hover {
         <div class="p-2 justify-content-center align-items-center" style="margin:0 auto;width:100%">
             <div class="font-weight-bold text-center text-info" ><h4>Private Photos</h4></div>
             {% for image in private_list %}
-                <div class="imageitem-cur p-1 justify-content-center align-items-center">
+               <div class="imageitem-cur p-1 justify-content-center align-items-center">
                     {% if image.image_file %}
                         <div class="box">
                             <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
