@@ -135,8 +135,10 @@ class Genus(models.Model):
         ordering = ('genus',)
 
     def get_best_img(self):
-        img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+        if self.type == 'species':
+            img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality', '-rank', '?')
+        else:
+            img = HybImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality', '-rank', '?')
 
         if img.count() > 0:
             img = img[0:1][0]
@@ -537,6 +539,13 @@ class Species(models.Model):
             img = img[0:1][0]
             return img
         return None
+
+    def image_dir(self):
+        if self.pid.type == 'species':
+            return 'utils/images/species/'
+        else:
+            return 'utils/images/hybrid/'
+        # return 'utils/images/hybrid/' + block_id + '/'
 
     def get_num_img_by_author(self, author):
         if self.type == 'species':
@@ -1046,6 +1055,7 @@ class SpcImages(models.Model):
     def image_dir(self):
         return 'utils/images/species/'
         # return 'utils/images/hybrid/' + block_id + '/'
+
 
     def get_displayname(self):
         if self.credit_to:
