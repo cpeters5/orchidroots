@@ -10,7 +10,7 @@ from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer, Sponsor
 from utils import config
-from utils.views import write_output, getRole, get_family_list
+from utils.views import write_output, getRole
 
 # alpha_list = string.ascii_uppercase
 alpha_list = config.alpha_list
@@ -145,13 +145,12 @@ def search_orchid(request):
                 result_list.append([x, score])
 
     result_list.sort(key=lambda k: (-k[1], k[0].name()))
-    family_list, alpha = get_family_list(request)
     family = Family.objects.get(pk='Orchidaceae')
 
     context = {'result_list': result_list, 'keyword': keyword, 'fuzzy': '1',
                'tail': tail, 'genus': genus, 'spcount': spcount, 'spc_string': spc_string,
-               'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
-               'role': role, }
+               'family': family,
+               'alpha_list': alpha_list, 'role': role, }
     return render(request, "search/search_orchid.html", context)
 
 
@@ -315,13 +314,13 @@ def search_species(request):
     path = 'information'
     if role == 'cur':
         path = 'photos'
-    family_list, alpha = get_family_list(request)
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
                'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
-               'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha, 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+               'alpha_list': alpha_list,
                'app': app, 'fuzzy': fuzzy, 'single_word': single_word,
                'role': role, 'path': path, 'full_path': full_path}
     return render(request, "search/search_species.html", context)
@@ -486,15 +485,14 @@ def search_fuzzy(request):
             if result_score[i][0].gen.pid == genus_obj.pid:
                 if result_score[i][1] == 100:
                     result_score[i][1] = 200
-    family_list, alpha = get_family_list(request)
     family = Family.objects.get(pk='Orchidaceae')
 
     result_score.sort(key=lambda k: (-k[1], k[0].name()))
     context = {'result_list': result_list,'result_score': result_score, 'len': len(result_list), 'spc_string':  spc_string, 'genus': genus,
                'alliance_obj': alliance_obj, 'genus_obj': genus_obj,
                'min_score': min_score, 'keyword': keyword,
-               'family': family, 'family_list': family_list, 'alpha_list': alpha_list, 'alpha': alpha,
-               'role': role, 'namespace': 'search',
+               'family': family,
+               'alpha_list': alpha_list, 'role': role, 'namespace': 'search',
 
                }
     return render(request, "search/search_orchid.html", context)
