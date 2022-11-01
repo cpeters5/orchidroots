@@ -20,7 +20,7 @@ from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 from utils import config
 from utils.views import write_output, getRole, paginator, get_author, get_family_list, getModels, pathinfo
-from core.models import Family, Subfamily, Tribe, Subtribe
+from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer, Sponsor
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
@@ -1015,6 +1015,7 @@ def commonname(request):
 
 
 def distribution(request):
+    # For non-orchids only
     talpha = ''
     distribution = ''
     commonname = ''
@@ -1030,11 +1031,9 @@ def distribution(request):
         role = 'pub'
     if 'family' in request.GET:
         reqfamily = request.GET['family']
-        try:
-            family = Family.objects.get(family=reqfamily)
+        family = Family.objects.get(family=reqfamily)
+        if family != '' and family.family != 'Orchidaceae':
             crit = 1
-        except Family.DoesNotExist:
-            family = ''
     if 'genus' in request.GET:
         reqgenus = request.GET['genus']
         try:
@@ -1055,28 +1054,59 @@ def distribution(request):
         # species_list = Accepted.objects.filter(distribution__icontains=distribution)
     species_list = []
     if crit:
-        print(family)
-        if family != '':
+        # initialize species_list if family is not orchidaceae
+        if family != '' and family != 'Orchidaceae':            # Avoid large dataset in case of orchids
             species_list = Species.objects.filter(family=family)
-        else:
+        elif family != 'Orchidaceae':
             species_list = Species.objects.filter(family__application='other')
-        if genus != '':
-            species_list = species_list.filter(genus=genus)
 
+        # filter species list if Genus is requested
+        if not genus:
+            genus = ''
+        if genus != '':
+            if species_list:
+                species_list = species_list.filter(genus=genus)
+            else:
+                # this is orchid case with a requested genus
+                species_list = Species.objects.filter(genus=genus)
         if distribution:
-            dist_list = Distribution.objects.filter(dist_id__dist__icontains=distribution).values_list('pid', flat=True)
-            species_list = species_list.filter(pid__in=dist_list)
+            # build distribution list
+            if family.family != 'Orchidaceae':
+                dist_list = Distribution.objects.filter(dist_id__dist__icontains=distribution).values_list('pid', flat=True)
+                species_list = Species.objects.filter(pid__in=dist_list)
+            else:
+                # Orchidaceae has a different Distribution class
+                # Build distribution list
+                dist_list = []
+                subreg_list = SubRegion.objects.filter(name__icontains=distribution).values_list('code', flat=True)
+                if len(subreg_list) > 0:
+                    dist_list = Distribution.objects.filter(subregion_code__in=subreg_list).values_list('pid', flat=True)
+                # requested distribution could elther be region or subregion
+                reg_list = Region.objects.filter(name__icontains=distribution).values_list('id', flat=True)
+                if len(reg_list) > 0:
+                    dist_list = dist_list + Distribution.objects.filter(region_id__in=reg_list).values_list('pid', flat=True)
+                dist_list = list(set(dist_list))
+
+                # Filter species list
+                if species_list:
+                    species_list = species_list.filter(pid__in=dist_list)
+                else:
+                    species_list = Species.objects.filter(pid__in=dist_list)
 
         if commonname:
             name_list = Accepted.objects.filter(common_name__icontains=commonname).values_list('pid', flat=True)
-            species_list = species_list.filter(pid__in=name_list)
-
-        if 'talpha' in request.GET:
-            talpha = request.GET['talpha']
-        if talpha != '':
-            species_list = species_list.filter(species__istartswith=talpha)
+            if species_list:
+                species_list = species_list.filter(pid__in=name_list)
+            else:
+                # Orchidaceae with only common name requested
+                species_list = Species.objects.filter(pid__in=name_list)
+        if species_list:
+            if 'talpha' in request.GET:
+                talpha = request.GET['talpha']
+            if talpha != '':
+                species_list = species_list.filter(species__istartswith=talpha)
+            species_list = species_list.order_by('species')
         total = len(species_list)
-        species_list = species_list.order_by('species')
     context = {'species_list': species_list, 'distribution': distribution, 'commonname': commonname,
                'family': family, 'genus': genus,
                'role': role, 'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list, 'from_path': from_path}

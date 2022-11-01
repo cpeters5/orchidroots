@@ -32,6 +32,7 @@ urlpatterns = [
     path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
     path('req501c3/', views.req501c3, name='req501c3'),
     path('releasenote_v4/', views.releasenote_v4, name='releasenote_v4'),
+    path('sponsor/', views.sponsor, name='sponsor'),
     path('termsofuse/', views.termsofuse, name='termsofuse'),
     path('whoweare/', views.whoweare, name='whoweare'),
 

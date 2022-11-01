@@ -137,6 +137,10 @@ def contact(request):
     context = {}
     return render(request, 'documents/contact.html', context)
 
+def sponsor(request):
+    context = {}
+    return render(request, 'documents/sponsor.html', context)
+
 
 def whoweare(request):
     context = {}

@@ -57,7 +57,6 @@
             min-width: 72px;
         }
     }
-}
 </style>
 
 
@@ -112,7 +111,8 @@
                             {% for species in species_list %}
                             <tr>
                                 <td><a href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><i>{{species.name|safe}}</i></a> ({{species.gen.family}})<br>{{species.accepted.common_name|default:''}} </td>
-                                <td class="imgcol">{% if species.get_best_img %}<img class='imgsize' alt="" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">{% endif %}</td>
+                                <td class="imgcol">
+                                    {% if species.get_best_img %}<img class='imgsize' src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">{% endif %}</td>
                             </tr>
                             {% endfor %}
                     </table>
