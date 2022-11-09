@@ -311,11 +311,7 @@ seedparent, pollparent {
         <!--Main sections-->
 <div style="margin:0 auto;width:95%;">
     <!-- Main -->
-    {% if role == 'cur' %}
-        {% include 'common/detail-nav.html' %}
-    {% else %}
-        {% include "common/detail-nav.html" %}
-    {% endif %}
+    {% include 'common/detail-nav.html' %}
     <!-- body -->
     <div style="background:white; margin:0 auto;background:white;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
         <div class="d-flex p-2 justify-content-center">
@@ -542,7 +538,7 @@ seedparent, pollparent {
                                                  {% if off.seed_id %}
                                                     <a href="{% url 'display:information' off.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_seed_name|safe }}</a>
                                                  {% else %}
-                                                    na
+                                                   na
                                                  {% endif %}
                                                     ×
                                                  {% if off.pollen_id %}
@@ -643,6 +639,8 @@ seedparent, pollparent {
                         <div class="parent-text " style="text-align:center; margin-bottom:10px;">
                             {% if species.hybrid.seed_id.pid %}
                                 <a href="{% url 'display:information' species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
+                            {% elif species.status == 'synonym' and species.getAccepted.hybrid.seed_id.pid %}
+                                    <a href="{% url 'display:information' species.getAccepted.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_seed_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.seed_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -669,6 +667,8 @@ seedparent, pollparent {
                         <div class="parent-text" style="text-align:center;">
                             {% if species.hybrid.pollen_id.pid %}
                                     <a href="{% url 'display:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
+                            {% elif species.status == 'synonym' and species.getAccepted.hybrid.pollen_id.pid %}
+                                    <a href="{% url 'display:information' species.getAccepted.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_pollen_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.pollen_genus | default:"Nodata"}} ?
                             {% endif %}
