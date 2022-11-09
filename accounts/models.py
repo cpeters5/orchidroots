@@ -240,6 +240,8 @@ class Sponsor(models.Model):
     sid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, default='')
     author = models.CharField(max_length=200, default='')
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    specialty = models.CharField(max_length=200, null=True)
     sponsor_url = models.URLField(max_length=200, default='')
     pitch = models.CharField(max_length=200, null=True)
     short_description = models.CharField(max_length=500, null=True)
@@ -256,7 +258,6 @@ class Sponsor(models.Model):
     end_date = models.DateField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
-
     def __str__(self):
         return self.title
 
