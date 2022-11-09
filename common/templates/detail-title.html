@@ -63,7 +63,7 @@
                     syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>
                     <br>
                 {% endif %}
-                {% if species.type == 'hybrid' %}
+                {% if species.type == 'hybrid' and species.status != 'synonym' %}
                     {% if species.hybrid.seed_id.pid %}
                         {{species.hybrid.registered_seed_name_long|safe}}</a>
                     {% else %}
