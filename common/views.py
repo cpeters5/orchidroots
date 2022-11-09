@@ -65,7 +65,7 @@ def orchid_home(request):
 
     # Get a sample image of orchids
     SpcImages = apps.get_model('orchidaceae', 'SpcImages')
-    orcimage = SpcImages.objects.filter(rank__lt=7).order_by('-rank','quality', '?')[0:1][0]
+    orcimage = SpcImages.objects.filter(rank__lt=7).filter(rank__gt=0).order_by('-rank','quality', '?')[0:1][0]
     all_list = all_list + [['orchidaceae', orcimage]]
 
     # Get random other families
