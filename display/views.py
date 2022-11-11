@@ -185,9 +185,9 @@ def information(request, pid=None):
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
-    if len(display_items) > 0:
-        ads_insert = int(random.random() * len(display_items)) + 1
-        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    # if len(display_items) > 0:
+    ads_insert = int(random.random() * len(display_items)) + 1
+    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
@@ -269,9 +269,9 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
-    if len(public_list) > 0:
-        ads_insert = int(random.random() * len(public_list)) + 1
-        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    # if len(public_list) > 0:
+    ads_insert = int(random.random() * len(public_list)) + 1
+    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     if str(request.user) == 'chariya':
         print("public_list", len(public_list))
         print("ads_insert", ads_insert)
