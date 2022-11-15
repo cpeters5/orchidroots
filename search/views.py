@@ -272,16 +272,17 @@ def search_species(request):
             # Include synonyms
             syn_pids = orspecies_list.values_list('pid', flat=True)
             acc_pids = OrSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
-            oracc_list = OrSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
-            orspecies_list = orspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
+            oracc_list = OrSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            orspecies_list = orspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
 
             otspecies_list = OtSpecies.objects.filter(binomial__istartswith=spc_string)
             # Include synonyms
             syn_pids = otspecies_list.values_list('pid', flat=True)
             acc_pids = OtSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
-            otacc_list = OtSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
-            otspecies_list = otspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
+            otacc_list = OtSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            otspecies_list = otspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
             matched_spc_list = (otspecies_list).union(orspecies_list).union(oracc_list).union(otacc_list)
+            matched_spc_list = matched_spc_list.order_by('binomial')
             match_spc_list = []
             for x in matched_spc_list:
                 match_spc_list.append([x, 200])
@@ -290,22 +291,22 @@ def search_species(request):
             #Try to 0match species from all families
 
             # Matching Orchids
-            orspecies_list = OrSpecies.objects.filter(species__istartswith=spc_string)
-            orspecies_list = orspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            orspecies_list = OrSpecies.objects.filter(species__icontains=spc_string)
+            orspecies_list = orspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
             # # Include synonyms
             # syn_pids = orspecies_list.values_list('pid', flat=True)
             # acc_pids = OrSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
             # oracc_list = OrSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
 
             # Matching Others
-            otspecies_list = OtSpecies.objects.filter(binomial__istartswith=spc_string)
+            otspecies_list = OtSpecies.objects.filter(binomial__icontains=spc_string)
             # # Include synonyms
             # syn_pids = otspecies_list.values_list('pid', flat=True)
             # acc_pids = OtSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
             # otacc_list = OtSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
 
             # prepare output
-            otspecies_list = otspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            otspecies_list = otspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
             matched_species_list = (orspecies_list).union(otspecies_list)
             # matched_species_list = (orspecies_list).union(otspecies_list).union(oracc_list).union(otacc_list)
             match_spc_list = []
@@ -314,7 +315,7 @@ def search_species(request):
                     score = fuzz.ratio(x['species'].lower(), spc_string.lower())
                     if score >= min_score:
                         match_spc_list.append([x, score])
-            match_spc_list.sort(key=lambda k: (-k[1], k[0]['species']))
+            match_spc_list.sort(key=lambda k: (-k[1], k[0]['binomial']))
             # del match_spc_list[5:]
 
         # If all else fail, use the old style search (slow)
