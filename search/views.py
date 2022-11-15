@@ -165,7 +165,7 @@ def search_species(request):
     genus_list = []
     match_spc_list = []
     match_list = []
-    perfect_list = []
+    # perfect_list = []
     fuzzy_list = []
     fuzzy = ''
     full_path = request.path
@@ -272,15 +272,15 @@ def search_species(request):
             # Include synonyms
             syn_pids = orspecies_list.values_list('pid', flat=True)
             acc_pids = OrSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
-            oracc_list = OrSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
-            orspecies_list = orspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            oracc_list = OrSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
+            orspecies_list = orspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
 
             otspecies_list = OtSpecies.objects.filter(binomial__istartswith=spc_string)
             # Include synonyms
             syn_pids = otspecies_list.values_list('pid', flat=True)
             acc_pids = OtSynonym.objects.filter(spid__in=syn_pids).values_list('acc_id', flat=True)
-            otacc_list = OtSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
-            otspecies_list = otspecies_list.values('pid', 'species', 'family', 'genus', 'author', 'status', 'year')
+            otacc_list = OtSpecies.objects.filter(pid__in=acc_pids).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
+            otspecies_list = otspecies_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year')
             matched_spc_list = (otspecies_list).union(orspecies_list).union(oracc_list).union(otacc_list)
             match_spc_list = []
             for x in matched_spc_list:
@@ -317,6 +317,7 @@ def search_species(request):
             match_spc_list.sort(key=lambda k: (-k[1], k[0]['species']))
             # del match_spc_list[5:]
 
+        # If all else fail, use the old style search (slow)
         # if len(match_spc_list) == 0:
         #     # if no species found (single word) search binomial in other families
         #     spc_string = spc_string.replace('.', '')
@@ -367,8 +368,12 @@ def search_species(request):
 
     write_output(request, spc_string)
     context = {'spc_string': spc_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-               'perfect_list': perfect_list, 'match_list': match_list, 'fuzzy_list': fuzzy_list,
-               'genus_total': len(genus_list), 'match_total': len(match_list), 'fuzzy_total': len(fuzzy_list), 'perfect_total': len(perfect_list),
+               # 'perfect_list': perfect_list, 'match_list': match_list,
+               'fuzzy_list': fuzzy_list,
+               'genus_total': len(genus_list),
+               'fuzzy_total': len(fuzzy_list),
+               # 'perfect_total': len(perfect_list),
+               # 'match_total': len(match_list),
                'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
                'alpha_list': alpha_list,
                'app': app, 'fuzzy': fuzzy, 'single_word': single_word,

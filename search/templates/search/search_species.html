@@ -57,8 +57,13 @@
                             <tr>
                                 <td><i>{{species.0.family|default:''}}</i> species</td>
                                 <td>
-                                    <a href="/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}"><i>{{species.0.genus}}{%if species.o.type == 'species' %}} {{species.0.species}}</i>{% else %}</i> {{species.0.species}}{% endif %}
-                                </a> {{species.0.author|default:''}} {{species.0.year|default:''}} {% if species.0.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/display/{{path}}/{{species.0.pid}}/?family={{species.0.family}}">
+                                        <i>{{species.0.genus}}
+                                            {% if species.0.type == 'species' %} {{species.0.species}} {{species.0.infraspr}} {{species.0.infraspe}}</i>
+                                            {% else %} {{species.0.species}}{% endif %}
+                                            <i>{{species.0.infraspr|default:''}} {{species.0.infraspe|default:''}}</i>
+                                    </a>
+                                    {{species.0.author|default:''}} {{species.0.year|default:''}} {% if species.0.status == 'synonym' %}(syn.){% endif %}
 
                                 </td>
                                 <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
@@ -68,38 +73,39 @@
                             {% endfor %}
                 {% endif %}
 
-                {% if perfect_list %}
-                        {% for x in perfect_list %}
-                        <tr>
-                            <td><i>{{x.gen.family|default:''}}</i> species</td>
-                                <td>
-                                    <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>
-                                {{x.author|default:''}}
-                                ({{x.gen.family}})ccc
-                                {% if x.status == 'synonym' %}
-                                   (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
-                                {% endif %}
-                            </td>
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{x.num_image|default:''}}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                {% elif match_list %}
-                        {% for x in match_list %}
-                        <tr>
-                            <td><i>{{x.gen.family}}</i> species </td>
-                            <td>
-                                <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>
-                                {{x.author|default:''}}
-                                {% if x.status == 'synonym' %}
-                                    (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)
-                               {% endif %}
-                            </td>
-                            <td class="d-none d-lg-table-cell hidden-xs">{{x.num_image|default:''}}</td>
-                        </tr>
-                        {% endfor %}
-                {% endif %}
+<!--                {% if perfect_list %}-->
+<!--                        {% for x in perfect_list %}-->
+<!--                        <tr>-->
+<!--                            <td><i>{{x.gen.family|default:''}}</i> species</td>-->
+<!--                                <td>-->
+<!--                                    <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}"><i>{{ x.binomial_it|safe }}</i></a>-->
+<!--                                {{x.author|default:''}}-->
+<!--                                ({{x.gen.family}})ccc-->
+<!--                                {% if x.status == 'synonym' %}-->
+<!--                                   (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)-->
+<!--                                {% endif %}-->
+<!--                            </td>-->
+<!--                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">-->
+<!--                                {{x.num_image|default:''}}-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                        {% endfor %}-->
+<!--                {% endif %}-->
+<!--                {% if match_list %}-->
+<!--                        {% for x in match_list %}-->
+<!--                        <tr>-->
+<!--                            <td><i>{{x.gen.family}}</i> species </td>-->
+<!--                            <td>-->
+<!--                                <a href="/display/{{path}}/{{x.pid}}/?family={{x.gen.family}}&species={{x.binomial}}">{{ x.binomial_it|safe }}</a>-->
+<!--                                {{x.author|default:''}}-->
+<!--                                {% if x.status == 'synonym' %}-->
+<!--                                    (syn. <a href="/display/{{path}}/{{x.getAcc}}/?family={{x.gen.family}}&species={{x.binomial}}">{{x.getAccepted.binomial_it|safe}}</a>)-->
+<!--                               {% endif %}-->
+<!--                            </td>-->
+<!--                            <td class="d-none d-lg-table-cell hidden-xs">{{x.num_image|default:''}}</td>-->
+<!--                        </tr>-->
+<!--                        {% endfor %}-->
+<!--                {% endif %}-->
                         </table>
                 {% if fuzzy_list %}
                     <br>
