@@ -497,7 +497,7 @@ class Species(models.Model):
             return str(self.species)
 
     def sourceurl(self):
-        if self.source == 'Kew':
+        if self.source == 'xKew':
             return "https://wcsp.science.kew.org/namedetail.do?name_id=" + str(self.pid)
         elif self.source == 'RHS':
             return "http://apps.rhs.org.uk/horticulturaldatabase/orchidregister/orchiddetails.asp?ID=" + str(self.orig_pid)

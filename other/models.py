@@ -351,6 +351,8 @@ class Species(models.Model):
             return "https://www.gbif.org/species/" + self.orig_pid
         elif self.source == 'IPNI' and self.orig_pid:
             return "https://www.ipni.org/n/" + self.orig_pid
+        elif self.source == 'ITIS' and self.orig_pid:
+            return "https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=" + self.orig_pid
         elif self.source == 'Kew':
             return "https://wcsp.science.kew.org/namedetail.do?name_id=" + str(self.pid)
         elif self.source == 'NCBI' and self.orig_pid:
