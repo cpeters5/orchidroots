@@ -283,23 +283,6 @@ a:hover {
 <!--            Main section-->
         {% if public_list or private_list or upload_list %}
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
-                {% if sponsor %}
-                <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %} aditem">
-<!--                                    <div class="imgtitle"><span style="font-size:15px;">{{sponsor.pitch}}</span></div>-->
-                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                        <div class="box">
-                            <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-<!--                                    <div class="text text-br">{{sponsor.pitch}}</div>-->
-                        </div>
-                    </a>
-                    <div class="imgcaption">
-                        <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                            <b>Advertisement</b> {{sponsor.title}}
-                        </a>
-
-                    </div>
-                </div>
-                {% endif %}
                 {% for image in public_list %}
                     <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         <div class="box">

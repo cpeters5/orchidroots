@@ -30,9 +30,17 @@
 .hidden {
     display: none;
 }
+.adcaption {
+    font-size: 12px;
+    text-align: left;
+    height:70px;
+    /*overflow: hidden;*/
+}
+
 </style>
 <br>
-        {% if title != 'curate_newupload' and title != 'curate_pending' and title != 'myphoto_browse' %}
+    <div class="row">
+        <div class="col">
             <div class="nav2 detail-title" style="text-align:center">
                 <h1 style="display:none">{{species.genus}} {{species.species}}</h1>
                 <h1>
@@ -103,11 +111,30 @@
 <!--                        <h7 style="color: red;text-align: center">To upload a {{species.name|safe}} photo, click here <a href="https://orchidroots.com/detail/photos/{{species.pid}}/?family=Orchidaceae&role=pri">OrchidRoots</a></h7>-->
 <!--                    {% endif %}-->
                 {% endif %}
-               </div>
-                <br>
             </div>
-        {% endif %}
-        <div style="clear:left;"></div>
+        </div>
+
+        {% if sponsor %}
+        <div class="col d-none d-md-block" style="max-width:20%">
+            <div style="width:150px; height:150px; border: 1px solid white">
+                <div class="imgtitle"><span style="font-size:15px;">ADVERTISEMENT</span></div>
+                <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                    <div style="width:100px; height:100px; border: 1px solid white">
+                         <img alt="Sample advertisement" class="img-fluid" src="/static/{{sponsor.image_file_path}}{{sponsor.image_file}}">
+                   </div>
+                </a>
+                <div class="adcaption">
+                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                        {{sponsor.title}}
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<br>
+<div style="clear:left;"></div>
 
 <script>
 function showMore(id){
