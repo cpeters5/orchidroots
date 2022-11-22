@@ -24,7 +24,7 @@ class Command(BaseCommand):
             syn = []
             synid = []
             extracted_file = "data/powo_species.txt"
-            with open(input_file, 'r', encoding="utf8") as f, open(extracted_file, 'w', encoding="utf8") as out1:
+            with open(input_file, 'r+', encoding="utf8") as f, open(extracted_file, 'w', encoding="utf8") as out1:
                 for count, line in enumerate(f, 1):
                     words = line.rstrip().split('|')
                     if words[4] != family:
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         else:
             # If genus is not given, then extract all genera in the family
             extracted_file = "data/powo_genus.txt"
-            with open(input_file, 'r', encoding="utf8") as f, open(extracted_file, 'w', encoding="utf8") as out1:
+            with open(input_file, 'r+', encoding="utf8") as f, open(extracted_file, 'w', encoding="utf8") as out1:
                 for count, line in enumerate(f, 1):
                     words = line.rstrip().split('|')
                     if words[4] != family or words[2] != 'Genus':
