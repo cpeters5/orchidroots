@@ -1,19 +1,15 @@
 import string
 import re
-import os
 import logging
 import random
-import shutil
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.shortcuts import render, redirect
-# from django.conf import settings
 from django.urls import reverse
-from itertools import chain
 import django.shortcuts
+from itertools import chain
 from django.apps import apps
-from fuzzywuzzy import fuzz, process
 from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos, pathinfo
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
@@ -214,7 +210,6 @@ def photos(request, pid=None):
         family = request.GET['newfamily']
         url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
         return HttpResponseRedirect(url)
-
     author = get_reqauthor(request)
     if not author or author == 'anonymous':
         author = None
