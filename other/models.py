@@ -621,6 +621,7 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='poolpid',on_delete=models.DO_NOTHING)
+    binomial = models.CharField(max_length=100, null=True, blank=True)
     # pid = models.BigIntegerField(null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='poolspcauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -632,10 +633,8 @@ class SpcImages(models.Model):
     text_data = models.TextField(null=True, blank=True)
     certainty = models.CharField(max_length=20, null=True, blank=True)
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
-    zoom = models.IntegerField(default=0)
     form = models.CharField(max_length=50, null=True, blank=True)
     source_file_name = models.CharField(max_length=100, null=True, blank=True)
-    spid = models.IntegerField(null=True, blank=True)
     awards = models.CharField(max_length=200, null=True, blank=True)
     description = models.CharField(max_length=100, null=True, blank=True)
     variation = models.CharField(max_length=50, null=True, blank=True)
@@ -648,8 +647,8 @@ class SpcImages(models.Model):
     family = models.ForeignKey(Family, db_column='family', related_name='poolspcfamily', on_delete=models.DO_NOTHING)
     download_date = models.DateField(null=True, blank=True)
     genus = models.CharField(max_length=50)
+    species = models.CharField(max_length=50, null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='poolspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    is_private = models.BooleanField(null=True, default=False)
     block_id = models.IntegerField(null=True, blank=True)
     user_id = models.ForeignKey(User, db_column='user_id',related_name='pooluser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     approved_by = models.ForeignKey(User, db_column='approved_by', related_name='poolapproved_by', null=True, blank=True,on_delete=models.DO_NOTHING)

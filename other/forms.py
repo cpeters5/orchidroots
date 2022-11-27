@@ -351,14 +351,13 @@ class UploadSpcWebForm(forms.ModelForm):
         # self.fields['author'].required = True
         # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
         self.fields['author'].widget.is_localized = True
-        self.fields['is_private'].initial = False
 
     class Meta:
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
         'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
-        'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
+        'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
             'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
             # 'author':'Your name for credit: select a name, if not exists, see next box',
@@ -375,7 +374,6 @@ class UploadSpcWebForm(forms.ModelForm):
             'rank': 'Rank',
             'text_data': 'Comment',
             'description': 'Tags',
-            'is_private': 'Private photo',
         }
         widgets = {
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
@@ -389,12 +387,10 @@ class UploadSpcWebForm(forms.ModelForm):
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
         }
         choices = {
             'rank': CHOICES,
             'quality': QUALITY,
-            'is_private': PRIVATE,
         }
         # help_texts = {
         #     # 'author': 'The name for credit attribution',
@@ -466,14 +462,13 @@ class UploadHybWebForm(forms.ModelForm):
         # self.fields['author'].queryset = Photographer.objects.all().values_list('fullname','displayname').order_by('fullname')
         self.fields['rank'].choices = CHOICES
         self.fields['quality'].choices = QUALITY
-        self.fields['is_private'].initial = False
 
     class Meta:
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
         'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
-        'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
+        'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
             'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
             'credit_to': 'or credit name. Enter only when name does not exist in Author list',
@@ -489,7 +484,6 @@ class UploadHybWebForm(forms.ModelForm):
             'rank': 'Rank',
             'text_data': 'Comment',
             'description': 'Tags',
-            'is_private': 'Private photo',
         }
         widgets = {
             # 'author':TextInput(attrs={'size': 35}),
@@ -504,12 +498,10 @@ class UploadHybWebForm(forms.ModelForm):
             'form': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'text_data': Textarea(attrs={'cols': 47, 'rows': 4, 'style': 'font-size: 13px', }),
             'description': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
         }
         choices = {
             'rank': CHOICES,
             'quality': QUALITY,
-            'is_private': PRIVATE,
         }
         # help_texts = {
         #     # 'author': 'The name for credit attribution',
