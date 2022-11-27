@@ -2,12 +2,14 @@ User-agent: *
 Disallow: /admin/
 Disallow: /accounts/
 Disallow: /core/
+Disallow: /data/
 Disallow: /detail/
+Disallow: /display/information/
 Disallow: /documents/
+Disallow: /fungi/
 Disallow: /donations/
 Disallow: /orchidaceae/
 Disallow: /orchidlist/
-Disallow: /orchiddb/
 Disallow: /other/
 Disallow: /search/
 Disallow: /utils/

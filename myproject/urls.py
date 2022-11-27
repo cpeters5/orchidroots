@@ -25,12 +25,13 @@ from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
 from common.views import orchid_home
-from utils.views import robots_txt
+# from myproject.views import robots_txt
+from . import views
 
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
-    path("robots.txt", robots_txt),
+    # path("robots.txt", robots_txt),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
     # path('dispatch', dispatch, name='dispatch'),
     path('documents/', include('documents.urls')),

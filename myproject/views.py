@@ -29,13 +29,17 @@ def robots_txt(request):
         "Disallow: /account/",
         "Disallow: /common/",
         "Disallow: /core/",
+        "Disallow: /data/",
         "Disallow: /detail/",
         "Disallow: /display/information/",
         "Disallow: /documents/",
         "Disallow: /donations/",
+        "Disallow: /fungi/",
+        "Disallow: /old/",
         "Disallow: /orchidaceae/",
         "Disallow: /orchidlist/",
         "Disallow: /other/",
+        "Disallow: /search/",
         "Disallow: /utils/",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")

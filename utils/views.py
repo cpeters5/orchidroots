@@ -337,27 +337,27 @@ def getmyphotos(request, author, app, species, Species, Synonym, UploadFile, Spc
 #     return deep_find(get_resolver())
 #
 
-@require_GET
-def robots_txt(request):
-    lines = [
-        "User-Agent: *",
-        "Disallow: /accounts/",
-        "Disallow: /core/",
-        "Disallow: /detail/",
-        "Disallow: /documents/",
-        "Disallow: /donations/",
-        "Disallow: /natural/",
-        "Disallow: /orchid/",
-        "Disallow: /orchidaceae/",
-        "Disallow: /orchidlist/",
-        "Disallow: /orchidlight/",
-        "Disallow: /orchiddb/",
-        "Disallow: /other/",
-        "Disallow: /search/",
-        "Disallow: /utils/",
-        "User-Agent: PetalBot",
-        "Disallow: /",
-
-    ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")
-
+# @require_GET
+# def robots_txt(request):
+#     lines = [
+#         "User-Agent: *",
+#         "Disallow: /accounts/",
+#         "Disallow: /core/",
+#         "Disallow: /detail/",
+#         "Disallow: /documents/",
+#         "Disallow: /donations/",
+#         "Disallow: /natural/",
+#         "Disallow: /orchid/",
+#         "Disallow: /orchidaceae/",
+#         "Disallow: /orchidlist/",
+#         "Disallow: /orchidlight/",
+#         "Disallow: /orchiddb/",
+#         "Disallow: /other/",
+#         "Disallow: /search/",
+#         "Disallow: /utils/",
+#         "User-Agent: PetalBot",
+#         "Disallow: /",
+#
+#     ]
+#     return HttpResponse("\n".join(lines), content_type="text/plain")
+#
