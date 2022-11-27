@@ -39,6 +39,7 @@ def getAllGenera():
     # Call this when Family is not provided
     OrGenus = apps.get_model('orchidaceae', 'Genus')
     OtGenus = apps.get_model('other', 'Genus')
+    FuGenus = apps.get_model('fungi', 'Genus')
     return OrGenus, OtGenus
 
 
@@ -60,8 +61,7 @@ def orchid_home(request):
 
     num_samples = 4
     # 3 major families + succulent + carnivorous
-    # (3 other families form the last row.)
-    num_blocks = 5
+    # (3 other and fungi families form the last row.)
 
     # Get a sample image of orchids
     SpcImages = apps.get_model('orchidaceae', 'SpcImages')
@@ -96,7 +96,23 @@ def orchid_home(request):
     sample_genus = Genus.objects.filter(is_parasitic=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     parasitic_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
     all_list = all_list + [['Parasitic', parasitic_obj]]
+    print("all_list = ", len(all_list))
 
+
+    num_samples = 2
+    # Get random fungi families
+    SpcImages = apps.get_model('fungi', 'SpcImages')
+    Genus = apps.get_model('fungi', 'Genus')
+    sample_families = Genus.objects.filter(num_spcimage__gt=0).distinct().values_list('family', flat=True).order_by('?')[0:num_samples]
+    for fam in sample_families:
+        try:
+            fungi_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
+        except:
+            continue
+        all_list = all_list + [[fungi_obj.pid.family, fungi_obj]]
+    print("all_list = ", len(all_list))
+    # Advertisement
+    num_blocks = 5
     ads_insert = int(random.random() * num_blocks) + 1
     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     random.shuffle(all_list)
@@ -240,7 +256,7 @@ def species(request):
         genus_list = genus_list.values_list('genus', flat=True)
         species_list = species_list.filter(genus__in=genus_list)
     else:
-        # app = 'other'
+        # app = 'other' or 'fungi'
         # Species = apps.get_model(app, 'Species')
         species_list = Species.objects.filter(type='species')
         species_list = species_list.filter(gen__family__application=app)

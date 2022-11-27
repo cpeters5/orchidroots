@@ -20,7 +20,8 @@ my ($sth, $sth1);
 # use open qw(:locale);
 
 my @apps = (
-	'other'
+	'other',
+	'fungi'
 );
 my $date = strftime "%Y-%m-%d:%H:%M-%S", localtime;
 # our ($DB,$stf,$sth, $rc, $sth1, $sth2, $dbh);
