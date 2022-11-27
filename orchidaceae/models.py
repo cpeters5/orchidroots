@@ -541,7 +541,7 @@ class Species(models.Model):
         return None
 
     def image_dir(self):
-        if self.pid.type == 'species':
+        if self.type == 'species':
             return 'utils/images/species/'
         else:
             return 'utils/images/hybrid/'
