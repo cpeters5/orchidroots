@@ -354,7 +354,7 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadFile
         fields = (
-        'image_file_path', 'author', 'source_url', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
+        'image_file_path', 'author', 'source_url', 'name', 'variation', 'forma', 'originator', 'description', 'text_data',
         'location', 'image_file',)
 
         labels = {
@@ -362,7 +362,6 @@ class UploadFileForm(forms.ModelForm):
             'author': "Your credit attribution name",
             'image_file_path': 'Select image file',
             'name': 'Clonal name',
-            'awards': 'Awards',
             'variation': 'Varieties',
             'forma': 'Form',
             'originator': 'If author is not in the list, enter a name to be used for credit attribution here',
@@ -374,7 +373,6 @@ class UploadFileForm(forms.ModelForm):
             # 'role': forms.HiddenInput(),
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'originator': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
@@ -384,7 +382,6 @@ class UploadFileForm(forms.ModelForm):
         }
         help_texts = {
             #     'name': 'Clonal name of the plant',
-            #     'awards': 'Awards received, comma separated',
             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
             #     'forma': 'E.g. color forms, peloric, region...',
             #     'originator': 'e.g. hybridizer, cultivator, vender',
@@ -420,7 +417,7 @@ class UploadSpcWebForm(forms.ModelForm):
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
+        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
         'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
             'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
@@ -430,7 +427,6 @@ class UploadSpcWebForm(forms.ModelForm):
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
             'name': 'Clonal name',
-            'awards': 'Awards',
             'quality': 'Quality',
             'variation': 'Varieties',
             'form': 'Form',
@@ -445,7 +441,6 @@ class UploadSpcWebForm(forms.ModelForm):
             'image_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'source_file_name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'form': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
@@ -463,7 +458,6 @@ class UploadSpcWebForm(forms.ModelForm):
         #     'image_url': "Right click on the image and select 'copy image address'",
         #     'source_file_name': 'Identified name if differs from the accepted name for the species, e.g. a synonym or undescribed/unpublished or unregistered name. (Put infra specific if exists in Variety box below.',
         #     'name': 'Clonal name of the plant',
-        #     'awards': 'Awards received, comma separated',
         #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
         #     'form': 'E.g. color forms, peloric, region...',
         #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
@@ -531,7 +525,7 @@ class UploadHybWebForm(forms.ModelForm):
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
+        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
         'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
             'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
@@ -540,7 +534,6 @@ class UploadHybWebForm(forms.ModelForm):
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
             'name': 'Clonal name',
-            'awards': 'Awards',
             'quality': 'Quality',
             'variation': 'Varieties',
             'form': 'Form',
@@ -556,7 +549,6 @@ class UploadHybWebForm(forms.ModelForm):
             'image_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'source_file_name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'certainty': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'form': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
@@ -574,7 +566,6 @@ class UploadHybWebForm(forms.ModelForm):
         #     'image_url': "Right click on the image and select 'copy image address'",
         #     'source_file_name': 'The name you prefer, if different from accepted name for the species, e.g. a synonym, an undescribed or unregistered name. (Place infraspecific in Variety box below.',
         #     'name': 'Clonal name of the plant',
-        #     'awards': 'Awards received, comma separated',
         #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
         #     'certainty': 'Put one or more ? to show level of certainty',
         #     'form': 'E.g. color forms, peloric, region...',

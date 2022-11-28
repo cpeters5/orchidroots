@@ -108,14 +108,15 @@ def compare(request, pid):
     # TODO:  Use Species form instead
     role = getRole(request)
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
-    species = Species.objects.get(pk=pid)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponseRedirect('/')
+
     spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     family = species.gen.family
     genus = species.genus
-    if species:
-        species1 = species
-    else:
-        return HttpResponse("/")
+    species1 = species
 
     # Handle comparison request. Should use SpcForm instead.
     spcimg2_list = []
@@ -400,7 +401,6 @@ def reidentify(request, orid, pid):
             new_img.image_url = old_img.image_url
             new_img.image_file = old_img.image_file
             new_img.name = old_img.name
-            new_img.awards = old_img.awards
             new_img.variation = old_img.variation
             new_img.form = old_img.form
             new_img.text_data = old_img.text_data
@@ -458,9 +458,6 @@ def uploadweb(request, pid, orid=None):
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
-            # set rank to 0 if private status is requested
-            if spc.is_private is True or request.user.tier.tier < 3:
-                spc.rank = 0
 
             # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
             if spc.author.user_id and request.user.tier.tier < 3:

@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from other.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
+from fungi.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
 from accounts.models import Photographer
 import copy
 

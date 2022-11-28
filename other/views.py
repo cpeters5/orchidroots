@@ -566,9 +566,6 @@ def uploadweb(request, pid, orid=None):
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
-            # set rank to 0 if private status is requested
-            if spc.is_private is True or request.user.tier.tier < 3:
-                spc.rank = 0
 
             # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
             if spc.author.user_id and request.user.tier.tier < 3:

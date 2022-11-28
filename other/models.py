@@ -635,7 +635,6 @@ class SpcImages(models.Model):
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
     form = models.CharField(max_length=50, null=True, blank=True)
     source_file_name = models.CharField(max_length=100, null=True, blank=True)
-    awards = models.CharField(max_length=200, null=True, blank=True)
     description = models.CharField(max_length=100, null=True, blank=True)
     variation = models.CharField(max_length=50, null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
@@ -671,8 +670,6 @@ class SpcImages(models.Model):
             myname = '%s %s ' % (myname, self.certainty)
         if self.name:
             myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
         return myname
 
     def imginfo(self):
@@ -685,8 +682,6 @@ class SpcImages(models.Model):
             myname = '%s %s ' % (myname, self.certainty)
         if self.name:
             myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
         return myname
 
     def fullimgname(self):
@@ -702,8 +697,6 @@ class SpcImages(models.Model):
             myname = '%s %s ' % (myname, self.certainty)
         if self.name:
             myname = "%s '%s' " % (myname, self.name)
-        if self.awards:
-            myname = '%s %s' % (myname, self.awards)
         return myname
 
     def abrev(self):
