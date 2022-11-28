@@ -141,6 +141,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'accounts/templates')],
+        # 'APP_DIRS': True,
         'OPTIONS': {
             "loaders": [
                 "django.template.loaders.filesystem.Loader",

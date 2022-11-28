@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, RedirectView
 from django.urls import path, include, re_path
@@ -25,16 +26,20 @@ from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
 from common.views import orchid_home
-# from myproject.views import robots_txt
+# from other.sitemaps import SpeciesSitemap# from myproject.views import robots_txt
 from . import views
+
+# sitemaps = {
+#     'photos':SpeciesSitemap
+# }
 
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
+    # path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
     # path("robots.txt", robots_txt),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
     # path('dispatch', dispatch, name='dispatch'),
-    path('documents/', include('documents.urls')),
     # path('index/', index, name='index'),
     # path('ads/', include('ads.urls')),
     # path("ads.txt", RedirectView.as_view(url=staticfiles_storage.url("ads.txt")),),
@@ -58,6 +63,7 @@ urlpatterns = [
 
     # Landing
     path('', orchid_home, name='orchid_home'),
+    path('documents/', include('documents.urls')),
     # path('', ode, name='ode'),
 
     path('search/', include('search.urls')),
@@ -66,6 +72,7 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('common/', include('common.urls')),
     path('display/', include('display.urls')),
+    path('fungi/', include('fungi.urls')),
     path('other/', include('other.urls')),
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),
