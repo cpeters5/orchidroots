@@ -109,7 +109,7 @@ def orchid_home(request):
             fungi_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
         except:
             continue
-        all_list = all_list + [[fungi_obj.pid.family, fungi_obj]]
+        all_list = all_list + [["Fungi", fungi_obj]]
     print("all_list = ", len(all_list))
     # Advertisement
     num_blocks = 5
