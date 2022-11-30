@@ -78,9 +78,9 @@ urlpatterns = [
     path('detail/', include('detail.urls')),
 
                   # legacy applications
-    path('natural/', include('detail.urls')),
-    path('orchid/', include('orchidaceae.urls')),
-    path('orchidlite/', include('detail.urls')),
+    # path('natural/', include('detail.urls')),
+    # path('orchid/', include('orchidaceae.urls')),
+    # path('orchidlite/', include('detail.urls')),
     # path('orchidlist/', include('orchidlist.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
