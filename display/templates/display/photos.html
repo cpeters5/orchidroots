@@ -254,26 +254,27 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
             {% if role == 'cur' %}
-                <form class="" action="" id="author">
-                    <input type="hidden" name="genus" value="{{genus}}" >
-                    <input type="hidden" name="family" value="{{species.gen.family}}" >
-                    <input type="hidden" name="role" value="{{role}}" >
-                    <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0 auto;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip" data-placement="bottom" title="author">
-                        {% if not author %}
-                            <option disabled selected>Select an author</option>
-                        {% endif %}
-                        <option value="">---</option>
-                        {% for aut in author_list %}
-                            {% if aut == author %}
-                                <option selected="selected" disabled value="{{author}}">{{author.displayname}}</option>
-                            {% else %}
-                                <option value="{{aut.author_id}}">{{aut.displayname}}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
-                </form>
-            {% elif role == 'pri' %}
+<!--                <form class="" action="" id="author">-->
+<!--                    <input type="hidden" name="genus" value="{{genus}}" >-->
+<!--                    <input type="hidden" name="family" value="{{species.gen.family}}" >-->
+<!--                    <input type="hidden" name="role" value="{{role}}" >-->
+<!--                    <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0 auto;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip" data-placement="bottom" title="author">-->
+<!--                        {% if not author %}-->
+<!--                            <option disabled selected>Select an author</option>-->
+<!--                        {% endif %}-->
+<!--                        <option value="">-&#45;&#45;</option>-->
+<!--                        {% for aut in author_list %}-->
+<!--                            {% if aut == author %}-->
+<!--                                <option selected="selected" disabled value="{{author}}">{{author.displayname}}</option>-->
+<!--                            {% else %}-->
+<!--                                <option value="{{aut.author_id}}">{{aut.displayname}}</option>-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                    <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
+<!--                </form>-->
+            {% endif %}
+            {% if role == 'pri' %}
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>
                 <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>
             {% endif %}
@@ -296,6 +297,7 @@ a:hover {
                         </div>
                         <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                             <div style="width:100%;word-wrap: break-word;">
+                                {{image.image_dir}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
                                         <br><a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>

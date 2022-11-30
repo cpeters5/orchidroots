@@ -213,7 +213,7 @@ def photos(request, pid=None):
     author = get_reqauthor(request)
     if not author or author == 'anonymous':
         author = None
-    author_list = Photographer.objects.all().order_by('displayname')
+    # author_list = Photographer.objects.all().order_by('displayname')
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
         if pid:
@@ -267,12 +267,14 @@ def photos(request, pid=None):
     # if len(public_list) > 0:
     ads_insert = int(random.random() * len(public_list)) + 1
     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
-    if str(request.user) == 'chariya':
-        print("public_list", len(public_list))
-        print("ads_insert", ads_insert)
-        print("sponsor", sponsor)
+    # if str(request.user) == 'chariya':
+    #     print("public_list", len(public_list))
+    #     print("ads_insert", ads_insert)
+    #     print("sponsor", sponsor)
     write_output(request, str(family))
-    context = {'species': species, 'author': author, 'author_list': author_list, 'family': family,
+    context = {'species': species, 'author': author,
+               # 'author_list': author_list,
+               'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
