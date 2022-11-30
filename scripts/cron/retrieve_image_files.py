@@ -29,8 +29,9 @@ i = 0
 for row in cur:
     i = i + 1
     url = row[1]
-    if app == 'other' and row[3]:
-        family = row[3].title()
+    if row[3]:
+        if app == 'other' or app == 'fungi':
+            family = row[3].title()
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)
     # ext = a.split('.')[-1]
@@ -45,7 +46,7 @@ for row in cur:
 
     try:
         # html = urlopen(url)
-        if app == 'other':
+        if app == 'other' or app == 'fungi':
             imgdir = "/mnt/static/utils/images/" + family + "/"
             Path(imgdir).mkdir(parents=True, exist_ok=True)
         local_filename, headers = urllib.request.urlretrieve(url, imgdir + fname)
