@@ -60,11 +60,11 @@ class SynonymAdmin(admin.ModelAdmin):
 
 class AcceptedAdmin(admin.ModelAdmin):
     pass
-    list_display = ('pid', 'species', 'common_name')
-    fields = [('pid', 'species', 'common_name', 'distribution', 'introduced', 'comment')]
-    ordering = ['species']
-    list_filter = ('species',)
-    search_fields = ['genus', 'species', 'common_name', 'distribution']
+    list_display = ('pid', 'binomial', 'common_name')
+    fields = [('pid', 'binomial', 'common_name', 'distribution', 'introduced', 'comment')]
+    ordering = ['binomial']
+    list_filter = ('binomial',)
+    search_fields = ['genus', 'binomial', 'common_name', 'distribution']
 
 admin.site.register(TestSpecies, TestSpeciesAdmin)
 admin.site.register(Genus, GenusAdmin)

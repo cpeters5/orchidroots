@@ -455,12 +455,12 @@ seedparent, pollparent {
                     </div>
                     {% endif %}
 
-                    {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.history or accepted.etymology %}
+                    {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.etymology %}
                     <div class="card">
                         <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Information">Misc. Information</button>
                         <div id="Information" class="collapse" data-parent="#accordion">
                             <div class="card-body">
-                                {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.history or accepted.etymology %}
+                                {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.etymology %}
                                     {% if accepted.common_name or accepted.local_name %}
                                         <br>
                                         <b>Common Name:</b>
@@ -476,11 +476,6 @@ seedparent, pollparent {
                                         <br>
                                         <b>bloom_month (local):</b>
                                         {{accepted.bloom_month|safe}}
-                                    {% endif %}
-                                    {% if accepted.history %}
-                                        <br>
-                                        <b>History</b>
-                                        {{accepted.history|safe}}
                                     {% endif %}
                                     {% if accepted.etymology %}
                                         <br>

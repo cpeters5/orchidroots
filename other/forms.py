@@ -194,21 +194,19 @@ class HybridInfoForm(forms.ModelForm):
 
     class Meta:
         model = Hybrid
-        fields = ('description', 'comment', 'history', 'etymology', 'culture',
+        fields = ('description', 'comment', 'etymology', 'culture',
                   # 'seed_genus','seed_species','seed_id','pollen_genus','pollen_species','pollen_id',
                   # 'ref_url',
                   )
         labels = {
             'description': 'Description',
             'comment': 'Comment',
-            'history': 'History',
             'etymology': 'Etymology',
             'culture': 'Culture',
         }
         widgets = {
             'description': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px', }),
             'comment': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px', }),
-            'history': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px', }),
             'etymology': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px', }),
             'culture': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px', }),
             # 'seed_genus': HiddenInput(),
@@ -221,7 +219,6 @@ class HybridInfoForm(forms.ModelForm):
         # help_texts = {
         #     'description':'Description',
         #     'comment':'Additional comment related to this species',
-        #     'history':'History',
         #     'etymology':'Ethymology',
         #     'culture':'Culture',
         # }
@@ -283,13 +280,12 @@ class AcceptedInfoForm(forms.ModelForm):
 
     class Meta:
         model = Accepted
-        fields = ('description', 'comment', 'history', 'etymology', 'culture', 'url', 'url_name',
+        fields = ('description', 'comment', 'etymology', 'culture', 'url', 'url_name',
                   'common_name', 'local_name', 'bloom_month', 'fragrance', 'altitude'
                   )
         labels = {
             'description': 'Description',
             'comment': 'Comment',
-            'history': 'History',
             'etymology': 'Etymology',
             'culture': 'Culture',
             'url': 'Link to an online publication',
@@ -308,7 +304,6 @@ class AcceptedInfoForm(forms.ModelForm):
             'altitude': TextInput(attrs={'size': 50, 'style': 'font-size: 13px'}),
             'description': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
             'comment': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
-            'history': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
             'etymology': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
             'culture': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
             'url': TextInput(attrs={'size': 50, 'style': 'font-size: 13px'}),
@@ -322,7 +317,6 @@ class AcceptedInfoForm(forms.ModelForm):
         #     'altitude':'Altitude above sea level in feet',
         #     'description':'Description',
         #     'comment':'Any comment related to this species',
-        #     'history':'History',
         #     'etymology':'Etymology',
         #     'url':'Link to a useful information',
         #     'urlname':'Name of URL',

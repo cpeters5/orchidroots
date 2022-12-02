@@ -393,10 +393,7 @@ class Accepted(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='othgen_id', null=True, blank=True, on_delete=models.DO_NOTHING)
-    genus = models.CharField(max_length=50)
-    species = models.CharField(max_length=50)
-    infraspr = models.CharField(max_length=20, null=True)
-    infraspe = models.CharField(max_length=50, null=True)
+    binomial = models.CharField(max_length=150, null=True)
     distribution = models.TextField(blank=True)
     location = models.TextField(blank=True)
     introduced = models.TextField(blank=True)
@@ -413,8 +410,6 @@ class Accepted(models.Model):
     fragrance = models.CharField(max_length=50, null=True, blank=True)
     altitude = models.CharField(max_length=50, null=True, blank=True)
 
-    history = models.TextField(null=True, blank=True)
-    analysis = models.TextField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
     etymology = models.TextField(null=True, blank=True)
     culture = models.TextField(null=True, blank=True)
@@ -451,13 +446,9 @@ class Hybrid(models.Model):
         on_delete=models.DO_NOTHING,
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='othhybgen', default=0, on_delete=models.DO_NOTHING)
-    source = models.CharField(max_length=10, null=True, blank=True)
-    genus = models.CharField(max_length=50, null=True, blank=True)
-    species = models.CharField(max_length=50, null=True, blank=True)
-    infraspr = models.CharField(max_length=20, null=True, blank=True)
+    binomial = models.CharField(max_length=150, null=True, blank=True)
     is_hybrid = models.CharField(max_length=5, null=True, blank=True)
     hybrid_type = models.CharField(max_length=20, null=True, blank=True)
-    infraspe = models.CharField(max_length=50, null=True, blank=True)
     author = models.CharField(max_length=200, null=True, blank=True)
     # seed_gen = models.BigIntegerField(null=True, blank=True)
     seed_gen = models.ForeignKey(Genus, db_column='seedgen', related_name='othseedgen', null=True,
