@@ -453,13 +453,13 @@ img{
                         {% for x in page_list %}
                             {% if ads_insert == forloop.counter %}
                                 <div class="imageitem aditem border">
-                                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                    <a href="{{sponsor.sponsor_url}}" target="_blank">
                                         <div class="box">
                                             <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
                                         </div>
                                     </a>
                                     <div class="imgcaption">
-                                        <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                                        <a href="{{sponsor.sponsor_url}}" target="_blank">
                                             {{sponsor.title}}
                                         </a>
 

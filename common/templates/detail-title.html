@@ -37,6 +37,11 @@
     /*overflow: hidden;*/
 }
 
+.sponsorimg {
+    width: 100%;
+    height: 150px;
+    border: 1px solid blue
+}
 </style>
 <br>
     <div class="row">
@@ -117,14 +122,14 @@
         {% if sponsor %}
         <div class="col d-none d-md-block" style="max-width:20%">
             <div style="width:150px; height:150px; border: 1px solid white">
-                <div class="imgtitle"><span style="font-size:15px;">ADVERTISEMENT</span></div>
-                <a href="{{sponsor.sponsor_url}}/" target="_blank">
-                    <div style="width:100px; height:100px; border: 1px solid white">
+                <div class="imgtitle"><span style="font-size:15px;"><a href="{% url 'documents:sponsor' %}">ADVERTISEMENT</a></span></div>
+                <a href="{{sponsor.sponsor_url}}" target="_blank">
+                    <div  class="sponsorimg">
                          <img alt="Sample advertisement" class="img-fluid" src="/static/{{sponsor.image_file_path}}{{sponsor.image_file}}">
                    </div>
                 </a>
                 <div class="adcaption">
-                    <a href="{{sponsor.sponsor_url}}/" target="_blank">
+                    <a href="{{sponsor.sponsor_url}}" target="_blank">
                         {{sponsor.title}}
                     </a>
 
