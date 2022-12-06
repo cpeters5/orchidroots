@@ -297,7 +297,6 @@ a:hover {
                         </div>
                         <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                             <div style="width:100%;word-wrap: break-word;">
-                                {{image.image_dir}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
                                         <br><a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
