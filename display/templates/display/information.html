@@ -524,7 +524,7 @@ seedparent, pollparent {
                                                  {% if off.pid %}<a href="{% url 'display:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
                                                  <span style="font-zize:11px">
                                                      {{off.pid.name |safe}}
-                                                     {% if off.pid.num_image > 0 %} *{% endif %}
+                                                     {% if off.pid.num_image > 0 %} ({{off.pid.num_image}}){% endif %}
                                                  </span>
                                                  {% else %}{{off.pid.pid}}
                                                  {% endif %}
