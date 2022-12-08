@@ -1,18 +1,21 @@
 from allauth.account.utils import perform_login
-from allauth.exceptions import ImmediateHttpResponse
-from allauth.socialaccount.signals import pre_social_login
-from django.db import models
-from django.conf import settings
-from django.shortcuts import redirect
-from django.db.models.signals import post_save
 from allauth.account.signals import user_signed_up, user_logged_in, email_confirmed
 from allauth.account.models import EmailAddress
+from allauth.exceptions import ImmediateHttpResponse
+from allauth.socialaccount.signals import pre_social_login
 
+from django.db import models
+from django.db.models.signals import post_save
+from django.conf import settings
+from django.shortcuts import redirect
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.dispatch import receiver
 
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+# from django.apps import apps
+
+
+# Country = apps.get_model('core', 'Country')
+
 # import uuid
 
 
@@ -249,7 +252,7 @@ class Sponsor(models.Model):
     is_active = models.BooleanField(default=True)
     status = models.CharField(max_length=20, null=True)
     address = models.TextField(null=True)
-    country_code = models.CharField(max_length=2, null=True, blank=True)
+    country_code = models.CharField(max_length=3, blank=True, null=True)
     phone = models.CharField(max_length=20, null=True)
     email = models.EmailField(verbose_name='email address', max_length=255, null=True,default=None)
     image_file = models.CharField(max_length=100)
