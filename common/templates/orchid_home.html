@@ -179,7 +179,7 @@ img{
                     {% for othimage in all_list %}
                         {% if ads_insert == forloop.counter %}
                             <div class="imageitem aditem">
-                                <div class="imgtitle"><span style="font-size:15px;">{{sponsor.title}}</span></div>
+                                <div class="imgtitle"><span style="font-size:15px;"><a href="https://bluenanta.com/documents/sponsor" target="_blank">ADVERTISEMENT</a></span></div>
                                 <a href="{{sponsor.sponsor_url}}" target="_blank">
                                     <div class="box">
                                         <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
