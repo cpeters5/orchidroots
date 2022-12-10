@@ -781,8 +781,6 @@ def uploadfile(request, pid):
             url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
                                                 request.user.photographer.author_id, family)
             return HttpResponseRedirect(url)
-        else:
-            return HttpResponse('save failed')
 
     context = {'form': form, 'species': species, 'web': 'active',
                'author_list': author_list, 'author': author, 'family': family,

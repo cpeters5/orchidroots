@@ -346,7 +346,7 @@ class UploadFileForm(forms.ModelForm):
         # role = forms.CharField(required=True)
     class Meta:
         model = UploadFile
-        fields = ('image_file_path','author','source_url','name','awards','variation','forma','credit_to','description','text_data','location','image_file',)
+        fields = ('image_file_path','author','source_url','name','awards','variation','forma','credit_to','description','text_data','location',)
 
         labels = {
             'author':"Your credit attribution name",
@@ -389,7 +389,12 @@ class UploadFileForm(forms.ModelForm):
                 'required': _("Please select a file to upload."),
             },
         }
-
+        
+    def clean_image_file_path(self):
+        image_file_path = self.cleaned_data['image_file_path']
+        if not image_file_path:
+            raise forms.ValidationError('You must select a valid image file')
+        return image_file_path
 
 class UploadSpcWebForm(forms.ModelForm):
     author = ModelChoiceField(
