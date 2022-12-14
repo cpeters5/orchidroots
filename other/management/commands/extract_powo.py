@@ -12,13 +12,21 @@ class Command(BaseCommand):
     help = "Read description from other/Description and print out unique values / load to database. "
 
     def add_arguments(self, parser):
-        parser.add_argument('family', type=str, help='Family')
+        parser.add_argument('-f', '--family', type=str, help='Family')
         parser.add_argument('-g', '--genus', type=str, help='Genus', )
 
     def handle(self, *args, **kwargs):
         # 0 id, 28-orig_id, 2 type, 3 status, 4 family, 6 genus, 8 species, 9 infraspr, 10 infrspe, 16 year, 18 geoloc, 19 life form, 20 climate, 22 author, 23 acc_id, 29 formula, 30 reviewed
-        family = kwargs['family']
-        genus = kwargs['genus']
+        if kwargs['genus']:
+            genus = kwargs['genus']
+        if kwargs['family']:
+            family = kwargs['family']
+        else:  # no parameters given
+            family = input('Enter family:\t')
+            if not family:
+                exit
+            genus = input('Enter genus (optional):\t')
+
         input_file = "data/input/wcvp_names.csv"
         if genus:
             syn = []
