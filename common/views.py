@@ -266,6 +266,8 @@ def species(request):
         syn = 'N'
     else:
         syn = 'Y'
+
+    total_species = len(species_list)
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
     if talpha != '':
@@ -290,7 +292,7 @@ def species(request):
     context = {
         'genus': genus, 'species_list': species_list, 'app': app, 'total':total, 'syn': syn, 'max_items': max_items,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
+        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies, 'total_species': total_species,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
     return render(request, "common/species.html", context)

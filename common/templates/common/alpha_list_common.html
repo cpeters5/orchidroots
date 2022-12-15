@@ -43,13 +43,13 @@
                     {% if talpha == opt %}
                         <li class="page-item active"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
                     {% else %}
-                        <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&alpha={{alpha}}&page={{page}}&family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&display={{display}}" >{{opt}}</a></li>
+                        <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&page={{page}}&family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&display={{display}}" >{{opt}}</a></li>
                     {% endif %}
                 {% endfor %}
                 {% if not talpha or talpha == "ALL" %}
         <li class="page-item active" style="width: 40px;"><a class="page-link" href="#">All </a></li>
                 {% else %}
-        <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&alpha={{alpha}}&page={{page}}&family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&display={{display}}">All </a></li>
+        <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&page={{page}}&family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&display={{display}}">All </a></li>
                 {% endif %}
     </ul>
     </div>

@@ -30,36 +30,36 @@
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family.family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family.family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
                         </dev>
-                        {% if species_list %}
-                            <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
-                                <input type="hidden" name="family" value="{{family.family}}" >
-                                <input type="hidden" name="subfamily" value="{{subfamily}}" >
-                                <input type="hidden" name="tribe" value="{{tribe}}" >
-                                <input type="hidden" name="subtribe" value="{{subtribe}}" >
-                                <input type="hidden" name="genus" value="{{genus}}" >
-                                <input type="hidden" name="genus" value="{{genus}}" >
-                                <input type="hidden" name="myspecies" value="{{myspecies}}" >
-                                {% if syn == 'N' %}
-                                <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
-                                {% else %}
-                                <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
-                                {% endif %}
-                            </form>
-                            &nbsp;
-                            <form action="?" id="myspecies" style="display:inline-block">
-                                <input type="hidden" name="family" value="{{family}}" >
-                                <input type="hidden" name="talpha" value="{{talpha}}" >
-                                <input type="hidden" name="type" value="{{type}}" >
-                                <input type="hidden" name="role" value="{{role}}" >
-                                <input type="hidden" name="syn" value="{{syn}}" >
-                                {% if myspecies %}
-                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
-                                {% else %}
-                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
-                                {% endif %}
-                            </form>
+                        <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
+                            <input type="hidden" name="family" value="{{family.family}}" >
+                            <input type="hidden" name="subfamily" value="{{subfamily}}" >
+                            <input type="hidden" name="tribe" value="{{tribe}}" >
+                            <input type="hidden" name="subtribe" value="{{subtribe}}" >
+                            <input type="hidden" name="genus" value="{{genus}}" >
+                            <input type="hidden" name="genus" value="{{genus}}" >
+                            <input type="hidden" name="myspecies" value="{{myspecies}}" >
+                            {% if syn == 'N' %}
+                            <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
+                            {% else %}
+                            <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
+                            {% endif %}
+                        </form>
+                        &nbsp;
+                        <form action="?" id="myspecies" style="display:inline-block">
+                            <input type="hidden" name="family" value="{{family}}" >
+                            <input type="hidden" name="talpha" value="{{talpha}}" >
+                            <input type="hidden" name="type" value="{{type}}" >
+                            <input type="hidden" name="role" value="{{role}}" >
+                            <input type="hidden" name="syn" value="{{syn}}" >
+                            {% if myspecies %}
+                            <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
+                            {% else %}
+                            <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
+                            {% endif %}
+                        </form>
                             <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
+                        {% if species_list %}
                             <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -101,7 +101,7 @@
                                         {% endfor %}
                                 </table>
                         {% else %}
-                            <br><br>We dont have any <i>{{genus}}</i> species in our system yet!
+                            <br><br>No <i>{{genus}}</i> species {% if talpha %} begins with {{talpha}}{% endif %}  in the current system yet!
                         {% endif %}
 
                     </div>
