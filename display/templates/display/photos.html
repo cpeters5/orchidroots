@@ -297,12 +297,13 @@ a:hover {
                         </div>
                         <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                             <div style="width:100%;word-wrap: break-word;">
-                                    {% if image.source_url %}
-                                        <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-                                        <br><a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
-                                    {% else %}
-                                        {{image.imgname|safe}}<br>{{image.get_displayname }}
-                                    {% endif %}
+                                <a href="{% url 'display:photos' image.pid_id %}?family={{species.gen.family}}">{{image.imgname|safe}}</a>
+                                <br>
+                                {% if image.source_url %}
+                                    <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
+                                {% else %}
+                                    {{image.imgname|safe}}<br>{{image.get_displayname }}
+                                {% endif %}
                                 {% if role == 'cur' %}
                                     {% include 'common/curate_links.html' %}
                                 {% endif %}
