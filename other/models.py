@@ -346,18 +346,23 @@ class Species(models.Model):
         elif self.source == 'EOL' and self.orig_pid:
             return "https://eol.org/pages/" + self.orig_pid
         elif self.source == 'FUNG' and self.orig_pid:
+            # All Fungi
             return "http://www.indexfungorum.org/names/NamesRecord.asp?RecordID=" + self.orig_pid
         elif self.source == 'GBIF' and self.orig_pid:
             return "https://www.gbif.org/species/" + self.orig_pid
         elif self.source == 'IPNI' and self.orig_pid:
             return "https://www.ipni.org/n/" + self.orig_pid
         elif self.source == 'ITIS' and self.orig_pid:
+            # Mosses and Lichens
             return "https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=" + self.orig_pid
         elif self.source == 'Kew':
+            # Kew is obsolete. Now merged with POWO
             return "https://wcsp.science.kew.org/namedetail.do?name_id=" + str(self.pid)
         elif self.source == 'NCBI' and self.orig_pid:
+            # Will be changed to FUNG
             return "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=" + self.orig_pid
         elif self.source == 'PL' and self.orig_pid:
+            # Will be changed to POWO
             return "http://www.theplantlist.org/tpl1.1/record/" + self.orig_pid
         elif self.source == 'POWO' and self.orig_pid:
             return "https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:" + self.orig_pid
