@@ -619,10 +619,11 @@ nav .search-container button:hover {
 
             <ul class="navbar-nav " style="line-height:25px !important;">
                 <li  class="nav-item">
-                        <form class="form-inline" id="searchspc" action="/search/search_species/" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="family" value="{{ family.family }}" >
+                        <form class="form-inline" id="search" action="/search/search/" style="display:inline-block; margin-top: 5px;">
+<!--                            <input type="hidden" name="family" value="{{ family.family }}" >-->
                             <input type="hidden" name="role" value="{{ role }}" >
-                            <input class="searchbox" form="searchspc" value="{{spc_string}}" type="text" name="spc_string"  pattern=".{3,}" placeholder="Search..." required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+                            <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search genus" required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
+<!--                            <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search species" required title="Genus is required" style="border:1px solid #ccc; border-right: 0">-->
                         </form>
 
                 </li>
@@ -684,24 +685,8 @@ nav .search-container button:hover {
 
 
 <div class="p-1" style="background-color:black; font-size: 11px;">
-    <div class=" p-2">
-        {% if from_path == 'species' or from_path == 'photos' or from_path == 'information' %}
-<!--        Disable family changes when in low level view.-->
-<!--            <a class="disabled-link btn btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="#">Orchids</a>-->
-<!--            <a class="disabled-link btn btn-info fambtn {% if app == 'other' and from_path != 'research' %}active1{% endif %}" href="#">Others</a>-->
-        {% else %}
-            {% if family %}
-                <a class="btn btn-info fambtn {% if family.family == 'Orchidaceae' %}active1{% endif %}" href="?newfamily=Orchidaceae&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Orchids</a>
-                <a class="btn btn-info fambtn {% if family.family != 'Orchidaceae' and not from_path %}active1{% endif %}" href="?newfamily=&app=other&family=&role={{role}}&spc_string={{spc_string}}&genus={{species.genus}}&display=checked&syn=N">Non-orchids</a>
-            {% else %}
-            <!--     Deactivated for pages pages with no family info    -->
-                <a class="btn btn-info fambtn" href="{{full_path}}?newfamily=Orchidaceae&display=checked{% if spc_string %}&spc_string={{spc_string}}{% endif %}">Orchids</a>
-                <a class="btn btn-info fambtn {% if app == 'other' and not from_path %}active1{% endif %}" href="{{full_path}}?{% if spc_string %}spc_string={{spc_string}}{% endif %}&display=checked">Non-orchids</a>
-            {% endif %}
-        {% endif %}
             &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
             &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>
-        <!--        <input type="button" value="Click here" style="float: right;">-->
     </div>
 
 

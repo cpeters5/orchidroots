@@ -9,6 +9,7 @@ Disallow: /documents/
 Disallow: /fungi/
 Disallow: /donations/
 Disallow: /orchidaceae/
+Disallow: /orchid/
 Disallow: /orchidlist/
 Disallow: /other/
 Disallow: /search/

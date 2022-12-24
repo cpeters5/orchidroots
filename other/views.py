@@ -774,3 +774,4 @@ def curateinfohyb(request, pid):
                    }
         return render(request, app + '/curateinfohyb.html', context)
 
+

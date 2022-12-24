@@ -9,7 +9,7 @@ from . import views
 # TODO: Add search by ancestors pair.
 # TODO: Add search by location
 
-# app_name = 'other'
+app_name = 'other'
 # sitemaps = {
 #     'photos':SpeciesSitemap
 # }

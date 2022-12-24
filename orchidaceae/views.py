@@ -27,7 +27,6 @@ from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, S
     Subgenus, Section, Subsection, Series, \
     Distribution, SpcImages, HybImages, UploadFile, AncestorDescendant
 
-alpha_list = config.alpha_list
 logger = logging.getLogger(__name__)
 User = get_user_model()
 Photographer = apps.get_model('accounts', 'Photographer')
@@ -39,6 +38,8 @@ Region = apps.get_model('core', 'Region')
 Subregion = apps.get_model('core', 'Subregion')
 Localregion = apps.get_model('core', 'Localregion')
 imgdir, hybdir, spcdir = imgdir()
+
+alpha_list = config.alpha_list
 
 @login_required
 def genera(request):
@@ -1072,4 +1073,3 @@ def mypaginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
-

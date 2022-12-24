@@ -27,7 +27,6 @@ from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedI
     SpeciesForm, RenameSpeciesForm
 
 epoch = 1740
-alpha_list = string.ascii_uppercase
 logger = logging.getLogger(__name__)
 GenusRelation = []
 Accepted = []
@@ -971,19 +970,6 @@ def getPartialPid(reqgenus, type, status, app):
     return reqgenus, pid_list, intragen_list
 
 
-def get_species_list(application, family=None, subfamily=None, tribe=None, subtribe=None):
-    Species = apps.get_model(application, 'Species')
-    species_list = Species.objects.all()
-    if subtribe:
-        species_list = species_list.filter(gen__subtribe=subtribe)
-    elif tribe:
-        species_list = species_list.filter(gen__tribe=tribe)
-    elif subfamily:
-        species_list = species_list.filter(gen__subfamily=subfamily)
-    return species_list
-    # return species_list.values('pid', 'binomial', 'author', 'source', 'status', 'type', 'family')
-
-
 @login_required
 def research(request):
     family = ''
@@ -1713,5 +1699,4 @@ def curate_newapproved(request):
                'app': app,
                }
     return render(request, 'common/curate_newapproved.html', context)
-
 

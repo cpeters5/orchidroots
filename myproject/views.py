@@ -38,6 +38,7 @@ def robots_txt(request):
         "Disallow: /old/",
         "Disallow: /orchidaceae/",
         "Disallow: /orchidlist/",
+        "Disallow: /orchid/",
         "Disallow: /other/",
         "Disallow: /search/",
         "Disallow: /utils/",

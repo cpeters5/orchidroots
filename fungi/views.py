@@ -38,26 +38,18 @@ from utils.views import write_output, is_int, getRole
 from common.forms import UploadFileForm
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
-from accounts.models import User, Profile
+from accounts.models import User, Profile, Photographer
+from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
+from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
 
-from django.apps import apps
-Family = apps.get_model('core', 'Family')
-Subfamily = apps.get_model('core', 'Subfamily')
-Tribe = apps.get_model('core', 'Tribe')
-Subtribe = apps.get_model('core', 'Subtribe')
-Region = apps.get_model('core', 'Region')
-Subregion = apps.get_model('core', 'Subregion')
-Photographer = apps.get_model('accounts', 'Photographer')
+# from django.apps import apps
+# Family = apps.get_model('core', 'Family')
+# Subfamily = apps.get_model('core', 'Subfamily')
+# Tribe = apps.get_model('core', 'Tribe')
+# Subtribe = apps.get_model('core', 'Subtribe')
+# Region = apps.get_model('core', 'Region')
+# Subregion = apps.get_model('core', 'Subregion')
 
-app = 'fungi'
-Genus = apps.get_model(app, 'Genus')
-Species = apps.get_model(app, 'Species')
-Accepted = apps.get_model(app, 'Accepted')
-Hybrid = apps.get_model(app, 'Hybrid')
-Synonym = apps.get_model(app, 'Synonym')
-SpcImages = apps.get_model(app, 'SpcImages')
-Distribution = apps.get_model(app, 'Distribution')
-UploadFile = apps.get_model('common', 'UploadFile')
 MAX_HYB = 500
 list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
@@ -150,7 +142,7 @@ def compare(request, pid):
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
                        'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, app + '/compare.html', context)
+            return render(request, 'fungi/compare.html', context)
         if spc2:
             species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
             if len(species2) == 0:
@@ -160,7 +152,7 @@ def compare(request, pid):
                            'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message2': message,
                            'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, app + '/compare.html', context)
+                return render(request, 'fungi/compare.html', context)
             elif len(species2) > 1:
                 if infraspe2 and infraspr2:
                     species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
@@ -180,14 +172,14 @@ def compare(request, pid):
                                'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message2': message, 'family': family,
                                'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request,  app + '/compare.html', context)
+                    return render(request,  'fungi/compare.html', context)
                 else:  # length = 0
                     message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                     context = {'species': species, 'genus': genus, 'pid': pid,  # original
                                'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                                'message1': message, 'family': family,
                                'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, app + '/compare.html', context)
+                    return render(request, 'fungi/compare.html', context)
             else:
                 species2 = species2[0]
                 pid2 = species2.pid
@@ -210,10 +202,7 @@ def compare(request, pid):
             cross = cross[0]
         else:
             cross = ''
-            if species2.gen.family.family == 'Orchidaceae' and species2.type == 'hybrid':
-                spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-            else:
-                spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     msgnogenus = ''
     if 'msgnogenus' in request.GET:
@@ -227,7 +216,7 @@ def compare(request, pid):
                'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role}
-    return render(request, app + '/compare.html', context)
+    return render(request, 'fungi/compare.html', context)
 
 
 @login_required
@@ -247,7 +236,7 @@ def curate_newupload(request):
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days, 'family': family,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app, 'section': 'Curator Corner',
+               'section': 'Curator Corner',
                }
     return render(request, "common/curate_newupload.html", context)
 
@@ -291,7 +280,6 @@ def curate_pending(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app,
                }
     return render(request, 'common/curate_pending.html', context)
 
@@ -340,7 +328,6 @@ def curate_newapproved(request):
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app,
                }
     return render(request, 'common/curate_newapproved.html', context)
 
@@ -423,7 +410,7 @@ def reidentify(request, orid, pid):
         else:
             logger.error(">>> 5 form not valid")
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
-    return render(request, app + '/reidentify.html', context)
+    return render(request, 'fungi/reidentify.html', context)
 
 
 @login_required
@@ -436,7 +423,6 @@ def uploadweb(request, pid, orid=None):
 
     # For Other application only
     family = species.gen.family
-    app = family.application
 
     # We now allow synonym view
     # if species.status == 'synonym':
@@ -492,8 +478,8 @@ def uploadweb(request, pid, orid=None):
 
     context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
                'species': species, 'family': family,
-               'role': role, 'app': app,}
-    return render(request, app + '/uploadweb.html', context)
+               'role': role}
+    return render(request, 'fungi/uploadweb.html', context)
 
 
 def mypaginator(request, full_list, page_length, num_show):
@@ -596,9 +582,9 @@ def curateinfospc(request, pid):
     else:
         accepted = Accepted.objects.get(pk=species.pid)
         form = AcceptedInfoForm(instance=accepted)
-        context = {'form': form, 'genus': genus, 'species': species, 'app': app, 'family': family,
+        context = {'form': form, 'genus': genus, 'species': species, 'family': family,
                    'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
                    'role': role,}
-        return render(request, app + '/curateinfospc.html', context)
+        return render(request, 'fungi/curateinfospc.html', context)
 
 
