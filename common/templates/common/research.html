@@ -92,7 +92,6 @@ form {
 
 <div class="container-fluid" style="margin: 0 auto;width: 90%">
     <br>
-    {% if family == 'Orchidaceae' %}
         <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family=Orchidaceae&role={{role}}" style="text-align:center"><h4>Orchidaceae</h4></a>
@@ -102,26 +101,19 @@ form {
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&family=Orchidaceae&display=checked">Browse Orchidaceae genera</a>
                 <a class="btn btn-xs p-3 custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&family=Orchidaceae">List Orchidaceae genera</a>
                 <br>
-                <form class="rescontrol" id="orsearch" action="/search/search_species/" style="display:inline-block;">
-                   <div class="form-floating">
-                    <input type="hidden" name="family" value="Orchidaceae" >
-                    <input type="hidden" name="role" value="{{ role }}" >
-                    <input class="form-control resinput" id="orsc" name="spc_string" placeholder="Search Orchidaceae" style="margin: 4px 0">
-                    <label for="orsc">&nbsp;Keyword search Orchidaceae</label>
-                   </div>
-                </form>
-
-                <form class="rescontrol" action="{% url 'common:species' %}" style="display:inline-block;">
+                <form class="rescontrol" id="orsearch" action="{% url 'common:species' %}" style="display:inline-block;">
                     <div class="form-floating">
-                    <input type="hidden" name="role" value="{{ role }}" >
-                    <input type="hidden" name="family" value="Orchidaceae" >
-                    <input class="form-control resinput" id="orgen" name="genus" placeholder="Search genus" style="margin: 4px 0">
+                    <input type="hidden" form="orsearch" name="role" value="{{ role }}" >
+                    <input type="hidden" form="orsearch" name="app" value="orchidaceae" >
+                    <input type="hidden" form="orsearch" name="family" value="Orchidaceae" >
+                    <input class="form-control resinput" form="orgen" id="orgen" name="genus" placeholder="Search genus" style="margin: 4px 0">
                     <label for="orgen">&nbsp;Enter a genus to list species</label>
                     </div>
                 </form>
                 <form class="rescontrol" action="{% url 'common:hybrid' %}" style="display:inline-block;">
                     <div class="form-floating">
                     <input type="hidden" name="role" value="{{ role }}" >
+                    <input type="hidden" name="app" value="orchidaceae" >
                     <input type="hidden" name="family" value="Orchidaceae" >
                     <input class="form-control resinput" id="orhyb" name="genus" placeholder="Search genus" style="margin: 4px 0">
                     <label for="orhyb">&nbsp;Enter a genus to list hybrids</label>
@@ -129,38 +121,61 @@ form {
                 </form>
             </div>
         </div>
-    {% else %}
+
         <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family={{family|default:'other'}}&role={{role}}" style="text-align:center">
-                    <h4>{% if family %}{{family}}{% else %}Browse Other Plant Families{% endif %}</h4></a>
+                    <h4>Browse Other Plant Families</h4></a>
             </div>
             <div style="margin: auto;">
+                <br>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other&family={{family}}" style="text-align:center">List genera</a>
                 <br>
-                    <form class="rescontrol" action="/search/search_species/" style="display:inline-block;">
-<!--                       <div class="form-floating">-->
-                        <input type="hidden" name="family" value="other" >
-                        <input type="hidden" name="role" value="{{ role }}" >
-                        <input class="form-control abtn" id="otsc" type="text" name="spc_string" placeholder="Keyword Search" style="margin: 4px 0;">
-<!--                        <label for="otsc">&nbsp;Keyword search other families</label>-->
-<!--                       </div>-->
-                    </form>
-                    <form class="rescontrol" id=otgenus action="{% url 'common:species' %}" style="display:inline-block;" >
+                    <form class="rescontrol" id="otgenus" action="{% url 'common:species' %}" style="display:inline-block;" >
 <!--                        <div class="form-floating">-->
                         <input type="hidden" form="otgenus" name="role" value="{{ role }}" >
+                        <input type="hidden" form="otgenus" name="app" value="other" >
                         <input type="hidden" form="otgenus" name="family" value="{{family|default:'other'}}" >
                         <input type="hidden" form="otgenus" name="from_path" value="{{from_path}}" >
-                        <input class="form-control abtn" id="otgen" name="genus" placeholder="List species by selecting a genus" style="margin: 4px 0;">
+                        <input class="form-control abtn" form="otgenus" id="otgen" name="genus" placeholder="List species by selecting a genus" style="margin: 4px 0;">
 <!--                        <label for="otgen">&nbsp;Enter a genus to list species</label>-->
 <!--                        </div>-->
                     </form>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:distribution' %}?role={{role}}" style="text-align:center">Native Plant Search</a>
+                <br>
             </div>
+                <br>
         </div>
-    {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <a href="{% url 'common:genera' %}?family={{family|default:'fungi'}}&role={{role}}" style="text-align:center">
+                    <h4>Browse Fungi</h4></a>
+            </div>
+            <div style="margin: auto;">
+                <br>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=fungi&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=fungi&family={{family}}" style="text-align:center">List genera</a>
+                <br>
+                    <form class="rescontrol" id=fugenus action="{% url 'common:species' %}" style="display:inline-block;" >
+<!--                        <div class="form-floating">-->
+                        <input type="hidden" form="fugenus" name="role" value="{{ role }}" >
+                        <input type="hidden" form="fugenus" name="family" value="{{family|default:''}}" >
+                        <input type="hidden" form="fugenus" name="app" value="{{family.application|default:'fungi'}}" >
+                        <input type="hidden" form="fugenus" name="from_path" value="{{from_path}}" >
+                        <input class="form-control abtn" form="fugenus" id="fugen" name="genus" placeholder="List species by selecting a genus" style="margin: 4px 0;">
+<!--                        <label for="fugen">&nbsp;Enter a genus to list species</label>-->
+<!--                        </div>-->
+                    </form>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:distribution' %}?role={{role}}" style="text-align:center">Native Plant Search</a>
+                <br>
+            </div>
+                <br>
+        </div>
+
 </div>
 
 {% endblock %}
