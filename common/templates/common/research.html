@@ -92,6 +92,7 @@ form {
 
 <div class="container-fluid" style="margin: 0 auto;width: 90%">
     <br>
+<!--ORCHID-->
         <div class="card">
             <div class="card-header">
                 <a href="{% url 'common:genera' %}?family=Orchidaceae&role={{role}}" style="text-align:center"><h4>Orchidaceae</h4></a>
@@ -121,10 +122,10 @@ form {
                 </form>
             </div>
         </div>
-
+<!--OTHER-->
         <div class="card">
             <div class="card-header">
-                <a href="{% url 'common:genera' %}?family={{family|default:'other'}}&role={{role}}" style="text-align:center">
+                <a href="{% url 'common:genera' %}?family={{family}}&role={{role}}" style="text-align:center">
                     <h4>Browse Other Plant Families</h4></a>
             </div>
             <div style="margin: auto;">
@@ -148,10 +149,10 @@ form {
             </div>
                 <br>
         </div>
-
+<!--FUNGI-->
         <div class="card">
             <div class="card-header">
-                <a href="{% url 'common:genera' %}?family={{family|default:'fungi'}}&role={{role}}" style="text-align:center">
+                <a href="{% url 'common:genera' %}?family={{family}}&role={{role}}" style="text-align:center">
                     <h4>Browse Fungi</h4></a>
             </div>
             <div style="margin: auto;">
@@ -175,6 +176,33 @@ form {
             </div>
                 <br>
         </div>
+<!--AVES-->
+        <div class="card">
+        <div class="card-header">
+            <a href="{% url 'common:genera' %}?family={{family}}&role={{role}}" style="text-align:center">
+                <h4>Browse Aves</h4></a>
+        </div>
+        <div style="margin: auto;">
+            <br>
+            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
+            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=aves&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
+            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=aves&family={{family}}" style="text-align:center">List genera</a>
+            <br>
+                <form class="rescontrol" id=avgenus action="{% url 'common:species' %}" style="display:inline-block;" >
+<!--                        <div class="form-floating">-->
+                    <input type="hidden" form="avgenus" name="role" value="{{ role }}" >
+                    <input type="hidden" form="avgenus" name="family" value="{{family|default:''}}" >
+                    <input type="hidden" form="avgenus" name="app" value="{{family.application|default:'fungi'}}" >
+                    <input type="hidden" form="avgenus" name="from_path" value="{{from_path}}" >
+                    <input class="form-control abtn" form="avgenus" id="avgen" name="genus" placeholder="List species by selecting a genus" style="margin: 4px 0;">
+<!--                        <label for="fugen">&nbsp;Enter a genus to list species</label>-->
+<!--                        </div>-->
+                </form>
+            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:distribution' %}?role={{role}}" style="text-align:center">Native Plant Search</a>
+            <br>
+        </div>
+            <br>
+    </div>
 
 </div>
 

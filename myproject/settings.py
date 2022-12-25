@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'orchidaceae',
     'other',
     'fungi',
+    'aves',
 
     # Third Party
     'ads',

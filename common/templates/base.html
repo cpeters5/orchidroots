@@ -613,7 +613,7 @@ nav .search-container button:hover {
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="container" style="width:100% !important;">
         <div class="navbar-header">
-            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/?role={{role}}" style="color: #07f7ff;"><b>BlueNanta {% if family %}<span style="color:#7ef51a;"> - {{family.family|default:''}}{% endif%}</span></b></a>
+            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff;"><b>BlueNanta {% if family %}<span style="color:#7ef51a;"> - {{family.family|default:''}}{% endif%}</span></b></a>
             <!-- Brand -->
 <!-- Links -->
 
@@ -685,8 +685,12 @@ nav .search-container button:hover {
 
 
 <div class="p-1" style="background-color:black; font-size: 11px;">
-            &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
-            &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:browsegen' %}?app=orchidaceae&display=checked">Orchidaceae</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:browsegen' %}?app=fungi&display=checked">Fungi</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:browsegen' %}?app=other&display=checked">Other families</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:browsegen' %}?app=aves&display=checked">Birds</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
+     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>
     </div>
 
 

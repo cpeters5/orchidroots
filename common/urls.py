@@ -4,7 +4,6 @@ from display.views import photos as display_photos, information as display_infor
 app_name = 'common'
 urlpatterns = [
     # Top level
-    # path('', orchid_home, name='orchid_home'),
     # path('taxonomy/', views.taxonomy, name='taxonomy'),
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),

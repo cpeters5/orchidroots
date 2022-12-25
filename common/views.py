@@ -47,7 +47,7 @@ def getFamilyImage(family):
     return SpcImages.objects.filter(rank__lt=7).order_by('-rank','quality', '?')[0:1][0]
 
 
-def orchid_home(request):
+def home(request):
     ads_insert = 0
     sponsor = ''
     all_list = []
@@ -97,7 +97,6 @@ def orchid_home(request):
     all_list = all_list + [['Parasitic', parasitic_obj]]
     print("all_list = ", len(all_list))
 
-
     num_samples = 2
     # Get random fungi families
     SpcImages = apps.get_model('fungi', 'SpcImages')
@@ -110,6 +109,22 @@ def orchid_home(request):
             continue
         all_list = all_list + [["Fungi", fungi_obj]]
     print("all_list = ", len(all_list))
+
+    num_samples = 2
+    # Get random bird families
+    SpcImages = apps.get_model('aves', 'SpcImages')
+    Genus = apps.get_model('aves', 'Genus')
+    sample_families = Genus.objects.filter(num_spcimage__gt=0).distinct().values_list('family', flat=True).order_by('?')[0:num_samples]
+    for fam in sample_families:
+        try:
+            aves_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
+        except:
+            continue
+        all_list = all_list + [["Aves", aves_obj]]
+    print("all_list = ", len(all_list))
+
+
+
     # Advertisement
     num_blocks = 5
     ads_insert = int(random.random() * num_blocks) + 1
@@ -119,7 +134,7 @@ def orchid_home(request):
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
                'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj,
                'ads_insert': ads_insert, 'sponsor': sponsor, 'role': role }
-    return render(request, 'orchid_home.html', context)
+    return render(request, 'home.html', context)
 
 
 def require_get(view_func):
@@ -610,6 +625,7 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
 def browsegen(request):
     app = ''
     family = ''
+    family_list = []
     newfamily = ''
     talpha = ''
     num_show = 5
@@ -620,19 +636,25 @@ def browsegen(request):
     my_full_list = []
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        if (family == '' or family == None) and 'family' in request.GET:
-            family = request.GET['family']
-    if 'app' in request.GET:
-        app = request.GET['app']
+    if 'family' in request.GET:
+        family = request.GET['family']
+        try:
+            family = Family.objects.get(family=family)
+        except Family.DoesNotExist:
+            family = ''
 
-    if family and family != 'other':
-        family = Family.objects.get(family=family)
-        app = family.application
-    else:
-        app = 'other'
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request, family)
+    if 'app' in request.GET:
+        # If family is request, then ignore app
+        app = request.GET['app']
+        if not family:
+            if app == 'orchidaceae':
+                family = Family.objects.get(family='Orchidaceae')
+            else:
+                family_list = Family.objects.filter(application=app).order_by('?')
+                family = ''
+    print("family_list = ", len(family_list))
+    if family:
+        print("family = ", family.family)
 
     page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
     display = ''
@@ -643,56 +665,64 @@ def browsegen(request):
     if not display:
         display = ''
 
-    if app == 'orchidaceae':
-        Genus = apps.get_model(app.lower(), 'Genus')
-    else:
-        Genus = apps.get_model(app.lower(), 'Genus')
+    Genus = apps.get_model(app.lower(), 'Genus')
+    # Species = apps.get_model(app.lower(), 'Species')
 
     pid_list = Genus.objects.all()
-
+    # print("1 pid_list = ", len(pid_list))
+    if display == 'checked':
+        pid_list = pid_list.filter(num_spcimage__gt=0)
     if talpha:
         pid_list = pid_list.filter(genus__istartswith=talpha)
 
-    if pid_list:
-        if family:
-            pid_list = pid_list.filter(family=family.family)
-        else:
-            pid_list = pid_list.filter(family__application='other')
+    if family:
+        pid_list = pid_list.filter(family=family)
+        pid_list = pid_list.order_by('?')[1:20]
+    elif len(family_list) > 0:
+        tmp_list = []
+        for x in family_list:
+            tmp_obj = pid_list.filter(family=x).order_by('?')[0:1]
+            if len(tmp_obj) > 0:
+                if tmp_list:
+                    tmp_list = tmp_list.union(tmp_obj)
+                else:
+                    tmp_list = (tmp_obj)
+            if len(tmp_list) > 20:
+                break
+        pid_list = tmp_list
 
-        if display == 'checked':
-            pid_list = pid_list.filter(num_spcimage__gt=0)
-        pid_list = pid_list.order_by('genus')
-        total = len(pid_list)
-        page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
-            = mypaginator(request, pid_list, page_length, num_show)
+    total = len(pid_list)
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
+        = mypaginator(request, pid_list, page_length, num_show)
 
-        if len(page_list) > start_ad:
-            ads_insert = int(random.random() * len(page_list)) + 1
-            sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    if len(page_list) > start_ad:
+        ads_insert = int(random.random() * len(page_list)) + 1
+        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
-        # if switch display, restart pagination
-        if 'prevdisplay' in request.GET:
-            page = 1
+    # if switch display, restart pagination
+    if 'prevdisplay' in request.GET:
+        page = 1
 
-        for x in page_list:
-            x.imgobj = x.get_best_img()
-            if x.get_best_img():
-                if family:
-                    if family.family == 'Orchidaceae':
-                        x.image_dir = 'utils/images/' + str(x.type) + '/'
-                    else:
-                        x.image_dir = 'utils/images/' + str(x.family) + '/'
+    for x in page_list:
+        x.imgobj = x.get_best_img()
+        if x.get_best_img():
+            if family:
+                if family.family == 'Orchidaceae':
+                    x.image_dir = 'utils/images/' + str(x.type) + '/'
                 else:
                     x.image_dir = 'utils/images/' + str(x.family) + '/'
-
-                x.image_file = x.get_best_img().image_file
-                x.img_pid = x.get_best_img().pid
             else:
-                x.image_file = 'utils/images/noimage_light.jpg'
-            my_full_list.append(x)
+                x.image_dir = 'utils/images/' + str(x.family) + '/'
+
+            x.image_file = x.get_best_img().image_file
+            x.img_pid = x.get_best_img().pid
+        else:
+            x.image_file = 'utils/images/noimage_light.jpg'
+        my_full_list.append(x)
 
     write_output(request, str(family))
-    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+    context = {'family':family, 'app': app,
+               # 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
         'page_list': my_full_list, 'display': display,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
         'page': page, 'total': total, 'talpha': talpha,
