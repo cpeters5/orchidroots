@@ -97,7 +97,7 @@ def home(request):
     all_list = all_list + [['Parasitic', parasitic_obj]]
     print("all_list = ", len(all_list))
 
-    num_samples = 2
+    num_samples = 1
     # Get random fungi families
     SpcImages = apps.get_model('fungi', 'SpcImages')
     Genus = apps.get_model('fungi', 'Genus')
@@ -110,7 +110,7 @@ def home(request):
         all_list = all_list + [["Fungi", fungi_obj]]
     print("all_list = ", len(all_list))
 
-    num_samples = 2
+    num_samples = 1
     # Get random bird families
     SpcImages = apps.get_model('aves', 'SpcImages')
     Genus = apps.get_model('aves', 'Genus')
@@ -123,6 +123,18 @@ def home(request):
         all_list = all_list + [["Aves", aves_obj]]
     print("all_list = ", len(all_list))
 
+    num_samples = 1
+    # Get random bird families
+    SpcImages = apps.get_model('animalia', 'SpcImages')
+    Genus = apps.get_model('animalia', 'Genus')
+    sample_families = Genus.objects.filter(num_spcimage__gt=0).distinct().values_list('family', flat=True).order_by('?')[0:num_samples]
+    for fam in sample_families:
+        try:
+            animalia_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
+        except:
+            continue
+        all_list = all_list + [["Aves", animalia_obj]]
+    print("all_list = ", len(all_list))
 
 
     # Advertisement

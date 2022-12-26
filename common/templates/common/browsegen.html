@@ -235,7 +235,10 @@ img{
                                     subtribe {{subtribe.subtribe}}
                                 {% endif %}
                             {% endif %}
+                        {% else %}
+                                {{app|default:None}}
                         {% endif %}
+
                             </i>
                         </span>
                     </span>

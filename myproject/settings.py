@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'other',
     'fungi',
     'aves',
+    'animalia',
 
     # Third Party
     'ads',

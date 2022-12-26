@@ -32,7 +32,7 @@ for row in cur:
     if i > 10: exit
     url = row[1]
     if row[3]:
-        if app == 'other' or app == 'fungi' or app == 'aves':
+        if app in range ('other', 'fungi', 'aves', 'animalia'):
             family = row[3].title()
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)

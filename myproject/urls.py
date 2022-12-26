@@ -72,6 +72,7 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('common/', include('common.urls')),
     path('display/', include('display.urls')),
+    path('animalia/', include('animalia.urls')),
     path('aves/', include('aves.urls')),
     path('fungi/', include('fungi.urls')),
     path('other/', include('other.urls')),
