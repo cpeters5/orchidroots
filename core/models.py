@@ -58,6 +58,7 @@ class Family(models.Model):
     common_name = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     order = models.CharField(max_length=20, null=True)
+    clss = models.CharField(max_length=20, null=True)
     kingdom = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     source = models.CharField(max_length=20, null=True)

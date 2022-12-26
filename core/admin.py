@@ -11,10 +11,10 @@ class SubfamilyInline(admin.TabularInline):
 
 class FamilyAdmin(admin.ModelAdmin):
     pass
-    list_display = ('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'order', 'orig_pid',)
-    fields = [('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'order', 'orig_pid', 'description',)]
+    list_display = ('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'clss', 'order', 'orig_pid',)
+    fields = [('family','author','year','status','source', 'application', 'common_name', 'kingdom', 'clss', 'order', 'orig_pid', 'description',)]
     ordering = ['family']
-    search_fields = ['family','kingdom', 'order']
+    search_fields = ['family','kingdom', 'clss', 'order']
     # inlines = [SubfamilyInline]
 
 
