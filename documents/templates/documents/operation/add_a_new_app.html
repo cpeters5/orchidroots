@@ -1,0 +1,64 @@
+{% include "base.html" %}
+<style>
+    ul{
+        padding-left:10px;
+        line-height: 30px;
+        list-style-type:none;
+    }
+    li {
+            display: list-item;
+    }
+    .card-body {
+        font-size: 15px;
+    }
+</style>
+<br>
+
+<div class="container-fluid" style="min-height:200px;">
+    <div style="clear:both"></div>
+
+            <div class="col-sm-8 col-lg-9" style="margin-top:7px;">
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title" style="margin-bottom: 0">Create a new application:</h6>
+                </div>
+
+                <div class="card-body" style="padding:20px;">
+                    <h6 class="mb-0">Process</h6>
+                    <ul>
+                        <li>python manage.py startapp newapp name</li>
+                        <li>add newapp to INSTALLED_APPS</li>
+                        <li>add newapp.urls.py path to the main urls.py</li>
+                        <li>Copy medels.py, url.py, views.py, form.py from other app</li>
+                        <li>edit newapp.urls.py to change app name to newapp.</li>
+                        <li>edit models.py and change all related_name to a unique name</li>
+                        <li>python manage.py makemigrations newapp</li>
+                        <li>python manage.py migrates</li>
+                        <li>redesign each newapp_* tables.  Check all constraits, triggers, datetime.</li>
+                        <li>If some newapp data already exists in other app (e.g. other app), move them to newapp tables</li>
+                        <li>edit newapp.forms.py to change oldapp.models to newapp.models</li>
+                    </>
+                    <h6 class="mb-0">FUNCTIONS</h6>
+                    <ul>
+                        <li>NAVBAR: Add a button to second navbar for the newapp --> browsegen <newapp></li>
+                        <li>commin/home: Add sample images of the newapp to home page</li>
+                        <li>common/browsegen: </li>
+                        <li>SEARCH:
+                            <ul>
+                                <li>Add a url path to search.urls.py</li>
+                                <li>Add search_<newapp> method to search.views (copy from a <oldapp>_search method and change app name.)</li>
+                                <li>Add statements for newapp in searcgh.search, and search.search_species methods</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h6 class="mb-0">MAINT</h6>
+                    <ul>
+                        <li>PROCESS IMAGES: retrieve_image_file.py: add app = 'aves' to the criteria</li>
+                    </ul>
+                    <br>
+             </div>
+        </div>
+    </div>
+
+</div>
