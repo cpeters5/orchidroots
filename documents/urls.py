@@ -36,6 +36,9 @@ urlpatterns = [
     path('termsofuse/', views.termsofuse, name='termsofuse'),
     path('whoweare/', views.whoweare, name='whoweare'),
 
+    # Operations
+    path('add_a_new_app/', views.add_a_new_app, name='add_a_new_app'),
+
     # path('assets/$', views.assets, name='assets'),
     # path('copyright/', views.copyright, name='copyright'),
     # path('newrelease/', views.newrelease, name='newrelease'),

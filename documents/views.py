@@ -146,3 +146,8 @@ def whoweare(request):
     context = {}
     return render(request, 'documents/whoweare.html', context)
 
+
+def add_a_new_app(request):
+    context = {}
+    return render(request, 'documents/operation/add_a_new_app.html', context)
+
