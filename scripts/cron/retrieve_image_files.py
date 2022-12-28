@@ -23,16 +23,14 @@ if app != 'other':
 
 stmthead = "UPDATE " + tab + " set image_file = '%s' where id = %d"
 stmt = "SELECT id, image_url, genus, family  FROM " + tab + " where image_url <>'' and image_url is not null and (image_file is null or image_file = '') order by id"
-print(stmt)
 cur.execute(stmt)
 i = 0
 for row in cur:
     i = i + 1
-    print(i)
     if i > 10: exit
     url = row[1]
     if row[3]:
-        if app in range ('other', 'fungi', 'aves', 'animalia'):
+        if app in ('other', 'fungi', 'aves', 'animalia'):
             family = row[3].title()
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)
@@ -48,7 +46,7 @@ for row in cur:
 
     try:
         # html = urlopen(url)
-        if app == 'other' or app == 'fungi':
+        if app in ('other', 'fungi', 'aves', 'animalia'):
             imgdir = "/mnt/static/utils/images/" + family + "/"
             Path(imgdir).mkdir(parents=True, exist_ok=True)
         local_filename, headers = urllib.request.urlretrieve(url, imgdir + fname)

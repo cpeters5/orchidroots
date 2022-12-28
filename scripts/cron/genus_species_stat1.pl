@@ -21,7 +21,9 @@ my ($sth, $sth1);
 
 my @apps = (
 	'other',
-	'fungi'
+	'fungi',
+	'aves',
+	'animalia'
 );
 my $date = strftime "%Y-%m-%d:%H:%M-%S", localtime;
 # our ($DB,$stf,$sth, $rc, $sth1, $sth2, $dbh);
