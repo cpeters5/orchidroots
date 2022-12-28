@@ -221,11 +221,11 @@ img{
             <div class="card">
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
-                        Sample images of
-                        <span style="color:blue">
+                        Sample images
                             <i>
                         {% if family %}
-                            {{family.family}}
+                                of genera in
+                            {{family.family}} family
                             {% if subfamily %}
                                 subfamily {{subfamily.subfamily}}
                             {% endif %}
@@ -236,12 +236,11 @@ img{
                                 {% endif %}
                             {% endif %}
                         {% else %}
-                                {{app|default:None}}
+                                by families in {{app|default:None}} group
                         {% endif %}
 
                             </i>
                         </span>
-                    </span>
                 </div>
                 <div class="card-body">
                     <dev style="font-size:16px;">
@@ -275,13 +274,13 @@ img{
                                     <div style="float:left">
                                         <ul class="pagination pagination-xs" style="text-align: center">
                                             {% if page > 1 %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page=1&role={{role}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?app={{app}}&family={{family}}&talpha={{talpha}}&page=1&role={{role}}&display={{display}}"><span class="fa fa-angle-double-left" ></span></a></li>
                                             {% else %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
                                             {% endif %}
 
                                             {% if page > 1 %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{prev_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?app={{app}}&family={{family}}&talpha={{talpha}}&page={{prev_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-left"></span></a></li>
                                             {% else %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
                                             {% endif %}
@@ -290,20 +289,20 @@ img{
                                                 {% if pg == page %}
                                                     <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
                                                 {% else %}
-                                                    <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{pg}}&role={{role}}&display={{display}}">{{pg}}</a></li>
+                                                    <li class="page-item"><a class="page-link" href="?app={{app}}&family={{family}}&talpha={{talpha}}&page={{pg}}&role={{role}}&display={{display}}">{{pg}}</a></li>
                                                 {% endif %}
                                             {% endfor %}
 
                                             {% if page == last_page %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
                                             {% else %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{next_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?app={{app}}&family={{family}}&talpha={{talpha}}&page={{next_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-right"></span></a></li>
                                             {% endif %}
 
                                             {% if page == last_page %}
                                                 <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
                                             {% else %}
-                                                <li class="page-item"><a class="page-link" href="?family={{family}}&talpha={{talpha}}&page={{last_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
+                                                <li class="page-item"><a class="page-link" href="?app={{app}}&family={{family}}&talpha={{talpha}}&page={{last_page}}&role={{role}}&display={{display}}"><span class="fa fa-angle-double-right"></span></a></li>
                                             {% endif %}
                                       </ul>
 
@@ -321,20 +320,16 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                         {% for x in page_list %}
                             <div class="imageitem border ">
-                                {% if forloop.counter == ads_insert %}
-                                    <a href="{{sponsor.sponsor_url}}" target="_blank">
-                                        <img class="thumbnails p-1" alt="" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}" >
-                                    </a>
-                                    <div class="imgcaption">{{sponsor.pitch}}</div>
-                                {% else %}
-                                    <a href="{% url 'common:browse' %}?tab=sum&role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
+                                    {% if not family %}
+                                        <a href="{% url 'common:browsegen' %}?app={{app}}&display={{display}}&family={{x.family.family}}">{{x.family}}</a>
+                                    {% endif %}
+                                    <a href="{% url 'common:browse' %}?role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}} {{x}}
+                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}}
                                         {% if x.imgobj.status == 'synonym' %}<br><span style="font-size:11px">(syn. x{{x.imgobj.getAccepted.binomial_it|safe}})</span>{% endif %}
                                     </div>
-                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>

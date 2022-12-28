@@ -642,32 +642,34 @@ def browsegen(request):
     talpha = ''
     num_show = 5
     page_length = 20
-    ads_insert = 0
-    start_ad = 3        # Minimum images to display sponsor ad.
-    sponsor = ''
+    # ads_insert = 0
+    # start_ad = 3        # Minimum images to display sponsor ad.
+    # sponsor = ''
     my_full_list = []
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
     if 'family' in request.GET:
         family = request.GET['family']
-        try:
-            family = Family.objects.get(family=family)
-        except Family.DoesNotExist:
-            family = ''
+        if family:
+            try:
+                family = Family.objects.get(family=family)
+                app = family.application
+            except Family.DoesNotExist:
+                family = None
 
     if 'app' in request.GET:
         # If family is request, then ignore app
         app = request.GET['app']
-        if not family:
-            if app == 'orchidaceae':
-                family = Family.objects.get(family='Orchidaceae')
-            else:
-                family_list = Family.objects.filter(application=app).order_by('?')
-                family = ''
-    print("family_list = ", len(family_list))
+    if not family:
+        if app == 'orchidaceae':
+            family = Family.objects.get(family='Orchidaceae')
+        else:
+            family_list = Family.objects.filter(application=app).order_by('?')
+            family = ''
     if family:
-        print("family = ", family.family)
-
+        app = family.application
+        family_list = [family]
+    print("app = ", app, family)
     page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
     display = ''
     # Get requested parameters
@@ -678,38 +680,45 @@ def browsegen(request):
         display = ''
 
     Genus = apps.get_model(app.lower(), 'Genus')
-    # Species = apps.get_model(app.lower(), 'Species')
 
     pid_list = Genus.objects.all()
-    # print("1 pid_list = ", len(pid_list))
+    print("pid_list = ", len(pid_list))
     if display == 'checked':
         pid_list = pid_list.filter(num_spcimage__gt=0)
     if talpha:
         pid_list = pid_list.filter(genus__istartswith=talpha)
+    print("family_list = ", len(family_list))
+    print("pid_list = ", len(pid_list))
 
-    if family:
-        pid_list = pid_list.filter(family=family)
-        pid_list = pid_list.order_by('?')[1:20]
-    elif len(family_list) > 0:
-        tmp_list = []
-        for x in family_list:
-            tmp_obj = pid_list.filter(family=x).order_by('?')[0:1]
-            if len(tmp_obj) > 0:
-                if tmp_list:
-                    tmp_list = tmp_list.union(tmp_obj)
-                else:
-                    tmp_list = (tmp_obj)
-            if len(tmp_list) > 20:
-                break
-        pid_list = tmp_list
+    if app != 'orchidaceae':
+        if family:
+            pid_list = pid_list.filter(family=family)
+            pid_list = pid_list.order_by('?')[1:20]
+        elif len(family_list) > 0:
+            tmp_list = []
+            for x in family_list:
+                tmp_obj = pid_list.filter(family=x).order_by('?')[0:1]
+                print("family = ", x.family)
+                if len(tmp_obj) > 0:
+                    print("obj = ", x.family, len(tmp_obj))
+                    if tmp_list:
+                        tmp_list = tmp_list.union(tmp_obj)
+                    else:
+                        tmp_list = (tmp_obj)
+                if len(tmp_list) > 20:
+                    break
+            pid_list = tmp_list
 
     total = len(pid_list)
+    print("total = ", total)
+    print("app = ", app, family)
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
         = mypaginator(request, pid_list, page_length, num_show)
+    print("page_list = ", len(page_list))
 
-    if len(page_list) > start_ad:
-        ads_insert = int(random.random() * len(page_list)) + 1
-        sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    # if len(page_list) > start_ad:
+    #     ads_insert = int(random.random() * len(page_list)) + 1
+    #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
     # if switch display, restart pagination
     if 'prevdisplay' in request.GET:
@@ -738,7 +747,7 @@ def browsegen(request):
         'page_list': my_full_list, 'display': display,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
         'page': page, 'total': total, 'talpha': talpha,
-        'ads_insert': ads_insert, 'sponsor': sponsor,
+        # 'ads_insert': ads_insert, 'sponsor': sponsor,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
         'role': role,
     }
@@ -755,9 +764,9 @@ def browse(request):
     talpha = ''
     num_show = 5
     page_length = 20
-    ads_insert = 0
-    start_ad = 3        # Minimum images to display sponsor ad.
-    sponsor = ''
+    # ads_insert = 0
+    # start_ad = 3        # Minimum images to display sponsor ad.
+    # sponsor = ''
     my_full_list = []
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
@@ -879,10 +888,24 @@ def browse(request):
         pid_list = pid_list.filter(species__istartswith=talpha)
 
     if pid_list and group:
-        if group == 'succulent':
-            pid_list = pid_list.filter(gen__is_succulent=True)
-        elif group == 'carnivorous':
-            pid_list = pid_list.filter(gen__is_carnivorous=True)
+        if app == 'other':
+            if group == 'succulent':
+                pid_list = pid_list.filter(gen__is_succulent=True)
+            elif group == 'carnivorous':
+                pid_list = pid_list.filter(gen__is_carnivorous=True)
+        if app == 'animalia':
+            if group == 'poisonous':
+                pid_list = pid_list.filter(gen__is_poisonous=True)
+            elif group == 'carnivorous':
+                pid_list = pid_list.filter(gen__is_carnivorous=True)
+        if app == 'aves':
+            if group == 'migratory':
+                pid_list = pid_list.filter(gen__is_migratory=True)
+        if app == 'fungi':
+            if group == 'poisonous':
+                pid_list = pid_list.filter(gen__is_poisonous=True)
+            elif group == 'edible':
+                pid_list = pid_list.filter(gen__is_edible=True)
 
     if pid_list:
         if family:
@@ -916,9 +939,9 @@ def browse(request):
         page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
             = mypaginator(request, pid_list, page_length, num_show)
 
-        if len(page_list) > start_ad:
-            ads_insert = int(random.random() * len(page_list)) + 1
-            sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+        # if len(page_list) > start_ad:
+        #     ads_insert = int(random.random() * len(page_list)) + 1
+        #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
         # if switch display, restart pagination
         # if 'prevdisplay' in request.GET:
@@ -953,7 +976,7 @@ def browse(request):
         'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
         'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
         'page': page, 'total': total, 'talpha': talpha, 'myspecies': myspecies,
-        'ads_insert': ads_insert, 'sponsor': sponsor,
+        # 'ads_insert': ads_insert, 'sponsor': sponsor,
         'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
         'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
         'role': role,
