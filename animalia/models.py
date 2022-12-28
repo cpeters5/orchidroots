@@ -187,7 +187,7 @@ class Species(models.Model):
     binomial = models.CharField(max_length=500, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcanifamily', on_delete=models.DO_NOTHING)
     citation = models.CharField(max_length=200)
-    is_succulent = models.BooleanField(null=True, default=False)
+    is_poisonous = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
