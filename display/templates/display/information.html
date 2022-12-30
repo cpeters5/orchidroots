@@ -336,13 +336,13 @@ seedparent, pollparent {
                         <br><b>Genus:</b>
                         {{species.gen}}:
                         <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&type=species&genus={{species.genus}}&role={{role}}">list</a>&nbsp;&nbsp;|
-                        &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                        &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
 
                     {% if accepted.subgenus %}
                         <br><b>Subgenus:</b>
                         {{accepted.subgenus}}:
                             <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                            &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                            &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                     {% endif %}
 
                     {% if accepted.section %}
@@ -350,10 +350,10 @@ seedparent, pollparent {
                             {{accepted.section}}:
                                 {% if accepted.subgenus %}
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                                 {% else %}
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                                 {% endif %}
                     {% endif %}
 
@@ -362,10 +362,10 @@ seedparent, pollparent {
                                 {{accepted.subsection}}:
                                 {% if accepted.subgenus %}
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                                 {% else %}
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                                 {% endif %}
                     {% endif %}
 
@@ -375,10 +375,10 @@ seedparent, pollparent {
                                 {% if accepted.section %}
 
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
                                 {% else %}
                                     <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:browse' %}?family={{species.gen.family}}&role={{role}}&series={{accepted.series}}&genus={{species.genus}}&type=species&display=checked">images</a>
+                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&role={{role}}&series={{accepted.series}}&genus={{species.genus}}&type=species&display=checked">images</a>
                                 {% endif %}
                     {% endif %}
 <!--                <hr>-->

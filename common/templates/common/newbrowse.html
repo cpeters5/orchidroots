@@ -223,9 +223,11 @@ img{
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
                         Sample images
                             <i>
-                        {% if family %}
-                                of genera in
-                            {{family.family}} family
+                        {% if genus %}
+                                of species in <b>{{genus}}</b> genus
+                        {% elif family %}
+                                by genera in
+                                <b>{{family.family}}</b> family
                             {% if subfamily %}
                                 subfamily {{subfamily.subfamily}}
                             {% endif %}
@@ -235,38 +237,46 @@ img{
                                     subtribe {{subtribe.subtribe}}
                                 {% endif %}
                             {% endif %}
-                        {% else %}
-                                by families in {{app|default:None}} group
+                        {% elif app %}
+                                by families in <b>{{app|title}}</b>
                         {% endif %}
-
                             </i>
                         </span>
                 </div>
-                <div class="card-body">
-                    <dev style="font-size:16px;">
-                        <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Genus list</a>
-                    <form action="?" id="fam" style="display:inline-block">
-                        <input form="fam" type="hidden" name="app" value="{{app}}" >
-                        <input form="fam" type="hidden" name="talpha" value="{{talpha}}" >
-                        <input form="fam" type="hidden" name="role" value="{{role}}" >
-                        <input form="fam" type="hidden" name="display" value="{{display}}">
-                        <input type="text" class="btn-custom" name="family" value="{{family|default:''}}" onchange="this.form.submit()" style="margin-left:1px;">
-                    </form>
-                    <form action="?" id="display" style="display:inline-block">
-                        <input form="display" type="hidden" name="app" value="{{app}}" >
-                        <input form="display" type="hidden" name="family" value="{{family}}" >
-                        <input form="display" type="hidden" name="talpha" value="{{talpha}}" >
-                        <input form="display" type="hidden" name="role" value="{{role}}" >
-                        <input form="display" type="hidden" name="prevdisplay" value="{{display}}" >
-                        {% if display %}
-                        <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Uncheck to include species without images</span>
-                        {% else %}
-                        <input type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Check to hide species without images</span>
-                        {% endif %}
-                    </form>
-                    </dev>
 
-                <!-- Display -->
+                <div class="card-body">
+                    <div style="font-size:16px;">
+<!--                        <a href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">List {{app}} genera</a>-->
+                        <form action="?" id="fam" style="display:inline-block">
+<!--                            <input form="fam" type="hidden" name="app" value="{{app}}" >-->
+                            <input form="fam" type="hidden" name="talpha" value="{{talpha}}" >
+                            <input form="fam" type="hidden" name="role" value="{{role}}" >
+                            <input form="fam" type="hidden" name="display" value="{{display}}">
+                            <input form="fam" type="text" class="btn-custom" name="family" value="{{family|default:''}}" onchange="this.form.submit()" style="margin-left:1px;">
+                        </form>
+                        <form action="?" id="gen" style="display:inline-block">
+                            <input form="gen" type="hidden" name="app" value="{{app}}" >
+                            <input type="hidden" name="family" value="{{family}}" >
+                            <input form="gen" type="hidden" name="talpha" value="{{talpha}}" >
+                            <input form="gen" type="hidden" name="role" value="{{role}}" >
+                            <input form="gen" type="hidden" name="display" value="{{display}}">
+                            <input form="gen" type="text" class="btn-custom" name="genus" value="{{genus|default:''}}" onchange="this.form.submit()" style="margin-left:1px;">
+                        </form>
+                        <form action="?" id="display" style="display:inline-block">
+                            <input type="hidden" name="app" value="{{app}}" >
+                            <input type="hidden" name="family" value="{{family}}" >
+                            <input type="hidden" name="genus" value="{{genus}}" >
+                            {% if display %}
+                            <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Uncheck to include species without images</span>
+                            {% else %}
+                            <input type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Check to hide species without images</span>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+
+                <!-- Display app sample by family -->
                     <div class="container justify-content-left align-items-center" style="margin-top:10px; padding:0; text-align: left;">
                         {% if page_list %}
                             <div class="container justify-content-center align-items-center" style="margin:0 auto; padding:0; text-align: left;">
@@ -315,20 +325,50 @@ img{
                         {% endif %}
                     </div>
             <!--            <br>-->
-                    {% if page_list %}
+                    {% if family_list %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
                                 <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
-                        {% for x in page_list %}
+                        {% for x in family_list %}
                             <div class="imageitem border ">
-                                    {% if not family %}
-                                        <a href="{% url 'common:browsegen' %}?app={{app}}&display={{display}}&family={{x.family.family}}">{{x.family}}</a>
-                                    {% endif %}
-                                    <a href="{% url 'common:browse' %}?role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
+                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&display={{display}}&family={{x.family.family}}">{{x.family}}</a>
+                                    <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
+                                        <img class="thumbnails p-1" alt="" src="{% static x.get_best_img.image_dir %}{{x.get_best_img.image_file}}" >
+                                    </a>
+                                    <div class="imgcaption">
+                                        <i>{{x.get_best_img.pid.name|safe}}
+                                    </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% elif genus_list %}
+                        <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
+                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                        {% for x in genus_list %}
+                            <div class="imageitem border ">
+                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.genus}}&display={{display}}">{{x.genus}}</a>
+                                    <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.genus}}&display={{display}}">
+                                        {% if x.get_best_img.image_file %}
+                                            <img class="thumbnails p-1" alt="" src="{% static x.get_best_img.image_dir %}{{x.get_best_img.image_file}}" >
+                                        {% else %}
+                                            <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                        {% endif %}
+                                    </a>
+                                    <div class="imgcaption">
+                                        <i>{{x.name|safe}}
+                                    </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% elif species_list %}
+                        <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
+                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                        {% for x in species_list %}
+                            <div class="imageitem border ">
+                                    <a href="{% url 'display:information'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}&display={{display}}">
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i><b>{{x.imgobj.pid.genus|safe}}</b></i> {{x.imgobj.pid.speciesname|safe}}
-                                        {% if x.imgobj.status == 'synonym' %}<br><span style="font-size:11px">(syn. x{{x.imgobj.getAccepted.binomial_it|safe}})</span>{% endif %}
+                                        <i>{{x.pid.name|safe}}</i>
                                     </div>
                             </div>
                         {% endfor %}

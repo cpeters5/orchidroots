@@ -23,7 +23,7 @@
                             {% if not genus or genus.num_hybrid > 0 %}
                                 <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
                             {% endif %}
-                            <a class="btn btn-custom" href="{% url 'common:browse' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&alpha={{alpha}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
                                 <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&alpha={{alpha}}&role={{role}}">Go to full genus list</a>
                             {% endif %}

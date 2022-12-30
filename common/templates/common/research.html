@@ -131,7 +131,7 @@ form {
             <div style="margin: auto;">
                 <br>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
-                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=other&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:newbrowse' %}?role={{role}}&app=other&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=other&family={{family}}" style="text-align:center">List genera</a>
                 <br>
                     <form class="rescontrol" id="otgenus" action="{% url 'common:species' %}" style="display:inline-block;" >
@@ -158,7 +158,7 @@ form {
             <div style="margin: auto;">
                 <br>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
-                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=fungi&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
+                <a class="btn btn-xs custom-link border abtn" href="{% url 'common:newbrowse' %}?role={{role}}&app=fungi&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
                 <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=fungi&family={{family}}" style="text-align:center">List genera</a>
                 <br>
                     <form class="rescontrol" id=fugenus action="{% url 'common:species' %}" style="display:inline-block;" >
@@ -185,7 +185,7 @@ form {
         <div style="margin: auto;">
             <br>
             <a class="btn btn-xs custom-link border abtn" href="{% url 'common:taxonomy' %}?role={{role}}" style="text-align:center">Show taxonomy tree</a>
-            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:browsegen' %}?role={{role}}&app=aves&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
+            <a class="btn btn-xs custom-link border abtn" href="{% url 'common:newbrowse' %}?role={{role}}&app=aves&display=checked&family={{family}}&genus={{genus}}" style="text-align:center">Browse genera</a>
             <a class="btn btn-xs custom-link border abtn" href="{% url 'common:genera' %}?role={{role}}&app=aves&family={{family}}" style="text-align:center">List genera</a>
             <br>
                 <form class="rescontrol" id=avgenus action="{% url 'common:species' %}" style="display:inline-block;" >

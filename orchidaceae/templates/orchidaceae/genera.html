@@ -271,11 +271,11 @@ a:hover {
 
                                     {% if genustype != 'hybrid' %}
                                         <td class="text-center small-font"><span  style="font-size: 11px;">{{genus.num_species|default:''}}</span></td>
-                                        <td class="text-center small-font"><a href="{% url 'common:browse' %}?family={{family}}&type=species&genus={{genus}}&display=checked">{{genus.num_spc_with_image|default:''}}</a></td>
+                                        <td class="text-center small-font"><a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=species&genus={{genus}}&display=checked">{{genus.num_spc_with_image|default:''}}</a></td>
                                         <td class="text-center small-font">{{genus.get_roundspcpct|default:''}}</td>
                                     {% endif %}
                                     <td class="text-center small-font"><span  style="font-size: 11px;">{{genus.num_hybrid|default:''}}</span></td>
-                                    <td class="text-center small-font"><a href="{% url 'common:browse' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked">{{genus.num_hyb_with_image|default:''}}</a></td>
+                                    <td class="text-center small-font"><a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=hybrid&genus={{genus}}&display=checked">{{genus.num_hyb_with_image|default:''}}</a></td>
                                     <td class="text-center small-font">{{genus.get_roundhybpct|default:''}}</td>
                                     <td class="text-center small-font">
                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&status=synonym&genus={{genus}}"><span style="font-size: 10px;"> {{genus.num_synonym|default:''}}</span></a>

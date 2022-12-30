@@ -33,6 +33,7 @@ Accepted = []
 Synonym = []
 alpha_list = config.alpha_list
 
+applications = ['orchidaceae', 'other', 'fungi', 'aves', 'animalia']
 
 def getAllGenera():
     # Call this when Family is not provided
@@ -720,10 +721,6 @@ def browsegen(request):
     #     ads_insert = int(random.random() * len(page_list)) + 1
     #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
 
-    # if switch display, restart pagination
-    if 'prevdisplay' in request.GET:
-        page = 1
-
     for x in page_list:
         x.imgobj = x.get_best_img()
         if x.get_best_img():
@@ -983,6 +980,96 @@ def browse(request):
     }
 
     return render(request, 'common/browse.html', context)
+
+def newbrowse(request):
+    # Application must be in request
+    # If family in request, it must belong to the requested app
+    # If genus in request, it must belong to the requested app
+    family_list = []
+    display = ''
+    app = ''
+    family = ''
+    genus = ''
+    # At least app must be in request
+    app = request.GET['app']
+    if 'family' in request.GET:
+        family = request.GET['family']
+    if app == 'orchidaceae':
+        # Special case for orchids
+        family = 'Orchidaceae'
+
+    if app in applications:
+        #     If app is requested, find family_list and sample image by family
+        if 'display' in request.GET:
+            display = request.GET['display']
+        if not display:
+            display = ''
+
+        # If family is requested, get sample list by genera
+        if 'genus' in request.GET:
+            # App and family must also be in the request.
+            Genus = apps.get_model(app.lower(), 'Genus')
+            Species = apps.get_model(app.lower(), 'Species')
+            genus = request.GET['genus']
+            if genus:
+                try:
+                    genus = Genus.objects.get(genus=genus)
+                except Genus.DoesNotExist:
+                    Genus = ''
+                if Genus:
+                    species = Species.objects.filter(genus=genus)
+                    if display == 'checked':
+                        species = species.filter(num_image__gt=0)
+                    if len(species) > 500:
+                        species = species[0: 500]
+                    species_list = []
+                    for x in species:
+                        spcimage = x.get_best_img()
+                        if spcimage:
+                            species_list = species_list + [spcimage]
+                    context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'display': display}
+                    return render(request, 'common/newbrowse.html', context)
+        if family:
+            try:
+                family = Family.objects.get(family=family)
+            except Family.DoesNotExist:
+                family = None
+            if family:
+                Genus = apps.get_model(app.lower(), 'Genus')
+                Species = apps.get_model(app.lower(), 'Species')
+                genera = Genus.objects.filter(family=family)
+                if len(genera) > 100:
+                    genera = genera[0: 1000]
+                genus_list = []
+                for x in genera:
+                    spcimage = Species.objects.filter(genus=x)
+                    if display == 'checked':
+                        spcimage = spcimage.filter(num_image__gt=0)
+                    spcimage = spcimage.order_by('?')[0:1]
+                    if len(spcimage) > 0:
+                        genus_list = genus_list + [spcimage[0]]
+                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display}
+                return render(request, 'common/newbrowse.html', context)
+
+        # Building sample by families
+        families = Family.objects.filter(application=app)
+        Genus = apps.get_model(app.lower(), 'Genus')
+        family_list = []
+        for fam in families:
+            genimage = Genus.objects.filter(family=fam.family)
+            if display == 'checked':
+                genimage = genimage.filter(num_spcimage__gt=0)
+            genimage = genimage.order_by('?')[0:1]
+            if len(genimage) > 0:
+                family_list = family_list + [genimage[0]]
+        context = {'family_list': family_list, 'app': app, 'display': display}
+        return render(request, 'common/newbrowse.html', context)
+
+    # Bad application, and neither families nor genus are valid, list all genera in the app
+    write_output(request, str(family))
+    return HttpResponseRedirect('/')
+
+    # Now we get family_list of sample genera
 
 
 def getPartialPid(reqgenus, type, status, app):
@@ -1487,12 +1574,11 @@ def myphoto_list(request):
     if 'newfamily' in request.GET:
         family = request.GET['newfamily']
 
-    app_list = ['Orchidaceae', 'other']
+    app_list = ['Orchidaceae', 'other', 'fungi', 'aves', 'animalia']
     my_hyb_list = []
     my_list = []
     if role == 'pub':
-        send_url = "%s?family=%s" % (reverse('common:browse'), family)
-        return HttpResponseRedirect(send_url)
+        return HttpResponseRedirect('/')
     if role == 'cur' and 'author' in request.GET:
         author = request.GET['author']
         author = Photographer.objects.get(pk=author)
@@ -1544,8 +1630,7 @@ def myphoto_browse_spc(request):
     role = getRole(request)
 
     if role == 'pub':
-        send_url = "%s?family=%s" % (reverse('common:browse'), family)
-        return HttpResponseRedirect(send_url)
+        return HttpResponseRedirect('/')
     if role == 'cur' and 'author' in request.GET:
         author = request.GET['author']
         author = Photographer.objects.get(pk=author)
@@ -1592,8 +1677,7 @@ def myphoto_browse_hyb(request):
         family = 'other'
     role = getRole(request)
     if role == 'pub':
-        send_url = "%s?tab=%s" % (reverse('common:browse'), 'sum')
-        return HttpResponseRedirect(send_url)
+        return HttpResponseRedirect('/')
     author, author_list = get_author(request)
     if role == 'cur' and 'author' in request.GET:
         author = request.GET['author']
