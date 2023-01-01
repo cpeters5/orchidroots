@@ -27,6 +27,8 @@ def robots_txt(request):
         "Disallow: /admin/",
         "Disallow: /accounts/",
         "Disallow: /account/",
+        "Disallow: /animalia/",
+        "Disallow: /aves/",
         "Disallow: /common/",
         "Disallow: /core/",
         "Disallow: /data/",
