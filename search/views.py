@@ -29,7 +29,6 @@ def search(request):
             message = 'The search term must contain genus name'
             return HttpResponse(message)
         if ' ' not in search_string:
-            single_word = True
             genus_string = search_string
         elif search_string.split()[0]:
             genus_string = search_string.split()[0]
@@ -58,6 +57,12 @@ def search(request):
             genus = ''
     if not genus:
         Genus = apps.get_model('aves', 'Genus')
+        try:
+            genus = Genus.objects.get(genus=genus_string)
+        except Genus.DoesNotExist:
+            genus = ''
+    if not genus:
+        Genus = apps.get_model('animalia', 'Genus')
         try:
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
