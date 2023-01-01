@@ -44,7 +44,6 @@
                             <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
                             {% endif %}
                         </form>
-                        &nbsp;
                         <form action="?" id="myspecies" style="display:inline-block">
                             <input type="hidden" name="family" value="{{family}}" >
                             <input type="hidden" name="talpha" value="{{talpha}}" >
@@ -82,7 +81,7 @@
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.name|safe}}</i></a>
+                                                    <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.binomial_it|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
