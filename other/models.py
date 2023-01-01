@@ -224,12 +224,9 @@ class Species(models.Model):
 
     def binomial_it(self):
         if self.type == 'species':
-            if self.infraspe:
-                return '<i>%s %s</i> %s <i>%s</i>' % (self.genus, self.species, self.infraspr, self.infraspe)
-            else:
-                return '<i>%s %s</i>' % (self.genus, self.species)
+            return '<i>%s</i>' % (self.binomial)
         else:
-            return '<i>%s</i> %s' % (self.genus, self.species)
+            return self.binomial
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
@@ -289,11 +286,6 @@ class Species(models.Model):
         else:
             name = '<i>%s</i> %s' % (self.genus, self.speciesname())
         return name
-
-    def namecasual(self):
-        namecasual = self.abrevname()
-        namecasual = re.sub('Memoria', 'Mem.', namecasual.rstrip())
-        return namecasual
 
     def get_species(self):
         name = '%s' % (self.species)

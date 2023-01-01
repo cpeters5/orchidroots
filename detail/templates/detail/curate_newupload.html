@@ -104,7 +104,7 @@ img{
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                 </a>
                                 <div style="font-size:12px">
-                                    <a href="{% url 'detail:photos' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.namecasual|safe}}</a>
+                                    <a href="{% url 'detail:photos' image.pid_id %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a>
                                     <br>{{image.created_date.date}}
                                     <br>
                                     {% if image.approved %}

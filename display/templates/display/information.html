@@ -570,7 +570,7 @@ seedparent, pollparent {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:information' image.pid_id %}?family={{species.gen.family}}">{{image.imgname|safe}}</a>
+                                    <a href="{% url 'display:information' image.pid_id %}?family={{species.gen.family}}">{{image.binomial_it|safe}}</a>
                                     <br>
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
