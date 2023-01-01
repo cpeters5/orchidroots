@@ -11,9 +11,9 @@ urlpatterns = [
     # path('commonname/', views.commonname, name='commonname'),
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
-    path('browsegen/', views.browsegen, name='browsegen'),
-    path('browse/', views.browse, name='browse'),
-    path('newbrowse/', views.newbrowse, name='newbrowse'),
+    # path('browsegen/', views.browsegen, name='browsegen'),
+    # path('browse/', views.browse, name='browse'),
+    # path('newbrowse/', views.newbrowse, name='newbrowse'),
     path('taxonomy/', views.taxonomy, name='taxonomy'),
 
     # Redirect to display
