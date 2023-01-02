@@ -6,7 +6,7 @@ urlpatterns = [
     # If application is given, find list of families --> list of genera
     # then redirect to local search
     path('search/', views.search, name='search'),
-    # path('search_species/', views.search_species, name='search_species'),
+    path('search_species/', views.search_species, name='search_species'),
 
     # Local search: Based on family(families) found, search for matching species
     # path('search_orchid/', views.search_orchid, name='search_orchid'),

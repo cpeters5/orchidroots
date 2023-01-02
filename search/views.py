@@ -34,6 +34,7 @@ def search(request):
     else:
         message = 'The search term must contain genus name'
         return HttpResponse(message)
+    print("genus_string = ", genus_string)
 
     # From search string, get family and application
     Genus = apps.get_model('orchidaceae', 'Genus')
@@ -47,18 +48,21 @@ def search(request):
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
             genus = ''
+    print("other genus = ", genus)
     if not genus:
         Genus = apps.get_model('fungi', 'Genus')
         try:
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
             genus = ''
+    print("fungi genus = ", genus)
     if not genus:
         Genus = apps.get_model('aves', 'Genus')
         try:
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
             genus = ''
+    print("aves genus = ", genus)
     if not genus:
         Genus = apps.get_model('animalia', 'Genus')
         try:
@@ -66,32 +70,36 @@ def search(request):
         except Genus.DoesNotExist:
             genus = ''
 
+    print("animalia genus = ", genus)
     if genus and genus != '':
         family = genus.family
+        full_path = request.path
+        path = 'information'
+        if role == 'cur':
+            path = 'photos'
+
+        genus_list, match_spc_list = getResultByGenus(family, search_string, genus)
+        context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                   'family': family, 'role': role, 'path': path, 'full_path': full_path
+                   }
+        return render(request, "search/search_species.html", context)
+
     else:
         if 'family' in request.GET:
             family = request.GET['family'].strip()
         try:
             family = Family.objects.get(family=family)
             url = "%s?family=%s&search_string=%s" % (reverse('search:search_species'), family, search_string)
+            print("No genus found, but found family")
             return HttpResponseRedirect(url)
         except Family.DoesNotExist:
             # Tough luck, nothing is given
             url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
+            print("No genus no family found, go to search_species")
             return HttpResponseRedirect(url)
-    full_path = request.path
-    path = 'information'
-    if role == 'cur':
-        path = 'photos'
-
-    genus_list, match_spc_list = getResult(family, search_string, genus)
-    context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-               'family': family, 'role': role,  'path': path, 'full_path': full_path
-               }
-    return render(request, "search/search_species.html", context)
 
 
-def getResult(family, search_string, genus):
+def getResultByGenus(family, search_string, genus):
     genus_list = []
     match_spc_list = []
     single_word = False
@@ -129,7 +137,7 @@ def getResult(family, search_string, genus):
     return genus_list, match_spc_list
 
 
-def xsearch_species(request):
+def search_species(request):
     # Only family or genus is given (one or both)
     family = ''
     subfamily = ''
