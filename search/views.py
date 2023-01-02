@@ -79,10 +79,14 @@ def search(request):
             # Tough luck, nothing is given
             url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
             return HttpResponseRedirect(url)
+    full_path = request.path
+    path = 'information'
+    if role == 'cur':
+        path = 'photos'
 
     genus_list, match_spc_list = getResult(family, search_string, genus)
     context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-               'family': family, 'role': role,
+               'family': family, 'role': role,  'path': path, 'full_path': full_path
                }
     return render(request, "search/search_species.html", context)
 

@@ -981,6 +981,7 @@ def browse(request):
 
     return render(request, 'common/browse.html', context)
 
+
 def newbrowse(request):
     # Application must be in request
     # If family in request, it must belong to the requested app
@@ -1018,8 +1019,11 @@ def newbrowse(request):
                     Genus = ''
                 if Genus:
                     species = Species.objects.filter(genus=genus)
+                    print("app = ", app)
+                    print("spc list = ", len(species))
                     if display == 'checked':
                         species = species.filter(num_image__gt=0)
+                    print("spc list = ", len(species))
                     if len(species) > 500:
                         species = species[0: 500]
                     species_list = []
