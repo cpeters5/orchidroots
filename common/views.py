@@ -90,7 +90,6 @@ def home(request):
     sample_genus = Genus.objects.filter(is_parasitic=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
     parasitic_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
     all_list = all_list + [['Parasitic', parasitic_obj]]
-    print("all_list = ", len(all_list))
 
     num_samples = 1
     # Get random fungi families
@@ -103,7 +102,6 @@ def home(request):
         except:
             continue
         all_list = all_list + [["Fungi", fungi_obj]]
-    print("all_list = ", len(all_list))
 
     num_samples = 1
     # Get random bird families
@@ -116,7 +114,6 @@ def home(request):
         except:
             continue
         all_list = all_list + [["Aves", aves_obj]]
-    print("all_list = ", len(all_list))
 
     num_samples = 1
     # Get random bird families
@@ -129,8 +126,6 @@ def home(request):
         except:
             continue
         all_list = all_list + [["Aves", animalia_obj]]
-    print("all_list = ", len(all_list))
-
 
     # Advertisement
     num_blocks = 5
@@ -166,8 +161,9 @@ def genera(request):
     myspecies = ''
     author = ''
     path = resolve(request.path).url_name
-    role = getRole(request)
+    app = request.GET['app']
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+
     family_list, alpha = get_family_list(request)
     if 'myspecies' in request.GET:
         myspecies = request.GET['myspecies']
@@ -210,14 +206,24 @@ def genera(request):
 
     total = len(genus_list)
     write_output(request, str(family))
-    context = {
-        'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
-        'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
-        'family_list': family_list, 'myspecies': myspecies,
-        'alpha_list': alpha_list, 'alpha': alpha,
-        'path': path
-    }
-    return render(request, "common/genera.html", context)
+    if genus_list:
+        context = {
+            'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
+            'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+            'family_list': family_list, 'myspecies': myspecies,
+            'alpha_list': alpha_list, 'alpha': alpha,
+            'path': path
+        }
+        return render(request, "common/genera.html", context)
+    else:
+        context = {
+            'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
+            'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+            'family_list': family_list, 'myspecies': myspecies,
+            'alpha_list': alpha_list, 'alpha': alpha,
+            'path': path
+        }
+        return render(request, "common/family.html", context)
 
 
 @login_required
@@ -634,349 +640,6 @@ def getmyphotos(author, app, species, Species, UploadFile, SpcImages, HybImages,
     return private_list, public_list, upload_list, myspecies_list, myhybrid_list
 
 
-def browsegen(request):
-    app = ''
-    family = ''
-    family_list = []
-    talpha = ''
-    num_show = 5
-    page_length = 20
-    # ads_insert = 0
-    # start_ad = 3        # Minimum images to display sponsor ad.
-    # sponsor = ''
-    my_full_list = []
-    if 'talpha' in request.GET:
-        talpha = request.GET['talpha']
-    if 'family' in request.GET:
-        family = request.GET['family']
-        if family:
-            try:
-                family = Family.objects.get(family=family)
-                app = family.application
-            except Family.DoesNotExist:
-                family = None
-
-    if 'app' in request.GET:
-        # If family is request, then ignore app
-        app = request.GET['app']
-    if not family:
-        if app == 'orchidaceae':
-            family = Family.objects.get(family='Orchidaceae')
-        else:
-            family_list = Family.objects.filter(application=app).order_by('?')
-            family = ''
-    if family:
-        app = family.application
-        family_list = [family]
-    print("app = ", app, family)
-    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
-    display = ''
-    # Get requested parameters
-    role = getRole(request)
-    if 'display' in request.GET:
-        display = request.GET['display']
-    if not display:
-        display = ''
-
-    Genus = apps.get_model(app.lower(), 'Genus')
-
-    pid_list = Genus.objects.all()
-    print("pid_list = ", len(pid_list))
-    if display == 'checked':
-        pid_list = pid_list.filter(num_spcimage__gt=0)
-    if talpha:
-        pid_list = pid_list.filter(genus__istartswith=talpha)
-    print("family_list = ", len(family_list))
-    print("pid_list = ", len(pid_list))
-
-    if app != 'orchidaceae':
-        if family:
-            pid_list = pid_list.filter(family=family)
-            pid_list = pid_list.order_by('?')[1:20]
-        elif len(family_list) > 0:
-            tmp_list = []
-            for x in family_list:
-                tmp_obj = pid_list.filter(family=x).order_by('?')[0:1]
-                print("family = ", x.family)
-                if len(tmp_obj) > 0:
-                    print("obj = ", x.family, len(tmp_obj))
-                    if tmp_list:
-                        tmp_list = tmp_list.union(tmp_obj)
-                    else:
-                        tmp_list = (tmp_obj)
-                if len(tmp_list) > 20:
-                    break
-            pid_list = tmp_list
-
-    total = len(pid_list)
-    print("total = ", total)
-    print("app = ", app, family)
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
-        = mypaginator(request, pid_list, page_length, num_show)
-    print("page_list = ", len(page_list))
-
-    # if len(page_list) > start_ad:
-    #     ads_insert = int(random.random() * len(page_list)) + 1
-    #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
-
-    for x in page_list:
-        x.imgobj = x.get_best_img()
-        if x.get_best_img():
-            if family:
-                if family.family == 'Orchidaceae':
-                    x.image_dir = 'utils/images/' + str(x.type) + '/'
-                else:
-                    x.image_dir = 'utils/images/' + str(x.family) + '/'
-            else:
-                x.image_dir = 'utils/images/' + str(x.family) + '/'
-
-            x.image_file = x.get_best_img().image_file
-            x.img_pid = x.get_best_img().pid
-        else:
-            x.image_file = 'utils/images/noimage_light.jpg'
-        my_full_list.append(x)
-
-    write_output(request, str(family))
-    context = {'family':family, 'app': app,
-               # 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-        'page_list': my_full_list, 'display': display,
-        'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-        'page': page, 'total': total, 'talpha': talpha,
-        # 'ads_insert': ads_insert, 'sponsor': sponsor,
-        'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-        'role': role,
-    }
-
-    return render(request, 'common/browsegen.html', context)
-
-
-def browse(request):
-    app = ''
-    myspecies = ''
-    author = ''
-    family = ''
-    talpha = ''
-    num_show = 5
-    page_length = 20
-    # ads_insert = 0
-    # start_ad = 3        # Minimum images to display sponsor ad.
-    # sponsor = ''
-    my_full_list = []
-    if 'talpha' in request.GET:
-        talpha = request.GET['talpha']
-    if 'family' in request.GET:
-        family = request.GET['family']
-    if family and family != 'other':
-        family = Family.objects.get(family=family)
-        app = family.application
-    else:
-        app = 'other'
-
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request, family)
-    if 'myspecies' in request.GET:
-        myspecies = request.GET['myspecies']
-        if myspecies:
-            author = Photographer.objects.get(user_id=request.user)
-
-    # reqsubgenus = reqsection = reqsubsection = reqseries = ''
-    # subgenus_obj = section_obj = subsection_obj = series_obj = ''
-    # subgenus_list = section_list = subsection_list = series_list = []
-    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
-    display = ''
-    seed_genus = pollen_genus = seed = pollen = ''
-    reqgenus = ''
-    group = ''
-    # Get requested parameters
-    role = getRole(request)
-    if 'display' in request.GET:
-        display = request.GET['display']
-    if not display:
-        display = ''
-    if 'type' in request.GET:
-        type = request.GET['type']
-    else:
-        type = 'species'
-    if 'group' in request.GET:
-        group = request.GET['group']
-    # else:
-    #     group = ''
-
-    # if type == 'species':
-    #     if 'subgenus' in request.GET:
-    #         reqsubgenus = request.GET['subgenus']
-    #         if reqsubgenus:
-    #             try:
-    #                 subgenus_obj = Subgenus.objects.get(pk=reqsubgenus)
-    #             except Subgenus.DoesNotExist:
-    #                 subgenus_obj = ''
-    #     if 'section' in request.GET:
-    #         reqsection = request.GET['section']
-    #         if reqsection:
-    #             try:
-    #                 section_obj = Section.objects.get(pk=reqsection)
-    #             except Section.DoesNotExist:
-    #                 section_obj = ''
-    #     if 'subsection' in request.GET:
-    #         reqsubsection = request.GET['subsection']
-    #         if reqsubsection:
-    #             try:
-    #                 subsection_obj = Subsection.objects.get(pk=reqsubsection)
-    #             except Subsection.DoesNotExist:
-    #                 subsection_obj = ''
-    #     if 'series' in request.GET:
-    #         reqseries = request.GET['series']
-    #         if reqseries:
-    #             try:
-    #                 series_obj = Series.objects.get(pk=reqseries)
-    #             except Series.DoesNotExist:
-    #                 series_obj = ''
-    if type == 'hybrid':
-        if 'seed_genus' in request.GET:
-            seed_genus = request.GET['seed_genus']
-        if seed_genus == 'clear':
-            seed_genus = ''
-        if 'pollen_genus' in request.GET:
-            pollen_genus = request.GET['pollen_genus']
-        if pollen_genus == 'clear':
-            pollen_genus = ''
-        if 'seed' in request.GET:
-            seed = request.GET['seed']
-        if 'pollen' in request.GET:
-            pollen = request.GET['pollen']
-    if 'genus' in request.GET:
-        reqgenus = request.GET['genus']
-        if reqgenus == '------':
-            reqgenus = ''
-
-    # genus, pid_list, intragen_list = getPartialPid(reqgenus, type, 'accepted', app)
-
-    if app == 'orchidaceae':
-        Genus = apps.get_model(app.lower(), 'Genus')
-        Species = apps.get_model(app.lower(), 'Species')
-    else:
-        Genus = apps.get_model(app.lower(), 'Genus')
-        Species = apps.get_model(app.lower(), 'Species')
-
-    pid_list = Species.objects.filter(type=type)
-    # pid_list = pid_list.exclude(status='synonym')
-
-    if subfamily:
-        pid_list = pid_list.filter(gen__subfamily=subfamily)
-    if subtribe:
-        pid_list = pid_list.filter(gen__subtribe=subtribe)
-    elif tribe:
-        pid_list = pid_list.filter(gen__tribe=tribe)
-
-    if reqgenus:
-        try:
-            genus = Genus.objects.get(genus=reqgenus)
-        except Genus.DoesNotExist:
-            genus = ''
-        if genus:
-            pid_list = pid_list.filter(genus=genus)
-    else:
-        reqgenus = ''
-    if talpha:
-        pid_list = pid_list.filter(species__istartswith=talpha)
-
-    if pid_list and group:
-        if app == 'other':
-            if group == 'succulent':
-                pid_list = pid_list.filter(gen__is_succulent=True)
-            elif group == 'carnivorous':
-                pid_list = pid_list.filter(gen__is_carnivorous=True)
-        if app == 'animalia':
-            if group == 'poisonous':
-                pid_list = pid_list.filter(gen__is_poisonous=True)
-            elif group == 'carnivorous':
-                pid_list = pid_list.filter(gen__is_carnivorous=True)
-        if app == 'aves':
-            if group == 'migratory':
-                pid_list = pid_list.filter(gen__is_migratory=True)
-        if app == 'fungi':
-            if group == 'poisonous':
-                pid_list = pid_list.filter(gen__is_poisonous=True)
-            elif group == 'edible':
-                pid_list = pid_list.filter(gen__is_edible=True)
-
-    if pid_list:
-        if family:
-            pid_list = pid_list.filter(gen__family=family.family)
-        else:
-            pid_list = pid_list.filter(gen__family__application='other')
-
-        if display == 'checked':
-            pid_list = pid_list.filter(num_image__gt=0)
-        if type == 'species':
-            pid_list = pid_list.filter(type='species')
-        elif type == 'hybrid':
-            pid_list = pid_list.filter(type='hybrid')
-            if seed_genus and pollen_genus:
-                pid_list = pid_list.filter(Q(hybrid__seed_genus=seed_genus) & Q(hybrid__pollen_genus=pollen_genus) | Q(
-                        hybrid__seed_genus=pollen_genus) & Q(hybrid__pollen_genus=seed_genus))
-            elif seed_genus:
-                pid_list = pid_list.filter(Q(hybrid__seed_genus=seed_genus) | Q(hybrid__pollen_genus=seed_genus))
-            elif pollen_genus:
-                pid_list = pid_list.filter(Q(hybrid__seed_genus=pollen_genus) | Q(hybrid__pollen_genus=pollen_genus))
-            if seed:
-                pid_list = pid_list.filter(Q(hybrid__seed_species=seed) | Q(hybrid__pollen_species=seed))
-            if pollen:
-                pid_list = pid_list.filter(Q(hybrid__seed_species=pollen) | Q(hybrid__pollen_species=pollen))
-        if myspecies and author:
-            my_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
-            pid_list = pid_list.filter(pid__in=my_list)
-
-        pid_list = pid_list.order_by('genus', 'species')
-        total = len(pid_list)
-        page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
-            = mypaginator(request, pid_list, page_length, num_show)
-
-        # if len(page_list) > start_ad:
-        #     ads_insert = int(random.random() * len(page_list)) + 1
-        #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
-
-        # if switch display, restart pagination
-        # if 'prevdisplay' in request.GET:
-        #     page = 1
-
-        for x in page_list:
-            if x.get_best_img():
-                if family and family.family == 'Orchidaceae':
-                    if type == 'species':
-                        x.image_dir = 'utils/images/species/'
-                    else:
-                        x.image_dir = 'utils/images/hybrid/'
-                else:
-                    x.image_dir = 'utils/images/' + str(x.gen.family) + '/'
-                x.image_file = x.get_best_img().image_file
-                my_full_list.append(x)
-            else:
-                x.image_file = 'utils/images/noimage_light.jpg'
-                my_full_list.append(x)
-
-    # family_list, alpha = get_family_list(request)
-    genus_list = Genus.objects.all()
-    if family:
-        genus_list = genus_list.filter(family=family.family)
-    if display == 'checked':
-        if type == 'species':
-            genus_list = genus_list.filter(num_spcimage__gt=0)
-        else:
-            genus_list = genus_list.filter(num_hybimage__gt=0)
-    write_output(request, str(family))
-    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-        'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
-        'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-        'page': page, 'total': total, 'talpha': talpha, 'myspecies': myspecies,
-        # 'ads_insert': ads_insert, 'sponsor': sponsor,
-        'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
-        'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-        'role': role,
-    }
-
-    return render(request, 'common/browse.html', context)
-
-
 def newbrowse(request):
     # Application must be in request
     # If family in request, it must belong to the requested app
@@ -1014,11 +677,8 @@ def newbrowse(request):
                     Genus = ''
                 if Genus:
                     species = Species.objects.filter(genus=genus)
-                    print("app = ", app)
-                    print("spc list = ", len(species))
                     if display == 'checked':
                         species = species.filter(num_image__gt=0)
-                    print("spc list = ", len(species))
                     if len(species) > 500:
                         species = species[0: 500]
                     species_list = []
@@ -1143,7 +803,6 @@ def commonname(request):
     # else:
     #     role = 'pub'
 
-    print(">>> role = " + str(role))
     context = {'role': role,}
     if 'commonname' in request.GET:
         commonname = request.GET['commonname']
@@ -1157,7 +816,6 @@ def commonname(request):
         if talpha != '':
             species_list = species_list.filter(species__istartswith=talpha)
         total = len(species_list)
-        print(">>> role = " + str(role))
         context = {'species_list': species_list, 'commonname': commonname, 'role': role,
                    'app': 'other', 'genus_list': genus_list,
                    'talpha': talpha, 'alpha_list': alpha_list}
@@ -1839,4 +1497,339 @@ def curate_newapproved(request):
                'app': app,
                }
     return render(request, 'common/curate_newapproved.html', context)
+
+# decommissioned
+
+def xbrowsegen(request):
+    app = ''
+    family = ''
+    family_list = []
+    talpha = ''
+    num_show = 5
+    page_length = 20
+    # ads_insert = 0
+    # start_ad = 3        # Minimum images to display sponsor ad.
+    # sponsor = ''
+    my_full_list = []
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if 'family' in request.GET:
+        family = request.GET['family']
+        if family:
+            try:
+                family = Family.objects.get(family=family)
+                app = family.application
+            except Family.DoesNotExist:
+                family = None
+
+    if 'app' in request.GET:
+        # If family is request, then ignore app
+        app = request.GET['app']
+    if not family:
+        if app == 'orchidaceae':
+            family = Family.objects.get(family='Orchidaceae')
+        else:
+            family_list = Family.objects.filter(application=app).order_by('?')
+            family = ''
+    if family:
+        app = family.application
+        family_list = [family]
+    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
+    display = ''
+    # Get requested parameters
+    role = getRole(request)
+    if 'display' in request.GET:
+        display = request.GET['display']
+    if not display:
+        display = ''
+
+    Genus = apps.get_model(app.lower(), 'Genus')
+
+    pid_list = Genus.objects.all()
+    if display == 'checked':
+        pid_list = pid_list.filter(num_spcimage__gt=0)
+    if talpha:
+        pid_list = pid_list.filter(genus__istartswith=talpha)
+
+    if app != 'orchidaceae':
+        if family:
+            pid_list = pid_list.filter(family=family)
+            pid_list = pid_list.order_by('?')[1:20]
+        elif len(family_list) > 0:
+            tmp_list = []
+            for x in family_list:
+                tmp_obj = pid_list.filter(family=x).order_by('?')[0:1]
+                if len(tmp_obj) > 0:
+                    if tmp_list:
+                        tmp_list = tmp_list.union(tmp_obj)
+                    else:
+                        tmp_list = (tmp_obj)
+                if len(tmp_list) > 20:
+                    break
+            pid_list = tmp_list
+
+    total = len(pid_list)
+    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
+        = mypaginator(request, pid_list, page_length, num_show)
+
+    # if len(page_list) > start_ad:
+    #     ads_insert = int(random.random() * len(page_list)) + 1
+    #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+
+    for x in page_list:
+        x.imgobj = x.get_best_img()
+        if x.get_best_img():
+            if family:
+                if family.family == 'Orchidaceae':
+                    x.image_dir = 'utils/images/' + str(x.type) + '/'
+                else:
+                    x.image_dir = 'utils/images/' + str(x.family) + '/'
+            else:
+                x.image_dir = 'utils/images/' + str(x.family) + '/'
+
+            x.image_file = x.get_best_img().image_file
+            x.img_pid = x.get_best_img().pid
+        else:
+            x.image_file = 'utils/images/noimage_light.jpg'
+        my_full_list.append(x)
+
+    write_output(request, str(family))
+    context = {'family':family, 'app': app,
+               # 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+        'page_list': my_full_list, 'display': display,
+        'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+        'page': page, 'total': total, 'talpha': talpha,
+        # 'ads_insert': ads_insert, 'sponsor': sponsor,
+        'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+        'role': role,
+    }
+
+    return render(request, 'common/browsegen.html', context)
+
+
+def xbrowse(request):
+    app = ''
+    myspecies = ''
+    author = ''
+    family = ''
+    talpha = ''
+    num_show = 5
+    page_length = 20
+    # ads_insert = 0
+    # start_ad = 3        # Minimum images to display sponsor ad.
+    # sponsor = ''
+    my_full_list = []
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if 'family' in request.GET:
+        family = request.GET['family']
+    if family and family != 'other':
+        family = Family.objects.get(family=family)
+        app = family.application
+    else:
+        app = 'other'
+
+    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request, family)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
+
+    # reqsubgenus = reqsection = reqsubsection = reqseries = ''
+    # subgenus_obj = section_obj = subsection_obj = series_obj = ''
+    # subgenus_list = section_list = subsection_list = series_list = []
+    page_range = page_list = last_page = next_page = prev_page = page = first_item = last_item = total = ''
+    display = ''
+    seed_genus = pollen_genus = seed = pollen = ''
+    reqgenus = ''
+    group = ''
+    # Get requested parameters
+    role = getRole(request)
+    if 'display' in request.GET:
+        display = request.GET['display']
+    if not display:
+        display = ''
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        type = 'species'
+    if 'group' in request.GET:
+        group = request.GET['group']
+    # else:
+    #     group = ''
+
+    # if type == 'species':
+    #     if 'subgenus' in request.GET:
+    #         reqsubgenus = request.GET['subgenus']
+    #         if reqsubgenus:
+    #             try:
+    #                 subgenus_obj = Subgenus.objects.get(pk=reqsubgenus)
+    #             except Subgenus.DoesNotExist:
+    #                 subgenus_obj = ''
+    #     if 'section' in request.GET:
+    #         reqsection = request.GET['section']
+    #         if reqsection:
+    #             try:
+    #                 section_obj = Section.objects.get(pk=reqsection)
+    #             except Section.DoesNotExist:
+    #                 section_obj = ''
+    #     if 'subsection' in request.GET:
+    #         reqsubsection = request.GET['subsection']
+    #         if reqsubsection:
+    #             try:
+    #                 subsection_obj = Subsection.objects.get(pk=reqsubsection)
+    #             except Subsection.DoesNotExist:
+    #                 subsection_obj = ''
+    #     if 'series' in request.GET:
+    #         reqseries = request.GET['series']
+    #         if reqseries:
+    #             try:
+    #                 series_obj = Series.objects.get(pk=reqseries)
+    #             except Series.DoesNotExist:
+    #                 series_obj = ''
+    if type == 'hybrid':
+        if 'seed_genus' in request.GET:
+            seed_genus = request.GET['seed_genus']
+        if seed_genus == 'clear':
+            seed_genus = ''
+        if 'pollen_genus' in request.GET:
+            pollen_genus = request.GET['pollen_genus']
+        if pollen_genus == 'clear':
+            pollen_genus = ''
+        if 'seed' in request.GET:
+            seed = request.GET['seed']
+        if 'pollen' in request.GET:
+            pollen = request.GET['pollen']
+    if 'genus' in request.GET:
+        reqgenus = request.GET['genus']
+        if reqgenus == '------':
+            reqgenus = ''
+
+    # genus, pid_list, intragen_list = getPartialPid(reqgenus, type, 'accepted', app)
+
+    if app == 'orchidaceae':
+        Genus = apps.get_model(app.lower(), 'Genus')
+        Species = apps.get_model(app.lower(), 'Species')
+    else:
+        Genus = apps.get_model(app.lower(), 'Genus')
+        Species = apps.get_model(app.lower(), 'Species')
+
+    pid_list = Species.objects.filter(type=type)
+    # pid_list = pid_list.exclude(status='synonym')
+
+    if subfamily:
+        pid_list = pid_list.filter(gen__subfamily=subfamily)
+    if subtribe:
+        pid_list = pid_list.filter(gen__subtribe=subtribe)
+    elif tribe:
+        pid_list = pid_list.filter(gen__tribe=tribe)
+
+    if reqgenus:
+        try:
+            genus = Genus.objects.get(genus=reqgenus)
+        except Genus.DoesNotExist:
+            genus = ''
+        if genus:
+            pid_list = pid_list.filter(genus=genus)
+    else:
+        reqgenus = ''
+    if talpha:
+        pid_list = pid_list.filter(species__istartswith=talpha)
+
+    if pid_list and group:
+        if app == 'other':
+            if group == 'succulent':
+                pid_list = pid_list.filter(gen__is_succulent=True)
+            elif group == 'carnivorous':
+                pid_list = pid_list.filter(gen__is_carnivorous=True)
+        if app == 'animalia':
+            if group == 'poisonous':
+                pid_list = pid_list.filter(gen__is_poisonous=True)
+            elif group == 'carnivorous':
+                pid_list = pid_list.filter(gen__is_carnivorous=True)
+        if app == 'aves':
+            if group == 'migratory':
+                pid_list = pid_list.filter(gen__is_migratory=True)
+        if app == 'fungi':
+            if group == 'poisonous':
+                pid_list = pid_list.filter(gen__is_poisonous=True)
+            elif group == 'edible':
+                pid_list = pid_list.filter(gen__is_edible=True)
+
+    if pid_list:
+        if family:
+            pid_list = pid_list.filter(gen__family=family.family)
+        else:
+            pid_list = pid_list.filter(gen__family__application='other')
+
+        if display == 'checked':
+            pid_list = pid_list.filter(num_image__gt=0)
+        if type == 'species':
+            pid_list = pid_list.filter(type='species')
+        elif type == 'hybrid':
+            pid_list = pid_list.filter(type='hybrid')
+            if seed_genus and pollen_genus:
+                pid_list = pid_list.filter(Q(hybrid__seed_genus=seed_genus) & Q(hybrid__pollen_genus=pollen_genus) | Q(
+                        hybrid__seed_genus=pollen_genus) & Q(hybrid__pollen_genus=seed_genus))
+            elif seed_genus:
+                pid_list = pid_list.filter(Q(hybrid__seed_genus=seed_genus) | Q(hybrid__pollen_genus=seed_genus))
+            elif pollen_genus:
+                pid_list = pid_list.filter(Q(hybrid__seed_genus=pollen_genus) | Q(hybrid__pollen_genus=pollen_genus))
+            if seed:
+                pid_list = pid_list.filter(Q(hybrid__seed_species=seed) | Q(hybrid__pollen_species=seed))
+            if pollen:
+                pid_list = pid_list.filter(Q(hybrid__seed_species=pollen) | Q(hybrid__pollen_species=pollen))
+        if myspecies and author:
+            my_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
+            pid_list = pid_list.filter(pid__in=my_list)
+
+        pid_list = pid_list.order_by('genus', 'species')
+        total = len(pid_list)
+        page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item \
+            = mypaginator(request, pid_list, page_length, num_show)
+
+        # if len(page_list) > start_ad:
+        #     ads_insert = int(random.random() * len(page_list)) + 1
+        #     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+
+        # if switch display, restart pagination
+        # if 'prevdisplay' in request.GET:
+        #     page = 1
+
+        for x in page_list:
+            if x.get_best_img():
+                if family and family.family == 'Orchidaceae':
+                    if type == 'species':
+                        x.image_dir = 'utils/images/species/'
+                    else:
+                        x.image_dir = 'utils/images/hybrid/'
+                else:
+                    x.image_dir = 'utils/images/' + str(x.gen.family) + '/'
+                x.image_file = x.get_best_img().image_file
+                my_full_list.append(x)
+            else:
+                x.image_file = 'utils/images/noimage_light.jpg'
+                my_full_list.append(x)
+
+    # family_list, alpha = get_family_list(request)
+    genus_list = Genus.objects.all()
+    if family:
+        genus_list = genus_list.filter(family=family.family)
+    if display == 'checked':
+        if type == 'species':
+            genus_list = genus_list.filter(num_spcimage__gt=0)
+        else:
+            genus_list = genus_list.filter(num_hybimage__gt=0)
+    write_output(request, str(family))
+    context = {'family':family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+        'page_list': my_full_list, 'type': type, 'genus': reqgenus, 'display': display, 'genus_list': genus_list,
+        'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
+        'page': page, 'total': total, 'talpha': talpha, 'myspecies': myspecies,
+        # 'ads_insert': ads_insert, 'sponsor': sponsor,
+        'seed_genus': seed_genus, 'seed': seed, 'pollen_genus': pollen_genus, 'pollen': pollen,
+        'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
+        'role': role,
+    }
+
+    return render(request, 'common/browse.html', context)
 

@@ -12,7 +12,7 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of Genera in {% if family %}family <i>{{family.family}}</i> {% else %}All {{app|title}} Families{% endif %} {% if subfamily %} subfamily <i>{{subfamily}}</i>  {% endif %}
+                            List of Families in {% if app == 'other' %} Plantae (except Orchidaceae) {% else %}{{app|title}}{% endif %}
                             {% if tribe %} tribe <i>{{tribe}}</i>  {% endif %}
                                 {% if subtribe %} subtribe <i>{{subtribe}}</i>  {% endif %}
                         </div>
@@ -43,27 +43,23 @@
 
                         </div>
                         <!--   Main table-->
-                        {% if genus_list %}
-                            {% include "common/alpha_list_common.html" %}
+                        {% if family_list %}
+                            {% include "common/alpha_list_core.html" %}
                             <div style="clear: both"></div>
-                            <div class="flex">
-                                <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
+                            <div>
+                                <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
-                                        <th>Genus</th>
-                                        <th class="d-none d-lg-table-cell hidden-xs">Family Subfamily Tribe Subtribe</th>
-                                        <th>#images</th>
+                                        <th>Family</th>
+                                        <th>Common name</th>
+                                        <th class="d-none d-lg-table-cell hidden-xs">Order</th>
                                     </thead>
-                                        {% for genus in genus_list %}
+                                        {% for family in family_list %}
                                         <tr><td>
-                                                <a href="{% url 'common:species' %}?app={{app}}&alpha={{alpha}}&talpha={{talpha}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
-                                                {{genus.author|default:""}}
+                                                <a href="{% url 'common:genera' %}?app={{app}}&family={{family.family}}&year={{ year }}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{family.family}}</i></a>
+                                                {{family.author|default:""}}
                                             </td>
-
-                                            <td class="d-none d-lg-table-cell hidden-xs">
-                                                {{genus.family}} {% if genus.subfamily %} {{genus.subfamily}} {% endif %} {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
-                                            </td>
-                                            <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
-        <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
+                                            <td>{{family.common_name|default:''}}</td>
+                                            <td class="d-none d-lg-table-cell hidden-xs">{{family.order}}</td>
                                         </tr>
                                         {% endfor %}
                                 </table>

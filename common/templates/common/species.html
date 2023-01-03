@@ -24,32 +24,32 @@
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
                         <dev style="font-size:13px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}&talpha={{talpha}}&myspecies={{myspecies}}">Genus list</a>
-                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&talpha={{talpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
+                            <a class="btn btn-custom" href="{% url 'common:genera' %}?app={{app}}&family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}&talpha={{talpha}}&myspecies={{myspecies}}">Genus list</a>
+                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?app={{app}}&family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&talpha={{talpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
                             <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family.family}}&talpha={{talpha}}&genus={{genus}}&display=checked">Browse</a>
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family.family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
                             {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family.family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
                         </dev>
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="family" value="{{family.family}}" >
-                            <input type="hidden" name="subfamily" value="{{subfamily}}" >
-                            <input type="hidden" name="tribe" value="{{tribe}}" >
-                            <input type="hidden" name="subtribe" value="{{subtribe}}" >
-                            <input type="hidden" name="genus" value="{{genus}}" >
-                            <input type="hidden" name="genus" value="{{genus}}" >
-                            <input type="hidden" name="myspecies" value="{{myspecies}}" >
+                            <input type="hidden" form="display" name="app" value="{{family.application}}" >
+                            <input type="hidden" form="display" name="family" value="{{family.family}}" >
+                            <input type="hidden" form="display" name="subfamily" value="{{subfamily}}" >
+                            <input type="hidden" form="display" name="tribe" value="{{tribe}}" >
+                            <input type="hidden" form="display" name="subtribe" value="{{subtribe}}" >
+                            <input type="hidden" form="display" name="genus" value="{{genus}}" >
+                            <input type="hidden" form="display" name="myspecies" value="{{myspecies}}" >
                             {% if syn == 'N' %}
-                            <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
+                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
                             {% else %}
-                            <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
+                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
                             {% endif %}
                         </form>
                         <form action="?" id="myspecies" style="display:inline-block">
-                            <input type="hidden" name="family" value="{{family}}" >
-                            <input type="hidden" name="talpha" value="{{talpha}}" >
-                            <input type="hidden" name="type" value="{{type}}" >
-                            <input type="hidden" name="role" value="{{role}}" >
-                            <input type="hidden" name="syn" value="{{syn}}" >
+                            <input type="hidden" form="myspecies" name="app" value="{{family.application}}" >
+                            <input type="hidden" form="myspecies" name="family" value="{{family}}" >
+                            <input type="hidden" form="myspecies" name="talpha" value="{{talpha}}" >
+                            <input type="hidden" form="myspecies" name="type" value="{{type}}" >
+                            <input type="hidden" form="myspecies" name="syn" value="{{syn}}" >
                             {% if myspecies %}
                             <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
                             {% else %}

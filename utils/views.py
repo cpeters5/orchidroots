@@ -27,12 +27,12 @@ def get_family_list(request):
     alpha = ''
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
+    app = request.GET['app']
+    family_list = Family.objects.filter(application=app)
     if alpha != '':
-        family_list = Family.objects.filter(family__istartswith=alpha)
-    else:
-        family_list = Family.objects.all()
-    favorite = Family.objects.filter(family__in=('Orchidaceae'))
-    family_list = favorite.union(family_list)
+        family_list = family_list.filter(family__istartswith=alpha)
+    # favorite = Family.objects.filter(family__in=('Orchidaceae'))
+    # family_list = favorite.union(family_list)
     return family_list, alpha
 
 
@@ -265,22 +265,22 @@ def getOtherModels(request, family=None):
 
 def getModels(request, family=None):
     app, subfamily, tribe, subtribe = '', '', '', ''
+    if 'app' in request.GET:
+        app = request.GET['app']
+
     if not family:
         if 'family' in request.GET:
             family = request.GET['family']
         elif 'family' in request.POST:
             family = request.POST['family']
-
-    if family != 'other':
-        try:
-            family = Family.objects.get(pk=family)
+    try:
+        family = Family.objects.get(pk=family)
+        if not app:
             app = family.application
-        except Family.DoesNotExist:
-            family = ''
-            app = 'other'
-    else:
+    except Family.DoesNotExist:
         family = ''
-        app = 'other'
+        if not app:
+            app = 'other'
 
     if 'subfamily' in request.GET:
         subfamily = request.GET['subfamily']

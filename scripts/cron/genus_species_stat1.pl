@@ -20,6 +20,7 @@ my ($sth, $sth1);
 # use open qw(:locale);
 
 my @apps = (
+	'orchidaceae',
 	'other',
 	'fungi',
 	'aves',
@@ -30,7 +31,7 @@ my $date = strftime "%Y-%m-%d:%H:%M-%S", localtime;
 # my $datestring = strftime "%a %b %e %H:%M:%S %Y", localtime();
 my $datetime = localtime();
 my $start_time = time();
-my $debug = 0;
+my $debug = 1;
 my ($stmt,%num_image,%num_species, %num_hybrid, %num_hybimage, %num_spcimage,
 	%num_hyb_with_image,%num_spc_with_image,@accepted, %synonym,
 	%num_species_synonym,%num_hybrid_synonym,%num_synonym, %genus,
@@ -63,8 +64,6 @@ foreach my $app (@apps) {
 print "Process Family\n" if $debug;
 getFamImage();
 print "$date\t Runtime = ", duration(time() - $start_time), "\n";
-
-
 
 sub getFamImage {
 	my $stmt = "select sum(num_spcimage), family from other_genus group by 2 order by 2";
@@ -242,6 +241,7 @@ sub getSynonymPid {
 
 sub getHybImages {
 	my $app = shift;
+	cleanup();
 	# Initialize num images
 	$stmt = "select count(*) c, pid, gen from " . $app . "_hybimages where `rank` > 0 and pid < 999999999 group by 2, 3 order by 3;";
 	&getASPM($stmt);
@@ -264,7 +264,8 @@ sub getHybImages {
 
 sub getSpcImages {
 	my $app = shift;
-	$stmt = "select count(*) c, pid, gen from " . $app . "_spcimages where `rank` > 0 group by 2, 3 order by 2;";
+	cleanup();
+	$stmt = "select count(*) c, pid, gen from " . $app . "_spcimages where `rank` > 0 group by 2, 3 order by 3;";
 	print "$stmt\n" if $debug;
 	&getASPM($stmt);
 	my $prevgen = 0;
@@ -284,10 +285,18 @@ sub getSpcImages {
 	}
 }
 
-
 sub getASPM {
 	my $stmt = shift;
 	$sth = $dbh->prepare( $stmt ) or die( "\n$stmt\nCannot prepare: ", $dbh->errstr(), "\n" );
 	my $rc = $sth->execute() or die("\nDead! \n$stmt\nCannot execute: ", $sth->errstr(),"\n" );
 }
 
+sub cleanup() {
+	foreach (keys  %num_image) {$num_image{$_} = 0;}
+	foreach (keys  %num_species) {$num_species{$_} = 0;}
+	foreach (keys  %num_hybrid) {$num_hybrid{$_} = 0;}
+	foreach (keys  %num_hybimage) {$num_hybimage{$_} = 0;}
+	foreach (keys  %num_spcimage) {$num_spcimage{$_} = 0;}
+	foreach (keys  %num_hyb_with_image) {$num_hyb_with_image{$_} = 0;}
+	foreach (keys  %num_spc_with_image) {$num_spc_with_image{$_} = 0;}
+}
