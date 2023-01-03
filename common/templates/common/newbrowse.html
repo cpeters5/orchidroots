@@ -243,7 +243,13 @@ img{
                             </i>
                         </span>
                         &nbsp;
-                    <a href="{% url 'common:species' %}?app={% if family %}{{family.application}}{% else %}{{app}}{% endif %}&family={{family}}&genus={{genus}}">List {{genus}} species</a>
+                    {% if genus %}
+                    <a href="{% url 'common:species' %}?app={{family.application}}&family={{family}}&genus={{genus}}">List {{genus}} species</a>
+                    {% elif family %}
+                    <a href="{% url 'common:genera' %}?app={{family.application}}&family={{family}}">List {{family.family}} genera</a>
+                    {% else %}
+                    <a href="{% url 'common:genera' %}?app={{app}}">List {{app}} families</a>
+                    {% endif %}
                 </div>
 
                 <div class="card-body">
@@ -252,7 +258,7 @@ img{
                         <form action="?" id="fam" style="display:inline-block">
 <!--                            <input form="fam" type="hidden" name="app" value="{{app}}" >-->
                             <input form="fam" type="hidden" name="talpha" value="{{talpha}}" >
-                            <input form="fam" type="hidden" name="role" value="{{role}}" >
+                            <input form="fam" type="hidden" name="app" value="{{app}}" >
                             <input form="fam" type="hidden" name="display" value="{{display}}">
                             <input form="fam" type="text" class="btn-custom" name="family" value="{{family|default:''}}" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
@@ -260,7 +266,6 @@ img{
                             <input form="gen" type="hidden" name="app" value="{{app}}" >
                             <input type="hidden" name="family" value="{{family}}" >
                             <input form="gen" type="hidden" name="talpha" value="{{talpha}}" >
-                            <input form="gen" type="hidden" name="role" value="{{role}}" >
                             <input form="gen" type="hidden" name="display" value="{{display}}">
                             <input form="gen" type="text" class="btn-custom" name="genus" value="{{genus|default:''}}" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
