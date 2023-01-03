@@ -242,23 +242,12 @@ class Species(models.Model):
             spc = '%s %s <i>%s</i>' % (spc, self.infraspr, self.infraspe)
         return spc
 
-    def fullspeciesname(self):
-        if self.type == 'species' or self.is_hybrid:
-            spc = '<i>%s</i>' % self.species
-            if self.is_hybrid:
-                spc = '%s %s' % (self.is_hybrid, spc)
-        else:
-            spc = '<i>%s</i>' % self.species
-
-        if self.infraspr:
-            spc = '%s %s <i>%s</i>' % (spc, self.infraspr, self.infraspe)
-
-        return spc
-
     def textspeciesname(self):
         spc = re.sub('Memoria', 'Mem.', self.species.rstrip())
         if self.infraspr:
-            spc = '%s %s %s' % (self.species, self.infraspr, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspr)
+        if self.infraspe:
+            spc = '%s <i>%s</i>' % (name, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
         return spc
@@ -266,13 +255,12 @@ class Species(models.Model):
     def textspeciesnamefull(self):
         spc = self.species.rstrip()
         if self.infraspr:
-            spc = '%s %s %s' % (self.species, self.infraspr, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspr)
+        if self.infraspe:
+            spc = '%s <i>%s</i>' % (name, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
         return spc
-
-    def shortspeciesname(self):
-        return '%s %s' % (self.genus, self.species)
 
     def textname(self):
         return '%s %s' % (self.genus, self.textspeciesname())
@@ -292,7 +280,9 @@ class Species(models.Model):
         if self.is_hybrid:
             name = '%s %s' % (self.is_hybrid, name)
         if self.infraspr:
-            name = '%s %s %s' % (name, self.infraspr, self.infraspe)
+            name = '%s %s' % (name, self.infraspr)
+        if self.infraspe:
+            name = '%s %s' % (name, self.infraspe)
         return name
 
     def getAccepted(self):
@@ -306,29 +296,12 @@ class Species(models.Model):
             return spid.acc_id
         return "Not a synonym."
 
-    def getAbrevName(self):
-        name = self.species
-        name = re.sub('Memoria', 'Mem.', name.rstrip())
-        if self.gen.abrev:
-            if self.infraspe:
-                name = self.gen.abrev + ' ' + name + ' ' + self.infraspr + ' ' + self.infraspe
-            else:
-                name = self.gen.abrev + ' ' + name
-        else:
-            name = self.name()
-        return name
-
     def grex(self):
+        if self.infraspr:
+            name = name + ' ' + str(self.infraspr)
         if self.infraspe:
-            return str(self.genus) + ' ' + str(self.species) + ' ' + str(self.infraspr) + ' ' + str(self.infraspe)
-        else:
-            return str(self.genus) + ' ' + str(self.species)
-
-    def short_grex(self):
-        if self.infraspe:
-            return str(self.species) + ' ' + str(self.infraspr) + ' ' + str(self.infraspe)
-        else:
-            return str(self.species)
+            name = name + str(self.infraspe)
+        return name
 
     def sourceurl(self):
         if self.source == 'AlgaeBase' and self.orig_pid:
@@ -555,18 +528,6 @@ class AncestorDescendant(models.Model):
         hybrid = '%s %s' % (self.did.genus, self.did.species)
         pct = '%'
         return '%s %s %s' % (hybrid, self.aid, self.pct)
-
-    def anc_name(self):
-        name = Species.objects.get(pk=self.aid.pid)
-        if name.infraspr:
-            return "%s %s %s %s" % (name.genus, name.species, name.infraspr,name.infraspe)
-        else:
-            return "%s %s" % (name.genus, name.species)
-
-    def anc_abrev(self):
-        # name = Species.objects.get(pk=self.aid.pid)
-        abrev = self.did.abrev
-        return self.did.nameabrev()
 
     def prettypct(self):
         # pct = int(self.pct*100)/100
