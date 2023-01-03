@@ -398,7 +398,7 @@ def search_fuzzy(request):
     # Compute fuzzy score for all species in grexlist
     for x in grexlist:
         # If the first word is genus hint, compare species and the tail
-        score = fuzz.ratio(x.short_grex().lower(), keyword)
+        score = fuzz.ratio(x.grex().lower(), keyword)
         if score >= min_score:
             result_list.append(x)
             result_score.append([x, score])
