@@ -243,7 +243,7 @@ img{
                             </i>
                         </span>
                         &nbsp;
-                    <a href="{% url 'common:species' %}?app={{family.application}}&family={{family}}&genus={{genus}}">List {{genus}} species</a>
+                    <a href="{% url 'common:species' %}?app={% if family %}{{family.application}}{% else %}{{app}}{% endif %}&family={{family}}&genus={{genus}}">List {{genus}} species</a>
                 </div>
 
                 <div class="card-body">

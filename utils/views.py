@@ -180,6 +180,89 @@ def getRole(request):
         return role
     return 'pub'
 
+def getOtherModels(request, family=None):
+    app, subfamily, tribe, subtribe = '', '', '', ''
+    if not family:
+        if 'family' in request.GET:
+            family = request.GET['family']
+        elif 'family' in request.POST:
+            family = request.POST['family']
+
+    if family != 'other':
+        try:
+            family = Family.objects.get(pk=family)
+            app = family.application
+        except Family.DoesNotExist:
+            family = ''
+            app = 'other'
+    else:
+        family = ''
+        app = 'other'
+
+    if 'subfamily' in request.GET:
+        subfamily = request.GET['subfamily']
+        if subfamily:
+            try:
+                subfamily = Subfamily.objects.get(pk=subfamily)
+            except Subfamily.DoesNotExist:
+                subfamily = ''
+            if subfamily.family:
+                family = subfamily.family
+    if 'tribe' in request.GET:
+        tribe = request.GET['tribe']
+        if tribe:
+            try:
+                tribe = Tribe.objects.get(pk=tribe)
+            except Tribe.DoesNotExist:
+                tribe = ''
+            if tribe.subfamily:
+                subfamily = tribe.subfamily
+            if subfamily.family:
+                family = tribe.subfamily.family
+    if 'subtribe' in request.GET:
+        subtribe = request.GET['subtribe']
+        if subtribe:
+            try:
+                subtribe = Subtribe.objects.get(pk=subtribe)
+            except Subtribe.DoesNotExist:
+                subtribe = ''
+            if subtribe.tribe:
+                tribe = subtribe.tribe
+            if tribe.subfamily:
+                subfamily = tribe.subfamily
+            if subfamily.family:
+                family = subfamily.family
+    Genus = ''
+    Species = ''
+    Accepted = ''
+    Hybrid = ''
+    Synonym = ''
+    Distribution = ''
+    SpcImages = ''
+    HybImages = ''
+    UploadFile = ''
+    Intragen = ''
+    if app:
+        if app == 'orchidaceae':
+            from detail.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
+            # only exist for orchidaceae
+            GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
+            HybImages = apps.get_model(app.lower(), 'HybImages')
+            Intragen = apps.get_model(app.lower(), 'Intragen')
+        else:
+            HybImages = apps.get_model(app.lower(), 'SpcImages')
+        Genus = apps.get_model(app.lower(), 'Genus')
+        Hybrid = apps.get_model(app.lower(), 'Hybrid')
+        Species = apps.get_model(app.lower(), 'Species')
+        Accepted = apps.get_model(app.lower(), 'Accepted')
+        Ancestordescendant = apps.get_model(app.lower(), 'AncestorDescendant')
+        Synonym = apps.get_model(app.lower(), 'Synonym')
+        Distribution = apps.get_model(app.lower(), 'Distribution')
+        SpcImages = apps.get_model(app.lower(), 'SpcImages')
+        UploadFile = apps.get_model('common', 'UploadFile')
+    return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
+
+
 def getModels(request, family=None):
     app, subfamily, tribe, subtribe = '', '', '', ''
     if not family:
@@ -187,13 +270,6 @@ def getModels(request, family=None):
             family = request.GET['family']
         elif 'family' in request.POST:
             family = request.POST['family']
-        if 'newfamily' in request.GET:
-            newfamily = request.GET['newfamily']
-            if newfamily == 'other':
-                family = ''
-                app = 'other'
-            else:
-                family = newfamily
 
     if family != 'other':
         try:

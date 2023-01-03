@@ -40,10 +40,6 @@ def information(request, pid=None):
         role = 'pub'
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     ps_list = pp_list = ss_list = sp_list = ()
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
     max_items = 3000
     ancspc_list = []
     seedimg_list = []
@@ -206,10 +202,6 @@ def photos(request, pid=None):
     from_path = pathinfo(request)
     ads_insert = ''
     sponsor = ''
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
     author = get_reqauthor(request)
     if not author or author == 'anonymous':
         author = None

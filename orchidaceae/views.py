@@ -266,9 +266,7 @@ def species(request):
     author = ''
     role = getRole(request)
     family = ''
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-    elif 'family' in request.GET:
+    if 'family' in request.GET:
         family = request.GET['family']
     if family != 'Orchidaceae':
         send_url = '/common/species/?family=' + str(family) + '&role=' + role
@@ -391,9 +389,7 @@ def hybrid(request):
     primary = ''
     role = getRole(request)
     family = ''
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-    elif 'family' in request.GET:
+    if 'family' in request.GET:
         family = request.GET['family']
     # logger.error(">>> 1 Family = " + str(family))
     if family != 'Orchidaceae':
@@ -853,11 +849,6 @@ def progeny_old(request, pid):
     alpha = ''
     direct = ''
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-
 
     if 'direct' in request.GET:
         direct = request.GET['direct']
@@ -891,12 +882,7 @@ def progeny_old(request, pid):
 def progeny(request, pid):
     direct = ''
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-    else:
-        family = Family.objects.get(pk='Orchidaceae')
+    family = Family.objects.get(pk='Orchidaceae')
 
     if 'direct' in request.GET:
         direct = request.GET['direct']
@@ -946,12 +932,7 @@ def progenyimg(request, pid=None):
     num_show = 5
     page_length = 30
     min_pct = 30
-    
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
 
     if not pid:
         if 'pid' in request.GET:

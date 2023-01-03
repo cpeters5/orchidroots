@@ -195,10 +195,6 @@ def createhybrid(request):
 def compare(request, pid=None):
     family = Family.objects.get(pk='Orchidaceae')
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
     # TODO:  Use Species form instead
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     spcimg1_list = spcimg2_list = []

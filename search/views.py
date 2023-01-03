@@ -307,56 +307,6 @@ def search_orchid(request):
     return render(request, "search/search_species.html", context)
 
 
-def getPartialPid(reqgenus, type, status, app):
-    if app == 'orchidaceae':
-        Genus = apps.get_model(app.lower(), 'Genus')
-        Species = apps.get_model(app.lower(), 'Species')
-        Intragen = apps.get_model(app.lower(), 'Intragen')
-        intragen_list = Intragen.objects.all()
-        if status == 'synonym' or type == 'hybrid':
-            intragen_list = []
-    else:
-        Genus = apps.get_model(app.lower(), 'Genus')
-        Species = apps.get_model(app.lower(), 'Species')
-        intragen_list = []
-
-    pid_list = []
-    pid_list = Species.objects.filter(type=type)
-    pid_list = pid_list.exclude(status='synonym')
-
-    if reqgenus:
-        if reqgenus[0] != '*' and reqgenus[-1] != '*':
-            try:
-                genus = Genus.objects.get(genus=reqgenus)
-            except Genus.DoesNotExist:
-                genus = ''
-            if genus:
-                pid_list = pid_list.filter(genus=genus)
-                if intragen_list:
-                    intragen_list = intragen_list.filter(genus=genus)
-            return genus, pid_list, intragen_list
-
-        elif reqgenus[0] == '*' and reqgenus[-1] != '*':
-            mygenus = reqgenus[1:]
-            pid_list = pid_list.filter(genus__iendswith=mygenus)
-            if intragen_list:
-                intragen_list = intragen_list.filter(genus__iendswith=mygenus)
-
-        elif reqgenus[0] != '*' and reqgenus[-1] == '*':
-            mygenus = reqgenus[:-1]
-            pid_list = pid_list.filter(genus__istartswith=mygenus)
-            if intragen_list:
-                intragen_list = intragen_list.filter(genus__istartswith=mygenus)
-        elif reqgenus[0] == '*' and reqgenus[-1] == '*':
-            mygenus = reqgenus[1:-1]
-            pid_list = pid_list.filter(genus__icontains=mygenus)
-            if intragen_list:
-                intragen_list = intragen_list.filter(genus__icontains=mygenus)
-    else:
-        reqgenus = ''
-    return reqgenus, pid_list, intragen_list
-
-
 def get_species_list(application, family=None, subfamily=None, tribe=None, subtribe=None):
     Species = apps.get_model(application, 'Species')
     species_list = Species.objects.all()

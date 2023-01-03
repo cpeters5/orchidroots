@@ -53,12 +53,6 @@ def home(request):
     sponsor = ''
     all_list = []
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
-
     num_samples = 4
     # 3 major families + succulent + carnivorous
     # (3 other and fungi families form the last row.)
@@ -239,6 +233,11 @@ def species(request):
     if str(request.user) == 'chariya':
         path_link = 'photos'
     role = getRole(request)
+    if 'app' in request.GET:
+        app = request.GET['app']
+        if not app:
+            app = 'other'
+
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'genus' in request.GET:
         genus = request.GET['genus']
@@ -639,7 +638,6 @@ def browsegen(request):
     app = ''
     family = ''
     family_list = []
-    newfamily = ''
     talpha = ''
     num_show = 5
     page_length = 20
@@ -757,7 +755,6 @@ def browse(request):
     myspecies = ''
     author = ''
     family = ''
-    newfamily = ''
     talpha = ''
     num_show = 5
     page_length = 20
@@ -767,10 +764,8 @@ def browse(request):
     my_full_list = []
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-        if (family == '' or family == None) and 'family' in request.GET:
-            family = request.GET['family']
+    if 'family' in request.GET:
+        family = request.GET['family']
     if family and family != 'other':
         family = Family.objects.get(family=family)
         app = family.application
@@ -991,7 +986,7 @@ def newbrowse(request):
     app = ''
     family = ''
     genus = ''
-    # At least app must be in request
+    # app must be in browse request
     app = request.GET['app']
     if 'family' in request.GET:
         family = request.GET['family']
@@ -1131,8 +1126,6 @@ def research(request):
     family = ''
     if 'family' in request.GET:
         family = request.GET['family']
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
 
     from_path = pathinfo(request)
     write_output(request, '')
@@ -1534,9 +1527,6 @@ def approvemediaphoto(request, pid):
 def myphoto(request, pid):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     role = getRole(request)
-    if 'newfamily' in request.GET:
-        url = "%s?role=%s&family=%s" % (reverse('common:genera'), role, family)
-        return HttpResponseRedirect(url)
 
     try:
         species = Species.objects.get(pk=pid)
@@ -1575,9 +1565,6 @@ def myphoto_list(request):
         family = request.GET['family']
 
     # If change family
-    if 'newfamily' in request.GET:
-        family = request.GET['newfamily']
-
     app_list = ['Orchidaceae', 'other', 'fungi', 'aves', 'animalia']
     my_hyb_list = []
     my_list = []
