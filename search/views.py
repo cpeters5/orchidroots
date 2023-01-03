@@ -15,8 +15,108 @@ from utils.views import write_output, getRole
 alpha_list = config.alpha_list
 # Create your views here.
 
-
 def search(request):
+    # Search across entire database. Get species > family > If  a match is found, redirect to local search
+    role = getRole(request)
+    family = ''
+    single_word = False
+    # Get search string
+    if 'search_string' in request.GET:
+        search_string = request.GET['search_string'].strip()
+        print("search_string = ", search_string)
+        if search_string == '':
+            message = 'The search term must contain genus name'
+            return HttpResponse(message)
+        if ' ' not in search_string:
+            genus_string = search_string
+            single_word = True
+        elif search_string.split()[0]:
+            genus_string = search_string.split()[0]
+    else:
+        message = 'The search term must contain genus name'
+        return HttpResponse(message)
+    print("genus_string = ", genus_string)
+
+    genus_list = []
+    # Check if genus is in Orchidaceae
+    Genus = apps.get_model('orchidaceae', 'Genus')
+    try:
+        genus = Genus.objects.get(genus=genus_string)
+    except Genus.DoesNotExist:
+        genus = ''
+    if not genus:
+        Genus = apps.get_model('other', 'Genus')
+        try:
+            genus = Genus.objects.get(genus=genus_string)
+            genus_list.append(genus)
+        except Genus.DoesNotExist:
+            genus = ''
+    print("other genus = ", genus)
+
+    # Check if genus in Fungi
+    Genus = apps.get_model('fungi', 'Genus')
+    try:
+        genus = Genus.objects.get(genus=genus_string)
+        genus_list.append(genus)
+    except Genus.DoesNotExist:
+        genus = ''
+    print("fungi genus = ", genus)
+
+    # Check if genus in Aves
+    Genus = apps.get_model('aves', 'Genus')
+    try:
+        genus = Genus.objects.get(genus=genus_string)
+        genus_list.append(genus)
+    except Genus.DoesNotExist:
+        genus = ''
+    print("aves genus = ", genus)
+
+    # Check if genus is in Animalia
+    Genus = apps.get_model('animalia', 'Genus')
+    try:
+        genus = Genus.objects.get(genus=genus_string)
+        genus_list.append(genus)
+    except Genus.DoesNotExist:
+        genus = ''
+    print("animalia genus = ", genus)
+    print("genus_list = ", len(genus_list))
+
+    if genus_list:
+        match_spc_list = []
+        for genus in genus_list:
+            if ' ' not in search_string:
+                continue
+            family = genus.family
+            Species = apps.get_model(family.application, 'Species')
+            this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=search_string)
+            match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+            print(">> This match_spc_list = ", len(this_match_spc_list))
+            print(family, len(genus_list), len(match_spc_list))
+        full_path = request.path
+        path = 'information'
+        if role == 'cur':
+            path = 'photos'
+        context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                   'path': path, 'full_path': full_path
+                   }
+        return render(request, "search/search_species.html", context)
+
+    else:
+        if 'family' in request.GET:
+            family = request.GET['family'].strip()
+        try:
+            family = Family.objects.get(family=family)
+            url = "%s?family=%s&search_string=%s" % (reverse('search:search_species'), family, search_string)
+            print("No genus found, but found family")
+            return HttpResponseRedirect(url)
+        except Family.DoesNotExist:
+            # Tough luck, nothing is given
+            url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
+            print("No genus no family found, go to search_species")
+            return HttpResponseRedirect(url)
+
+
+def xsearch(request):
     # Search across entire database. Get species > family > If  a match is found, redirect to local search
     role = getRole(request)
     family = ''
@@ -36,6 +136,7 @@ def search(request):
         return HttpResponse(message)
     print("genus_string = ", genus_string)
 
+
     # From search string, get family and application
     Genus = apps.get_model('orchidaceae', 'Genus')
     try:
@@ -49,6 +150,8 @@ def search(request):
         except Genus.DoesNotExist:
             genus = ''
     print("other genus = ", genus)
+
+    # Check if genus in Fungi
     if not genus:
         Genus = apps.get_model('fungi', 'Genus')
         try:
@@ -56,6 +159,8 @@ def search(request):
         except Genus.DoesNotExist:
             genus = ''
     print("fungi genus = ", genus)
+
+    # Check if genus in Aves
     if not genus:
         Genus = apps.get_model('aves', 'Genus')
         try:
@@ -63,14 +168,16 @@ def search(request):
         except Genus.DoesNotExist:
             genus = ''
     print("aves genus = ", genus)
+
+    # Check if genus is in Animalia
     if not genus:
         Genus = apps.get_model('animalia', 'Genus')
         try:
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
             genus = ''
-
     print("animalia genus = ", genus)
+
     if genus and genus != '':
         family = genus.family
         full_path = request.path
@@ -100,7 +207,6 @@ def search(request):
 
 
 def getResultByGenus(family, search_string, genus):
-    genus_list = []
     match_spc_list = []
     single_word = False
 
@@ -132,7 +238,7 @@ def getResultByGenus(family, search_string, genus):
         match_spc_list = get_species_list(family.application, family).filter(binomial__icontains=search_string)
         if family:
             match_spc_list = match_spc_list.filter(gen__family=family.family)
-        match_spc_list = match_spc_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+        match_spc_list = match_spc_list.values_list('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
 
     return genus_list, match_spc_list
 

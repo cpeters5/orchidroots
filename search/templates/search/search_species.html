@@ -30,34 +30,31 @@
                 <h5>Search results for "<i>{{search_string}}</i>"</h5>
                     <table>
                 {% if genus_list %}
-                    <tr><th></th><th></th><th class="d-none d-lg-table-cell hidden-xs">#images</th></tr>
-                    <tr><td><b>Genera</b></td></tr>
+                    <tr><th>Family</th><th>genedra</th><th class="d-none d-lg-table-cell hidden-xs">#images</th></tr>
                     {% for genus in genus_list %}
                         <tr>
                             <td>
-                                <a href="/common/genera/?family={{genus.0.family}}"><i>{{genus.0.family|default:''}}</i></a></td>
+                                <a href="/common/genera/?family={{genus.family}}"><i>{{genus.family|default:''}}</i></a> ({{genus.family.application}})</td>
                             <td>
-                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}
-                                    <a href="/common/species/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a> {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                {% if not genus.num_hybrid or genus.num_species > 0 %}
+                                    <a href="/common/species/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% else %}
-                                    <a href="/common/hybrid/?family={{genus.0.family}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/common/hybrid/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% endif %}
-                                {% if genus.0.family != family.family %}
-                                    (<a href="/search/search_species/?family={{genus.0.family}}&search_string={{search_string}}&role={{role}}&app={{genus.0.family}}">Search {{genus.0.family}} family</a>)
-                                {% endif %}
-                        </td>
+                            </td>
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{genus.num_spcimage}}</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
-                            <tr><td><b>Species</b></td></tr>
+                            <tr><td><b></b></td><td><b>Species</b></td></tr>
                 {% if match_spc_list %}
                     {% for species in match_spc_list %}
                         <tr>
-                            <td><i>{{species.family|default:''}}</i></td>
+                            <td><i>{{species.family|default:''}}</i> ({{species.gen.family.application}})</td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}">
                                     <i>{{species.genus}}
-                                        {% if species.type == 'species' %} {{species.species}} {{species.infraspr}} {{species.infraspe}}</i>
+                                        {% if species.type == 'species' %} {{species.species}} </i>
                                         {% else %} {{species.species}}{% endif %}
                                         <i>{{species.infraspr|default:''}} {{species.infraspe|default:''}}</i>
                                 </a>
