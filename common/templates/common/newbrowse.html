@@ -342,7 +342,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.get_best_img.image_dir %}{{x.get_best_img.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.get_best_img.pid.name|safe}}
+                                        <i>{{x.get_best_img.pid.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}
@@ -361,7 +361,7 @@ img{
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.name|safe}}
+                                        <i>{{x.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}
@@ -375,7 +375,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.pid.name|safe}}</i>
+                                        <i>{{x.pid.binomial_it|safe}}</i>
                                     </div>
                             </div>
                         {% endfor %}
