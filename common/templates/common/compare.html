@@ -1,0 +1,410 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+
+<style>
+
+div.text-br {
+    position: absolute;
+    bottom: 2px;
+    right: 6px;
+    font-size:13px;
+}
+
+        /*Display square image*/
+.imageitem {
+    display:inline-block;
+    margin:5px;
+    width : 16vw;
+    /*height : 22vw;*/
+    background-color: #eaeaea;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    /*text-align: left;*/
+    color: white;
+    margin: 4px 0;
+}
+
+
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 15vw;
+   width : 15vw;
+   /*padding:2px;*/
+   padding:2px 1px 3px 1px;
+}
+.imgcaption {
+    font-size: 10px;
+    height: 45px;
+    overflow: hidden;
+}
+
+.subtitle {
+    text-align:center;
+    margin-top: 10px;
+    font-size:15px;
+    border:0 solid green;
+    padding:10px;
+    height:50px;
+}
+
+.title {
+    margin:0 auto;
+    padding:10px;
+    text-align: center;
+    border:0 solid blue;
+}
+input[type=text] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+@media only screen and (max-width: 850px) {
+    div.text-br {
+        font-size:10px;
+    }
+    .thumbnails {
+       height: 20vw;
+       width : 20vw;
+       padding:2px 1px 3px 1px;
+    }
+    .imageitem {
+        width : 22vw;
+       /*height: 28px;*/
+    }
+    .imgcaption {
+        font-size: 10px;
+        height: 40px;
+        overflow: hidden;
+    }
+    .subtitle {
+        font-size:12px;
+    }
+    .title {
+        font-size: 13px;
+    }
+
+}
+
+@media only screen and (max-width: 600px) {
+    div.text-br {
+        font-size:9px;
+    }
+    .thumbnails {
+       height: 25vw;
+       width : 25vw;
+       padding:2px 1px 3px 1px;
+    }
+    .imageitem {
+        width : 27vw;
+    }
+    .imgcaption {
+        margin: 0 auto;
+        font-size: 10px;
+        height: 32px;
+        overflow: auto;
+        width: 100%;
+    }
+    .subtitle {
+        font-size:11px;
+    }
+    .title {
+        font-size: 12px;
+    }
+    input[type=text], select {
+        font-size:10px;
+    }
+
+}
+
+</style>
+    <br>
+<div style="clear:both"></div>
+
+<!--Title-->
+<div class="detail-title" style="text-align:center">
+    <h6>
+<!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
+        {% if pid and pid2 %}
+            {% if pid != pid2 %}
+                {{species.name|safe}} v.s. {{species2.name|safe}}
+            {% else %}
+                The two orchids are the identical or synonymous!
+            {% endif %}
+        {% else %}
+            {% if pid %}
+                Comparing {{species.name|safe}} with ?
+            {% elif pid2 %}
+                Comparing ? with {{species2.name|safe}}
+            {% else %}
+                Comparing two Orchids
+            {% endif %}
+        {% endif %}
+    </h6>
+</div>
+
+<!--Instruction-->
+<div class="d-flex p-2 justify-content-center" style="width:100%; border:0 solid pink; margin:0 auto;">
+    <div class="row justify-content-center align-items-center" style="border:0 solid blue;font-size:11px;">
+        <button class="btn btn-xs btn-primary" type="button" data-toggle="collapse" data-target="#Announcement">Instruction</button>
+        <div id="Announcement" class="collapse" style="padding:20px;">
+            <h6>Warning: This page is still a prototype. Please report any error to <a href="https://m.facebook.com/groups/186576315397600/">OrchidRoots Support Group</a></h6>
+            This page provides a mean to compare images of two species and or hybrids.
+            <ul>
+                <li>Enter each species in the forms below and click either "Go" buttons. The name entered must be correct! We may consider genus abreviation or partial matching of species name in a future update if needed.</li>
+                <li>If a cross already registered (or temporary created in OrchidRoots) you will see the hybrid name at the top of the screen.  The name serves as the link to the detail page.</li>
+                <li>If the cross has not been registered or creatred in OrchidRoots, a button to create it is provided.
+                    <br><b>Please create this hybrid ONLY IF you have photos to upload</b></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<br>
+{% include "common/detail-nav.html" %}
+        <!--Main sections-->
+    <div class="d-flex p-2 justify-content-center" style="margin:0 auto;width:95%;">
+        <div class="tab-content clearfix" style="background:white; width:100%;">
+                <!-- Results -->
+                <div style="width:100%;margin: 0 auto; border:0 solid blue;">
+                    <div class="title" style="margin:0 auto;padding:10px;text-align: center; border:0 solid blue;">
+                    {% if cross %}
+                        This cross has already been
+                        {% if cross.pid.source == 'RHS' %}
+                        registered at <a href="{{cross.pid.sourceurl}}" target="_blank">({{cross.pid.source}}</a>):
+                        {% else %}
+                        temporarily created:
+                        {% endif %}
+                        {% if role == 'cur' %}
+                            <a href="{% url 'display:photos' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
+                        {% else %}
+                            <a href="{% url 'display:information' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
+                        {% endif %}
+                    {% else %}
+                        {% if pid and pid2 and pid != pid2 %}
+                            This cross has not been registered. <br>
+                            {% if role == 'cur' %}
+                                {% if msgnogenus %}
+                                    <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
+                                {% else %}
+                                    <a class="btn btn-primary btn-xs" href="#">
+                                        Create a new grex - {{species.binomial}} × {{species2.binomial}}
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                Please contact Bluenanta admins to create one.
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+
+                <!-- Compare -->
+
+                <div class="d-flex justify-content-between" >
+                    <div class="p-2" style="width:48%;">
+                        <div class="subtitle">
+                            {% if message1 %}
+                                <span class="text-danger">{{message1|safe}}</span>
+                            {% elif species.species or species.species %}
+                                {{species.binomial_it|safe}} {{species.author|default:''}} {{species.year|default:''}}
+                                {% if accepted %} <br>(syn. {{accepted.binomial_it|safe}}) {% endif %}
+                            {% else %}
+                                Enter the correct name of the first orchid
+                            {% endif %}
+                        </div>
+                        <div style="padding:10px;">
+                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea">{{genus}}</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.species}}</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.infraspr|default_if_none:' '}}</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.infraspe|default_if_none:' '}}</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.author|default_if_none:' '}}</button>
+                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.year|default_if_none:' '}}</button>
+                        </div>
+                        <div class="d-flex justify-content-center" style="display:inline-block;text-align:center; boundary:0 solid blue;">
+                            {% if species and not spcimg1_list %}
+                                <div class="subtitle">
+                                    No image available
+                                </div>
+                            {% else %}
+                                {% for image in spcimg1_list %}
+                                    {% if forloop.last %}
+                                       <div class="d-none d-sm-block imageitem">
+                                            <a href="/static/{{image.image_dir}}/{{image.image_file}}" data-lightbox="current" data-title="{{image.id}}: {{image.imgname}}">
+                                                <div class="box">
+                                                    <img class="thumbnails" alt="" src="/static/{{image.image_dir}}/{{image.image_file}}">
+                                                    <div class="text-br">{{image.id}}</div>
+                                                </div>
+                                            </a>
+                                            <div class="imgcaption" style="text-align: center;">
+                                                {% if image.source_url %}
+                                                    <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                                                {% else %}
+                                                    {{image.get_displayname}}
+                                                {% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                            </div>
+                                       </div>
+                                    {% else %}
+                                        <div class="imageitem">
+                                            <a href="/static/{{image.image_dir}}/{{image.image_file}}" data-lightbox="current" data-title="{{image.id}}: {{image.imgname}}">
+                                                <div class="box">
+                                                    <img class="thumbnails" alt="" src="/static/{{image.image_dir}}/{{image.image_file}}">
+                                                    <div class="text-br">{{image.id}}</div>
+                                                </div>
+                                            </a>
+                                            <div class="imgcaption" style="text-align: center;">
+                                                {% if image.source_url %}
+                                                    <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                                                {% else %}
+                                                    {{image.get_displayname}}
+                                                {% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor%}
+                            {% endif %}
+                        </div>
+                    </div>
+<!--                            <div class="col-1" style="padding:0; border:3px solid black"></div>-->
+                    <div class="p-2" style="width:48%;">
+                        <div class="subtitle">
+                            {% if message2 %}
+                                <span class="text-danger">{{message2|safe}}</span>
+                            {% elif species2.species %}
+                                <a href="{% url 'display:information' species2.pid %}?family={{species.gen.family}}&role={{role}}">{{species2.binomial_it|safe}}</a> {{species2.author|default:''}} {{species2.year|default:''}}
+                                {% if accepted2 %} <br>(syn. {{accepted2.binomial_it|safe}}) {% endif %}
+                            {% else %}
+                                Enter the correct name of second orchid.
+                            {% endif %}
+                        </div>
+                        <div style="padding:10px;">
+                            <form action="?" id="compare">
+                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
+                            <input type="hidden" name="role" value="{{role}}">
+                            <input type="hidden" name="pid" value="{{species.pid}}">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" value="{{genus2}}" placeholder="Genus" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" value="{{species2.species}}" placeholder="Species"  title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" value="{{species2.infraspr|default_if_none:' '}}" placeholder="infraspecific rank" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" value="{{species2.infraspe|default_if_none:' '}}" placeholder="infraspecific value" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="author2" onfocus="this.select()" value="{{species2.author|default_if_none:' '}}" placeholder="Author" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="year2" onfocus="this.select()" value="{{species2.year|default_if_none:' '}}" placeholder="year" title="">
+                            </form>
+                        </div>
+                        <div class="d-flex justify-content-center" style="display:inline-block;text-align:center">
+                            {% if species2 and not spcimg2_list %}
+                                <div class="subtitle">
+                                    No image available
+                                </div>
+                            {% else %}
+                                {% for image in spcimg2_list %}
+                                    {% if forloop.last %}
+                                        <div class="d-none d-sm-block imageitem" style="display:inline-block; border:1px solid lightgrey;text-align:center;">
+                                            <a href="/static/{{image.image_dir}}/{{image.image_file}}" data-lightbox="compare" data-title="{{image.id}}: {{image.imgname}}">
+                                                <div class="box">
+                                                    <img class="thumbnails" alt="" src="/static/{{image.image_dir}}/{{image.image_file}}">
+                                                    <div class="text-br">{{image.id}}</div>
+                                                </div>
+                                            </a>
+                                            <div class="imgcaption" style="text-align: center;">
+                                                {% if image.source_url %}
+                                                    <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                                                {% else %}
+                                                    {{image.get_displayname}}
+                                                {% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="imageitem" style="display:inline-block; border:1px solid lightgrey;text-align:center;">
+                                            <a href="/static/{{image.image_dir}}/{{image.image_file}}" data-lightbox="compare" data-title="{{image.id}}: {{image.imgname}}">
+                                                <div class="box">
+                                                    <img class="thumbnails" alt="" src="/static/{{image.image_dir}}/{{image.image_file}}">
+                                                    <div class="text-br">{{image.id}}</div>
+                                                </div>
+                                            </a>
+                                            <div class="imgcaption" style="text-align: center;">
+                                                {% if image.source_url %}
+                                                    <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                                                {% else %}
+                                                    {{image.get_displayname}}
+                                                {% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                            </div>
+                                        </div>
+                                   {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+
+
+<!--<footer>Copyright &copy; OrchidRoots.com</footer>-->
+
+
+
+{# TODO: Add sort image by - RANDOM, DISTANCE, DATE #}
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+
+// function myFunction() {
+//   // Get the checkbox
+//   var myCheck = document.querySelector('input[id="myCheck"]');
+//   var btn_mysubmit = document.getElementById("mysubmit");
+//   // Get the output text
+//   var text = document.getElementById("text");
+//
+//   // If the checkbox is checked, display the output text
+//   if (myCheck.checked == true){
+//     btn_mysubmit.disabled  = false;
+//   } else {
+//     btn_mysubmit.disabled  = true;
+//   }
+// }
+                        // function myFunction() {
+                        //     var x = document.getElementById("myCheck").defaultChecked;
+                        //     document.getElementById("demo").innerHTML = x;
+                        // }
+
+</script>
+
+
+
+{% endblock %}
+
+
+
