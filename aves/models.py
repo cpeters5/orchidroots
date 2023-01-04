@@ -257,6 +257,13 @@ class Species(models.Model):
     def name(self):
         return '<i>%s</i> %s' % (self.genus, self.speciesname())
 
+    def abrevname(self):
+        if self.gen.abrev:
+            name = '<i>%s</i> %s' % (self.gen.abrev, self.speciesname())
+        else:
+            name = '<i>%s</i> %s' % (self.genus, self.speciesname())
+        return name
+
     def get_species(self):
         name = '%s' % (self.species)
         if self.is_hybrid:
