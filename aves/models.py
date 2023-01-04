@@ -317,6 +317,8 @@ class Species(models.Model):
             return "https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:" + self.orig_pid
         elif self.source == 'Tropicos' and self.orig_pid:
             return "http://http://legacy.tropicos.org/Name/" + self.orig_pid
+        elif self.source == 'Avibase' and self.orig_pid:
+            return "https://avibase.bsc-eoc.org/species.jsp?lang=EN&avibaseid=" + self.orig_pid
         else:
             return None
 
