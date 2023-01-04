@@ -192,19 +192,22 @@ def createhybrid(request):
 
 
 # All access - at least role = pub
-def compare(request, pid=None):
-    family = Family.objects.get(pk='Orchidaceae')
-    role = getRole(request)
+def compare(request, pid):
     # TODO:  Use Species form instead
+    role = getRole(request)
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
-    spcimg1_list = spcimg2_list = []
-    if pid:
+    try:
         species = Species.objects.get(pk=pid)
-    else:
+    except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
+    spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    family = species.gen.family
     genus = species.genus
-    # Handfle request. Should use SpcForm instead.
+    species1 = species
+
+    # Handle comparison request. Should use SpcForm instead.
+    spcimg2_list = []
     if 'species2' in request.GET:
         spc2 = request.GET['species2']
         spc2 = spc2.strip()
@@ -224,72 +227,54 @@ def compare(request, pid=None):
         year2 = request.GET['year2']
         if year2:
             year2 = year2.strip()
-    if pid:
-        try:
-            species = Species.objects.get(pk=pid)
-            pid = species.pid
-            genus = species.genus
-            species1 = species
-        except Species.DoesNotExist:
-            return HttpResponseRedirect("/")
-    else:
-        return HttpResponse("/")
-
-    if gen2:
-        try:
-            genus2 = Genus.objects.get(genus__iexact=gen2)
-        except Genus.DoesNotExist:
-            # Fallback to initial species
-            message = "genus <b>" + gen2 + '</b> does not exist'
-            context = {'species1': species1, 'genus1': genus1,
-                       'pid1': species1.pid,
+    binomial2 = gen2 + ' ' + spc2
+    if infraspr2:
+        binomial2 = binomial2 + ' ' + infraspr2
+    if infraspe2:
+        binomial2 = binomial2 + ' ' + infraspe2
+    if binomial2:
+        print("binomial2 = >", binomial2,"<")
+        species2 = Species.objects.filter(binomial__iexact=binomial2)
+        if len(species2) == 0:
+            message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
+            context = {'species': species, 'genus': genus, 'pid': pid, 'family': family,
                        'spcimg1_list': spcimg1_list,
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
-                       'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, 'detail/compare.html', context)
-        if spc2:
-            species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
-            if len(species2) == 0:
-                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus1': species1.genus, 'species1': species1, 'spcimg1_list': spcimg1_list,
-                           'genus2': gen2, 'species2': spc2,
-                           'message2': message,
-                           'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, 'detail/compare.html', context)
-            elif len(species2) > 1:
-                if infraspe2 and infraspr2:
-                    species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
-                else:
-                    species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
-                if year2:
-                    species2 = species2.filter(year=year2)
-                if author2:
-                    species2 = species2.filter(author=author2)
-
-                if len(species2) == 1:  # Found unique species
-                    species2 = species2[0]
-                    pid2 = species2.pid
-                elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message2': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, 'detail/compare.html', context)
-                else:  # length = 0
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message,
-                               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, 'detail/compare.html', context)
+                       'tab': 'sbs', 'sbs': 'active', 'role': role}
+            return render(request, 'common/compare.html', context)
+        elif len(species2) > 1:
+            if infraspe2 and infraspr2:
+                species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
             else:
+                species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+            if year2:
+                species2 = species2.filter(year=year2)
+            if author2:
+                species2 = species2.filter(author=author2)
+
+            if len(species2) == 1:  # Found unique species
                 species2 = species2[0]
                 pid2 = species2.pid
+            elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message2': message, 'family': family,
+                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request,  'common/compare.html', context)
+            else:  # length = 0
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message1': message, 'family': family,
+                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, 'common/compare.html', context)
         else:
-            pid2 = ''
+            species2 = species2[0]
+            pid2 = species2.pid
+    else:
+        pid2 = ''
 
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
@@ -298,6 +283,7 @@ def compare(request, pid=None):
         pid2 = species2.getAcc()
         accepted2 = species2.getAccepted()
 
+    # A second species is found
     if pid2:
         cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
         if not cross:
@@ -306,31 +292,21 @@ def compare(request, pid=None):
             cross = cross[0]
         else:
             cross = ''
-
-    if species.type == 'species':
-        spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-    else:
-        spcimg1_list = HybImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-
-    if species2:
-        if species2.type == 'species':
             spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-        else:
-            spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     msgnogenus = ''
     if 'msgnogenus' in request.GET:
         msgnogenus = request.GET['msgnogenus']
 
     write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
-    context = {'pid': pid, 'genus': genus, 'species': species, 'family': family,
+    context = {'pid': pid, 'genus': genus, 'species': species,
                'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
                'spcimg1_list': spcimg1_list,
                'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
-               'cross': cross,
+               'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
-               'title': 'compare', 'tab': 'sbs', 'sbs': 'active', 'role': role}
-    return render(request, 'detail/compare.html', context)
+               'tab': 'sbs', 'sbs': 'active', 'role': role}
+    return render(request, 'common/compare.html', context)
 
 
 def comment(request):

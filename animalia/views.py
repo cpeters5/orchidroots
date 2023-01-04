@@ -131,60 +131,54 @@ def compare(request, pid):
         year2 = request.GET['year2']
         if year2:
             year2 = year2.strip()
-    if gen2:
-        try:
-            genus2 = Genus.objects.get(genus__iexact=gen2)
-        except Genus.DoesNotExist:
-            # Fallback to initial species
-            message = "genus <b>" + gen2 + '</b> does not exist in ' + family.family + ' family'
+    binomial2 = gen2 + ' ' + spc2
+    if infraspr2:
+        binomial2 = binomial2 + ' ' + infraspr2
+    if infraspe2:
+        binomial2 = binomial2 + ' ' + infraspe2
+    if binomial2:
+        print("binomial2 = >", binomial2,"<")
+        species2 = Species.objects.filter(binomial__iexact=binomial2)
+        if len(species2) == 0:
+            message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
             context = {'species': species, 'genus': genus, 'pid': pid, 'family': family,
                        'spcimg1_list': spcimg1_list,
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
                        'tab': 'sbs', 'sbs': 'active', 'role': role}
-            return render(request, 'animalia/compare.html', context)
-        if spc2:
-            species2 = Species.objects.filter(species__iexact=spc2).filter(genus__iexact=gen2)
-            if len(species2) == 0:
-                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
-                context = {'species': species, 'genus': genus, 'pid': pid, 'family': family,
-                           'spcimg1_list': spcimg1_list,
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message2': message,
-                           'tab': 'sbs', 'sbs': 'active', 'role': role}
-                return render(request, 'animalia/compare.html', context)
-            elif len(species2) > 1:
-                if infraspe2 and infraspr2:
-                    species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
-                else:
-                    species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
-                if year2:
-                    species2 = species2.filter(year=year2)
-                if author2:
-                    species2 = species2.filter(author=author2)
-
-                if len(species2) == 1:  # Found unique species
-                    species2 = species2[0]
-                    pid2 = species2.pid
-                elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message2': message, 'family': family,
-                               'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request,  'animalia/compare.html', context)
-                else:  # length = 0
-                    message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
-                    context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                               'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                               'message1': message, 'family': family,
-                               'tab': 'sbs', 'sbs': 'active', 'role': role}
-                    return render(request, 'animalia/compare.html', context)
+            return render(request, 'common/compare.html', context)
+        elif len(species2) > 1:
+            if infraspe2 and infraspr2:
+                species2 = species2.filter(infraspe__icontains=infraspe2).filter(infraspr__icontains=infraspr2)
             else:
+                species2 = species2.filter(infraspe__isnull=True).filter(infraspr__isnull=True)
+            if year2:
+                species2 = species2.filter(year=year2)
+            if author2:
+                species2 = species2.filter(author=author2)
+
+            if len(species2) == 1:  # Found unique species
                 species2 = species2[0]
                 pid2 = species2.pid
+            elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message2': message, 'family': family,
+                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request,  'common/compare.html', context)
+            else:  # length = 0
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
+                context = {'species': species, 'genus': genus, 'pid': pid,  # original
+                           'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'message1': message, 'family': family,
+                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                return render(request, 'common/compare.html', context)
         else:
-            pid2 = ''
+            species2 = species2[0]
+            pid2 = species2.pid
+    else:
+        pid2 = ''
 
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
@@ -216,7 +210,7 @@ def compare(request, pid):
                'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role}
-    return render(request, 'animalia/compare.html', context)
+    return render(request, 'common/compare.html', context)
 
 
 @login_required
