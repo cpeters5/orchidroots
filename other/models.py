@@ -239,18 +239,20 @@ class Species(models.Model):
             spc = '<i>%s</i>' % self.species
 
         if self.infraspr:
-            spc = '%s %s <i>%s</i>' % (spc, self.infraspr, self.infraspe)
+            spc = '%s %s' % (spc, self.infraspr)
+        if self.infraspe:
+            spc = '%s <i>%s</i>' % (spc, self.infraspe)
         return spc
 
-    def textspeciesname(self):
-        spc = re.sub('Memoria', 'Mem.', self.species.rstrip())
-        if self.infraspr:
-            spc = '%s <i>%s</i>' % (spc, self.infraspr)
-        if self.infraspe:
-            spc = '%s <i>%s</i>' % (name, self.infraspe)
-        if self.is_hybrid:
-            spc = '%s %s' % (self.is_hybrid, spc)
-        return spc
+    # def textspeciesname(self):
+    #     spc = re.sub('Memoria', 'Mem.', self.species.rstrip())
+    #     if self.infraspr:
+    #         spc = '%s <i>%s</i>' % (spc, self.infraspr)
+    #     if self.infraspe:
+    #         spc = '%s <i>%s</i>' % (name, self.infraspe)
+    #     if self.is_hybrid:
+    #         spc = '%s %s' % (self.is_hybrid, spc)
+    #     return spc
 
     def textspeciesnamefull(self):
         spc = self.species.rstrip()
@@ -263,7 +265,15 @@ class Species(models.Model):
         return spc
 
     def textname(self):
-        return '%s %s' % (self.genus, self.textspeciesname())
+        spc = re.sub('Memoria', 'Mem.', self.species.rstrip())
+        if self.infraspr:
+            spc = '%s <i>%s</i>' % (spc, self.infraspr)
+        if self.infraspe:
+            spc = '%s <i>%s</i>' % (name, self.infraspe)
+        if self.is_hybrid:
+            spc = '%s %s' % (self.is_hybrid, spc)
+
+        return '%s %s' % (self.genus, spc)
 
     def name(self):
         return '<i>%s</i> %s' % (self.genus, self.speciesname())
