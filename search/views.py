@@ -20,22 +20,22 @@ def search(request):
     role = getRole(request)
     family = ''
     single_word = False
+    search_list = []
     # Get search string
     if 'search_string' in request.GET:
         search_string = request.GET['search_string'].strip()
-        print("search_string = ", search_string)
         if search_string == '':
             message = 'The search term must contain genus name'
             return HttpResponse(message)
         if ' ' not in search_string:
             genus_string = search_string
             single_word = True
-        elif search_string.split()[0]:
-            genus_string = search_string.split()[0]
+        else:
+            genus_string, search_list = search_string.split(' ', 1)
+            search_list = search_list.split()
     else:
         message = 'The search term must contain genus name'
         return HttpResponse(message)
-    print("genus_string = ", genus_string)
 
     genus_list = []
     # Check if genus is in Orchidaceae
@@ -51,7 +51,6 @@ def search(request):
             genus_list.append(genus)
         except Genus.DoesNotExist:
             genus = ''
-    print("other genus = ", genus)
 
     # Check if genus in Fungi
     Genus = apps.get_model('fungi', 'Genus')
@@ -60,7 +59,6 @@ def search(request):
         genus_list.append(genus)
     except Genus.DoesNotExist:
         genus = ''
-    print("fungi genus = ", genus)
 
     # Check if genus in Aves
     Genus = apps.get_model('aves', 'Genus')
@@ -69,7 +67,6 @@ def search(request):
         genus_list.append(genus)
     except Genus.DoesNotExist:
         genus = ''
-    print("aves genus = ", genus)
 
     # Check if genus is in Animalia
     Genus = apps.get_model('animalia', 'Genus')
@@ -78,8 +75,6 @@ def search(request):
         genus_list.append(genus)
     except Genus.DoesNotExist:
         genus = ''
-    print("animalia genus = ", genus)
-    print("genus_list = ", len(genus_list))
 
     if genus_list:
         match_spc_list = []
@@ -88,10 +83,8 @@ def search(request):
                 continue
             family = genus.family
             Species = apps.get_model(family.application, 'Species')
-            this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=search_string)
+            this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
             match_spc_list = list(chain(match_spc_list, this_match_spc_list))
-            print(">> This match_spc_list = ", len(this_match_spc_list))
-            print(family, len(genus_list), len(match_spc_list))
         full_path = request.path
         path = 'information'
         if role == 'cur':
@@ -107,12 +100,10 @@ def search(request):
         try:
             family = Family.objects.get(family=family)
             url = "%s?family=%s&search_string=%s" % (reverse('search:search_species'), family, search_string)
-            print("No genus found, but found family")
             return HttpResponseRedirect(url)
         except Family.DoesNotExist:
             # Tough luck, nothing is given
             url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
-            print("No genus no family found, go to search_species")
             return HttpResponseRedirect(url)
 
 
