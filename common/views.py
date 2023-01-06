@@ -681,6 +681,7 @@ def newbrowse(request):
                         species = species.filter(num_image__gt=0)
                     if len(species) > 500:
                         species = species[0: 500]
+                    species = species.order_by('species')
                     species_list = []
                     for x in species:
                         spcimage = x.get_best_img()
@@ -699,6 +700,7 @@ def newbrowse(request):
                 genera = Genus.objects.filter(family=family)
                 if len(genera) > 100:
                     genera = genera[0: 1000]
+                genera = genera.order_by('genus')
                 genus_list = []
                 for x in genera:
                     spcimage = Species.objects.filter(genus=x)
@@ -712,6 +714,7 @@ def newbrowse(request):
 
         # Building sample by families
         families = Family.objects.filter(application=app)
+        families = families.order_by('family')
         Genus = apps.get_model(app.lower(), 'Genus')
         family_list = []
         for fam in families:
