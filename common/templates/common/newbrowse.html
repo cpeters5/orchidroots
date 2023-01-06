@@ -334,7 +334,7 @@ img{
             <!--            <br>-->
                     {% if family_list %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
-                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                                <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
                                 <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&display={{display}}&family={{x.family.family}}">{{x.family}}</a>
@@ -349,7 +349,7 @@ img{
                         </div>
                     {% elif genus_list %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
-                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                                <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
                                 <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.genus}}&display={{display}}">{{x.genus}}</a>
@@ -368,7 +368,7 @@ img{
                         </div>
                     {% elif species_list %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
-                                <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                                <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in species_list %}
                             <div class="imageitem border ">
                                     <a href="{% url 'display:information'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}&display={{display}}">

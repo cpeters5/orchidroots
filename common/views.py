@@ -649,6 +649,10 @@ def newbrowse(request):
     app = ''
     family = ''
     genus = ''
+    talpha = ''
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+
     # app must be in browse request
     app = request.GET['app']
     if 'family' in request.GET:
@@ -679,6 +683,8 @@ def newbrowse(request):
                     species = Species.objects.filter(genus=genus)
                     if display == 'checked':
                         species = species.filter(num_image__gt=0)
+                    if talpha:
+                        species = species.filter(species__istartswith=talpha)
                     if len(species) > 500:
                         species = species[0: 500]
                     species = species.order_by('species')
@@ -687,7 +693,7 @@ def newbrowse(request):
                         spcimage = x.get_best_img()
                         if spcimage:
                             species_list = species_list + [spcimage]
-                    context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'display': display}
+                    context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
                     return render(request, 'common/newbrowse.html', context)
         if family:
             try:
@@ -698,6 +704,8 @@ def newbrowse(request):
                 Genus = apps.get_model(app.lower(), 'Genus')
                 Species = apps.get_model(app.lower(), 'Species')
                 genera = Genus.objects.filter(family=family)
+                if talpha:
+                    genera = genera.filter(genus__istartswith=talpha)
                 if len(genera) > 100:
                     genera = genera[0: 1000]
                 genera = genera.order_by('genus')
@@ -709,11 +717,13 @@ def newbrowse(request):
                     spcimage = spcimage.order_by('?')[0:1]
                     if len(spcimage) > 0:
                         genus_list = genus_list + [spcimage[0]]
-                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display}
+                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
                 return render(request, 'common/newbrowse.html', context)
 
         # Building sample by families
         families = Family.objects.filter(application=app)
+        if talpha:
+            families = families.filter(family__istartswith=talpha)
         families = families.order_by('family')
         Genus = apps.get_model(app.lower(), 'Genus')
         family_list = []
@@ -724,7 +734,7 @@ def newbrowse(request):
             genimage = genimage.order_by('?')[0:1]
             if len(genimage) > 0:
                 family_list = family_list + [genimage[0]]
-        context = {'family_list': family_list, 'app': app, 'display': display}
+        context = {'family_list': family_list, 'app': app, 'display': display, 'talpha': talpha, 'alpha_list': alpha_list,}
         return render(request, 'common/newbrowse.html', context)
 
     # Bad application, and neither families nor genus are valid, list all genera in the app
