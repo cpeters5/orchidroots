@@ -183,7 +183,6 @@ def information(request, pid=None):
     ads_insert = int(random.random() * len(display_items)) + 1
     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     write_output(request, str(family))
-    print(" view = ", request.path)
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
@@ -270,7 +269,7 @@ def photos(request, pid=None):
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'role': role,
                'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
     return render(request, 'display/photos.html', context)

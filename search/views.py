@@ -21,6 +21,14 @@ def search(request):
     family = ''
     single_word = False
     search_list = []
+    match_spc_list = []
+    full_path = request.path
+    path = 'information'
+    if role == 'cur':
+        path = 'photos'
+    if 'app' in request.GET:
+        app = request.GET['app']
+    print("app = ", app)
     # Get search string
     if 'search_string' in request.GET:
         search_string = request.GET['search_string'].strip()
@@ -75,7 +83,7 @@ def search(request):
         genus_list.append(genus)
     except Genus.DoesNotExist:
         genus = ''
-
+    print("genus_list = ", len(genus_list))
     if genus_list:
         match_spc_list = []
         for genus in genus_list:
@@ -85,24 +93,42 @@ def search(request):
             Species = apps.get_model(family.application, 'Species')
             this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
             match_spc_list = list(chain(match_spc_list, this_match_spc_list))
-        full_path = request.path
-        path = 'information'
-        if role == 'cur':
-            path = 'photos'
-        context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'path': path, 'full_path': full_path
-                   }
+        # Incase no species found where search_string is more than one word, then look at other genus
+        other_genus_spc = []
+        if genus_list and not match_spc_list and ' ' in search_string:
+            other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+
+        print("app = ", app)
         return render(request, "search/search_species.html", context)
 
     else:
-        if 'family' in request.GET:
-            family = request.GET['family'].strip()
-        try:
-            family = Family.objects.get(family=family)
-            url = "%s?family=%s&search_string=%s" % (reverse('search:search_species'), family, search_string)
-            return HttpResponseRedirect(url)
-        except Family.DoesNotExist:
-            # Tough luck, nothing is given
+        # other_genus_spc = []
+        if 'app' in request.GET:
+            app = request.GET['app'].strip()
+        print("Given app = ", app)
+        if app:
+            try:
+                family_list = Family.objects.filter(application=app).values_list('family')
+                print("Found families = ", len(family))
+                Species = apps.get_model(app, 'Species')
+                other_genus_spc = Species.objects.filter(
+                        Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+
+                print("other_genus_spc - ", len(other_genus_spc))
+                print("app = ", app)
+                context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                           'other_genus_spc': other_genus_spc, 'app': app,
+                           'path': path, 'full_path': full_path
+                           }
+                return render(request, "search/search_species.html", context)
+            except Family.DoesNotExist:
+                # Tough luck, nothing is given
+                print("family not valid = ")
+                url = "%s?search_string=%s&app=%s" % (reverse('search:search_species'), search_string, app)
+                return HttpResponseRedirect(url)
+        else:
+            # looks like only search string is given.
+            print("Nothing found, go through species = ")
             url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
             return HttpResponseRedirect(url)
 
@@ -236,11 +262,13 @@ def getResultByGenus(family, search_string, genus):
 
 def search_species(request):
     # Only family or genus is given (one or both)
+    print("Enter search species")
     family = ''
     subfamily = ''
     tribe = ''
     subtribe = ''
     genus_list = []
+    search_list = []
     match_spc_list = []
     full_path = request.path
     # If no match found, perform fuzzy match
@@ -256,7 +284,8 @@ def search_species(request):
         if ' ' not in search_string:
             genus_string = search_string
         elif search_string.split()[0]:
-            genus_string = search_string.split()[0]
+            genus_string, search_list = search_string.split(' ', 1)
+            search_list = search_list.split()
     else:
         send_url = '/'
         return HttpResponseRedirect(send_url)
@@ -280,40 +309,35 @@ def search_species(request):
 
     # Try to match entire string
     #  Get orchid species matches
-    orspecies_list = OrSpecies.objects.filter(binomial__icontains=search_string). \
-                     values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+    orspecies_list = OrSpecies.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
     # Get other species matches
-    otspecies_list = OtSpecies.objects.filter(binomial__icontains=search_string). \
-                     values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+    otspecies_list = OtSpecies.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
     # Get fungi species matches
-    fuspecies_list = FuSpecies.objects.filter(binomial__icontains=search_string). \
-                     values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+    fuspecies_list = FuSpecies.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
     # Get aves species matches
-    avspecies_list = AvSpecies.objects.filter(binomial__icontains=search_string). \
-                     values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+    avspecies_list = AvSpecies.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
     # Get animalia species matches
-    anspecies_list = AnSpecies.objects.filter(binomial__icontains=search_string). \
-                     values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+    anspecies_list = AnSpecies.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
     if family:
         if family.application == 'orchidaceae':
-            orspecies_list = orspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            orspecies_list = orspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial', 'gen')
             match_spc_list = orspecies_list
         elif family.application == 'other':
-            otspecies_list = otspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            otspecies_list = otspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial', 'gen')
             match_spc_list = otspecies_list
         elif family.application == 'fungi':
-            fuspecies_list = fuspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            fuspecies_list = fuspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial', 'gen')
             match_spc_list = fuspecies_list
         elif family.application == 'aves':
-            avspecies_list = avspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            avspecies_list = avspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial', 'gen')
             match_spc_list = avspecies_list
         elif family.application == 'animalia':
-            anspecies_list = anspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
+            anspecies_list = anspecies_list.filter(family=family).values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial', 'gen')
             match_spc_list = anspecies_list
 
     else:

@@ -50,6 +50,27 @@
                 {% if match_spc_list %}
                     {% for species in match_spc_list %}
                         <tr>
+                            <td><i>{{species.family|default:''}}</i>
+                                        ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
+                            <td>
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}">
+                                    <i>{{species.genus}}
+                                        {% if species.type == 'species' %} {{species.species}} </i>
+                                        {% else %} {{species.species}}{% endif %}
+                                        <i>{{species.infraspr|default:''}} {{species.infraspe|default:''}}</i>
+                                </a>
+                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn.){% endif %}
+
+                            </td>
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{species.num_image|default:''}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% elif other_genus_spc %}
+                        <tr><td></td><td>Occurences in other genera</td></tr>
+                    {% for species in other_genus_spc %}
+                        <tr>
                             <td><i>{{species.family|default:''}}</i> ({{species.gen.family.application}})</td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}">
@@ -66,6 +87,7 @@
                             </td>
                         </tr>
                     {% endfor %}
+
                 {% endif %}
 
                         </table>
