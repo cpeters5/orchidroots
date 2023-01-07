@@ -67,6 +67,18 @@
                     </div>
                 </li>
 
+                {% if related_list %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
+                    <div class="dropdown-menu">
+                        {% for spc in related_list %}
+                            <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&tab=rel"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
+                        {% endfor %}
+                    </div>
+
+                </li>
+                {% endif %}
+
                 {% if species.type == 'hybrid' %}
                     <li class="nav-item dropdown">
                         <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
@@ -74,7 +86,7 @@
                         </a>
                         <div class="nav2 dropdown-menu">
                         {% if species.gen.family.family == 'Orchidaceae' %}
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=anc"><span style="color:#575757;;">Ancestry list</span></a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=anc"><span style="color:#575757;">Ancestry list</span></a>
                             <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
                         {% endif %}
                        </div>

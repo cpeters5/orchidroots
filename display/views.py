@@ -52,6 +52,8 @@ def information(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
+    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).order_by('binomial')
+
     # If pid is a synonym, convert to accept
     req_pid = pid
     req_species = species
@@ -181,14 +183,15 @@ def information(request, pid=None):
     ads_insert = int(random.random() * len(display_items)) + 1
     sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
     write_output(request, str(family))
+    print(" view = ", request.path)
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
-               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
+               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'role': role, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
-               'from_path': from_path,
+               'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
     return render(request, "display/information.html", context)
 
@@ -217,6 +220,8 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+
+    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).order_by('binomial')
 
     variety = ''
     tail = ''
@@ -263,10 +268,9 @@ def photos(request, pid=None):
     context = {'species': species, 'author': author,
                # 'author_list': author_list,
                'family': family,
-               'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
+               'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'ads_insert': ads_insert, 'sponsor': sponsor,
-               'role': role, 'from_path': from_path,
+               'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
     return render(request, 'display/photos.html', context)
