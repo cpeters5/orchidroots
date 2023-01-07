@@ -52,7 +52,7 @@ def information(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
-    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).order_by('binomial')
+    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
 
     # If pid is a synonym, convert to accept
     req_pid = pid
@@ -221,7 +221,7 @@ def photos(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
-    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).order_by('binomial')
+    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
 
     variety = ''
     tail = ''

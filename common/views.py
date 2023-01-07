@@ -706,9 +706,9 @@ def newbrowse(request):
                 genera = Genus.objects.filter(family=family)
                 if talpha:
                     genera = genera.filter(genus__istartswith=talpha)
+                genera = genera.order_by('genus')
                 if len(genera) > 100:
                     genera = genera[0: 1000]
-                genera = genera.order_by('genus')
                 genus_list = []
                 for x in genera:
                     spcimage = Species.objects.filter(genus=x)

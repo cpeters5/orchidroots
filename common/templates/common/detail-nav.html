@@ -53,20 +53,6 @@
                     </div>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
-                    </a>
-                    <div class="nav3 dropdown-menu">
-                        {% if species.gen.family.family == 'Orchidaceae' %}
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
-                        {% else %}
-                            IN PROGRESS
-                        {% endif %}
-                    </div>
-                </li>
-
                 {% if related_list %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
@@ -79,19 +65,31 @@
                 </li>
                 {% endif %}
 
-                {% if species.type == 'hybrid' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
-                        </a>
-                        <div class="nav2 dropdown-menu">
-                        {% if species.gen.family.family == 'Orchidaceae' %}
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=anc"><span style="color:#575757;">Ancestry list</span></a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
-                        {% endif %}
-                       </div>
+                {% if species.gen.family.family == 'Orchidaceae' %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
+                    </a>
+                    <div class="nav3 dropdown-menu">
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
+                    </div>
+                </li>
 
-                    </li>
+                    {% if species.type == 'hybrid' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
+                            </a>
+                            <div class="nav2 dropdown-menu">
+                            {% if species.gen.family.family == 'Orchidaceae' %}
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=anc"><span style="color:#575757;">Ancestry list</span></a>
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
+                            {% endif %}
+                           </div>
+
+                        </li>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </ul>
