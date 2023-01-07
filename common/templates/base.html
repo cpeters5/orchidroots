@@ -621,7 +621,7 @@ nav .search-container button:hover {
                 <li  class="nav-item">
                         <form class="form-inline" id="search" action="/search/search/" style="display:inline-block; margin-top: 5px;">
 <!--                            <input type="hidden" name="family" value="{{ family.family }}" >-->
-                            <input type="hidden" name="app" value="{{ family.application }}" >
+                            <input type="hidden" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
                             <input type="hidden" name="role" value="{{ role }}" >
                             <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search genus" required title="Include genus to speed up the search." style="border:1px solid #ccc; border-right: 0">
 <!--                            <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search species" required title="Genus is required" style="border:1px solid #ccc; border-right: 0">-->
