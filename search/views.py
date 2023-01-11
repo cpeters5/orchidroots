@@ -13,22 +13,17 @@ from utils import config
 from utils.views import write_output, getRole
 
 alpha_list = config.alpha_list
-# Create your views here.
+applications = config.applications
 
 def search(request):
-    # Search across entire database. Get species > family > If  a match is found, redirect to local search
     role = getRole(request)
-    family = ''
-    single_word = False
     search_list = []
     match_spc_list = []
     full_path = request.path
     path = 'information'
     if role == 'cur':
         path = 'photos'
-    if 'app' in request.GET:
-        app = request.GET['app']
-    print("app = ", app)
+
     # Get search string
     if 'search_string' in request.GET:
         search_string = request.GET['search_string'].strip()
@@ -37,7 +32,6 @@ def search(request):
             return HttpResponse(message)
         if ' ' not in search_string:
             genus_string = search_string
-            single_word = True
         else:
             genus_string, search_list = search_string.split(' ', 1)
             search_list = search_list.split()
@@ -46,44 +40,16 @@ def search(request):
         return HttpResponse(message)
 
     genus_list = []
-    # Check if genus is in Orchidaceae
-    Genus = apps.get_model('orchidaceae', 'Genus')
-    try:
-        genus = Genus.objects.get(genus=genus_string)
-    except Genus.DoesNotExist:
-        genus = ''
-    if not genus:
-        Genus = apps.get_model('other', 'Genus')
+    # collection all matching genus in each app
+    for app in applications:
+        Genus = apps.get_model(app, 'Genus')
         try:
             genus = Genus.objects.get(genus=genus_string)
-            genus_list.append(genus)
         except Genus.DoesNotExist:
             genus = ''
+        if genus:
+            genus_list.append(genus)
 
-    # Check if genus in Fungi
-    Genus = apps.get_model('fungi', 'Genus')
-    try:
-        genus = Genus.objects.get(genus=genus_string)
-        genus_list.append(genus)
-    except Genus.DoesNotExist:
-        genus = ''
-
-    # Check if genus in Aves
-    Genus = apps.get_model('aves', 'Genus')
-    try:
-        genus = Genus.objects.get(genus=genus_string)
-        genus_list.append(genus)
-    except Genus.DoesNotExist:
-        genus = ''
-
-    # Check if genus is in Animalia
-    Genus = apps.get_model('animalia', 'Genus')
-    try:
-        genus = Genus.objects.get(genus=genus_string)
-        genus_list.append(genus)
-    except Genus.DoesNotExist:
-        genus = ''
-    print("genus_list = ", len(genus_list))
     if genus_list:
         match_spc_list = []
         for genus in genus_list:
@@ -98,129 +64,30 @@ def search(request):
         if genus_list and not match_spc_list and ' ' in search_string:
             other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
-        print("app = ", app)
-        return render(request, "search/search_species.html", context)
-
-    else:
-        # other_genus_spc = []
-        if 'app' in request.GET:
-            app = request.GET['app'].strip()
-        print("Given app = ", app)
-        if app:
-            try:
-                family_list = Family.objects.filter(application=app).values_list('family')
-                print("Found families = ", len(family))
-                Species = apps.get_model(app, 'Species')
-                other_genus_spc = Species.objects.filter(
-                        Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-
-                print("other_genus_spc - ", len(other_genus_spc))
-                print("app = ", app)
-                context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                           'other_genus_spc': other_genus_spc, 'app': app,
-                           'path': path, 'full_path': full_path
-                           }
-                return render(request, "search/search_species.html", context)
-            except Family.DoesNotExist:
-                # Tough luck, nothing is given
-                print("family not valid = ")
-                url = "%s?search_string=%s&app=%s" % (reverse('search:search_species'), search_string, app)
-                return HttpResponseRedirect(url)
-        else:
-            # looks like only search string is given.
-            print("Nothing found, go through species = ")
-            url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
-            return HttpResponseRedirect(url)
-
-
-def xsearch(request):
-    # Search across entire database. Get species > family > If  a match is found, redirect to local search
-    role = getRole(request)
-    family = ''
-    # Get search string
-    if 'search_string' in request.GET:
-        search_string = request.GET['search_string'].strip()
-        print("search_string = ", search_string)
-        if search_string == '':
-            message = 'The search term must contain genus name'
-            return HttpResponse(message)
-        if ' ' not in search_string:
-            genus_string = search_string
-        elif search_string.split()[0]:
-            genus_string = search_string.split()[0]
-    else:
-        message = 'The search term must contain genus name'
-        return HttpResponse(message)
-    print("genus_string = ", genus_string)
-
-
-    # From search string, get family and application
-    Genus = apps.get_model('orchidaceae', 'Genus')
-    try:
-        genus = Genus.objects.get(genus=genus_string)
-    except Genus.DoesNotExist:
-        genus = ''
-    if not genus:
-        Genus = apps.get_model('other', 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-    print("other genus = ", genus)
-
-    # Check if genus in Fungi
-    if not genus:
-        Genus = apps.get_model('fungi', 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-    print("fungi genus = ", genus)
-
-    # Check if genus in Aves
-    if not genus:
-        Genus = apps.get_model('aves', 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-    print("aves genus = ", genus)
-
-    # Check if genus is in Animalia
-    if not genus:
-        Genus = apps.get_model('animalia', 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-    print("animalia genus = ", genus)
-
-    if genus and genus != '':
-        family = genus.family
-        full_path = request.path
-        path = 'information'
-        if role == 'cur':
-            path = 'photos'
-
-        genus_list, match_spc_list = getResultByGenus(family, search_string, genus)
         context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'family': family, 'role': role, 'path': path, 'full_path': full_path
+                   'other_genus_spc': other_genus_spc,
+                   'path': path, 'full_path': full_path
                    }
         return render(request, "search/search_species.html", context)
 
     else:
-        if 'family' in request.GET:
-            family = request.GET['family'].strip()
-        try:
-            family = Family.objects.get(family=family)
-            url = "%s?family=%s&search_string=%s" % (reverse('search:search_species'), family, search_string)
-            print("No genus found, but found family")
-            return HttpResponseRedirect(url)
-        except Family.DoesNotExist:
-            # Tough luck, nothing is given
-            url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
-            print("No genus no family found, go to search_species")
-            return HttpResponseRedirect(url)
+        other_genus_spc = []
+        for app in applications:
+            Species = apps.get_model(app, 'Species')
+            this_spc_list = Species.objects.filter(
+                    Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+            other_genus_spc = list(chain(other_genus_spc, this_spc_list))
+        if other_genus_spc:
+            context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                       'other_genus_spc': other_genus_spc,
+                       'path': path, 'full_path': full_path
+                       }
+            return render(request, "search/search_species.html", context)
+
+    # looks like only search string is given.
+    print("Nothing found, go through species = ")
+    url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
+    return HttpResponseRedirect(url)
 
 
 def getResultByGenus(family, search_string, genus):
