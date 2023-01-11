@@ -22,6 +22,13 @@ def pathinfo(request):
     path  = request.path.split('/')[2:][0]
     return path
 
+def get_random_sponsor():
+    from accounts.models import Sponsor
+    from django.utils.timezone import datetime
+    today = datetime.today()
+    return Sponsor.objects.filter(is_active=1).filter(end_date__year__gte=today.year).filter(
+        end_date__month__gte=today.month).order_by('?')[0:1][0]
+
 
 def get_family_list(request):
     alpha = ''
