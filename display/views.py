@@ -17,7 +17,6 @@ from orchidaceae.models import Intragen, HybImages
 from accounts.models import User, Photographer, Sponsor
 
 epoch = 1740
-alpha_list = string.ascii_uppercase
 logger = logging.getLogger(__name__)
 GenusRelation = []
 Accepted = []
@@ -33,7 +32,6 @@ def information(request, pid=None):
     # NOTE: seed and pollen id must all be accepted.
     from_path = pathinfo(request)
     role = getRole(request)
-    ads_insert = ''
     # Information request role must be either cur or pub.
     if not role or role != 'cur':
         role = 'pub'
@@ -77,7 +75,6 @@ def information(request, pid=None):
             images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
         else:               # req_pid is accepted species, show the accepted photos and all of its synonyms photos
             images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
-        accid = 0
         if species.status == 'synonym':
             accid = species.getAcc()
             myspecies = Species.objects.get(pk=accid)
@@ -119,9 +116,6 @@ def information(request, pid=None):
     pollen_list = Hybrid.objects.filter(pollen_id=species.pid)
     # Remove duplicates. i.e. if both parents are synonym.
     temp_list = pollen_list
-    # for x in temp_list:
-    #     if x.seed_status() == 'syn' and x.pollen_status() == 'syn':
-    #         pollen_list = pollen_list.exclude(pid=x.pid_id)
     pollen_list = pollen_list.order_by('seed_genus', 'seed_species')
     offspring_list = chain(list(seed_list), list(pollen_list))
     offspring_count = len(seed_list) + len(pollen_list)
@@ -254,12 +248,10 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
-    # if len(public_list) > 0:
     ads_insert = int(random.random() * len(public_list)) + 1
     sponsor = get_random_sponsor()
     write_output(request, str(family))
     context = {'species': species, 'author': author,
-               # 'author_list': author_list,
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
