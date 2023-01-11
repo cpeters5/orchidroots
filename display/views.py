@@ -10,7 +10,7 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos, pathinfo
+from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos, pathinfo, get_random_sponsor
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -34,7 +34,6 @@ def information(request, pid=None):
     from_path = pathinfo(request)
     role = getRole(request)
     ads_insert = ''
-    sponsor = ''
     # Information request role must be either cur or pub.
     if not role or role != 'cur':
         role = 'pub'
@@ -181,7 +180,7 @@ def information(request, pid=None):
         species = req_species
     # if len(display_items) > 0:
     ads_insert = int(random.random() * len(display_items)) + 1
-    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    sponsor = get_random_sponsor()
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
@@ -199,11 +198,6 @@ def photos(request, pid=None):
     Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     role = getRole(request)
     # For photos view request role must be either cur or pub.
-    # if not role or role != 'cur':
-    #     role = 'pub'
-    from_path = pathinfo(request)
-    ads_insert = ''
-    sponsor = ''
     author = get_reqauthor(request)
     if not author or author == 'anonymous':
         author = None
@@ -262,7 +256,7 @@ def photos(request, pid=None):
         private_list = private_list.filter(author=author)
     # if len(public_list) > 0:
     ads_insert = int(random.random() * len(public_list)) + 1
-    sponsor = Sponsor.objects.filter(is_active=1).order_by('?')[0:1][0]
+    sponsor = get_random_sponsor()
     write_output(request, str(family))
     context = {'species': species, 'author': author,
                # 'author_list': author_list,

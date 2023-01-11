@@ -8,7 +8,7 @@ from itertools import chain
 from fuzzywuzzy import fuzz, process
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
-from accounts.models import User, Photographer, Sponsor
+from accounts.models import User, Photographer
 from utils import config
 from utils.views import write_output, getRole
 
