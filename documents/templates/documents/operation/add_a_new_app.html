@@ -39,18 +39,19 @@
                         <li>If some newapp data already exists in other app (e.g. other app), move them to newapp tables</li>
                         <li>edit newapp.forms.py to change oldapp.models to newapp.models</li>
                         <li>Edit robots.txt and myproject/views.py to add the newapp folder in teh denied section</li>
-                    </>
+                        <li>Add newapp to util/config.py</li>
+                    </ul>
                     <h6 class="mb-0">FUNCTIONS</h6>
                     <ul>
                         <li>NAVBAR: Add a button to second navbar for the newapp --> browsegen <newapp></li>
-                        <li>commin/home: Add sample images of the newapp to home page</li>
+                        <li>common/home: Add sample images of the newapp to home page</li>
                         <li>common/newbrowse: add search criteria specific to the newapp</li>
                         <li>common/research: add newapp section</li>
                         <li>SEARCH:
                             <ul>
                                 <li>Add a url path to search.urls.py</li>
-                                <li>Add search_<newapp> method to search.views (copy from a <oldapp>_search method and change app name.)</li>
-                                <li>Add statements for newapp in searcgh.search, and search.search_species methods</li>
+<!--                                <li>Add search_<newapp> method to search.views (copy from a <oldapp>_search method and change app name.)</li>-->
+                                <li>Add section for newapp in search.search, and search.search_species methods</li>
                             </ul>
                         </li>
                     </ul>
