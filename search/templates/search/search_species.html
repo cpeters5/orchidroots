@@ -34,7 +34,8 @@
                     {% for genus in genus_list %}
                         <tr>
                             <td>
-                                <a href="/common/genera/?app={{app}}&family={{genus.family}}"><i>{{genus.family|default:''}}</i></a> ({{genus.family.application}})</td>
+                                <a href="/common/genera/?app={{app}}&family={{genus.family}}"><i>{{genus.family|default:''}}</i></a>
+                                ({% if genus.family.application == 'other' %}{{genus.family.kingdom}}{% else %}{{genus.family.application}}{% endif %})</td>
                             <td>
                                 {% if not genus.num_hybrid or genus.num_species > 0 %}
                                     <a href="/common/species/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
@@ -51,7 +52,7 @@
                     {% for species in match_spc_list %}
                         <tr>
                             <td><i>{{species.family|default:''}}</i>
-                                        ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
+                                   ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}">
                                     <i>{{species.genus}}
@@ -59,7 +60,7 @@
                                         {% else %} {{species.species}}{% endif %}
                                         <i>{{species.infraspr|default:''}} {{species.infraspe|default:''}}</i>
                                 </a>
-                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn.){% endif %}
+                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
 
                             </td>
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
@@ -71,7 +72,8 @@
                         <tr><td></td><td>Occurences in other genera</td></tr>
                     {% for species in other_genus_spc %}
                         <tr>
-                            <td><i>{{species.family|default:''}}</i> ({{species.gen.family.application}})</td>
+                            <td><i>{{species.family|default:''}}</i>
+                                ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}">
                                     <i>{{species.genus}}
