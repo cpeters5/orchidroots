@@ -337,12 +337,12 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&display={{display}}&family={{x.family.family}}">{{x.family}}</a>
-                                    <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&role={{role}}&family={{x.family}}&genus={{x.genus}}&display=checked">
-                                        <img class="thumbnails p-1" alt="" src="{% static x.get_best_img.image_dir %}{{x.get_best_img.image_file}}" >
+                                <a href="{% url 'common:newbrowse' %}?app={{x.0.family.application}}&display={{display}}&family={{x.0.family.family}}">{{x.0.family}}</a>
+                                    <a href="{% url 'display:information'  x.1.pid_id %}?app={{x.0.family.application}}&family={{x.0.family}}">
+                                        <img class="thumbnails p-1" alt="" src="{% static x.1.image_dir %}{{x.1.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.get_best_img.pid.binomial_it|safe}}
+                                        {{x.1.pid.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}
@@ -352,16 +352,16 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.genus}}&display={{display}}">{{x.genus}}</a>
-                                    <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.genus}}&display={{display}}">
-                                        {% if x.get_best_img.image_file %}
-                                            <img class="thumbnails p-1" alt="" src="{% static x.get_best_img.image_dir %}{{x.get_best_img.image_file}}" >
+                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.0.genus}}&display={{display}}">{{x.0.genus}}</a>
+                                    <a href="{% url 'display:information'  x.1.pid_id %}?app={{x.0.family.application}}&family={{x.0.family}}">
+                                        {% if x.1.image_file %}
+                                            <img class="thumbnails p-1" alt="" src="{% static x.1.image_dir %}{{x.1.image_file}}" >
                                         {% else %}
                                             <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.binomial_it|safe}}
+                                        {{x.0.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}
@@ -375,7 +375,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <i>{{x.pid.binomial_it|safe}}</i>
+                                        {{x.pid.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}

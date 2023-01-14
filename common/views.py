@@ -692,7 +692,7 @@ def newbrowse(request):
                         spcimage = spcimage.filter(num_image__gt=0)
                     spcimage = spcimage.order_by('?')[0:1]
                     if len(spcimage) > 0:
-                        genus_list = genus_list + [spcimage[0]]
+                        genus_list = genus_list + [(spcimage[0], spcimage[0].get_best_img())]
                 context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
                 return render(request, 'common/newbrowse.html', context)
 
@@ -709,7 +709,7 @@ def newbrowse(request):
                 genimage = genimage.filter(num_spcimage__gt=0)
             genimage = genimage.order_by('?')[0:1]
             if len(genimage) > 0:
-                family_list = family_list + [genimage[0]]
+                family_list = family_list + [(genimage[0], genimage[0].get_best_img())]
         context = {'family_list': family_list, 'app': app, 'display': display, 'talpha': talpha, 'alpha_list': alpha_list,}
         return render(request, 'common/newbrowse.html', context)
 
