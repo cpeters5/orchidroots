@@ -8,7 +8,6 @@ urlpatterns = [
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
     path('hybrid/', views.hybrid, name='hybrid'),
-    # path('commonname/', views.commonname, name='commonname'),
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     # path('browsegen/', views.browsegen, name='browsegen'),

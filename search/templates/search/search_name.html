@@ -1,0 +1,69 @@
+{% load static %}
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% load testtags %}
+<style>
+    table {
+        width: 80%;
+    }
+    @media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+    }
+    }
+</style>
+<div style="min-height:200px;background-color:white;width: 100%;">
+    <div style="clear:both"></div>
+    <div class="row" style="margin:0 auto;">
+        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
+                <br>
+                <h5>Search results for "<i>{{search_string}}</i>"</h5>
+                    <table>
+                            <tr><td><b>Application</b></td><td><b>Species</b></td><td><b>common name</b></td></tr>
+                    {% if name_list %}
+                        {% for species in name_list %}
+                            <tr>
+                                <td>{% if species.0.pid.family.application == 'other' or species.0.pid.family.application == 'orchidaceae' %}Plantae{% else %}{{species.0.pid.family.application}}{% endif %}</td>
+                                <td><i><a href="/display/information/{{path}}{{species.0.pid_id}}/?family={{species.0.pid.family}}">{{species.0.pid.binomial_it|safe}}</a></i></td>
+                                <td>{{species.0.common_name}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </table>
+                <br>
+                <div class="btn btn-custom" onclick="history.back()">
+                    Go back
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+
+</script>
+
+
+
+{% endblock %}

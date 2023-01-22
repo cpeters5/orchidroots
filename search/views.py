@@ -224,6 +224,31 @@ def search_species(request):
     return render(request, "search/search_species.html", context)
 
 
+def search_name(request):
+    talpha = ''
+    commonname = ''
+    # app = 'other'
+    # Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    if 'commonname' in request.GET:
+        commonname = request.GET['commonname'].strip()
+    name_list = []
+    for app in applications:
+        Accepted = apps.get_model(app, 'Accepted')
+        this_name_list = Accepted.objects.filter(common_name__icontains=commonname)
+        if this_name_list:
+            name_list.append(this_name_list)
+
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if talpha != '':
+        name_list = name_list.filter(species__istartswith=talpha)
+    total = len(name_list)
+    context = {'name_list': name_list, 'commonname': commonname,
+               'talpha': talpha, 'alpha_list': alpha_list}
+    write_output(request, str(commonname))
+    return render(request, "search/search_name.html", context)
+
+
 def search_orchid(request):
     app = 'orchidaceae'
     genus_string = ''

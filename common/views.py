@@ -782,36 +782,6 @@ def research(request):
     return render(request, "common/research.html", context)
 
 
-def commonname(request):
-    talpha = ''
-    family = 'other'
-    role = ''
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    if 'role' in request.GET:
-        role = request.GET['role']
-
-    context = {'role': role,}
-    if 'commonname' in request.GET:
-        commonname = request.GET['commonname']
-        if commonname == '':
-            render(request, "common/research.html", context)
-
-        species_list = Accepted.objects.filter(common_name__icontains=commonname).order_by('species')
-        genus_list = Genus.objects.filter(common_name__icontains=commonname).order_by('genus')
-        if 'talpha' in request.GET:
-            talpha = request.GET['talpha']
-        if talpha != '':
-            species_list = species_list.filter(species__istartswith=talpha)
-        total = len(species_list)
-        context = {'species_list': species_list, 'commonname': commonname, 'role': role,
-                   'app': 'other', 'genus_list': genus_list,
-                   'talpha': talpha, 'alpha_list': alpha_list}
-        write_output(request, str(commonname))
-        return render(request, "common/commonname.html", context)
-
-    return render(request, "common/research.html", context)
-
-
 def distribution(request):
     # For non-orchids only
     talpha = ''
