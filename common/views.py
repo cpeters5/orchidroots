@@ -222,7 +222,7 @@ def genera(request):
 
 
 @login_required
-def species(request):
+def xspecies(request):
     # path = resolve(request.path).url_name
     myspecies = ''
     author = ''
@@ -320,6 +320,130 @@ def species(request):
     }
     return render(request, "common/species.html", context)
 
+def species(request):
+    # path = resolve(request.path).url_name
+    myspecies = ''
+    syn = ''
+    type = ''
+    talpha = ''
+    req_genus = ''
+    req_family = ''
+    path_link = 'information'
+    if str(request.user) == 'chariya':
+        path_link = 'photos'
+    if 'type' in request.GET:
+        req_type = request.GET['type']
+    if 'family' in request.GET:
+        req_family = request.GET['family']
+    if 'genus' in request.GET:
+        req_genus = request.GET['genus']
+        print("req_genus = ", req_genus)
+    if 'myspecies' in request.GET:
+        myspecies = request.GET['myspecies']
+        if myspecies:
+            author = Photographer.objects.get(user_id=request.user)
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+    if 'syn' in request.GET:
+        syn = request.GET['syn']
+
+    # If Orchidaceae, go to full table.
+    if req_family == 'Orchidaceae':
+        if req_type == 'hybrid':
+            url = "%s?family=%s&genus=%s&type=hybrid" % (reverse('orchidaceae:hybrid'), req_family, req_genus)
+        else:
+            url = "%s?family=%s&genus=%s&type=species" % (reverse('orchidaceae:species'), req_family, req_genus)
+
+        return HttpResponseRedirect(url)
+    max_items = 3000
+    genus_list = []
+    species_list = []
+    if req_family:
+        try:
+            req_family = Family.objects.get(family=req_family)
+            app = req_family.application
+        except Family.DoesNotExist:
+            app = ''
+            req_family = ''
+    if req_family and req_family != '':
+        Genus = apps.get_model(app, 'Genus')
+        Species = apps.get_model(app, 'Species')
+        if req_genus != '':
+            try:
+                req_genus = Genus.objects.get(genus=req_genus)
+            except Genus.DoesNotExist:
+                req_genus = ''
+            if req_genus != '':
+                species_list = Species.objects.filter(genus=req_genus).filter(family=req_family)
+                if req_type != '':
+                    species_list = species_list.filter(type=req_type)
+                if talpha != '':
+                    species_list = species_list.filter(species__istartswith=talpha)
+                if syn == 'N':
+                    species_list = species_list.exclude(status='synonym')
+                    syn = 'N'
+                else:
+                    syn = 'Y'
+        if req_genus == '':
+            # If requested genus in not valid return list of genera
+            genus_list = Genus.objects.filter(family=req_family)
+    elif req_genus != '':
+        print("req_genus = ", req_genus)
+        # Get list of req_genus species from all applications
+        species_list = []
+        for app in applications:
+            print("app = ", app)
+            # Go through all applications
+            Genus = apps.get_model(app, 'Genus')
+            Species = apps.get_model(app, 'Species')
+            try:
+                req_genus = Genus.objects.get(genus=req_genus)
+                print("req_genus = ", req_genus)
+            except Genus.DoesNotExist:
+                continue
+            species_list = None
+            if req_genus != '':
+                this_species_list = Species.objects.filter(genus=req_genus)
+                if req_type != '':
+                    this_species_list = this_species_list.filter(type=req_type)
+                if talpha != '':
+                    this_species_list = this_species_list.filter(species__istartswith=talpha)
+                if syn == 'N':
+                    this_species_list = this_species_list.exclude(status='synonym')
+                    syn = 'N'
+                else:
+                    syn = 'Y'
+                if this_species_list:
+                    if not species_list:
+                        species_list = this_species_list
+                    else:
+                        species_list = species_list.union(this_species_list)
+                print("species_list = ", len(species_list))
+
+    if not genus_list and not species_list:
+        #     No filter requested, return empty list
+        msg = 'select a valid family and/or a valid genus'
+        context = {'msg': msg, 'path_link': path_link, 'from_path': 'species',}
+        return render(request, "common/species.html", context)
+
+    total = len(species_list)
+    msg = ''
+
+    if total > max_items:
+        species_list = species_list[0:max_items]
+        msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
+        total = max_items
+
+    write_output(request, str(req_family))
+    context = {
+        'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
+        'syn': syn, 'type': req_type,
+        'family': req_family,
+        # 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
+        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
+        'msg': msg, 'path_link': path_link, 'from_path': 'species',
+    }
+    return render(request, "common/species.html", context)
 
 @login_required
 def hybrid(request):

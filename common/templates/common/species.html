@@ -2,7 +2,9 @@
 {% load testtags %}
 {% include "base.html" %}
 {% block body %}
-
+<style>
+    .form-inline .my-hidden { display: none; }
+</style>
 <div style="min-height:200px;background-color:white;width: 100%;">
    <div style="clear:both"></div>
    <div class="row" style="width:98%; margin:0 auto;">
@@ -12,12 +14,20 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of Species in
-                            {% if family %}Family <i>{{family}}</i>{% else %} All Other Familes{% endif %}
-                            {% if subfamily %}Subfamily <i>{{subfamily}}</i>  {% endif %}
-                            {% if tribe %}Tribe {{tribe}}  {% endif %}
-                            {% if subtribe %}Subtribe {{subtribe}}  {% endif %}
-                            {% if genus %}Genus <i> {{genus}}</i>{% endif %}
+                            List of
+                            {% if genus_list %}Genera{% else %}
+                               <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
+                                    <input type="hidden" form="type" name="family" value="{{family}}" >
+                                    <input type="hidden" form="type" name="genus" value="{{genus}}" >
+                                    <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 20px;width:150px;text-align: center">
+                                </form>
+                            {% endif %} in
+                               <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
+                                    <input type="hidden" form="family" name="type" value="{{type}}" >
+                                    <input class="searchbox border" form="family" value="{{family}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 20px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{genus}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 20px;width:150px;text-align: center">
+                                    <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+                                </form>
                             <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
                         </div>
                     </div>
@@ -94,6 +104,28 @@
 <!--                                                {% if species.gen.subtribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}&subtribe={{species.gen.subtribe}}">{{species.gen.subtribe}}</a> {% endif %}-->
 <!--                                            </td>-->
                                             <td class="d-none d-lg-table-cell">{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
+                                            <td style="text-align:center">{{species.num_image|default:""}}</td>
+<!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
+                                        </tr>
+                                        {% endfor %}
+                                </table>
+                        {% elif genus_list %}genus list = {{genus_list|length}}
+                            <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="spc_column">Genus</th>
+<!--                                            <th>Higher taxonomic levels</th>-->
+                                            <th class="d-none d-lg-table-cell">Common Name</th>
+                                            <th>#images</th>
+                                        </tr>
+                                    </thead>
+                                        {% for genus in genus_list %}
+                                        <tr>
+                                            <td>
+                                                <a href="?genus={{genus.genus}}/?family={{genus.family}}"><i>{{genus}}</i></a>
+                                                {{genus.author|default:""}} {{genus.year}}
+                                            </td>
+                                            <td class="d-none d-lg-table-cell">{{genus.common_name|default:''}}</td>
                                             <td style="text-align:center">{{species.num_image|default:""}}</td>
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
