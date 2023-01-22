@@ -20,7 +20,7 @@ my ($sth, $sth1);
 # use open qw(:locale);
 
 my @apps = (
-	'orchidaceae',
+	# 'orchidaceae',
 	'other',
 	'fungi',
 	'aves',
