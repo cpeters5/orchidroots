@@ -515,8 +515,7 @@ class Species(models.Model):
             img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality','-rank','?')
         else:
             img = HybImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality','-rank', '?')
-            
-        if img.count()>0:
+        if len(img) > 0:
             img = img[0:1][0]
             return img
         return None
@@ -557,7 +556,7 @@ class Species(models.Model):
 
 
 class Specieshistory(models.Model):
-    pid = models.ForeignKey(Species,db_column='pid', related_name='orpid', on_delete=models.CASCADE)
+    pid = models.ForeignKey(Species,db_column='pid', related_name='orpid3', on_delete=models.CASCADE)
     genus = models.CharField(max_length=50, null=True)
     species = models.CharField(max_length=100, null=True)
     infraspr = models.CharField(max_length=20, null=True)
@@ -955,7 +954,7 @@ class UploadFile(models.Model):
 
 
 class SpcImages(models.Model):
-    pid = models.ForeignKey(Accepted, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
+    pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=10, default='TBD')
@@ -994,13 +993,13 @@ class SpcImages(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return self.pid.pid.textname()
+        return self.pid.textname()
 
     def imgname(self):
         if self.source_file_name:
             myname = '<i>%s</i>' % (self.source_file_name)
         else:
-            myname = self.pid.pid.abrevname()
+            myname = self.pid.abrevname()
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -1031,7 +1030,7 @@ class SpcImages(models.Model):
         if self.source_file_name:
             myname = self.source_file_name
         else:
-            myname = self.pid.pid
+            myname = self.pid
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -1218,7 +1217,7 @@ class HybImgHistory(models.Model):
 
 
 class SpcImgHistory(models.Model):
-    pid = models.ForeignKey(Accepted, db_column='pid', related_name='or1pid', on_delete=models.CASCADE)
+    pid = models.ForeignKey(Species, db_column='pid', related_name='or1pid', on_delete=models.CASCADE)
     img_id = models.IntegerField(null=True, blank=True)
     user_id = models.ForeignKey(User, db_column='user_id', related_name='or1user_id', on_delete=models.CASCADE)
     action = models.CharField(max_length=50,null=True, blank=True)

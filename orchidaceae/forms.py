@@ -137,11 +137,11 @@ class SpeciesForm(ModelForm):
         elif species_obj.count() > 1:
             raise forms.ValidationError('Query returns multiple values')
 
-        if species_obj[0].status == 'synonym':
-            acc = species_obj[0].getAccepted().name()
-            message = new_genus + ' ' + self['species'].value() + ' ' + self['infraspr'].value() + ' ' + self[
-                'infraspe'].value() + ' is a synonym of ' + acc
-            raise forms.ValidationError(message)
+        # if species_obj[0].status == 'synonym':
+        #     acc = species_obj[0].getAccepted().name()
+        #     message = new_genus + ' ' + self['species'].value() + ' ' + self['infraspr'].value() + ' ' + self[
+        #         'infraspe'].value() + ' is a synonym of ' + acc
+        #     raise forms.ValidationError(message)
 
         return species_obj[0].pid
 
