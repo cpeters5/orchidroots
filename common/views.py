@@ -144,12 +144,14 @@ def require_get(view_func):
     wrap.__name__ = view_func.__name__
     return wrap
 
+
 @login_required
 def taxonomy(request):
     family_list, alpha = get_family_list(request)
     context = {'family_list': family_list,
                }
     return render(request, "common/taxonomy.html", context)
+
 
 @login_required
 def genera(request):
@@ -320,6 +322,8 @@ def xspecies(request):
     }
     return render(request, "common/species.html", context)
 
+
+@login_required
 def species(request):
     # path = resolve(request.path).url_name
     myspecies = ''
@@ -328,11 +332,15 @@ def species(request):
     talpha = ''
     req_genus = ''
     req_family = ''
+    req_app = ''
+    req_type = ''
     path_link = 'information'
     if str(request.user) == 'chariya':
         path_link = 'photos'
     if 'type' in request.GET:
         req_type = request.GET['type']
+        if req_type not in ['species', 'hybrid']:
+            req_type = 'species'
     if 'family' in request.GET:
         req_family = request.GET['family']
     if 'genus' in request.GET:
@@ -418,13 +426,24 @@ def species(request):
                         species_list = this_species_list
                     else:
                         species_list = species_list.union(this_species_list)
-                print("species_list = ", len(species_list))
+                # print("species_list = ", len(species_list))
 
     if not genus_list and not species_list:
-        #     No filter requested, return empty list
-        msg = 'select a valid family and/or a valid genus'
-        context = {'msg': msg, 'path_link': path_link, 'from_path': 'species',}
-        return render(request, "common/species.html", context)
+        #     No filter requested, return family list
+        family_list = Family.objects.all()
+        if 'app' in request.GET:
+            req_app = request.GET['app']
+        if req_app in applications:
+            family_list = family_list.filter(application=req_app)
+        context = {
+            'family_list': family_list,  'app': req_app,
+            'alpha_list': alpha_list,
+        }
+        return render(request, "common/family.html", context)
+
+        # msg = ''
+        # context = {'genus': req_genus, 'family': req_family,'msg': msg, 'path_link': path_link, 'type': req_type,}
+        # return render(request, "common/species.html", context)
 
     total = len(species_list)
     msg = ''
@@ -439,7 +458,6 @@ def species(request):
         'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
         'syn': syn, 'type': req_type,
         'family': req_family,
-        # 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe, 'role': role,
         'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
@@ -774,7 +792,7 @@ def newbrowse(request):
             Genus = apps.get_model(app.lower(), 'Genus')
             Species = apps.get_model(app.lower(), 'Species')
             genus = request.GET['genus']
-            if genus:
+            if genus and genus != '':
                 try:
                     genus = Genus.objects.get(genus=genus)
                 except Genus.DoesNotExist:
@@ -804,21 +822,23 @@ def newbrowse(request):
                 Genus = apps.get_model(app.lower(), 'Genus')
                 Species = apps.get_model(app.lower(), 'Species')
                 genera = Genus.objects.filter(family=family)
-                if talpha:
-                    genera = genera.filter(genus__istartswith=talpha)
-                genera = genera.order_by('genus')
-                if len(genera) > 100:
-                    genera = genera[0: 1000]
-                genus_list = []
-                for x in genera:
-                    spcimage = Species.objects.filter(genus=x)
-                    if display == 'checked':
-                        spcimage = spcimage.filter(num_image__gt=0)
-                    spcimage = spcimage.order_by('?')[0:1]
-                    if len(spcimage) > 0:
-                        genus_list = genus_list + [(spcimage[0], spcimage[0].get_best_img())]
-                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
-                return render(request, 'common/newbrowse.html', context)
+                if genera:
+                    if talpha:
+                        genera = genera.filter(genus__istartswith=talpha)
+                    genera = genera.order_by('genus')
+                    if len(genera) > 100:
+                        genera = genera[0: 1000]
+                    genus_list = []
+                    for x in genera:
+                        spcimage = Species.objects.filter(genus=x)
+                        if display == 'checked':
+                            spcimage = spcimage.filter(num_image__gt=0)
+                        spcimage = spcimage.order_by('?')[0:1]
+                        if len(spcimage) > 0:
+                            print("spcimage length = ", len(spcimage))
+                            genus_list = genus_list + [(spcimage[0], spcimage[0].get_best_img())]
+                    context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
+                    return render(request, 'common/newbrowse.html', context)
 
         # Building sample by families
         families = Family.objects.filter(application=app)
