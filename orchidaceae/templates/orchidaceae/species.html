@@ -167,7 +167,7 @@ option {
     <div class="card m-2">
         <div class="card-header">
             <h4>
-                {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} Species
+                {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} {{type}}
                 {% if genus.num_hybrid > 0 %}
                     <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
                 {% endif %}
