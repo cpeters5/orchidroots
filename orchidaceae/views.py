@@ -264,6 +264,7 @@ def getPrev(request,arg, prev):
 def species(request):
     myspecies = ''
     author = ''
+    max_rec = 3000
     role = getRole(request)
     family = ''
     if 'family' in request.GET:
@@ -298,6 +299,10 @@ def species(request):
         reqgenus = request.GET['genus']
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
+        if alpha == '':
+            alpha = 'A'
+        if alpha == 'ALL':
+            alpha == ''
     if 'syn' in request.GET:
         syn = request.GET['syn']
 
@@ -318,9 +323,6 @@ def species(request):
         myspecies = request.GET['myspecies']
         if myspecies:
             author = Photographer.objects.get(user_id=request.user)
-
-    if alpha != 'ALL':
-        alpha = alpha[0: 1]
 
     # initialize subfamily, tribe subtribe
     # Get list of affected  genus
@@ -386,6 +388,7 @@ def species(request):
 def hybrid(request):
     myspecies = ''
     myauthor = ''
+    max_rec = 3000
     primary = ''
     role = getRole(request)
     family = ''
@@ -432,10 +435,11 @@ def hybrid(request):
         originator = request.GET['originator']
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
-    else:
+        # Force alpha = A unless ALL is selected.
+        if alpha == '':
+            alpha = 'A'
+    if alpha == 'ALL':
         alpha = ''
-    if alpha != 'ALL':
-        alpha = alpha[0:1]
     if 'year' in request.GET:
         year = request.GET['year']
         if valid_year(year):
@@ -500,10 +504,10 @@ def hybrid(request):
                 total = len(this_species_list)
             else:
                 total = 0
-            if total > 5000:
-                msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
-                this_species_list = this_species_list[0:5000]
-                total = 5000
+            if total > max_rec:
+                msg = 'Your search request generated over maximum limit. Please refine your search criteria.'
+                this_species_list = this_species_list[0:max_rec]
+                total = max_rec
 
     genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
     genus_list.sort()
