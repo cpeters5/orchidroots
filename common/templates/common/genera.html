@@ -55,7 +55,7 @@
                                     </thead>
                                         {% for genus in genus_list %}
                                         <tr><td>
-                                                <a href="{% url 'common:species' %}?app={{app}}&alpha={{alpha}}&talpha={{talpha}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' %}?app={{app}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
 
