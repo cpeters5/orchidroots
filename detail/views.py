@@ -279,9 +279,9 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
 
-    if species2 and species2.status == 'synonym':
-        pid2 = species2.getAcc()
-        accepted2 = species2.getAccepted()
+    # if species2 and species2.status == 'synonym':
+    #     pid2 = species2.getAcc()
+    #     accepted2 = species2.getAccepted()
 
     # A second species is found
     if pid2:
@@ -534,10 +534,10 @@ def reidentify(request, orid, pid):
         return HttpResponseRedirect(url)
 
     old_species = Species.objects.get(pk=pid)
-    if old_species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        old_species = Species.objects.get(pk=pid)
+    # if old_species.status == 'synonym':
+    #     synonym = Synonym.objects.get(pk=pid)
+    #     pid = synonym.acc_id
+    #     old_species = Species.objects.get(pk=pid)
 
     form = SpeciesForm(request.POST or None)
     oldtype = old_species.type
@@ -562,7 +562,7 @@ def reidentify(request, orid, pid):
             if new_species.type == old_species.type:
                 if new_species.type == 'species':
                     new_img = SpcImages.objects.get(pk=old_img.id)
-                    new_img.pid = new_species.accepted
+                    new_img.pid = new_species.pid
                 else:
                     new_img = HybImages.objects.get(pk=old_img.id)
                     new_img.pid = new_species.hybrid
@@ -574,7 +574,7 @@ def reidentify(request, orid, pid):
             else:
                 if old_img.image_file:
                     if new_species.type == 'species':
-                        new_img = SpcImages(pid=new_species.accepted)
+                        new_img = SpcImages(pid=new_species.pid)
                         from_path = "/webapps/static/utils/images/hybrid/" + old_img.image_file
                         to_path = "/webapps/static/utils/images/species/" + old_img.image_file
                     else:
@@ -653,12 +653,12 @@ def approvemediaphoto(request, pid):
 
     filename, ext = os.path.splitext(str(upl.image_file_path))
     if species.type == 'species':
-        spc = SpcImages(pid=species.accepted, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+        spc = SpcImages(pid=species.pid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                         credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation,
                         form=upl.forma, rank=0, description=upl.description, location=upl.location,
                         created_date=upl.created_date, source_url=upl.source_url)
         spc.approved_by = request.user
-        hist = SpcImgHistory(pid=Accepted.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
+        hist = SpcImgHistory(pid=Species.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
                              action='approve file')
         newdir = os.path.join(settings.STATIC_ROOT, "utils/images/species")
         image_file = "spc_"
