@@ -677,10 +677,10 @@ def curateinfospc(request, pid):
                 spc.comment = spc.comment.replace("<br>\r", "\r")
                 spc.comment = spc.comment.replace("\"", "\'\'")
                 spc.comment = spc.comment.replace("\r", "<br>")
-            if spc.history:
-                spc.history = spc.history.replace("<br>", "")
-                spc.history = spc.history.replace("\"", "\'\'")
-                spc.history = spc.history.replace("\r", "<br>")
+            # if spc.history:
+            #     spc.history = spc.history.replace("<br>", "")
+            #     spc.history = spc.history.replace("\"", "\'\'")
+            #     spc.history = spc.history.replace("\r", "<br>")
             if spc.etymology:
                 spc.etymology = spc.etymology.replace("<br>", "")
                 # spc.etymology = spc.etymology.replace("\"", "\'\'")
