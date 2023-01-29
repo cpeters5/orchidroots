@@ -19,13 +19,13 @@
                                <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="type" name="family" value="{{family}}" >
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
-                                    <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 20px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
                             {% endif %} in
                                <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
-                                    <input class="searchbox border" form="family" value="{{family}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 20px;width:150px;text-align: center">
-                                    <input class="searchbox border" form="family" value="{{genus}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 20px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{family}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{genus}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
                                 </form>
                             <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
@@ -33,40 +33,19 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        <dev style="font-size:13px;">
-                            <a class="btn btn-custom" href="{% url 'common:genera' %}?app={{app}}&family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&alpha={{alpha}}&talpha={{talpha}}&myspecies={{myspecies}}">Genus list</a>
-                            <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?app={{app}}&family={{family.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&talpha={{talpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
-                            <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family.family}}&talpha={{talpha}}&genus={{genus}}&display=checked">Browse</a>
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:genera' %}?family={{family.family}}&alpha={{alpha}}">Detailed genera</a>{% endif %}
-                            {% if app == 'orchidaceae' %}<a class="btn btn-custom m2" href="{% url 'orchidaceae:species' %}?family={{family.family}}&alpha={{alpha}}">Detailed species</a>{% endif %}
-                        </dev>
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" form="display" name="app" value="{{family.application}}" >
+                            <input type="hidden" form="display" name="type" value="{{type}}" >
                             <input type="hidden" form="display" name="family" value="{{family.family}}" >
-                            <input type="hidden" form="display" name="subfamily" value="{{subfamily}}" >
-                            <input type="hidden" form="display" name="tribe" value="{{tribe}}" >
-                            <input type="hidden" form="display" name="subtribe" value="{{subtribe}}" >
                             <input type="hidden" form="display" name="genus" value="{{genus}}" >
-                            <input type="hidden" form="display" name="myspecies" value="{{myspecies}}" >
                             {% if syn == 'N' %}
                             <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:5px;"> <span style="margin-left:30px;font-size:13px;">Hide synonyms</span>
                             {% else %}
                             <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
                             {% endif %}
                         </form>
-                        <form action="?" id="myspecies" style="display:inline-block">
-                            <input type="hidden" form="myspecies" name="app" value="{{family.application}}" >
-                            <input type="hidden" form="myspecies" name="family" value="{{family}}" >
-                            <input type="hidden" form="myspecies" name="talpha" value="{{talpha}}" >
-                            <input type="hidden" form="myspecies" name="type" value="{{type}}" >
-                            <input type="hidden" form="myspecies" name="syn" value="{{syn}}" >
-                            {% if myspecies %}
-                            <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
-                            {% else %}
-                            <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">My species only</span>
-                            {% endif %}
-                        </form>
+                        {% if alpha_list %}
                             <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
+                        {% endif %}
                             <!--main table-->
                         {% if species_list %}
                             <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
@@ -114,7 +93,7 @@
                                     <thead>
                                         <tr>
                                             <th class="spc_column">Genus</th>
-<!--                                            <th>Higher taxonomic levels</th>-->
+                                            <th class="d-none d-lg-table-cell">Higher taxonomic levels</th>
                                             <th class="d-none d-lg-table-cell">Common Name</th>
                                             <th>#images</th>
                                         </tr>
@@ -122,17 +101,19 @@
                                         {% for genus in genus_list %}
                                         <tr>
                                             <td>
-                                                <a href="?genus={{genus.genus}}/?family={{genus.family}}"><i>{{genus}}</i></a>
-                                                {{genus.author|default:""}} {{genus.year}}
+                                                <a href="?genus={{genus.genus}}&family={{genus.family}}"><i>{{genus}}</i></a> {{genus.author|default:""}} {{genus.year}}
+                                            </td>
+                                            <td class="d-none d-lg-table-cell">
+                                                {{genus.family|default:''}} {{genus.subfamily|default:''}} {{genus.tribe|default:''}} {{genus.subtribe|default:''}}
                                             </td>
                                             <td class="d-none d-lg-table-cell">{{genus.common_name|default:''}}</td>
-                                            <td style="text-align:center">{{species.num_image|default:""}}</td>
+                                            <td style="text-align:center">{{genus.num_spcimage|default:""}}</td>
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
                                         {% endfor %}
                                 </table>
                         {% else %}
-                            <br><br>No <i>{{genus}}</i> species {% if talpha %} begins with {{talpha}}{% endif %}  in the current system yet!
+                            <br><br>There currently is no <i>{{genus}}</i> {{type}} {% if talpha %} begins with {{talpha}}{% endif %}  in our system yet!
                         {% endif %}
 
                     </div>
