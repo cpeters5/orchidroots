@@ -219,7 +219,8 @@ sub getSynonymPid {
 		&getASPM($stmt);
 		while (my @row = $sth->fetchrow_array()) {
 			# next if $num_image{$_} == 0;
-			$synonym{$row[0]} = $num_image{$_};
+			# $synonym{$row[0]} = $num_image{$_};    # Artificially set num image of synonym = accepted num image
+			$synonym{$row[0]} = $num_image{$row[0]};
 		}
 	}
 }
