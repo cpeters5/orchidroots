@@ -11,7 +11,6 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash, get_user_model
-# from django.contrib.auth.models import User, Group
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView, UpdateView
@@ -32,19 +31,11 @@ from itertools import chain
 from django.utils import timezone
 from datetime import datetime, timedelta
 from utils.views import write_output, is_int, getRole, get_reqauthor
-from common.views import getmyphotos
-
-# import pytz
-# MPTT stuff
-# from django.views.generic.list_detail import object_list
 
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
 from accounts.models import User, Profile
 from common.views import quality_update, rank_update, deletephoto
-
-# from orchidaceae.views import mypaginator
-
 
 from django.apps import apps
 Family = apps.get_model('core', 'Family')

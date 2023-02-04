@@ -57,6 +57,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
                     <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL"><span style="color:#575757;">ALL</span></a>
                         {% for spc in related_list %}
                             <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&tab=rel"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
                         {% endfor %}

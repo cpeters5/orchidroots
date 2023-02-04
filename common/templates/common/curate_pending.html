@@ -2,8 +2,8 @@
 {% include "base.html" %}
 {% block body %}
 <head>
-    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
-    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+<!--    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">-->
+<!--    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>-->
 </head>
 
 <style>
@@ -118,9 +118,9 @@ div.text-br {
                         {% if user.tier.tier > 1 %}
                             {% if role == 'cur' %}
                                 {% if role == 'cur' %}
-                                    <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}">Recently approved</a>
+                                    <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}?family={{family}}&app={{app}}">Recently approved</a>
                                 {% endif %}
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?gen=&type={{species.type}}">New uploaded photos</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?family={{family}}&app={{app}}&gen=&type={{species.type}}">New uploaded photos</a>
                             {% endif %}
                         {% endif %}
 
@@ -135,8 +135,8 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="speciesDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?tab=upl&type=species&days={{days}}">Pending Species</a>
-                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?tab=upl&type=hybrid&days={{days}}">Pending Hybrid</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&tab=upl&type=species&days={{days}}">Pending Species</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&tab=upl&type=hybrid&days={{days}}">Pending Hybrid</a>
                             </div>
                         </div>
                         &nbsp;
@@ -149,11 +149,11 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="hybridDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days="></a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=3">past 3 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=7">past 7 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=20">past 20 days</a>
-                                <a class="dropdown-item" href="?tab=upl&type={{type}}&days=30">past 30 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days="></a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=3">past 3 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=7">past 7 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=20">past 20 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=30">past 30 days</a>
                             </div>
                         </div>
                     </div>
@@ -167,13 +167,13 @@ div.text-br {
                         {% for image in file_list %}
                             <div class="imageitem p-1 justify-content-center">
                                 <div class="box">
-                                    <a class=myCarousel" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery">
+                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">
                                         <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
+                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
                                     <br>Approved by {{image.approved_by}}, {{image.created_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
@@ -197,13 +197,13 @@ div.text-br {
 
 
 
-<script type="text/javascript">
+<!--<script type="text/javascript">-->
 
-$(document).on('click', '[data-toggle="lightbox"]', function(event) {
-                event.preventDefault();
-                $(this).ekkoLightbox();
-            });
-</script>
+<!--$(document).on('click', '[data-toggle="lightbox"]', function(event) {-->
+<!--                event.preventDefault();-->
+<!--                $(this).ekkoLightbox();-->
+<!--            });-->
+<!--</script>-->
 
 
 {% endblock %}

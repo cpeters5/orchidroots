@@ -10,7 +10,7 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, getModels, getmyphotos, pathinfo, get_random_sponsor
+from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -31,11 +31,20 @@ def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
     from_path = pathinfo(request)
-    role = getRole(request)
-    # Information request role must be either cur or pub.
-    if not role or role != 'cur':
-        role = 'pub'
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    app, family = get_application(request)
+    if app == '':
+        return HttpResponseRedirect('/')
+    Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
+    SpcImages = apps.get_model(app, 'SpcImages')
+    Hybrid = apps.get_model(app, 'hybrid')
+    AncestorDescendant = apps.get_model(app, 'AncestorDescendant')
+    if app == 'orchidaceae':
+        HybImages = apps.get_model(app, 'HybImages')
+    else:
+        HybImages = apps.get_model(app, 'SpcImages')
+
+
     ps_list = pp_list = ss_list = sp_list = ()
     max_items = 3000
     ancspc_list = []
@@ -49,7 +58,7 @@ def information(request, pid=None):
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
-    related_list = Species.objects.filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
+    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
 
     # If pid is a synonym, convert to accept
     req_pid = pid
@@ -111,7 +120,6 @@ def information(request, pid=None):
                 i_8 += 1
                 display_items.append(x)
     # Build parents display for Orchidaceae hybrid  only
-    from orchidaceae.models import AncestorDescendant
     seed_list = Hybrid.objects.filter(seed_id=species.pid).order_by('pollen_genus', 'pollen_species')
     pollen_list = Hybrid.objects.filter(pollen_id=species.pid)
     # Remove duplicates. i.e. if both parents are synonym.
@@ -175,6 +183,9 @@ def information(request, pid=None):
     # if len(display_items) > 0:
     ads_insert = int(random.random() * len(display_items)) + 1
     sponsor = get_random_sponsor()
+    role = ''
+    if 'role' in request.GET:
+        role = request.GET['role']
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
@@ -182,20 +193,33 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'role': role, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
+               'app': app, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor, 'role': role,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
     return render(request, "display/information.html", context)
 
 
 def photos(request, pid=None):
-    Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
-    role = getRole(request)
-    # For photos view request role must be either cur or pub.
     author = get_reqauthor(request)
+    role = ''
+    if 'role' in request.GET:
+        role = request.GET['role']
     if not author or author == 'anonymous':
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
+    app, family = get_application(request)
+    if app == '':
+        return HttpResponseRedirect('/')
+    Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
+    SpcImages = apps.get_model(app, 'SpcImages')
+    if app == 'orchidaceae':
+        HybImages = apps.get_model(app, 'HybImages')
+    UploadFile = apps.get_model(app, 'UploadFile')
+
+
+
+
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
         if pid:
@@ -209,21 +233,54 @@ def photos(request, pid=None):
         return HttpResponseRedirect('/')
 
     related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
-
+    related = ''
     variety = ''
     tail = ''
-    private_list, public_list, upload_list, myspecies_list, myhybrid_list = getmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role)
+
+    if species:
+        syn_list = Synonym.objects.filter(acc_id=species.pid).values_list('spid')
+        if app == 'orchidaceae' and species.type == 'hybrid':
+            if species.status == 'synonym':      # input pid is a synonym, just get images of the requested synonym
+                public_list = HybImages.objects.filter(pid=species.pid)  # public photos
+            else:                   # input pid is an accepted species, include images of its synonyms
+                public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+        else:
+            if species.status == 'synonym':
+                public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
+            else:
+                public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
+        private_list = public_list.filter(rank=0)  # rejected photos
+        if role == 'pri':
+            upload_list = upload_list.filter(author=author) # Private photos
+            private_list = private_list.filter(author=author) # Private photos
+
+    else:
+        private_list = public_list = upload_list = []
+
+    # Request rank/quality change.
+    # Remove after implementing a dedicated curator task view.
     if app == 'orchidaceae' and species.type == 'hybrid':
         rank_update(request, HybImages)
         quality_update(request, HybImages)
     else:
         rank_update(request, SpcImages)
         quality_update(request, SpcImages)
+
+    # Create lists
+
     # Handle Variety filter
+    rel = ''
+    if 'rel' in request.GET:
+        rel = request.GET['rel']
+        related_pids = []
+        if rel == 'ALL':
+            related_pids = related_list.values_list('pid',flat=True)
+
     if 'variety' in request.GET:
         variety = request.GET['variety']
-    if variety == 'semi alba':
-        variety = 'semialba'
+        if variety == 'semi alba':
+            variety = 'semialba'
 
     # Extract first term, possibly an infraspecific
     parts = variety.split(' ', 1)
@@ -254,8 +311,8 @@ def photos(request, pid=None):
     context = {'species': species, 'author': author,
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
-               'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'role': role,
+               'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
+               # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
     return render(request, 'display/photos.html', context)

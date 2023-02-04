@@ -96,8 +96,8 @@ img{
                     {% if user.tier.tier > 1 %}
                         {% if role == 'cur' %}
                             {% if role == 'cur' %}
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}">Recently approved</a>
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?gen=&type={{species.type}}">All private photos</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}?family={{family}}&app={{app}}&">Recently approved</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&gen=&type={{species.type}}">All private photos</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -112,15 +112,15 @@ img{
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                 </a>
                                 <div style="font-size:12px">
-                                    <a href="{% url 'display:photos' image.pid %}?&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a>
+                                    <a href="{% url 'display:photos' image.pid %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a>
                                     <br>{{image.created_date.date}}
                                     <br>
                                     {% if image.approved %}
                                         <b>Approved</b>
                                     {% else %}
-                                        <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{family.family}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
+                                        <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
                                     {% endif %}
-                                    <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{family.family}}&role={{role}}&tab={{tab}}&page={{page}}&next=curate_newupload" >Delete</a>
+                                    <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{family.family}}&app={{app}}&role={{role}}&tab={{tab}}&page={{page}}&next=curate_newupload" >Delete</a>
                                 </div>
                             </div>
                         {% endfor %}

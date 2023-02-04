@@ -73,7 +73,6 @@
                     <input type="text" name="family" value="{{family}}" placeholder="family" style="text-align:center">
                     <input type="text" name="genus" value="{{genus}}" placeholder="genus" style="text-align:center">
                     <input type="text" name="distribution" value="{{distribution}}" placeholder="country or state" style="text-align:center">
-                    <input type="text" name="commonname" value="{{commonname}}" placeholder="common name" style="text-align:center">
                     <button form="otcname" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="visibility:hidden"></button>
                </form>
             </div>
@@ -88,13 +87,13 @@
                             {% if talpha == opt %}
                                 <li class="page-item active"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
                             {% else %}
-                                <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&distribution={{distribution}}&family={{family}}&genus={{genus}}&commonname={{commonname}}" >{{opt}}</a></li>
+                                <li class="page-item"><a class="page-link" {% if opt == talpha %} class="active" {% endif %} href="?talpha={{opt}}&distribution={{distribution}}&family={{family}}&genus={{genus}}" >{{opt}}</a></li>
                             {% endif %}
                         {% endfor %}
                         {% if not talpha or talpha == "ALL" %}
                         <li class="page-item active" style="width: 40px;"><a class="page-link" href="#">All </a></li>
                                 {% else %}
-                        <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&distribution={{distribution}}&family={{family}}&genus={{genus}}&commonname={{commonname}}">All </a></li>
+                        <li class="page-item" style="width: 40px;"><a class="page-link" href="?talpha=&distribution={{distribution}}&family={{family}}&genus={{genus}}">All </a></li>
                                 {% endif %}
                     </ul>
             </div>

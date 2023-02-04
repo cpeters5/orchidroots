@@ -7,7 +7,7 @@ urlpatterns = [
     # path('taxonomy/', views.taxonomy, name='taxonomy'),
     path('genera/', views.genera, name='genera'),
     path('species/', views.species, name='species'),
-    path('hybrid/', views.hybrid, name='hybrid'),
+    # path('hybrid/', views.hybrid, name='hybrid'),
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     # path('browsegen/', views.browsegen, name='browsegen'),
@@ -33,11 +33,11 @@ urlpatterns = [
     path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
 
     # Only works for orchidaceae.
-    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
+    # path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
 
     # upload from web threw error (species is not an instance)
-    path('uploadcommonweb/<int:pid>/', views.uploadcommonweb, name='uploadcommonweb'),
-    path('uploadcommonweb/<int:pid>/<int:orid>/', views.uploadcommonweb, name='uploadcommonweb'),
+    # path('uploadcommonweb/<int:pid>/', views.uploadcommonweb, name='uploadcommonweb'),
+    # path('uploadcommonweb/<int:pid>/<int:orid>/', views.uploadcommonweb, name='uploadcommonweb'),
 
     path('myphoto/<int:pid>/', views.myphoto, name='myphoto'),
     path('myphoto/', views.myphoto, name='myphoto'),
