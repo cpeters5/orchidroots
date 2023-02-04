@@ -345,7 +345,6 @@ def species(request):
         req_family = request.GET['family']
     if 'genus' in request.GET:
         req_genus = request.GET['genus']
-        print("req_genus = ", req_genus)
     if 'myspecies' in request.GET:
         myspecies = request.GET['myspecies']
         if myspecies:
@@ -381,6 +380,7 @@ def species(request):
                 req_genus = Genus.objects.get(genus=req_genus)
             except Genus.DoesNotExist:
                 req_genus = ''
+            # If genus object found, build species list
             if req_genus != '':
                 species_list = Species.objects.filter(genus=req_genus).filter(family=req_family)
                 if req_type != '':
@@ -392,21 +392,18 @@ def species(request):
                     syn = 'N'
                 else:
                     syn = 'Y'
-        if req_genus == '':
+        else:
             # If requested genus in not valid return list of genera
             genus_list = Genus.objects.filter(family=req_family)
     elif req_genus != '':
-        print("req_genus = ", req_genus)
         # Get list of req_genus species from all applications
         species_list = []
         for app in applications:
-            print("app = ", app)
             # Go through all applications
             Genus = apps.get_model(app, 'Genus')
             Species = apps.get_model(app, 'Species')
             try:
                 req_genus = Genus.objects.get(genus=req_genus)
-                print("req_genus = ", req_genus)
             except Genus.DoesNotExist:
                 continue
             species_list = None
@@ -426,9 +423,8 @@ def species(request):
                         species_list = this_species_list
                     else:
                         species_list = species_list.union(this_species_list)
-                # print("species_list = ", len(species_list))
 
-    if not genus_list and not species_list:
+    if not genus_list and not species_list and not req_genus:
         #     No filter requested, return family list
         family_list = Family.objects.all()
         if 'app' in request.GET:
@@ -447,7 +443,6 @@ def species(request):
 
     total = len(species_list)
     msg = ''
-
     if total > max_items:
         species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
