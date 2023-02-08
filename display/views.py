@@ -257,6 +257,7 @@ def photos(request, pid=None):
 
     else:
         private_list = public_list = upload_list = []
+    public_list = public_list.filter(rank__gt=0)  # public photos
 
     # Request rank/quality change.
     # Remove after implementing a dedicated curator task view.
