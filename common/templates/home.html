@@ -195,7 +195,7 @@ img{
                             </div>
                         {% endif %}
                         <div class="imageitem">
-                            <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.0}}</a></div>
+                            <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
                             <a href="{% url 'display:photos' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.image_dir %}{{othimage.1.image_file}}">
