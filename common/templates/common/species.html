@@ -21,10 +21,11 @@
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
                                     <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
-                            {% endif %} in
+                            {% endif %} in family
                                <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
                                     <input class="searchbox border" form="family" value="{{family}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
+                                   genus
                                     <input class="searchbox border" form="family" value="{{genus}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
                                 </form>
@@ -33,6 +34,7 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
+                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{genus}}">Browse images</a>
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                             <input type="hidden" form="display" name="type" value="{{type}}" >
                             <input type="hidden" form="display" name="family" value="{{family.family}}" >
