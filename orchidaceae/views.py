@@ -622,7 +622,10 @@ def ancestrytree(request, pid=None):
         hybrid.img = hybdir + get_random_img(hybrid)
 
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
-            s = Accepted.objects.get(pk=species.hybrid.seed_id)
+            if species.hybrid.seed_id.status == 'synonym':
+                s = Accepted.objects.get(pk=species.hybrid.seed_id.getAcc())
+            else:
+                s = Accepted.objects.get(pk=species.hybrid.seed_id)
             s.type = 'species'
             s.parent = 'seed'
             s.year = s.pid.year
@@ -630,7 +633,10 @@ def ancestrytree(request, pid=None):
 
             # tree_list = tree_list + (s,)
         elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
-            s = Hybrid.objects.get(pk=species.hybrid.seed_id)
+            if species.hybrid.seed_id.status == 'synonym':
+                s = Hybrid.objects.get(pk=species.hybrid.seed_id.getAcc())
+            else:
+                s = Hybrid.objects.get(pk=species.hybrid.seed_id)
             s.type = 'hybrid'
             s.parent = 'seed'
             s.year = s.pid.year
