@@ -49,8 +49,6 @@
             <div class="nav2 detail-title" style="text-align:center">
                 <h1 style="display:none">{{species.genus}} {{species.species}}</h1>
                 <h4>
-                    <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&display=checked"><i>
-                        {% if species.family.application != 'other' %}{{species.gen.family.application|title}}{% endif %}</i>
                     <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&display=checked"><i>{{species.gen.family}}</i> -
                     <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked"><i>{{species.genus}}</i></a>
                     {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
