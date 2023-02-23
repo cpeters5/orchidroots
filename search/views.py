@@ -21,7 +21,7 @@ def search(request):
     match_spc_list = []
     full_path = request.path
     path = 'information'
-    if role == 'cur':
+    if request.user.tier.tier > 2:
         path = 'photos'
 
     # Get search string
@@ -213,7 +213,7 @@ def search_species(request):
 
     # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
     path = 'information'
-    if role == 'cur':
+    if request.user.tier.tier > 2:
         path = 'photos'
 
     write_output(request, search_string)
