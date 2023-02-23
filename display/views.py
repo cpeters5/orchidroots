@@ -193,7 +193,7 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor, 'role': role,
+               'app': app, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
     return render(request, "display/information.html", context)
