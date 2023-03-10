@@ -73,7 +73,7 @@
                                 ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}{% if user.tier.tier > 2 %}&role=cur{% endif %}">
-                                    <i>{species.binomial}}</i>
+                                    <i>{{species.binomial}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn.){% endif %}
 
