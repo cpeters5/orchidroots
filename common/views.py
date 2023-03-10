@@ -375,11 +375,13 @@ def species(request):
         species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
         total = max_items
-
+    role = ''
+    if request.user.tier.tier > 2:
+        role = 'cur'
     write_output(request, str(req_family))
     context = {
         'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
-        'syn': syn, 'type': req_type,
+        'syn': syn, 'type': req_type, 'role':role,
         'family': req_family,
         'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',

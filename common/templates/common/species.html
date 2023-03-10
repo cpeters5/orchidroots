@@ -64,7 +64,7 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
+                                                        <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">{{species.binomial_it|safe}}</a>
                                                         (syn. <a href="/display/{{path_link}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
                                                             <i>{{species.getAccepted.binomial_it|safe}}</i></a>
                                                         {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %}
@@ -72,7 +72,7 @@
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}"><i>{{species.binomial_it|safe}}</i></a>
+                                                    <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><i>{{species.binomial_it|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
