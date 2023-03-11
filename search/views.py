@@ -21,7 +21,7 @@ def search(request):
     match_spc_list = []
     full_path = request.path
     path = 'information'
-    if request.user.tier.tier > 2:
+    if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
 
     # Get search string
