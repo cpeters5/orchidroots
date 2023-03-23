@@ -410,9 +410,9 @@ a:hover {
                                 {% if image.approved %}
                                     <b>Approved</b>
                                 {% elif role == 'cur' %}
-                                    <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                    <a href="/{{app}}/approvemediaphoto/{{image.pid.pid}}/?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                                 {% endif %}
-                                <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
+                                <a href="/common/deletephoto/{{image.id}}/{{image.pid.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
                             {% endif %}
                          </div>
 
@@ -494,9 +494,9 @@ a:hover {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                <a href="/{{app}}/approvemediaphoto/{{image.pid.pid}}/?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                             {% endif %}
-                            <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
+                            <a href="/common/deletephoto/{{image.id}}/{{image.pid.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
                         {% endif %}
                      </div>
 

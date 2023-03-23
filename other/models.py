@@ -8,6 +8,7 @@ from PIL import ExifTags
 # from django.core.files import File
 # from django.db.models.signals import post_save
 from django.conf import settings
+from colorful.fields import RGBColorField
 # from django.utils import timezone
 # from mptt.models import MPTTModel, TreeForeignKey
 
@@ -259,7 +260,7 @@ class Species(models.Model):
         if self.infraspr:
             spc = '%s <i>%s</i>' % (spc, self.infraspr)
         if self.infraspe:
-            spc = '%s <i>%s</i>' % (name, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
         return spc
@@ -269,7 +270,7 @@ class Species(models.Model):
         if self.infraspr:
             spc = '%s <i>%s</i>' % (spc, self.infraspr)
         if self.infraspe:
-            spc = '%s <i>%s</i>' % (name, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
 
@@ -365,6 +366,13 @@ class Species(models.Model):
             return img
         return None
 
+    def get_num_img_by_author(self, author):
+        if self.type == 'species':
+            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        else:
+            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
+        return len(img) + len(upl)
 
 class Accepted(models.Model):
     pid = models.OneToOneField(

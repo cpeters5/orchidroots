@@ -15,8 +15,6 @@ import logging
 import random
 import string
 import re
-from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
-    SpeciesForm, RenameSpeciesForm
 
 # import django.shortcuts
 from utils.views import write_output
@@ -1064,3 +1062,4 @@ def mypaginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
+

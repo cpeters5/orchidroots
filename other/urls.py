@@ -26,6 +26,8 @@ urlpatterns = [
     path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
+    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
+    path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
     # path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
 ]

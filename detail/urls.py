@@ -23,9 +23,10 @@ urlpatterns = [
     path('curateinfohyb/<int:pid>/', views.curateinfohyb, name='curateinfohyb'),
     path('curateinfohyb/', views.curateinfohyb, name='curateinfohyb'),
     path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
-    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
+    path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
+    path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
 
     # Redirect to orchidaceae
     path('ancestor/<int:pid>/', orchidaceae_ancestor, name='ancestor'),

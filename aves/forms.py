@@ -550,3 +550,68 @@ class UploadHybWebForm(forms.ModelForm):
     #     super().__init__(data, **kwargs)
 
 
+
+class UploadFileForm(forms.ModelForm):
+    author = ModelChoiceField(
+        queryset=Photographer.objects.order_by('displayname'),
+        required=False,
+        widget=Select2Widget
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(UploadFileForm, self).__init__(*args, **kwargs)
+        # Making UploadForm required
+        # self.fields['image_file_path'].required = True
+        self.fields['author'].required = True
+        # role = forms.CharField(required=True)
+
+    class Meta:
+        model = UploadFile
+        fields = (
+        'image_file_path', 'author', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
+        'text_data', 'location',)
+
+        labels = {
+            'author': "Your credit attribution name",
+            'source_url': 'Link to source',
+            'image_file_path': 'Select image file',
+            'name': 'Clonal name',
+            'variation': 'Varieties',
+            'forma': 'Form',
+            'credit_to': 'If author is not in the list, enter a name to be used for credit attribution here',
+            'description': 'Tags. Comma separated keywords to help in searching',
+            'text_data': 'Comment',
+            'location': 'Location',
+        }
+        widgets = {
+            # 'role': forms.HiddenInput(),
+            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
+            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+        }
+        help_texts = {
+            #     'name': 'Clonal name of the plant',
+            #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
+            #     'forma': 'E.g. color forms, peloric, region...',
+            #     'credit_to': 'e.g. hybridizer, cultivator, vender',
+            #     'description': 'Comma separated terms used for search',
+            #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
+            #     'location': 'Geolocation where this plant was originated from',
+            #     'image_file_path': _('Only JPG files are accepted, and file name MUST not have a leading undescore.'),
+        }
+        error_messages = {
+            'image_file_path': {
+                'required': _("Please select a file to upload."),
+            },
+        }
+
+    def clean_image_file_path(self):
+        image_file_path = self.cleaned_data['image_file_path']
+        if not image_file_path:
+            raise forms.ValidationError('You must select a valid image file')
+        return image_file_path

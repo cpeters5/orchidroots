@@ -356,6 +356,14 @@ class Species(models.Model):
             return img
         return None
 
+    def get_num_img_by_author(self, author):
+        if self.type == 'species':
+            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        else:
+            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+        upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
+        return len(img) + len(upl)
+
 
 class Accepted(models.Model):
     pid = models.OneToOneField(

@@ -3,7 +3,7 @@ from . import views
 from display.views import photos as display_photos, information as display_information
 from detail.views import reidentify as detail_reidentify, uploadfile as detail_uploadfile, \
     uploadweb as detail_uploadweb, curateinfospc as detail_curateinfospc, curateinfohyb as detail_curateinfohyb, \
-    compare as detail_compare, createhybrid as detail_createhybrid
+    compare as detail_compare, createhybrid as detail_createhybrid, approvemediaphoto as detail_approvemediaphoto
 
 
 app_name = 'orchidaceae'
@@ -36,9 +36,11 @@ urlpatterns = [
 
     # Redirect to detail
     path('reidentify/<int:orid>/<int:pid>/', detail_reidentify, name='reidentify'),
-    path('uploadfile/<int:pid>/', detail_uploadfile, name='uploadfile'),
     path('uploadweb/<int:pid>/', detail_uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', detail_uploadweb, name='uploadweb'),
+    path('uploadfile/<int:pid>/', detail_uploadfile, name='uploadfile'),
+    path('approvemediaphoto/<int:pid>/', detail_approvemediaphoto, name='approvemediaphoto'),
+
     path('curateinfospc/<int:pid>/', detail_curateinfospc, name='curateinfospc'),
     path('curateinfohyb/<int:pid>/', detail_curateinfohyb, name='curateinfohyb'),
     path('compare/<int:pid>/', detail_compare, name='compare'),

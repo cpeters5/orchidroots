@@ -71,6 +71,7 @@ MAX_HYB = 500
 list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
 
+app = 'orchidaceae'
 # Redirect to list or browse if species/hybrid does not exist.
 # TODO: Create a page for this
 redirect_message = "<br><br>Species does not exist! <br>You may try <a href='/common/species/'>" \
@@ -612,7 +613,7 @@ def reidentify(request, orid, pid):
 
 
 @login_required
-def approvemediaphoto(request, pid):
+def xxapprovemediaphoto(request, pid):
     species = Species.objects.get(pk=pid)
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
@@ -690,6 +691,8 @@ def approvemediaphoto(request, pid):
                 break
             i += 1
 
+    spc.image_file_path =  newdir + image_file
+    print("image_file_path = ", spc.image_file_path)
     spc.save()
     hist.save()
     upl.approved = True
@@ -697,58 +700,6 @@ def approvemediaphoto(request, pid):
     write_output(request, species.textname() + "-" + str(orid))
     url = "%s?role=%s" % (reverse('display:photos', args=(species.pid,)), role)
     return HttpResponseRedirect(url)
-
-
-@login_required
-def uploadfile(request, pid):
-    role = getRole(request)
-    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@orchidroots.org'
-        return HttpResponse(message)
-    species = Species.objects.get(pk=pid)
-    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
-        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
-                'Please delete one or more of your photos before uploading a new one.'
-        return HttpResponse(message)
-
-    author = get_reqauthor(request)
-    author_list = Photographer.objects.all().order_by('displayname')
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    # app = species.gen.family.application
-    # Orchid is a speciel case
-    app = 'detail'
-    family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, species.textname())
-            spc = form.save(commit=False)
-            if isinstance(species, Species):
-                spc.pid = species
-
-            spc.type = species.type
-            spc.user_id = request.user
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, family)
-            return HttpResponseRedirect(url)
-
-    context = {'form': form, 'species': species, 'web': 'active',
-               'author_list': author_list, 'author': author, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
 
 
 def get_author(request):
@@ -859,3 +810,157 @@ def uploadweb(request, pid, orid=None):
                'family': species.gen.family,
                'role': role, 'title': 'uploadweb'}
     return render(request, 'detail/uploadweb.html', context)
+
+
+
+@login_required
+def uploadfile(request, pid):
+    role = getRole(request)
+    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@orchidroots.org'
+        return HttpResponse(message)
+    species = Species.objects.get(pk=pid)
+    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
+        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
+                'Please delete one or more of your photos before uploading a new one.'
+        return HttpResponse(message)
+
+    author = get_reqauthor(request)
+    author_list = Photographer.objects.all().order_by('displayname')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    # app = species.gen.family.application
+    # Orchid is a speciel case
+    app = 'detail'
+    family = species.gen.family
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            if isinstance(species, Species):
+                spc.pid = species
+
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, family)
+            return HttpResponseRedirect(url)
+
+    context = {'form': form, 'species': species, 'web': 'active',
+               'author_list': author_list, 'author': author, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, app + '/uploadfile.html', context)
+
+
+@login_required
+def approvemediaphoto(request, pid):
+    family = 'Orchidaceae'
+    species = Species.objects.get(pk=pid)
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    if species.type == 'species':
+        image_dir = "utils/images/species/"
+    else:
+        image_dir = "utils/images/hybrid/"
+    newdir = os.path.join(settings.STATIC_ROOT, image_dir)
+    # Only curator can approve
+    role = getRole(request)
+    if role != "cur":
+        message = 'You do not have privilege to approve photos.'
+        return HttpResponse(message)
+
+    if 'id' in request.GET:
+        orid = request.GET['id']
+        orid = int(orid)
+    else:
+        message = 'This photo does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    try:
+        upl = UploadFile.objects.get(pk=orid)
+    except UploadFile.DoesNotExist:
+        msg = "uploaded file #" + str(orid) + "does not exist"
+        url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
+        return HttpResponseRedirect(url)
+    upls = UploadFile.objects.filter(pid=pid)
+    print("upload file path = ", upl.image_file_path)
+    for upl in upls:
+        old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+        tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
+
+        filename, ext = os.path.splitext(str(upl.image_file_path))
+        spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name,
+                    source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
+                    description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
+
+        if species.type == 'species':
+            spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+                            credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation,
+                            form=upl.forma, rank=0, description=upl.description, location=upl.location,
+                            created_date=upl.created_date, source_url=upl.source_url)
+            spc.approved_by = request.user
+            # hist = SpcImgHistory(pid=Species.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
+            #                      action='approve file')
+            newdir = os.path.join(settings.STATIC_ROOT, "utils/images/species")
+        else:
+            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+                            source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
+                            description=upl.description, location=upl.location, created_date=upl.created_date,
+                            source_url=upl.source_url)
+            spc.approved_by = request.user
+            # hist = HybImgHistory(pid=Hybrid.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
+            #                      action='approve file')
+            newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
+
+        spc.approved_by = request.user
+
+        image_file = species.genus + '_' + str(format(upl.pid.pid, "09d")) + "_" + str(format(upl.id, "09d"))
+        newpath = os.path.join(newdir, image_file)
+        print("newpath = ", newpath)
+        if not os.path.exists(newpath + ext):
+            try:
+                shutil.copy(old_name, tmp_name)
+                shutil.move(old_name, newpath + ext)
+            except shutil.Error:
+                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+                return HttpResponseRedirect(url)
+            spc.image_file = image_file + ext
+        else:
+            i = 1
+            while True:
+                image_file = image_file + "_" + str(i) + ext
+                x = os.path.join(newdir, image_file)
+                if not os.path.exists(x):
+                    try:
+                        shutil.copy(old_name, tmp_name)
+                        shutil.move(old_name, x)
+                    except shutil.Error:
+                        upl.delete()
+                        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+                        return HttpResponseRedirect(url)
+                    spc.image_file = image_file
+                    break
+                i += 1
+        # spc.image_file_path = image_dir + image_file
+        print("spc.image_file = ", spc.image_file)
+        spc.save()
+        upl.approved = True
+        upl.delete(0)
+    write_output(request, str(family))
+    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+    return HttpResponseRedirect(url)
+
