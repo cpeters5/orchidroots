@@ -41,20 +41,20 @@ my ($stmt,%num_image,%num_species, %num_hybrid, %num_hybimage, %num_spcimage,
 
 
 foreach my $app (@apps) {
-	print "$app - Initialize PID\n" if $debug;
+	# print "$app - Initialize PID\n" if $debug;
 	getPID($app);
 
-	print "$app - Count hybimages and spcimages\n" if $debug;
+	# print "$app - Count hybimages and spcimages\n" if $debug;
 	getSpcImages($app);
 	getHybImages($app) if $app eq 'orchidaceae';
 
-	print "$app - get synonym pid\n" if $debug;
+	# print "$app - get synonym pid\n" if $debug;
 	getSynonymPid($app);
 
-	print "$app - Processing genus\n" if $debug;
+	# print "$app - Processing genus\n" if $debug;
 	procGenus($app);
 
-	print "$app - Processing species\n" if $debug;
+	# print "$app - Processing species\n" if $debug;
 	procSpecies($app);
 
 	# Synonyms now have its own detailed view
