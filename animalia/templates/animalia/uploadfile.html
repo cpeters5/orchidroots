@@ -30,7 +30,6 @@
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' species.pid %}?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                         {{form.author|as_crispy_field}}
-                        {{form.originator|as_crispy_field}}
 
         <!--                <hr  class="my-4">-->
                         <div class="form-row">
@@ -41,10 +40,7 @@
                                 {{form.image_file_path|as_crispy_field}}
                             </div>
                         </div>
-                         <div class="form-group col-md-5 mb-0">
-                            {{form.source_url|as_crispy_field}}
-                         </div>
-
+                                {{form.source_url|as_crispy_field}}
                         <div class="form-row">
                             <div class="form-group col-md-6 mb-0">
                                  {{form.variation|as_crispy_field}}
@@ -57,9 +53,6 @@
                         <div class="form-row">
                             <div class="form-group col-md-4 mb-0">
                                 {{form.name|as_crispy_field}}
-                            </div>
-                            <div class="form-group col-md-4 mb-0">
-                                 {{form.awards|as_crispy_field}}
                             </div>
                             <div class="form-group col-md-4 mb-0">
                                 {{form.location|as_crispy_field}}
