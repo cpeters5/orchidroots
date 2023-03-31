@@ -1243,7 +1243,7 @@ class ReidentifyHistory(models.Model):
 
 class Distribution(models.Model):
     id              = models.AutoField(primary_key=True, default=10)
-    pid          = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid',related_name='ordist_pid')
+    pid          = models.ForeignKey(Species, on_delete=models.DO_NOTHING,db_column='pid',related_name='ordist_pid')
     gen          = models.ForeignKey(Genus, on_delete=models.DO_NOTHING,db_column='gen',related_name='ordist_gen',null=True, blank=True)
     source       = models.CharField(max_length=10, blank=True)
     continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='orcontinent_id',null=True, blank=True,on_delete=models.DO_NOTHING)

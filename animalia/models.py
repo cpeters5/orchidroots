@@ -561,8 +561,8 @@ class Location(models.Model):
 
 
 class Distribution(models.Model):
-    pid = models.ForeignKey(Species, on_delete=models.CASCADE,db_column='pid', default='', related_name='anidist_pid')
-    dist = models.ForeignKey(Location, db_column='dist', default='', on_delete=models.CASCADE)
+    pid = models.ForeignKey(Species, on_delete=models.DO_NOTHING,db_column='pid', default='', related_name='anidist_pid')
+    dist = models.ForeignKey(Location, db_column='dist', default='', on_delete=models.DO_NOTHING)
 
     class Meta:
         unique_together = (("pid", "dist"),)
