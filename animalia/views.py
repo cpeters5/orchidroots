@@ -32,9 +32,9 @@ from itertools import chain
 from django.utils import timezone
 from datetime import datetime, timedelta
 from utils.views import write_output, is_int, getRole, get_reqauthor
-# import pytz
-# MPTT stuff
-# from django.views.generic.list_detail import object_list
+from utils import config
+applications = config.applications
+
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm, UploadFileForm
 from accounts.models import User, Profile, Photographer

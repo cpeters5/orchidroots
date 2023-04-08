@@ -16,7 +16,8 @@ from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
 from accounts.models import Photographer
 
 logger = logging.getLogger(__name__)
-
+import utils.config
+applications = utils.config.applications
 
 def pathinfo(request):
     path  = request.path.split('/')[2:][0]
@@ -30,6 +31,7 @@ def get_random_sponsor():
         end_date__month__gte=today.month).order_by('?')[0:1][0]
 
 def get_application(request):
+    family = ''
     if 'family' in request.GET:
         family = request.GET['family']
         try:

@@ -9,11 +9,10 @@ from fuzzywuzzy import fuzz, process
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
-from utils import config
 from utils.views import write_output, getRole
-
-alpha_list = config.alpha_list
+from utils import config
 applications = config.applications
+alpha_list = config.alpha_list
 
 def search(request):
     role = getRole(request)
@@ -231,13 +230,14 @@ def search_name(request):
     # Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
+        commonname = commonname.replace("-", " ")
     name_list = []
     for app in applications:
         Accepted = apps.get_model(app, 'Accepted')
         this_name_list = Accepted.objects.filter(common_name__icontains=commonname)
         if this_name_list:
-            name_list.append(this_name_list)
-
+            for x in this_name_list:
+                name_list.append(x)
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
     if talpha != '':
