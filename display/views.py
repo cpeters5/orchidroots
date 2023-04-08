@@ -231,24 +231,29 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
+    related_pid = related_list.values_list('pid')
+    if 'related' in request.GET:
+        related = request.GET['related']
+        if related != 'ALL':
+            related_pid = [species.pid]
 
-    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
     related = ''
     variety = ''
     tail = ''
 
     if species:
-        syn_list = Synonym.objects.filter(acc_id=species.pid).values_list('spid')
+        syn_list = Synonym.objects.filter(acc_id__in=related_pid).values_list('spid')
         if app == 'orchidaceae' and species.type == 'hybrid':
             if species.status == 'synonym':      # input pid is a synonym, just get images of the requested synonym
-                public_list = HybImages.objects.filter(pid=species.pid)  # public photos
+                public_list = HybImages.objects.filter(pid__in=related_pid)  # public photos
             else:                   # input pid is an accepted species, include images of its synonyms
-                public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+                public_list = HybImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_list))  # public photos
         else:
             if species.status == 'synonym':
-                public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
+                public_list = SpcImages.objects.filter(pid__in=related_pid)  # public photos
             else:
-                public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+                public_list = SpcImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_list))  # public photos
         upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
@@ -272,12 +277,6 @@ def photos(request, pid=None):
 
     # Handle Variety filter
     rel = ''
-    if 'rel' in request.GET:
-        rel = request.GET['rel']
-        related_pids = []
-        if rel == 'ALL':
-            related_pids = related_list.values_list('pid',flat=True)
-
     if 'variety' in request.GET:
         variety = request.GET['variety']
         if variety == 'semi alba':
