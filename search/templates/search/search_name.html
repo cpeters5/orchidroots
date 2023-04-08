@@ -26,7 +26,7 @@
                         {% for species in name_list %}
                             <tr>
                                 <td>{% if species.pid.family.application == 'other' or species.pid.family.application == 'orchidaceae' %}Plantae{% else %}{{species.pid.family.application}}{% endif %}</td>
-                                <td><i><a href="/display/information/{{path}}{{species.0.pid_id}}/?family={{species.pid.family}}">{{species.pid.binomial_it|safe}}</a></i></td>
+                                <td><i><a href="/display/information/{{path}}{{species.pid_id}}/?family={{species.pid.family}}">{{species.pid.binomial_it|safe}}</a></i></td>
                                 <td>{{species.common_name}}</td>
                             </tr>
                         {% endfor %}
