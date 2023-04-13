@@ -202,8 +202,11 @@ def information(request, pid=None):
 def photos(request, pid=None):
     author = get_reqauthor(request)
     role = ''
+    syn = 'N'
     if 'role' in request.GET:
         role = request.GET['role']
+    if 'syn' in request.GET:
+        syn = request.GET['syn']
     if not author or author == 'anonymous':
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
@@ -241,20 +244,20 @@ def photos(request, pid=None):
     related = ''
     variety = ''
     tail = ''
-
     if species:
-        syn_list = Synonym.objects.filter(acc_id__in=related_pid).values_list('spid')
+        syn_list = Synonym.objects.filter(acc_id__in=related_pid)
+        syn_pid = syn_list.values_list('spid')
         if app == 'orchidaceae' and species.type == 'hybrid':
-            if species.status == 'synonym':      # input pid is a synonym, just get images of the requested synonym
+            if syn == 'N':      # input pid is a synonym, just get images of the requested synonym
                 public_list = HybImages.objects.filter(pid__in=related_pid)  # public photos
             else:                   # input pid is an accepted species, include images of its synonyms
-                public_list = HybImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_list))  # public photos
+                public_list = HybImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
         else:
-            if species.status == 'synonym':
+            if syn == 'N':
                 public_list = SpcImages.objects.filter(pid__in=related_pid)  # public photos
             else:
-                public_list = SpcImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_list))  # public photos
-        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
+                public_list = SpcImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
+        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
             upload_list = upload_list.filter(author=author) # Private photos
@@ -312,6 +315,7 @@ def photos(request, pid=None):
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
+               'syn_list': syn_list,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
