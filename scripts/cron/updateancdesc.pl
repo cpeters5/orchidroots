@@ -59,7 +59,6 @@ foreach my $pid (sort keys %pid) {
 
 sub initHybrid {
     my $stmt = "select pid, seed_id, pollen_id from orchidaceae_hybrid where pid not in (select distinct did from orchidaceae_ancestordescendant)
-    			order by pid;";
     &getASPM($stmt);
     while (my @row = $sth->fetchrow_array()) {
         $pid{$row[0]}++;
@@ -69,6 +68,8 @@ sub initHybrid {
 	    $poll{$row[0]} = "$row[2]";
 	    # print "$row[0]\t$pid{$row[0]}\t$row[1]\t$row[2]\n";
 	}
+	# print "total hybrid = ";
+	# print scalar %pid;
 }
 
 sub updatedata {
@@ -86,10 +87,10 @@ sub updatedata {
 	$aid{$poll} += 50;
 	$numberpair = 0;
 	foreach my $aid (sort keys %aid) {
-		my $stmt = "insert into orchidaceae_ancestordescendant (pct,aid,did) values($aid{$aid},$aid,$pid)";
+		my $stmt = "insert ignore into orchidaceae_ancestordescendant (pct,aid,did) values($aid{$aid},$aid,$pid)";
 		$numberpair++;
 		$totalpair++;
-#		print "$totalpair\t$numberpair\t$aid{$aid}\t$aid\t$pid\n";
+		# print "$totalpair\t$numberpair\t$aid{$aid}\t$aid\t$pid\n";
 		&getASPM1($stmt);
 	}
 }
