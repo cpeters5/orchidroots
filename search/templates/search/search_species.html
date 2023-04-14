@@ -54,7 +54,7 @@
                             <td><i>{{species.family|default:''}}</i>
                                    ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}{% if user.tier.tier > 2 %}&role=cur{% endif %}">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
@@ -72,7 +72,7 @@
                             <td><i>{{species.family|default:''}}</i>
                                 ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}{% if user.tier.tier > 2 %}&role=cur{% endif %}">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
                                     <i>{{species.binomial}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn.){% endif %}
