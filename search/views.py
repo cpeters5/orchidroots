@@ -16,6 +16,7 @@ alpha_list = config.alpha_list
 
 def search(request):
     role = getRole(request)
+    print("role = ", role)
     search_list = []
     match_spc_list = []
     full_path = request.path
@@ -64,7 +65,7 @@ def search(request):
             other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
         context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'other_genus_spc': other_genus_spc,
+                   'other_genus_spc': other_genus_spc, 'role': role,
                    'path': path, 'full_path': full_path
                    }
         return render(request, "search/search_species.html", context)
@@ -78,7 +79,7 @@ def search(request):
             other_genus_spc = list(chain(other_genus_spc, this_spc_list))
         if other_genus_spc:
             context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                       'other_genus_spc': other_genus_spc,
+                       'other_genus_spc': other_genus_spc, 'role': role,
                        'path': path, 'full_path': full_path
                        }
             return render(request, "search/search_species.html", context)
