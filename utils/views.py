@@ -26,9 +26,12 @@ def pathinfo(request):
 def get_random_sponsor():
     from accounts.models import Sponsor
     from django.utils.timezone import datetime
-    today = datetime.today()
-    return Sponsor.objects.filter(is_active=1).filter(end_date__year__gte=today.year).filter(
-        end_date__month__gte=today.month).order_by('?')[0:1][0]
+    today = datetime.today().date()
+    sponsors = Sponsor.objects.filter(is_active=1).filter(end_date__gte=today).order_by('?')[0:1]
+    sponsor = None
+    if sponsors:
+        sponsor = sponsors[0]
+    return sponsor
 
 def get_application(request):
     family = ''
