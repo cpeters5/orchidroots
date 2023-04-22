@@ -176,7 +176,6 @@ def genera(request):
     if not family and 'app' in request.GET:
         app = request.GET['app']
         family_list = Family.objects.filter(application=app)
-    print("app = ", app)
 
     if app:
         Genus = apps.get_model(app, 'Genus')
@@ -189,9 +188,7 @@ def genera(request):
         myspecies = request.GET['myspecies']
         if myspecies:
             author = Photographer.objects.get(user_id=request.user)
-            print("author = ", author)
     if family:
-        print("family = ", family)
         newfamily, subfamily, tribe, subtribe = getSuperGeneric(request)
         if subtribe:
             genus_list = Genus.objects.filter(subtribe=subtribe)
@@ -201,8 +198,6 @@ def genera(request):
             genus_list = Genus.objects.filter(subfamily=subfamily)
         elif family:
             genus_list = Genus.objects.filter(family=family.family)
-        print("1 family = ", family.family)
-        print("1 genus_list list = ", len(genus_list))
     elif family_list:
         # No family (e.g. first landing on this page), show all non-Orchidaceae genera
         # OrGenus, OtGenus = getAllGenera()
@@ -211,14 +206,10 @@ def genera(request):
     else:
         genus_list = ''
     # If private request
-    print("2 genus_list list = ", len(genus_list))
     if genus_list or family:
         if myspecies and author:
             pid_list = SpcImages.objects.filter(author_id=author).values_list('gen', flat=True).distinct()
             genus_list = genus_list.filter(pid__in=pid_list)
-        print("author = ", author)
-        print("myspecies = ", myspecies)
-        print("genus_list = ", len(genus_list))
 
         # Complete building genus list
         # Define sort
@@ -615,7 +606,6 @@ def newbrowse(request):
                             spcimage = spcimage.filter(num_image__gt=0)
                         spcimage = spcimage.order_by('?')[0:1]
                         if len(spcimage) > 0:
-                            print("spcimage length = ", len(spcimage))
                             genus_list = genus_list + [(spcimage[0], spcimage[0].get_best_img())]
                     context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'display': display,  'talpha': talpha, 'alpha_list': alpha_list,}
                     return render(request, 'common/newbrowse.html', context)
