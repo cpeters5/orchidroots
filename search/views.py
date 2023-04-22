@@ -16,7 +16,7 @@ alpha_list = config.alpha_list
 
 def search(request):
     role = getRole(request)
-    print("role = ", role)
+    # print("role = ", role)
     search_list = []
     match_spc_list = []
     full_path = request.path
@@ -47,9 +47,8 @@ def search(request):
             genus = Genus.objects.get(genus=genus_string)
         except Genus.DoesNotExist:
             genus = ''
-        if genus:
+        if genus and genus != '':
             genus_list.append(genus)
-
     if genus_list:
         match_spc_list = []
         for genus in genus_list:
@@ -85,7 +84,6 @@ def search(request):
             return render(request, "search/search_species.html", context)
 
     # looks like only search string is given.
-    print("Nothing found, go through species = ")
     url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
     return HttpResponseRedirect(url)
 
@@ -129,7 +127,7 @@ def getResultByGenus(family, search_string, genus):
 
 def search_species(request):
     # Only family or genus is given (one or both)
-    print("Enter search species")
+    # print("Enter search species")
     family = ''
     subfamily = ''
     tribe = ''
@@ -147,7 +145,7 @@ def search_species(request):
         search_string = search_string.replace(' Mem ', ' Memoria ')
         search_string = search_string.replace(' mem. ', ' Memoria ')
         search_string = search_string.replace(' Mem. ', ' Memoria ')
-        print("search_string", search_string)
+        # print("search_string", search_string)
         if ' ' not in search_string:
             genus_string = search_string
         elif search_string.split()[0]:
@@ -156,7 +154,7 @@ def search_species(request):
     else:
         send_url = '/'
         return HttpResponseRedirect(send_url)
-    print("search_string", search_string)
+    # print("search_string", search_string)
     role = getRole(request)
     if 'family' in request.GET:
         family = request.GET['family']
@@ -227,15 +225,16 @@ def search_species(request):
 def search_name(request):
     talpha = ''
     commonname = ''
+    commonname_search = ''
     # app = 'other'
     # Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
-        commonname = commonname.replace("-", " ")
+        commonname_search = commonname.replace("-", "").replace(" ", "")
     name_list = []
     for app in applications:
         Accepted = apps.get_model(app, 'Accepted')
-        this_name_list = Accepted.objects.filter(common_name__icontains=commonname)
+        this_name_list = Accepted.objects.filter(common_name_search__icontains=commonname_search)
         if this_name_list:
             for x in this_name_list:
                 name_list.append(x)
@@ -444,3 +443,8 @@ def search_fuzzy(request):
     return render(request, "search/search_orchid.html", context)
 
 
+def compare_strings(str1, str2, ignore_chars):
+    for char in ignore_chars:
+        str1 = str1.replace(char, '')
+        str2 = str2.replace(char, '')
+    return str1.lower() == str2.lower()

@@ -359,6 +359,7 @@ class Species(models.Model):
         upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
         return len(img) + len(upl)
 
+
 class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
@@ -376,6 +377,7 @@ class Accepted(models.Model):
     url_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     common_name = models.CharField(max_length=500, null=True, blank=True)
+    common_name_search = models.CharField(max_length=500, null=True, blank=True)
     local_name = models.CharField(max_length=100, null=True, blank=True)
     bloom_month = models.CharField(max_length=200, null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)

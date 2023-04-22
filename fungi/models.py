@@ -143,6 +143,7 @@ class Genus(models.Model):
             return img
         return None
 
+
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
     pid = models.OneToOneField(
@@ -382,6 +383,7 @@ class Accepted(models.Model):
     url_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     common_name = models.CharField(max_length=500, null=True, blank=True)
+    common_name_search = models.CharField(max_length=500, null=True, blank=True)
     local_name = models.CharField(max_length=100, null=True, blank=True)
     bloom_month = models.CharField(max_length=200, null=True, blank=True)
     size = models.CharField(max_length=50, null=True, blank=True)
