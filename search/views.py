@@ -228,6 +228,7 @@ def search_name(request):
     commonname_search = ''
     # app = 'other'
     # Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
+    role = getRole(request)
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
         commonname_search = commonname.replace("-", "").replace(" ", "")
@@ -244,7 +245,7 @@ def search_name(request):
         name_list = name_list.filter(species__istartswith=talpha)
     total = len(name_list)
     context = {'name_list': name_list, 'commonname': commonname,
-               'talpha': talpha, 'alpha_list': alpha_list}
+               'talpha': talpha, 'alpha_list': alpha_list, 'role': role,}
     write_output(request, str(commonname))
     return render(request, "search/search_name.html", context)
 

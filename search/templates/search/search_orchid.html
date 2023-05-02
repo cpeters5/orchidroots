@@ -49,29 +49,30 @@
 <!--                          <td class=" d-none d-sm-table-cell" align="center">{{ species.1 }}</td>-->
                          <td style="padding-left: 10px; ">
                              {% if species.0.status == 'synonym' %}<span style="font-size:13px;">{{species.0.name|safe}}</span>
-                              {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
+                             {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
                                   {% if role == "cur" %}
                              <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
                                   {% else %}
                              <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
                                   {% endif %}
-                              {%  else %}
+                             {%  else %}
                                   {{species.0.name}}
-                              {% endif %}
-                              {% if species.0.author %}{{species.0.author}}{% endif %}
-                              {% if species.0.status == 'synonym' %}
-                                   {% if species.0.getAcc %}
-                                        (syn.
-                                       {% if role == "cur" %}
-                                           <a href="{% url 'display:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
-                                       {% else %}
-                                           <a href="{% url 'display:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
-                                        {% endif %}
-                                        )
-                                   {% else %}
-                                        Error! Accepted name does not exist
-                                   {% endif %}
-                               {% endif %}
+                             {% endif %}
+
+                             {% if species.0.author %}{{species.0.author}}{% endif %}
+                             {% if species.0.status == 'synonym' %}
+                                 {% if species.0.getAcc %}
+                                     (syn.
+                                     {% if role == "cur" %}
+                                          <a href="{% url 'display:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                     {% else %}
+                                          <a href="{% url 'display:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                      {% endif %}
+                                     )
+                                 {% else %}
+                                     Error! Accepted name does not exist
+                                 {% endif %}
+                             {% endif %}
 <!--                          {% if species.0.num_image %}(img: {{species.0.num_image}}){% endif %}-->
                           </td>
                      </tr>
