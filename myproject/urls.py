@@ -79,6 +79,9 @@ urlpatterns = [
     path('orchidaceae/', include('orchidaceae.urls')),
     path('detail/', include('detail.urls')),
 
+    # New dev
+    path('gallery/', include('gallery.urls')),
+
                   # legacy applications
     # path('natural/', include('detail.urls')),
     # path('orchid/', include('orchidaceae.urls')),

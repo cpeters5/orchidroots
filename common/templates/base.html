@@ -645,6 +645,7 @@ nav .search-container button:hover {
                                 {% else %}
                                     <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family}}&display=checked">Browse</a></li>
                                 {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'gallery:index' %}">Gallery</a></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Species</a></li>
                             <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Hybrids</a></li>

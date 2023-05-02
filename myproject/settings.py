@@ -94,6 +94,8 @@ INSTALLED_APPS = [
     'aves',
     'animalia',
 
+    # New development
+    'gallery',
     # Third Party
     'ads',
     'allauth',

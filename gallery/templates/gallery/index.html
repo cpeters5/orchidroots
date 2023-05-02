@@ -1,0 +1,40 @@
+       <!doctype html>
+<html>
+  <head>
+    <title>Gallery selection</title>
+  </head>
+  {% load static %}
+{% load crispy_forms_tags %}
+{{ form.media.css }}
+{{ form.media.js }}
+    <!--Main sections-->
+<div style="width:95%;margin:0 auto;padding:0;">
+
+  <body>
+    <h1>Please select a city or area: -- {{city}}</h1>
+    <br><br>
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+    <div class="container" style="width:90%;font-size:13px;">
+        <form method="post"  action="/gallery/index/">
+            {% csrf_token %}
+            {{form.mycity|as_crispy_field}}
+            <br><br>
+            <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
+        </form>
+    </div>
+
+
+
+
+  </body>
+</html>
