@@ -203,6 +203,9 @@ def photos(request, pid=None):
     author = get_reqauthor(request)
     role = ''
     syn = 'N'
+    related = ''
+    variety = ''
+    tail = ''
     if 'role' in request.GET:
         role = request.GET['role']
     if 'syn' in request.GET:
@@ -219,9 +222,6 @@ def photos(request, pid=None):
     if app == 'orchidaceae':
         HybImages = apps.get_model(app, 'HybImages')
     UploadFile = apps.get_model(app, 'UploadFile')
-
-
-
 
     if not pid and 'pid' in request.GET:
         pid = request.GET['pid']
@@ -241,9 +241,6 @@ def photos(request, pid=None):
         if related != 'ALL':
             related_pid = [species.pid]
 
-    related = ''
-    variety = ''
-    tail = ''
     if species:
         syn_list = Synonym.objects.filter(acc_id__in=related_pid)
         syn_pid = syn_list.values_list('spid')
@@ -315,7 +312,7 @@ def photos(request, pid=None):
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
-               'syn_list': syn_list,
+               'syn_list': syn_list, 'related': related, 'syn': syn,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
