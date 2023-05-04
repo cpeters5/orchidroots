@@ -574,9 +574,9 @@ def newbrowse(request):
                         species = species.filter(num_image__gt=0)
                     if talpha:
                         species = species.filter(species__istartswith=talpha)
+                    species = species.order_by('species')
                     if len(species) > 500:
                         species = species[0: 500]
-                    species = species.order_by('species')
                     species_list = []
                     for x in species:
                         spcimage = x.get_best_img()
