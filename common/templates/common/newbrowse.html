@@ -259,26 +259,13 @@ img{
 <!--                            <input form="fam" type="hidden" name="app" value="{{app}}" >-->
                             <input form="fam" type="hidden" name="talpha" value="{{talpha}}" >
                             <input form="fam" type="hidden" name="app" value="{{app}}" >
-                            <input form="fam" type="hidden" name="display" value="{{display}}">
                             <input form="fam" type="text" class="btn-custom" name="family" value="{{family|default:''}}" placeholder="family" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
                         <form action="?" id="gen" style="display:inline-block">
                             <input form="gen" type="hidden" name="app" value="{{app}}" >
                             <input type="hidden" name="family" value="{{family}}" >
                             <input form="gen" type="hidden" name="talpha" value="{{talpha}}" >
-                            <input form="gen" type="hidden" name="display" value="{{display}}">
                             <input form="gen" type="text" class="btn-custom" name="genus" value="{{genus|default:''}}" placeholder="genus" onchange="this.form.submit()" style="margin-left:1px;">
-                        </form>
-                        <form action="?" id="display" style="display:inline-block">
-                            <input type="hidden" name="app" value="{{app}}" >
-                            <input type="hidden" name="family" value="{{family}}" >
-                            <input type="hidden" name="genus" value="{{genus}}" >
-                            <input type="hidden" name="talpha" value="{{talpha}}" >
-                            {% if display %}
-                            <input type="checkbox" class="form-check-input" name="display" value="checked" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Uncheck to include species without images</span>
-                            {% else %}
-                            <input type="checkbox" class="form-check-input" name="display" value="checked" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Check to hide species without images</span>
-                            {% endif %}
                         </form>
                     </div>
                 </div>
@@ -288,7 +275,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{x.0.family.application}}&display={{display}}&family={{x.0.family.family}}">{{x.0.family}}</a>
+                                <a href="{% url 'common:newbrowse' %}?app={{x.0.family.application}}&family={{x.0.family.family}}">{{x.0.family}}</a>
                                 {% if x.1.pid_id %}
                                     <a href="{% url 'display:information'  x.1.pid_id %}?app={{x.0.family.application}}&family={{x.0.family}}">
                                         <img class="thumbnails p-1" alt="" src="{% static x.1.image_dir %}{{x.1.image_file}}" >
@@ -307,17 +294,30 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.0.genus}}&display={{display}}">{{x.0.genus}}</a>
-                                    <a href="{% url 'display:information'  x.0.pid %}?app={{x.0.family.application}}&family={{x.0.family}}">
-                                        {% if x.1.image_file %}
-                                            <img class="thumbnails p-1" alt="" src="{% static x.1.image_dir %}{{x.1.image_file}}" >
+                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.gen.genus}}">{{x.gen.genus}}</a>
+                                {% if x.pid.pid.type == 'hybrid' and x.pid.pid.family.family == 'Orchidaceae' %}
+                                    <a href="{% url 'display:information' x.pid.pid.pid %}?app={{x.pid.pid.family.application}}&family={{x.pid.pid.family}}">
+                                        {% if x.image_file %}
+                                            <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                         {% else %}
                                             <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        {{x.0.binomial_it|safe}}
+                                        {{x.pid.pid.binomial_it|safe}}
                                     </div>
+                                {% else %}
+                                    <a href="{% url 'display:information' x.pid.pid %}?app={{x.pid.family.application}}&family={{x.pid.family}}">
+                                        {% if x.image_file %}
+                                            <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
+                                        {% else %}
+                                            <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                        {% endif %}
+                                    </a>
+                                    <div class="imgcaption">
+                                        {{x.pid.binomial_it|safe}}
+                                    </div>
+                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>
@@ -326,7 +326,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in species_list %}
                             <div class="imageitem border ">
-                                    <a href="{% url 'display:information'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}&display={{display}}">
+                                    <a href="{% url 'display:information'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}">
                                         <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">

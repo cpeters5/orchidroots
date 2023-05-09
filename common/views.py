@@ -536,6 +536,91 @@ def quality_update(request, SpcImages):
 
 def newbrowse(request):
     # Application must be in request
+    family = ''
+    talpha = ''
+    if 'talpha' in request.GET:
+        talpha = request.GET['talpha']
+
+    # app must be in browse request
+    app = request.GET['app']
+    if 'family' in request.GET:
+        family = request.GET['family']
+    if app == 'orchidaceae':
+        # Special case for orchids
+        family = 'Orchidaceae'
+
+    if app in applications:
+        #     If app is requested, find family_list and sample image by family
+        # If family is requested, get sample list by genera
+        if 'genus' in request.GET:
+            # App and family must also be in the request.
+            Genus = apps.get_model(app.lower(), 'Genus')
+            Species = apps.get_model(app.lower(), 'Species')
+            genus = request.GET['genus']
+            if genus and genus != '':
+                try:
+                    genus = Genus.objects.get(genus=genus)
+                except Genus.DoesNotExist:
+                    Genus = ''
+                if Genus:
+                    species = Species.objects.filter(genus=genus)
+                    if talpha:
+                        species = species.filter(species__istartswith=talpha)
+                    species = species.order_by('species')
+                    if len(species) > 500:
+                        species = species[0: 500]
+                    species_list = []
+                    for x in species:
+                        spcimage = x.get_best_img()
+                        if spcimage:
+                            species_list = species_list + [spcimage]
+                    context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'talpha': talpha, 'alpha_list': alpha_list,}
+                    return render(request, 'common/newbrowse.html', context)
+        if family:
+            try:
+                family = Family.objects.get(family=family)
+            except Family.DoesNotExist:
+                family = None
+            if family:
+                Genus = apps.get_model(app.lower(), 'Genus')
+                SpcImages = apps.get_model(app.lower(), 'SpcImages')
+                # genera = Genus.objects.filter(family=family)
+                genera = SpcImages.objects.order_by('gen').values_list('gen', flat=True)
+                if genera:
+                    genus_list = []
+                    genera = set(genera)
+                    genlist = Genus.objects.filter(pid__in=genera)
+                    if talpha:
+                        genlist = genlist.filter(genus__istartswith=talpha)
+                    genlist = genlist.order_by('genus')
+                    for gen in genlist:
+                        genus_list = genus_list + [gen.get_best_img()]
+                    context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'talpha': talpha, 'alpha_list': alpha_list,}
+                    return render(request, 'common/newbrowse.html', context)
+
+        # Building sample by families
+        families = Family.objects.filter(application=app)
+        if talpha:
+            families = families.filter(family__istartswith=talpha)
+        families = families.order_by('family')
+        Genus = apps.get_model(app.lower(), 'Genus')
+        family_list = []
+        for fam in families:
+            genimage = Genus.objects.filter(family=fam.family)
+            genimage = genimage.order_by('?')[0:1]
+            if len(genimage) > 0:
+                family_list = family_list + [(genimage[0], genimage[0].get_best_img())]
+        context = {'family_list': family_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list,}
+        return render(request, 'common/newbrowse.html', context)
+
+    # Bad application, and neither families nor genus are valid, list all genera in the app
+    write_output(request, str(family))
+    return HttpResponseRedirect('/')
+
+    # Now we get family_list of sample genera
+
+def xnewbrowse(request):
+    # Application must be in request
     display = ''
     family = ''
     talpha = ''
@@ -632,7 +717,6 @@ def newbrowse(request):
     return HttpResponseRedirect('/')
 
     # Now we get family_list of sample genera
-
 
 def getPartialPid(reqgenus, type, status, app):
     if app == 'orchidaceae':
