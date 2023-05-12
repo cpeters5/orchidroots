@@ -44,10 +44,6 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    # 'orchidroots.org',
-    # 'www.orchidroots.org',
-    # 'orchidroots.com',
-    # 'www.orchidroots.com',
     'bluenanta.com',
     'www.bluenanta.com',
     'beta.bluenanta.com',
@@ -429,8 +425,8 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env.str("MAILGUN_DOMAIN", default=''),
     "MAILGUN_API_URL": env.str("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
-DEFAULT_FROM_EMAIL = "admin@mail.orchidroots.org"  # if you don't already have this in settings
-SERVER_EMAIL = "admin@orchidroots.org"
+DEFAULT_FROM_EMAIL = "cpeters5@yahoo.com"  # if you don't already have this in settings
+SERVER_EMAIL = "cpeters5@yahoo.com"
 
 STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY', default='')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')

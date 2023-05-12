@@ -583,7 +583,7 @@ def uploadfile(request, pid):
     role = getRole(request)
     if request.user.tier.tier < 2 or not request.user.photographer.author_id:
         message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@orchidroots.org'
+                  'Or contact cpeters5@yahoo.com'
         return HttpResponse(message)
     species = Species.objects.get(pk=pid)
     if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
