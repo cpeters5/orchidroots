@@ -425,8 +425,8 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env.str("MAILGUN_DOMAIN", default=''),
     "MAILGUN_API_URL": env.str("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
-DEFAULT_FROM_EMAIL = "cpeters5@yahoo.com"  # if you don't already have this in settings
-SERVER_EMAIL = "cpeters5@yahoo.com"
+DEFAULT_FROM_EMAIL = "admin@bluenanta.com"  # if you don't already have this in settings
+SERVER_EMAIL = "admin@bluenanta.com"
 
 STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY', default='')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')
@@ -437,7 +437,7 @@ PAYPAL_SECRET =  env('PAYPAL_SECRET', default='')
 #  Use Gmail (Works)
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'cpeters5@gmail.com'
+# EMAIL_HOST_USER = 'admin@bluenanta.com'
 # EMAIL_HOST_PASSWORD = 'kvitodlpllgxuvtl'
 
 # Use Yahoo mail. need to setup twostep verification?
