@@ -5,14 +5,14 @@
     {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Hello from {{ site_name }}!
         <p>You're receiving this e-mail because user {{ user_display }} has given yours as an e-mail address to connect their account.</p>
         <p>To confirm this is correct please click the link below, <br>{{ activate_url }}</p>
-<!--        <p>To confirm this is correct, <a href="{{ activate_url }}">Click Here</a> </p>-->
+        <p>To confirm this is correct, <a class="btn btn-custom btn-outline-primary"  href="{{ activate_url }}">Click Here</a> </p>
 
     {% endblocktrans %}
         <p>
-            {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Thank you from {{ site_name }}!
+            {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Thank you!
                 </p>
         <p>
-           {{ site_domain }}
+           admin {{ site_domain }}
         </p>
     {% endblocktrans %}
 {% endblock %}
