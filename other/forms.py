@@ -596,7 +596,7 @@ class UploadFileForm(forms.ModelForm):
             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
         }
         help_texts = {
-            #     'name': 'Clonal name of the plant',
+            'name': 'Clonal name only. DO NOT include the grex name',
             #     'awards': 'Awards received, comma separated',
             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
             #     'forma': 'E.g. color forms, peloric, region...',
