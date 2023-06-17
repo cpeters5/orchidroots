@@ -211,7 +211,7 @@ def search_species(request):
 
     # Perform Fuzzy search if requested (fuzzy = 1) or if no species match found:
     path = 'information'
-    if request.user.tier.tier > 2:
+    if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
 
     write_output(request, search_string)
@@ -231,7 +231,7 @@ def search_name(request):
     role = getRole(request)
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
-        commonname_search = commonname.replace("-", "").replace(" ", "")
+        commonname_search = commonname.replace("-", "").replace(" ", "").replace("'", "")
     name_list = []
     for app in applications:
         Accepted = apps.get_model(app, 'Accepted')
