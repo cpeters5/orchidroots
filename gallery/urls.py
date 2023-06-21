@@ -5,6 +5,8 @@ from . import views
 app_name = 'gallery'
 urlpatterns = [
     path('index/', views.index, name='index'),
-    # path('result/', views.result, name='result'),
+    path('browse_artist/', views.browse_artist, name='browse_artist'),
+    path('photos/', views.photos, name='photos'),
+    path('uploadfile/', views.uploadfile, name='uploadfile'),
 
 ]
