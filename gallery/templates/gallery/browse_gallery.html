@@ -1,0 +1,69 @@
+{% load static %}
+{% include "gallery/base.html" %}
+{% block body %}
+  <head>
+    <title>Givens Gallery</title>
+  </head>
+<style>
+
+.imageitem {
+    display:inline;
+    margin:2px;
+    width : 20%;
+    height: auto;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.image {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+.image img {
+    flex: 1;
+}
+
+.image-info {
+      background-color: #f8f9fa;
+      padding: 10px;
+}
+</style>
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div style="margin-top:8px;">
+        <div class="card mt-3">
+<!-- Display samples -->
+            <div class="row">
+                {% for x in artwork_list %}
+              <div class="col-md-3 border m-1">
+                <div class="image">
+                    <a href="{% url 'gallery:photos' %}?artist={{x.artist}}">
+                        <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
+                    </a>
+                  <div class="image-info">
+                    <p>Artist: {{x.artist}}</p>
+                    {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}
+                    {% if x.medium %}<p>Medium: {{x.medium}}</p>{% endif %}
+                    {% if x.genre %}<p>style: {{x.genre}}</p>{% endif %}
+                 </div>
+                </div>
+              </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    </div>
+</div>
+
+
+{% endblock %}
+
+

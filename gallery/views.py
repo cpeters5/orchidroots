@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 # from flask import Flask, render_template, request
 import csv
-from .models import City, Gallery, Artist, Artwork
+from .models import City, Gallery, Artist, Artwork, Genre, Medium
 from .forms import CityForm, UploadFileForm
 
 
@@ -14,95 +14,158 @@ from .forms import CityForm, UploadFileForm
 # @app.route('/', methods=['GET', 'POST'])
 
 def index(request):
-    form = CityForm
-    context = {'form': form, }
-    if request.method == 'POST':
-        form = CityForm(request.POST)
-        thiscity = request.POST['mycity']
-        if form.is_valid():
-            gallery_list = Gallery.objects.filter(city=thiscity)
-            context = {'gallery_list': gallery_list, 'city': thiscity,}
-            return render(request, 'gallery/result.html', context)
+    genre_list = Artwork.objects.exclude(genre='NA').values_list('genre', flat=True).distinct().order_by('genre')
+    medium_list = Artwork.objects.exclude(medium='NA').values_list('medium', flat=True).distinct().order_by('medium')
+    genre = ''
+    medium = ''
+    if 'genre' in request.POST:
+        genre = request.POST['genre']
+        if genre and genre != '':
+            try:
+                genre = Genre.objects.get(genre=genre)
+            except Genre.DoesNotExist:
+                genre = ''
+    if 'medium' in request.POST:
+        medium = request.POST['medium']
+        if medium and medium != '':
+            try:
+                medium = Medium.objects.get(medium=medium)
+            except Genre.DoesNotExist:
+                medium = ''
+
+    # Get a sample image of orchids
+    artwork_list = Artwork.objects.filter(rank__lt=7).filter(rank__gt=0)
+    artwork_list = artwork_list.order_by('-rank', '?')[0:3]
+    print("artwork_list = ", len(artwork_list))
+    context = {'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
+               'genre_list': genre_list, 'medium_list': medium_list,
+               }
     return render(request, 'gallery/index.html', context)
 
 
-def browse_artist(request):
-    # Application must be in request
-    artist = ''
-    alpha = ''
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-
-    # app must be in browse request
-    app = request.GET['app']
-    if 'artist' in request.GET:
-        artist = request.GET['artist']
-    #     If app is requested, find artist_list and sample image by artist
-    # If artist is requested, get sample list by genera
-    if 'media' in request.GET:
-        # App and artist must also be in the request.
-        Media = apps.get_model(app.lower(), 'Media')
-        Species = apps.get_model(app.lower(), 'Species')
-        media = request.GET['artist']
-        if media and media != '':
+def browse_gallery(request):
+    genre_list = Artwork.objects.exclude(genre='NA').values_list('genre', flat=True).distinct().order_by('genre')
+    medium_list = Artwork.objects.exclude(medium='NA').values_list('medium', flat=True).distinct().order_by('medium')
+    genre = ''
+    medium = ''
+    if 'genre' in request.POST:
+        genre = request.POST['genre']
+        if genre and genre != '':
             try:
-                media = Media.objects.get(media=media)
-            except Media.DoesNotExist:
-                Media = ''
-            if Media:
-                species = Species.objects.filter(media=media)
-                if talpha:
-                    species = species.filter(species__istartswith=talpha)
-                species = species.order_by('species')
-                if len(species) > 500:
-                    species = species[0: 500]
-                species_list = []
-                for x in species:
-                    spcimage = x.get_best_img()
-                    if spcimage:
-                        species_list = species_list + [spcimage]
-                context = {'species_list': species_list, 'artist': media.artist, 'app': media.artist.application, 'media': media, 'talpha': talpha, 'alpha_list': alpha_list,}
-                return render(request, 'common/newbrowse.html', context)
-    if artist:
+                genre = Genre.objects.get(genre=genre)
+            except Genre.DoesNotExist:
+                genre = ''
+    if 'medium' in request.POST:
+        medium = request.POST['medium']
+        if medium and medium != '':
+            try:
+                medium = Medium.objects.get(medium=medium)
+            except Genre.DoesNotExist:
+                medium = ''
+
+    # Get a sample image of orchids
+    artwork_list = Artwork.objects.filter(rank__lt=7).filter(rank__gt=0)
+    if genre and genre != 'NA':
+        artwork_list = artwork_list.filter(genre=genre)
+    if medium and medium != 'NA':
+        artwork_list = artwork_list.filter(medium=medium)
+    artwork_list = artwork_list.order_by('-rank', '?')[0:6]
+    print("artwork_list = ", len(artwork_list))
+    context = {'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
+               'genre_list': genre_list, 'medium_list': medium_list,
+               }
+    return render(request, 'gallery/browse_gallery.html', context)
+
+
+def my_gallery(request):
+    genre_list = Artwork.objects.exclude(genre='NA').values_list('genre', flat=True).distinct().order_by('genre')
+    medium_list = Artwork.objects.exclude(medium='NA').values_list('medium', flat=True).distinct().order_by('medium')
+    genre = ''
+    medium = ''
+    artist = ''
+    if request.user.is_authenticated:
         try:
-            artist = Artist.objects.get(artist=artist)
+            artist = Artist.objects.get(artist=request.user)
         except Artist.DoesNotExist:
-            artist = None
-        if artist:
-            Media = apps.get_model(app.lower(), 'Media')
-            SpcImages = apps.get_model(app.lower(), 'SpcImages')
-            # genera = Media.objects.filter(artist=artist)
-            genera = SpcImages.objects.order_by('gen').values_list('gen', flat=True)
-            if genera:
-                media_list = []
-                genera = set(genera)
-                genlist = Media.objects.filter(pid__in=genera)
-                if talpha:
-                    genlist = genlist.filter(media__istartswith=talpha)
-                genlist = genlist.order_by('media')
-                for gen in genlist:
-                    media_list = media_list + [gen.get_best_img()]
-                context = {'media_list': media_list, 'artist': artist, 'app': artist.application, 'talpha': talpha, 'alpha_list': alpha_list,}
-                return render(request, 'common/newbrowse.html', context)
+            artist = ''
 
-    # Building sample by artists
-    artists = Artist.objects.filter(application=app)
-    if talpha:
-        artists = artists.filter(artist__istartswith=talpha)
-    artists = artists.order_by('artist')
-    Media = apps.get_model(app.lower(), 'Media')
-    artist_list = []
-    for fam in artists:
-        genimage = Media.objects.filter(artist=fam.artist)
-        genimage = genimage.order_by('?')[0:1]
-        if len(genimage) > 0:
-            artist_list = artist_list + [(genimage[0], genimage[0].get_best_img())]
-    context = {'artist_list': artist_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list,}
-    return render(request, 'common/newbrowse.html', context)
+    if 'genre' in request.POST:
+        genre = request.POST['genre']
+        if genre and genre != '':
+            try:
+                genre = Genre.objects.get(genre=genre)
+            except Genre.DoesNotExist:
+                genre = ''
+    if 'medium' in request.POST:
+        medium = request.POST['medium']
+        if medium and medium != '':
+            try:
+                medium = Medium.objects.get(medium=medium)
+            except Genre.DoesNotExist:
+                medium = ''
 
-    # Bad application, and neither artists nor media are valid, list all genera in the app
-    write_output(request, str(artist))
-    return HttpResponseRedirect('/')
+    # Get a sample image of orchids
+    if artist:
+        artwork_list = Artwork.objects.filter(artist=artist)
+    else:
+        artwork_list = Artwork.objects.filter(rank__lt=7).filter(rank__gt=0)
+    if genre and genre != 'NA':
+        artwork_list = artwork_list.filter(genre=genre)
+    if medium and medium != 'NA':
+        artwork_list = artwork_list.filter(medium=medium)
+    artwork_list = artwork_list.order_by('-rank', '?')[0:6]
+
+    context = {'artist': artist, 'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
+               'genre_list': genre_list, 'medium_list': medium_list,
+               }
+    return render(request, 'gallery/my_gallery.html', context)
+
+
+def browse_artist(request):
+    genre_list = Artwork.objects.exclude(genre='NA').values_list('genre', flat=True).distinct().order_by('genre')
+    medium_list = Artwork.objects.exclude(medium='NA').values_list('medium', flat=True).distinct().order_by('medium')
+    genre = ''
+    medium = ''
+    artist = ''
+    city = ''
+    if 'genre' in request.POST:
+        genre = request.POST['genre']
+        if genre and genre != '':
+            try:
+                genre = Genre.objects.get(genre=genre)
+            except Genre.DoesNotExist:
+                genre = ''
+    if 'medium' in request.POST:
+        medium = request.POST['medium']
+        if medium and medium != '':
+            try:
+                medium = Medium.objects.get(medium=medium)
+            except Genre.DoesNotExist:
+                medium = ''
+
+    if 'city' in request.GET:
+        city = request.GET['city']
+        if city and city != '':
+            try:
+                city = City.objects.get(city=city)
+            except City.DoesNotExist:
+                city = ''
+
+    artist_list = Artist.objects.all()
+    if medium:
+        artist_list = artist_list.filter(media__icontains=medium)
+    if city:
+        artist_list = artist_list.filter(city=city)
+
+    artist_list_sample = []
+    for artist in artist_list:
+        sample_image = Artwork.objects.filter(artist=artist).order_by('-rank', '?')[0:1][0]
+        artist_list_sample = artist_list_sample + [[artist, sample_image]]
+        print("artist = ", artist)
+        print("sample = ", sample_image.image_file)
+    artist_list = artist_list_sample
+    context = {'artist_list': artist_list, 'medium_list': medium_list, 'medium': medium,}
+    return render(request, 'gallery/browse_artist.html', context)
 
     # Now we get artist_list of sample genera
 

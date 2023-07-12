@@ -1,40 +1,107 @@
-       <!doctype html>
-<html>
+{% load static %}
+{% include "gallery/base.html" %}
+{% block body %}
   <head>
-    <title>Gallery selection</title>
+    <title>Givens Gallery</title>
   </head>
-  {% load static %}
-{% load crispy_forms_tags %}
-{{ form.media.css }}
-{{ form.media.js }}
-    <!--Main sections-->
-<div style="width:95%;margin:0 auto;padding:0;">
+<style>
 
-  <body>
-    <h1>Please select a city or area: -- {{city}}</h1>
-    <br><br>
-{% if form.errors %}
-    <div class="alert alert-danger">
-        <ul>
-        {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-                <li>{{ field }}: {{ error }}</li>
-            {% endfor %}
-        {% endfor %}
-        </ul>
+.imageitem {
+    display:inline;
+    margin:2px;
+    width : 20%;
+    height: auto;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.image {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+.image img {
+    flex: 1;
+}
+
+.image-info {
+      background-color: #f8f9fa;
+      padding: 10px;
+}
+</style>
+<div class="container-fluid" style="min-height:200px;border:0 solid grey">
+    <div style="margin-top:8px;">
+        <div class="card mt-3">
+            <div class="card-body" style="font-size:15px">
+                    <h6 class="card-title d-inline-block">Welcome to Givens Gallery</h6>
+                    <div class="d-inline-block">
+                        Givens Gallery is a new program with the mission to provide a venue for Givens' artist residents
+                        to show their artworks to the world.
+                        <br>At Givens Gallery, we believe that art should be accessible to all. That's why we're offering
+                        a unique opportunity for resident artists to exhibit their creations to a wider audience.
+                        Whether you're a painter, sculptor, photographer, or any other form of artist,
+                        our platform welcomes you with open arms.
+                        <br>
+                    <div class="clearfix"></div>
+                    </div>
+                </div>
+            <div class="card-body" style="font-size:15px">
+        Here's what you can expect from Givens Gallery
+    <div class="d-inline-block">
+<ul>
+<li>Free Artwork Posting: Share your masterpieces without any upfront charges!
+    Our platform allows you to upload high-quality pictures of your artworks at absolutely no cost.
+    This means you can showcase your talent and build your artistic portfolio without any financial burden.
+</li>
+<li>Sales Made Simple: We understand that artists deserve recognition and financial support for their hard work.
+    That's why we've developed a seamless sales system on our website. When a piece of your artwork finds a loving home,
+    we'll facilitate the transaction and collect a small fee as a commission. This fee will not only help us maintain
+    the website but also enable us to continuously improve and expand our services to benefit the entire artist community.
+</li>
+<li>Promotional Boost: We're committed to promoting your talent to a wider audience. Through our website, social media channels,
+    and various marketing initiatives, we'll ensure that your artworks gain the visibility they deserve.
+    Get ready to attract art enthusiasts, collectors, and potential buyers who appreciate your unique creations.
+</li>
+
+</ul>
     </div>
-{% endif %}
-    <div class="container" style="width:90%;font-size:13px;">
-        <form method="post"  action="/gallery/index/">
-            {% csrf_token %}
-            {{form.mycity|as_crispy_field}}
-            <br><br>
-            <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-        </form>
+</div>
+
+<!-- Display samples -->
+            <div class="row">
+                {% for x in artwork_list %}
+              <div class="col-md-4 border m-2">
+                <div class="image">
+                    <a href="{% url 'gallery:photos' %}?artist={{x.artist}}">
+                        <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
+                    </a>
+                  <div class="image-info">
+                    <p>Artist: {{x.artist}}</p>
+                    {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}
+                    {% if x.medium %}<p>Medium: {{x.medium}}</p>{% endif %}
+                    {% if x.genre %}<p>style: {{x.genre}}</p>{% endif %}
+                 </div>
+                </div>
+              </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
     </div>
+</div>
+<br>
 
 
 
 
-  </body>
-</html>
+{% endblock %}
+
+

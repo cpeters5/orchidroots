@@ -1,763 +1,126 @@
 <!DOCTYPE html>
-{% load static %}
-{% load humanize %}
-
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
-    <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
-    <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
-    <!--    <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico?v=2' %}"/>-->
-<!--    <script>-->
-<!--        window.dataLayer = window.dataLayer || [];-->
-<!--        function gtag(){dataLayer.push(arguments);}-->
-<!--        gtag('js', new Date());-->
-<!--        gtag('config', 'UA-128957305-1');-->
-<!--    </script>-->
-    {% if species %}
-        <title>{{species.binomial}}</title>
-    {% elif genus %}
-        <title>{{genus}}</title>
-    {% elif family %}
-        <title>{{family.family}}</title>
-    {% else %}
-        <title>Bluenanta</title>
-    {% endif %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
-    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Fondamento" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<!--    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="{% static '/utils/css/style.css' %}">
-	<link rel="{% static '/utils/css/index.css' %}">
-
-    <!--adsense-->
-<!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037211149077083" crossorigin="anonymous"></script>-->
-
-    <!--    Get rid of apple-touch error caused by requests from cellphone. Doesn't work anyway oh what to do??? -->
-<!--    <link rel="apple-touch-icon" href="apple-touch-icon.png">-->
-<!--    <link rel="icon" sizes="196x196" href="apple-touch-icon.png">-->
-<!--    <link rel="icon" sizes="120x120" href="apple-touch-icon.png">-->
-<!--    <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">-->
-<!--    <link rel="apple-touch-icon-precomposed apple-touch-icon" href="apple-touch-icon-precomposed.png">-->
-<!--    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>-->
-<!--	<script src="{% static 'utils/js/jstree.min.js' %}"></script>-->
-<!--    Select2-->
-<!--    <link href="select2.css" rel="stylesheet"/>-->
-<!--    <script src="select2.js"></script>-->
-<!--    <script>-->
-<!--        $(document).ready(function() { $("#genselect").select2(-->
-<!--            {-->
-<!--                placeholder: "Select a Genus",-->
-<!--                allowClear: true,-->
-<!--                closeOnSelect: false-->
-<!--            }-->
-<!--        ); });-->
-<!--        $(document).ready(function() { $("#spcselect").select2();});-->
-<!--        $(document).ready(function() { $("#hybselect").select2();});-->
-<!--    </script>-->
-
-    <style>
-
-    .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-    .mytable>tbody>tr>th { font-size: 16px; }
-    .mytable>tbody>tr>td { font-size: 12px !important; }
-	a {text-decoration: none}
-
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    .navbar-nav > li > a {padding-top:0 !important; padding-bottom:0 !important;}
-
-    /* adsense component*/
-    .infeed {
-        border: 1px solid lightgrey;
-    }
-  @media (min-width: 350px) {
-      .infeed {
-          height: 40px;
-      }
-  }
- @media (min-width: 500px) {
-    .infeed {
-      height: 20px;
-    }
-  }
- @media (min-width: 800px) {
-    .infeed {
-        height: 50px;
-    }
-  }
-
-</style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DVXPK0YWTQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DVXPK0YWTQ');
-</script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Bootstrap Navbar with Search Box and Tabs</title>
 </head>
-
 <style>
-
-
-img {
-max-width: 100%;
-display: block;
-}
-
-#log, #reg {
-    float: right;
-     width: 17%;
-     text-align: center;
-}
-
-.thumbnails {
-   object-fit: cover;
-   overflow: hidden;
-   height: 12vw;
-   width : 12vw;
-    padding:2px;
-}
-
-.imgcaption {
-    font-size: 11px;
-    text-align: center;
-    height:40px;
-    overflow: hidden;
-}
-
-.table-text {
-    font-size:13px;
-    text-align: left;
-    line-height: 20px;
-}
-
-.searchbox {
-    margin:0;
-    font-size: 13px;
-    width: 100px;
-    /*padding: 0;*/
-    /*height: 10px !important;*/
-    }
-.nav-style {
-    font-size:18px;
-    width:100px;
-}
-
-@media only screen and (max-width: 800px){
-    .imgcaption {
-        font-size: 10px;
-        height: 50px;
-        overflow: hidden
-    }
-    .table-text {
-        font-size:12px;
-    }
-}
-
-@media only screen and (max-width: 600px){
-    .searchbox {
-        font-size: 12px;
-        width: 80px;
-    }
-    .modal-content {
-        width: 100%;
-    }
-    .imgcaption {
-        font-size: 9px;
-        height: 60px;
-        overflow: hidden
-    }
-    .table-text {
-        font-size:12px;
-    }
-   .thumbnails {
-        width: 22vw;
-        height: 22vw;
-    }
-    .detail-title {
-        font-size:13px;
-    }
-    .dropdown-content a {
-        font-size:10px;
-
-    }
-}
-
-.navbar2 {
-    background-color: #fef9ff;
-    color: black;
-    width:100%;
-    margin:0;
-    float:left;
-    padding:4px;
-    font-size: 15px;
-    border: 1px solid lightgrey;
-}
-
-.navbar2:hover {
-    text-decoration: none;
-}
-.selected {
-    background-color: #bac4e8;
-    border: 1px solid #808080;
-    color: black;
-}
-
-.item-list {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.item-list:hover {
-    text-decoration: none;
-}
-
-.dropdown-item {
-    padding: 5px 10px;
-}
-
-.dropdown-item:hover {
-    background-color:lightgrey;
-}
-
-
-.dropdown-menu {
-    padding: 10px;
-    font-size:13px;
-
-}
-
-.dropdown:hover>.dropdown-menu {
-    display: block;
-}
-    .advanced_search {
-        height: 33px !important;
-        width: 170px !important;
-        border: 1px solid darkgrey !important;
-        font-size: 13px;
-    }
-
-.select2-hidden-accessible {
-    border: 0 !important;
-    clip: rect(0 0 0 0) !important;
-    height: 1px !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    position: absolute !important;
-    width: 1px !important;
-}
-.navbar {
-  min-height: 40px;
-}
-/*option:nth-child(2), option:nth-child(3) {*/
-/*    font-weight:bold;*/
-/*}*/
-
-.bannerfont {
-  font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-  font-size: 18pt;
-  color: #33f8ff;
-  /*line-height: 13px;*/
-}
-
-.famfont {
-  font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-  font-size: 16pt;
-  color: #7ef51a !important;
-    display: inline;
-}
-.famother {
-  font-family: "Lucida", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-  font-size: 16pt;
-  color: #7ef51a !important;
-    display: inline;
-}
-
-.selectedText{
-    color:blue;
-    font-weight:bold;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-    .navbar-nav {
-      flex-direction: row;
-    }
-
-    .nav-link {
-        padding-right: .5rem !important;
-        padding-left: .5rem !important;
-        color: white !important;
-        font-size:16px;
-        margin:0 10px;
-    }
-
-.custom-find{
-    /*color: #292929;*/
-    color:white;
-}
-
-.custom-find:hover {
-    text-decoration: none;
-    background-color: #353547;
-    color: lightblue !important;
-}
-
-.btn-custom{
-    /*margin:1px;*/
-    width:120px;
-    height:32px;
-    display: inline-block;
-    background: none;
-    border-color: #2196F3;
-    color: dodgerblue;
-    padding: 5px 5px;
-    font-size: 14px;
-}
-
-.btn-custom:hover {
-    text-decoration: none;
-    background-color: #c2cdd0;
-    color: black;
-}
-
-.btn-custom:active {
-    text-decoration: none;
-    background-color: #8887bd;
-    color: black;
-}
-@media only screen and (max-width: 600px) {
-    .famfont .famother {
-      font-size: 16px;
-    }
-}
-
-/*Taxonomy*/
-ul{
-        font-size: 13px;
-        padding-left:10px;
-        line-height: 23px;
-        list-style-type:none;
-}
-li {
-    padding-left:0;
-}
-form {
-    display: inline-block; //Or display: inline;
-}
-ul, #myUL {
-  list-style-type: none;
-}
-
-#myUL {
-  margin: 0;
-  padding: 0;
-}
-
-ul, #myUL1 {
-  list-style-type: none;
-}
-
-#myUL1 {
-  margin: 0;
-  padding: 0;
-}
-
-.spc_column {
-    min-width: 200px;
-}
-
-/*.indent {*/
-/*  text-indent: 18px;*/
-/*}*/
-
-/*.nested {*/
-/*  display: none;*/
-/*    margin-left: 8px;*/
-/*}*/
-
-.active {
-  display: block;
-}
-.dataTables_filter {
-    float: left;
-}
-
-.caret {
-  cursor: pointer;
-  -webkit-user-select: none; /* Safari 3.1+ */
-  -moz-user-select: none; /* Firefox 2+ */
-  -ms-user-select: none; /* IE 10+ */
-  user-select: none;
-}
-
-.caret::before {
-  content: "\25B7";
-  color: black;
-  display: inline-block;
-  margin-right: 6px;
-}
-
-.caret-down::before {
-  content: "\25BD";
-  /*-ms-transform: rotate(90deg); !* IE 9 *!*/
-  /*-webkit-transform: rotate(90deg); !* Safari *!'*/
-  /*transform: rotate(90deg);*/
-}
-
-a {
-        text-decoration: none;
-    /*color: blue;*/
-}
-
-a:hover {
-    /*text-decoration: none;*/
-    color: darkblue;
-}
-.submit {
-    /*Use only in home page*/
-    /*height:35px;*/
-    /*width: 38px;*/
-    height: 40px;
-    /*font-color:lightgrey;*/
-    /*border: none;*/
-    float: left;
-    margin: 0;
-    /*background-color: #607951;*/
-    /*color:white;*/
-    border: 1px solid #ccc;
-    border-left: 0;
-    /*visibility: hidden;*/
-}
-
-nav a {
-  float: left;
-  display: block;
-  color: black;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 14px;
-}
-/*nav a:hover {*/
-/*  background-color: #ddd;*/
-/*  color: black;*/
-/*}*/
-
-
-nav input[type=text] {
-  padding: 6px;
-  margin: 1px;
-  font-size: 14px;
-  border: none;
-    border-radius: 3px;
-    width: 200px;
-    height: 35px;
-}
-nav select {
-  height: 35px;
-  padding: 6px;
-  margin: 1px;
-  font-size: 16px;
-  /*border: 1px solid #ccc;*/
-  background-color: #5858be;
-  color: white;
-  border-left: #ccc;
-     border-radius: 3px;
-}
-option:not(:checked) {
-    background-color: #FFF;
-    color: black;
-}
-nav button[type=submit] {
-  padding: 6px !important;
-  margin: 1px !important;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  height: 35px !important;
-  width: 35px;
-}
-
-nav .search-container button {
-  float: right;
-  padding: 6px 10px;
-  margin-top: 4px;
-  margin-right: 16px;
-    height: 30px;
-  background: inherit;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-}
-nav .search-container button:hover {
-  background: #ccc;
-}
-/*.search-btn {*/
-/*    width: 150px !important;*/
-/*    height:40px !important;*/
-/*    font-size: 13px;*/
-/*}*/
-/*.search-btn1 {*/
-/*    width: 40px;*/
-/*    height:40px;*/
-/*    font-size: 12px;*/
-/*}*/
-.fambtn {
-    /*font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;*/
-    font-size:13px !important;
-    display:inline;
-    margin: 0 2px;
-    border: 0;
-}
-.disabled-link {
-  pointer-events: none;
-}
-
-@media screen and (max-width: 600px) {
-  nav .search-container {
-    float: none;
+  .logo__image-wrapper {
+    max-width: 100px;
   }
-  nav a, .topnav input[type=text], .topnav .search-container button {
-    float: none;
-    display: block;
-    text-align: left;
-    width: 100%;
-    margin: 0;
-    padding: 14px;
-  }
-  nav input[type=text] {
-    border: 1px solid #ccc;
-  }
-  .bannerfont {
-    font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
-    font-size: 17px;
-  }
-
-  /*.search-btn {*/
-  /*   width: 100px !important;*/
-  /*   height:30px !important;*/
-  /*    font-size: 11px;*/
-
-  /*}*/
-  /*  .search-btn1 {*/
-  /*      width: 30px !important;*/
-  /*      height:30px !important;*/
-  /*      font-size: 11px;*/
-  /*  }*/
-    .fambtn {
-        font-size: 10px;
-        padding: 4px !important;
+.hide-button {
+  display: none;
+}
+  /*================= If logo is above navigation ================== */
+    .site-nav {
+      margin-top: 30px;
     }
+      .logo__image-wrapper {
+        margin: 0;
+      }
+  /*============ If logo is on the same line as navigation ============ */
+.form-wrapper {
 }
 
-.active1 {
-    background-color: #394ad5 !important;
-}
+
+
 </style>
+<body>
+<div class="wrapper">
+    <div class="logo__image-wrapper supports-js">
+      <a href="{% url 'gallery:index' %}" itemprop="url" style="padding-top:58.27956989247312%;">
+        <img class="" src="/media/gallery/gallery_head3.jpg" data-sizes="auto" alt="Givens Gallery" itemprop="logo">
+      </a>
+    </div>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <div class="container" style="width:100% !important;">
-        <div class="navbar-header">
-            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff;"><b>BlueNanta</b></a>
-            <!-- Brand -->
-<!-- Links -->
-
-            <ul class="navbar-nav " style="line-height:25px !important;">
-                <li  class="nav-item">
-                        <form class="form-inline" id="search" action="/search/search/" style="display:inline-block; margin-top: 5px;">
-                            <input type="hidden" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
-                            <input type="hidden" name="role" value="{{ role }}" >
-                            <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="scientific name"style="border:1px solid #ccc; border-right: 0">
-                        </form>
-                </li>
-                <li  class="nav-item">
-                        <form class="form-inline" id="name" action="/search/search_name/" style="display:inline-block; margin-top: 5px;">
-                            <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">
-                        </form>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <div class="nav-item dropdown" style="float:right;">
-                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
-                        <ul class="dropdown-menu">
-                            {% if user.tier.tier == 5 %}
-                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
-                                <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}">Maintenance</a></li>
-                                <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
-                                {% if species %}
-                                    <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role=pub">Public</a></li>
-                                {% else %}
-                                    <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family}}&display=checked">Browse</a></li>
-                                {% endif %}
-                                <li><a class="dropdown-item" href="{% url 'gallery:index' %}">Gallery</a></li>
-                            {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Species</a></li>
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Hybrids</a></li>
-                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family}}&tab=brg&role=pri">My Collection</a></li>
-<!--                            <hr style="margin:0;padding:0;">-->
-                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/">Update profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/">Logout</a></li>
-                            <li>Role</li>
-                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family}}&role=pub&display=checked">Public</a></li>
-                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family}}&role=pri&display=checked">Private</a></li>
-                            <li><a class="btn btn-custom dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family}}&role=cur&display=checked">Curate</a></li>
-                        </ul>
-                    </div>
-                </li>
-                {% else %}
-<!--                    <li class="nav-item" style="margin-top:8px;">-->
-<!--                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login"><span style="color:white">Register</span></a>-->
-<!--                    </li>-->
-                    <li class="nav-item" style="margin-top:8px;">
-                        <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
-                    </li>
-                {% endif %}
-            </ul>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar2" aria-controls="navbar2" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar2">
+<!-- Select genre -->
+        <div class="form-wrapper mr-1">
+        <form action="/gallery/browse_gallery/" method="post" id="search-genre">
+                {% csrf_token %}
+          <select class="form-control" form="search-genre" name="genre" onchange="handleSelect(this)">
+            {% if genre %}
+            <option value="">{{genre}}</option>
+            {% else %}
+            <option value="">Select a category</option>
+            {% endif %}
+            <option value="">all category</option>
+            {% for x in genre_list %}
+              <option value="{{x}}" {% if x == genre %}active{% endif %}>{{x}}</option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="medium" value="{{ medium }}">
+        </form>
         </div>
-<!-- Search -->
-  </div>
-</nav>
-    <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark" >-->
-{% if messages %}
-  <div class="row">
-  <div class="col-sm-12">
-      {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}" role="alert">
-          <p>{{ message }}</p>
+<!--        Select medium -->
+        <div class="form-wrapper mr-1">
+        <form action="/gallery/browse_gallery/" method="post" id="search-medium">
+                {% csrf_token %}
+          <select class="form-control" form="search-medium" name="medium" onchange="handleSelect(this)">
+            {% if medium %}
+            <option value="">{{medium}}</option>
+            {% else %}
+            <option value="">Select a medium</option>
+            {% endif %}
+            <option value="">all medium</option>
+            {% for x in medium_list %}
+              <option value="{{x}}" {% if x == medium %}active{% endif %}>{{x}}</option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="genre" value="{{ genre }}">
+        </form>
+        </div>
+          <!--        Select artiist -->
+<!--        <div class="form-wrapper mr-1">-->
+<!--        <form class="form-inline mr-auto" id="search-artist" action="/gallery/photos/" >-->
+<!--          <input class="form-control" form="search-artist" type="search" placeholder="Search artists" aria-label="Search">-->
+<!--          <button class="btn btn-outline-primary my-2 my-sm-0 hide-button" form="search-artist" type="submit">Search</button>-->
+<!--        </form>-->
+<!--        </div>-->
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#">about</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'gallery:browse_artist' %}">Browse Artists</a>
+        </li>
+        <li class="nav-item">
+          {% if user.is_authenticated %}
+          <span  class="nav-link">{{user}}</span>
+          {% else %}
+          <a class="nav-link" href="{% url 'login' %}">Login/register</a>
+          {% endif %}
+        </li>
+      </ul>
       </div>
-      {% endfor %}
     </div>
+  </nav>
 
-  </div>
-{% endif %}
-
-
-
-<div class="p-1" style="background-color:black; font-size: 11px;">
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&display=checked">Orchids</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked">Fungi</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked">Plants</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked">Birds</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked">Animals</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'common:research' %}?family={{family}}&role={{cur}}">Research</a>
-<!--     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>-->
-    </div>
-
-
+  <script>
+    function handleSelect(select) {
+      var selectedOption = select.value;
+      console.log("Selected option:", selectedOption);
+      // Perform further actions based on the selected option
+      // e.g., submit the form programmatically, redirect, etc.
+      select.form.submit();
+    }
+  </script>
 
 </div>
 
 
-{% block content %}
-    {%  block body %}
-
-
-    {% endblock %}
-{% endblock %}
-
-
-
-<script>
-
-    (function($) {
-
-  $('#search-button').on('click', function(e) {
-    if($('#search-input-container').hasClass('hdn')) {
-      e.preventDefault();
-      $('#search-input-container').removeClass('hdn')
-      return false;
-    }
-  });
-
-  $('#hide-search-input-container').on('click', function(e) {
-    e.preventDefault();
-    $('#search-input-container').addClass('hdn')
-    return false;
-  });
-
-})(jQuery);
-
-</script>
-
-{% block extra-scripts %}
-
-{% endblock %}
-
-
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
-
-
-<ins class="adsbygoogle infeed"
-     style="display:block;"
-     data-ad-format="fluid"
-     data-ad-layout="image-top"
-     data-ad-layout-key="xxxxxxxx"
-     data-ad-client="ca-pub-12345"
-     data-ad-slot="123456"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
