@@ -628,6 +628,12 @@ class SpcImages(models.Model):
     def __str__(self):
         return self.pid.textname()
 
+    def clean_name(self):
+        name = self.name.strip('\"')
+        name = name.lstrip('\'')
+        name = name.rstrip('\'')
+        return name
+
     def imgname(self):
         if self.source_file_name:
             myname = '<i>%s</i>' % (self.source_file_name)
@@ -640,7 +646,7 @@ class SpcImages(models.Model):
         if self.certainty:
             myname = '%s %s ' % (myname, self.certainty)
         if self.name:
-            myname = "%s '%s' " % (myname, self.name)
+            myname = "%s '%s' " % (myname, self.clean_name())
         return myname
 
     def imginfo(self):
