@@ -30,6 +30,11 @@
       background-color: #f8f9fa;
       padding: 10px;
 }
+.parent {
+    display: grid;
+    background-color: #f7f7f7;
+    place-items: center;
+}
 </style>
 <div class="container-fluid" style="min-height:200px;border:0 solid grey">
     <div style="margin-top:8px;">
@@ -48,37 +53,37 @@
                     </div>
                 </div>
             <div class="card-body" style="font-size:15px">
-        Here's what you can expect from Givens Gallery
-    <div class="d-inline-block">
-<ul>
-<li>Free Artwork Posting: Share your masterpieces without any upfront charges!
-    Our platform allows you to upload high-quality pictures of your artworks at absolutely no cost.
-    This means you can showcase your talent and build your artistic portfolio without any financial burden.
-</li>
-<li>Sales Made Simple: We understand that artists deserve recognition and financial support for their hard work.
-    That's why we've developed a seamless sales system on our website. When a piece of your artwork finds a loving home,
-    we'll facilitate the transaction and collect a small fee as a commission. This fee will not only help us maintain
-    the website but also enable us to continuously improve and expand our services to benefit the entire artist community.
-</li>
-<li>Promotional Boost: We're committed to promoting your talent to a wider audience. Through our website, social media channels,
-    and various marketing initiatives, we'll ensure that your artworks gain the visibility they deserve.
-    Get ready to attract art enthusiasts, collectors, and potential buyers who appreciate your unique creations.
-</li>
+                Here's what you can expect from Givens Gallery
+                <div class="d-inline-block">
+                    <ul>
+                    <li>Free Artwork Posting: Share your masterpieces without any upfront charges!
+                        Our platform allows you to upload high-quality pictures of your artworks at absolutely no cost.
+                        This means you can showcase your talent and build your artistic portfolio without any financial burden.
+                    </li>
+                    <li>Sales Made Simple: We understand that artists deserve recognition and financial support for their hard work.
+                        That's why we've developed a seamless sales system on our website. When a piece of your artwork finds a loving home,
+                        we'll facilitate the transaction and collect a small fee as a commission. This fee will not only help us maintain
+                        the website but also enable us to continuously improve and expand our services to benefit the entire artist community.
+                    </li>
+                    <li>Promotional Boost: We're committed to promoting your talent to a wider audience. Through our website, social media channels,
+                        and various marketing initiatives, we'll ensure that your artworks gain the visibility they deserve.
+                        Get ready to attract art enthusiasts, collectors, and potential buyers who appreciate your unique creations.
+                    </li>
 
-</ul>
-    </div>
-</div>
+                    </ul>
+                </div>
+            </div>
 
 <!-- Display samples -->
-            <div class="row">
+            <div class="row parent">
                 {% for x in artwork_list %}
               <div class="col-md-4 border m-2">
                 <div class="image">
-                    <a href="{% url 'gallery:photos' %}?artist={{x.artist}}">
+                    <a href="{% url 'gallery:my_gallery' %}?artist={{x.artist}}">
                         <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
                     </a>
                   <div class="image-info">
-                    <p>Artist: {{x.artist}}</p>
+                      <p>Artist: <a href="{% url 'gallery:my_gallery' %}?artist={{x.artist}}">{{x.artist}}</a></p>
                     {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}
                     {% if x.medium %}<p>Medium: {{x.medium}}</p>{% endif %}
                     {% if x.genre %}<p>style: {{x.genre}}</p>{% endif %}

@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 {% include "gallery/base.html" %}
 {% block body %}
   <head>
@@ -16,13 +17,16 @@
     text-align:center;
 }
 
-.image {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-    margin-top: 5px;
+.image_l {
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*margin-bottom: 20px;*/
+    /*margin-top: 5px;*/
+    max-width: 500px;
+    height: auto;
+
 }
-.image img {
+.image_l img {
     flex: 1;
 }
 
@@ -32,25 +36,24 @@
 }
 </style>
 <div class="container-fluid" style="min-height:200px;border:0 solid grey">
-    <div style="margin-top:8px;">
+    <div style="margin-top:20px;">
         <div class="card mt-3">
 <!-- Display samples -->
             <div class="row">
-                {% for x in artwork_list %}
               <div class="col-md-3 border m-1">
-                <div class="image">
-                    <a href="{% url 'gallery:my_gallery' %}?artist={{x.artist}}">
-                        <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
-                    </a>
-                  <div class="image-info">
-                    <p>Artist: {{x.artist}}</p>
-                    {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}
-                    {% if x.medium %}<p>Medium: {{x.medium}}</p>{% endif %}
-                    {% if x.genre %}<p>style: {{x.genre}}</p>{% endif %}
-                 </div>
+                <div class="image_l">
+                        <img src="{{image.image_dir}}{{image.image_file}}" class="img-fluid image">
                 </div>
               </div>
-                {% endfor %}
+             <div class="col-md-3 border m-1">
+                  <div class="imageitem">
+                    {% if image.artist %}<p>Artist: {{image.artist}}</p>{% endif %}
+                    {% if image.title %}<p>Title: {{image.title}}</p>{% endif %}
+                    {% if image.medium %}<p>Medium: {{image.medium}}</p>{% endif %}
+                    {% if image.genre %}<p>style: {{image.genre}}</p>{% endif %}
+                    {% if image.status == 'AV' or image.status == '' and image.price > 0 %}Price: ${{image.price|intcomma}}<br>{% endif %}
+                 </div>
+                </div>
             </div>
 
         </div>

@@ -5,38 +5,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <title>Bootstrap Navbar with Search Box and Tabs</title>
+  <link rel="shortcut icon" type="image/png" href="/static/utils/images/favicon.ico"/>
+  <title>McGivens Gallery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <style>
-  .logo__image-wrapper {
-    max-width: 100px;
-  }
-.hide-button {
+.image-nav {
+    max-width: 5000px;
+
+}
+.dropdown-toggle::after {
+  content: none;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu {
   display: none;
-}
-  /*================= If logo is above navigation ================== */
-    .site-nav {
-      margin-top: 30px;
-    }
-      .logo__image-wrapper {
-        margin: 0;
-      }
-  /*============ If logo is on the same line as navigation ============ */
-.form-wrapper {
+  position: absolute;
+  z-index: 1;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
+.dropdown-menu li {
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
 
+.dropdown-menu li:hover {
+  background-color: #f1f1f1;
+}
 
 </style>
 <body>
 <div class="wrapper">
     <div class="logo__image-wrapper supports-js">
       <a href="{% url 'gallery:index' %}" itemprop="url" style="padding-top:58.27956989247312%;">
-        <img class="" src="/media/gallery/gallery_head3.jpg" data-sizes="auto" alt="Givens Gallery" itemprop="logo">
+        <img class="image-nav" src="/media/gallery/banner.jpg" data-sizes="auto" alt="McGivens Gallery" itemprop="logo">
       </a>
     </div>
 
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
     <div class="container">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar2" aria-controls="navbar2" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -79,27 +93,45 @@
         </form>
         </div>
           <!--        Select artiist -->
-<!--        <div class="form-wrapper mr-1">-->
-<!--        <form class="form-inline mr-auto" id="search-artist" action="/gallery/photos/" >-->
-<!--          <input class="form-control" form="search-artist" type="search" placeholder="Search artists" aria-label="Search">-->
-<!--          <button class="btn btn-outline-primary my-2 my-sm-0 hide-button" form="search-artist" type="submit">Search</button>-->
-<!--        </form>-->
-<!--        </div>-->
 
-      <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto">
+         {% if user.is_authenticated %}
+             <li class="nav-item">
+              <a class="nav-link" href="{% url 'gallery:my_gallery' %}?artist={{user.artist}}">My Artworks</a>
+            </li>
+         {% endif %}
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'gallery:browse_artist' %}">Our Artists</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="#">about</a>
         </li>
-         <li class="nav-item">
-          <a class="nav-link" href="{% url 'gallery:browse_artist' %}">Browse Artists</a>
-        </li>
         <li class="nav-item">
           {% if user.is_authenticated %}
-          <span  class="nav-link">{{user}}</span>
+    <li class="nav-link">
+      <a href="#" class="dropdown-toggle">{{user}}</a>
+      <ul class="dropdown-menu">
+        <li><a href="#">Option 1</a></li>
+        <li><a href="#">Option 2</a></li>
+        <li><a href="#">Option 3</a></li>
+      </ul>
+    </li>
           {% else %}
           <a class="nav-link" href="{% url 'login' %}">Login/register</a>
           {% endif %}
         </li>
+
+          {% if user.is_authenticated %}
+        <li><a class="nav-link" href="{% url 'logout' %}?next=/">Logout</a></li>
+        <li><a class="nav-link" href="{% url 'update_profile' %}?next=/gallery">Update profile</a></li>
+          {% endif %}
+
+             <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fa fa-shopping-cart"></i> Cart
+                  <span class="cart-counter">{{cart_items|default:0}}</span>
+                </a>
+             </li>
       </ul>
       </div>
     </div>

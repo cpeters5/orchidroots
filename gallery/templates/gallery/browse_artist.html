@@ -8,16 +8,18 @@
                         <div class="card-body border" style="width: 80%; margin: 0 auto; margin-top: 20px;">
                             <div class="row">
                                 <div class="col-sm-3 col-lg-2 imageitem m-2" style="padding:0; border-color: red">
-                                    <a href="{% url 'gallery:photos' %}?">
-                                            <img class="img-fluid image" alt="{{artist.1.title}}" src="{{artist.1.image_dir}}{{artist.1.image_file}}">
+                                    <a href="{% url 'gallery:my_gallery' %}?artist={{artist.0}}">
+                                        {% if artist.0.image_file %}
+                                        <img class="img-fluid image" alt="My photo" src="{{artist.0.image_dir}}{{artist.0.image_file}}">
+                                        {% endif %}
                                     </a>
                                     <div class="image-info">
-                                    <p>{{artist.0}}'s picture here</p>
+                                    <p>Put {{artist.0}}'s picture here</p>
                                     </div>
                                 </div>
                                 <div class="col-sm-7 col-lg-8 m-2" style="padding:0; border-color: blue">
                                 <div class="image-info" style="padding:0; border-color: blue">
-                                    <p>Artist: <a href="{{artwork.source_url}}" target="_blank" >{{artist.0}},</a></p>
+                                    <p>Artist: <a href="{% url 'gallery:my_gallery' %}?artist={{artist.0}}" >{{artist.0}},</a></p>
                                     <p>Contact information:</p>
                                     <p>City: {{artist.0.city|default:''}}</p>
                                     <p>Style: <a href="#">{{artist.0.media|default:''}}</a></p>

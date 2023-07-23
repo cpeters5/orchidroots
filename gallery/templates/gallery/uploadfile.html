@@ -13,43 +13,68 @@
 <div style="width:95%;margin:0 auto;padding:0;">
              <!--main section-->
     <br>
-    <div class="tab-content clearfix" style="width:100%;background-color:white;margin:0 auto;border-left:0 solid lightgrey;border-right:0 solid lightgrey;border-bottom:1px solid lightgrey">
+    artist= {{artist}} - {{artist.user_id}} - {{artist.get_profile_pic}}
+    <div class="tab-content clearfix" style="width:100%;background-color:white;margin:0 auto; padding:10px;">
         <div class="container" style="width:90%;font-size:13px;">
-            <form method="post" action="{% url 'gallery:uploadfile' %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'gallery:uploadfile' %}?artist={{artist}}" enctype="multipart/form-data">
                 {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-
+                    <div class="form-row" >
+                        <div class="form-group col-md-2 mb-0 float-left">
+                            <br>
+                            <button type="submit" class="btn btn-primary btn-sm" style="width:80px;" >
+                                Save
+                            </button>
+                        </div>                       &nbsp;&nbsp;
+                        <div class="form-group col-md-2 mb-0 float-left" style="margin-left:0px;">
+                            <br>
+                            <a href="{% url 'gallery:my_gallery' %}?artist={{user.artist}}" style="font-size:16px;"><b>Cancel</b></a>
+                        </div>
+                        <div class="form-group col-md-4 mb-0 float-left">
+                            {{form.image_file|as_crispy_field}}
+                        </div>
+                      </div>
     <!--                <hr  class="my-4">-->
                     <div class="form-row">
                         <div class="form-group col-md-4 mb-0 p-1">
                             {{form.artist|as_crispy_field}}
                         </div>
-                        <div class="form-group col-md-4 mb-0 p-1">
-                            {{form.title|as_crispy_field}}
-                        </div>
-                        <div class="form-group col-md-4 mb-0">
-                            {{form.image_file|as_crispy_field}}
-                        </div>
-                    </div>
-                    <div class="form-row">
                        <div class="form-group col-md-4 mb-0 p-2">
                              {{form.medium|as_crispy_field}}
                         </div>
                        <div class="form-group col-md-4 mb-0 p-2">
                              {{form.genre|as_crispy_field}}
                         </div>
-                        <div class="form-group col-md-4 mb-0 p-2">
-                            {{form.style|as_crispy_field}}
-                        </div>
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group col-md-12 mb-0">
+                        <div class="form-group col-md-8 mb-0 p-1">
+                            {{form.name|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4 mb-0">
+                            {{form.price|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="form-row">
+<!--                        {% if user.is_authenticated and user.tier.tier > 10 %}-->
+<!--                       <div class="form-group col-md-4 mb-0 p-2">-->
+<!--                             {{form.rank|as_crispy_field}}-->
+<!--                        </div>-->
+<!--                        {% endif %}-->
+                    </div>
+                     <div class="form-row">
+                        <div class="form-group col-md-4 mb-0">
+                            {{form.support|as_crispy_field}}
+                        </div>
+                         <div class="form-group col-md-4 mb-0">
                             {{form.hashtag|as_crispy_field}}
                         </div>
+                        <div class="form-group col-md-4 mb-0">
+                            {{form.status|as_crispy_field}}
+                        </div>
                      </div>
-
+                    {{form.source_url|as_crispy_field}}
                     {{form.description|as_crispy_field}}
+
                     <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                     <input type="hidden" name="title" value="{{ title }}">
 

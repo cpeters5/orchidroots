@@ -23,15 +23,6 @@
     border:1px solid lightgrey;
     text-align:center;
 }
-.imageitem-cur {
-    display:inline-block;
-    margin:2px;
-    width : 17vw;
-    height: 24vw;
-    background-color: #f7f7f7;
-    border:1px solid lightgrey;
-    text-align:center;
-}
 
 .box {
     position: relative;
@@ -51,15 +42,6 @@
     margin:5px auto;
 }
 
-.thumbnail-tiny {
-   object-fit: cover;
-   overflow: hidden;
-   height: 11vw;
-   width : 11vw;
-   padding:2px;
-    margin:5px auto;
-}
-
 .imgcaption {
     font-size: 10px;
     text-align: center;
@@ -67,49 +49,21 @@
     margin-top: -7px;
     /*overflow: hidden;*/
 }
-.imgcaption-cur {
-    font-size: 10px;
-    text-align: center;
-    /*height:80px;*/
-    margin-top: -7px;
-    /*overflow: hidden;*/
-}
-
-div.text {
-    position: absolute;
-    font-size:10px;
-    color: white
-}
-
-
-div.text-br {
-    position: absolute;
-    bottom: 5px;
-    right: 15px;
-}
 
 div.text-bl a {
     color: #2fffff;
 }
 
-.mybtn {
-    font-size: 12px;
+.title {
+    color: #bacecc;
 }
-
 @media only screen and (max-width: 800px){
     .imageitem {
         width: 28vw;
         height: 36vw;
     }
-    .imageitem-cur {
-        width: 28vw;
-        height: 40vw;
-    }
     .imgcaption {
         font-size: 10px;
-    }
-    .imgcaption-cur {
-        font-size: 9px;
     }
     .box {
         width: 27vw;
@@ -121,13 +75,6 @@ div.text-bl a {
     .thumbnails {
        height: 26vw !important;
        width: 26vw !important;
-    }
-    /*.thumbnails {*/
-    /*   height: 190px !important;*/
-    /*   width : 95% !important;*/
-    /*}*/
-    div.text {
-        font-size: 10px;
     }
 }
 
@@ -146,62 +93,18 @@ div.text-bl a {
        height: 30vw !important;
        width: 30vw !important;
     }
-    .imageitem-cur {
-        width: 36vw;
-        height: 56vw !important;
-        padding:2px;
-        margin:5px auto;
-    }
-    .box-tiny {
-        width: 18vw;
-        font-size: 9px;
-        margin-left:-3px;
-    }
-    .thumbnail-tiny {
-        height: 15vw;
-        width : 15vw;
-        padding:2px;
-        margin:3px auto;
-
-    }
     .imgcaption {
        width : 34vw;
         font-size: 9px;
         height: 59px;
     }
-    .imgcaption-cur {
-       width : 34vw;
-        font-size: 9px;
-        height: 62px;
-    }
-    div.text {
-        font-size: 10px;
-    }
 
-    .mybtn {
-        font-size: 11px !important;
-    }
-}
-
-.clearfix:after {
-    content: "";
-    display: table;
-    clear: both;
 }
 
 label {
     display: inline-block;
     width: 250px;
     margin-right: 5px;
-}
-
-.tab-content {
-    min-height: 200px !important;
-    background:white;
-    padding:10px 0;
-    border-left:1px solid lightgrey;
-    border-right:1px solid lightgrey;
-    border-bottom:1px solid lightgrey;
 }
 
 a:hover {
@@ -269,7 +172,11 @@ a:hover {
 
 </style>
 
+<div class="container-fluid border" style="width: 90%;border:0 solid grey; margin:0 auto;">
 
+    <div class="title">
+    <h3>{{artist}}'s Artworks</h3>
+    </div>
             {% for image in artwork_list %}
                 <div class="imageitem">
                     <div class="box">
@@ -289,18 +196,8 @@ a:hover {
                     </div>
                 </div>
             {% endfor %}
-
+</div>
 <script type="text/javascript">
-
-// $(document).ready(function(){
-//     $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
-//         localStorage.setItem('activeTab', $(e.target).attr('href'));
-//     });
-//     var activeTab = localStorage.getItem('activeTab');
-//     if(activeTab){
-//         $('#myTab a[href="' + activeTab + '"]').tab('show');
-//     }
-// });
 
 $(document).on('click', '[data-toggle="lightbox"]', function(event) {
                 event.preventDefault();

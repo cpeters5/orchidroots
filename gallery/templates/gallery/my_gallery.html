@@ -1,27 +1,26 @@
 {% load static %}
 {% include "gallery/base.html" %}
 {% block body %}
+{% load humanize %}
   <head>
     <title>Givens Gallery</title>
   </head>
 <style>
 
-.imageitem {
+.imagedescription {
     display:inline;
     margin:2px;
-    width : 20%;
+    width : 50%;
     height: auto;
-    background-color: #f7f7f7;
-    border:1px solid lightgrey;
-    text-align:center;
+    text-align:left;
 }
 
 .image {
     /*display: flex;*/
     /*flex-direction: column;*/
-    /*margin-bottom: 20px;*/
-    /*margin-top: 5px;*/
-    max-width: 80px;
+    margin: 100px 20px 0 5px;
+    margin: 5px;
+    max-width: 150px;
     height: auto;
 
 }
@@ -31,33 +30,93 @@
 
 .image-info {
       background-color: #f8f9fa;
-      padding: 10px;
+      padding: 30px;
+}
+
+.title {
+    color: #6a7777;
+    text-align: left;
+    /*padding: 30px;*/
+}
+.parent {
+    display: grid;
+    background-color: #f7f7f7;
+    place-items: center;
 }
 </style>
-<div class="container-fluid" style="min-height:200px;border:0 solid grey">
-    <div style="margin-top:8px;">
-        <div class="card mt-3">
+<div class="container-fluid" style="min-height:200px">
+    <div class="title">
+        {% if user.is_authenticated %}
+            <div class="row" style="border: 1px solid red">
+                <div class="col-md-8 border m-2 " style="margin-left: 100px; border: 1px solid red">
+                    <h4>{{artist.artist}}</h4>
+                    <a type="button" class="btn btn-primary" href="{% url 'gallery:uploadfile' %}">Upload file</a>
+                    <a type="button" class="btn btn-primary" href="{% url 'gallery:uploadfile' %}?artist=test">Test upload</a>
+                    <br>
+                    Contact:
+                    <br>
+                    Bio:
+                </div>
+                <div class="parent col-md-3 border m-1"  style="border: 1px solid red">
+                    <div class="image">
+                        <img src="{{artist.image_dir}}{% if artist.get_profile_pic %}{{artist.get_profile_pic}}{% else %}images/user_profile/artist.jpg{% endif%}" class="img-fluid image">
+                    </div>
+                </div>
+                </div>
+        {% endif %}
+        {% if user.is_authenticated and artist == 'test' %}This ppage is for testing only.  We will regularly remove uploaded photos every few weeks{% endif %}
+    </div>
+    <div style="margin: 0 auto;">
+            {% if not artwork_list %}
+            <h6 style="margin:0 auto;">Not available</h6>
+            {% else %}
 <!-- Display samples -->
-                {% for x in artwork_list %}
             <div class="row">
-              <div class="col-md-3 border m-1">
+                {% for x in artwork_list %}
+              <div class="parent col-md-3 border m-1">
                 <div class="image">
-                    <a href="{% url 'gallery:photos' %}?id={{x.id}}">
+                    <a href="{% url 'gallery:detail' x.id %}?id={{x.id}}">
                         <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
                     </a>
                 </div>
               </div>
-             <div class="col-md-3 border m-1">
-                  <div class="imageitem">
-                    {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}
-                    {% if x.medium %}<p>Medium: {{x.medium}}</p>{% endif %}
-                    {% if x.genre %}<p>style: {{x.genre}}</p>{% endif %}
-                 </div>
-                </div>
-            </div>
-                {% endfor %}
+                <br>
+                <br>
+              <div class="col-md-8 border m-1 ">
+                  <div class="imagedescription">
 
-        </div>
+                      {% if x.name %}
+                         <span style="font-size:20px; color:#1e7e34"><br><b>{{x.name}}</b></span>
+                        <br>
+                      {% endif %}
+                      {% if not user.is_authenticated %}
+                            Artist: {{x.artist}}
+                      <br>
+                      {% endif %}
+<!--                      {% if user.is_authenticated and x.artist.user_id == user %}-->
+<!--                            <div class="form-wrapper mr-1">-->
+<!--                            <form class="form-inline mr-auto" id="updatetitle" action="/gallery/my_artwork/" >-->
+<!--                              <input class="form-control" form="updatetitle" type="text" name="newtitle" placeholder="new title">-->
+<!--                              <button class="btn btn-outline-primary my-2 my-sm-0 hide-button" form="updatetitle" type="submit">Search</button>-->
+<!--                            </form>-->
+<!--                            </div>-->
+<!--                      {% endif %}-->
+
+                    {% if x.medium %}Medium: {{x.medium}}<br>{% endif %}
+                    {% if x.support %}Support: {{x.support}}<br>{% endif %}
+                    {% if x.genre and genre != 'NA' %}style: {{x.genre}}<br>{% endif %}
+                    {% if x.status %} Status: {{x.get_status_display}}<br>{% endif %}
+                    {% if x.status == 'AV' or x.status == '' and x.price > 0 %}Price: ${{x.price|intcomma}}<br>{% endif %}
+                    {% if x.source_url %} <a href="{{x.source_url}}">{{x.source_url}}</a><br>{% endif %}
+                    {% if x.description %}{{x.description}}<br>{% endif %}
+                    {% if user.is_authenticated and x.artist.user_id == user %} {{x.rank}},<a href="{% url 'gallery:updatefile' x.id %}?next=my_gallery">update</a>
+                      <a href="{% url 'gallery:deletephoto' x.id %}?next=my_gallery">delete</a>
+                    {% endif %}
+                 </div>
+              </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
