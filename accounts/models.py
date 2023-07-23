@@ -213,7 +213,7 @@ class Profile(BaseModel):
     current_credit_name = models.OneToOneField(Photographer, blank=True, null=True, on_delete=models.SET_NULL)
     specialty = models.CharField(max_length=500, null=True, blank=True)
     portfolio_site = models.URLField(max_length=500, blank=True)
-    profile_pic = models.ImageField(upload_to='profile_pics', null=True, blank=True)
+    profile_pic_path = models.ImageField(upload_to='images/user_profile/', null=True, blank=True)
     profile_pic_url = models.URLField(null=True, blank=True)
     # country = models.CharField(max_length=10, null=True, blank=True)
     country = models.ForeignKey(Country, db_column='country', on_delete=models.SET_NULL, null=True, blank=True)
