@@ -87,14 +87,37 @@
                             </div>
                         </div>
                 <!--                Upload instruction-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">WCSP Upload</button>
+<!--                        wcsp-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">WCSP Upload: Inactive (combined with POWO)</span></button>
                         <div id="WCSP" class="collapse" data-parent="#accordion">
                             <div class="card-body">
+                                <span style="color: red">merged into PWOW in 2022</span>
                                 {% include 'documents/datasources/WCSP.html' %}
                             </div>
                         </div>
+<!--                        POWO-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">POWO</span></button>
+                        <div id="WCSP" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                TBD
+                            </div>
+                        </div>
+<!--                                RHS Upload-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">RHS</button>
+                        <div id="IOA" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                TBD
+                            </div>
+                        </div>
+<!--                                IPNI Upload-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IPNI: Inactive (combined with POWO)</button>
+                        <div id="IOA" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                TBD
+                            </div>
+                        </div>
 <!--                                IOA Upload-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IOA Upload</button>
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IOA: Inactive (combined with POWO)</button>
                         <div id="IOA" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/datasources/IOA.html' %}
@@ -113,6 +136,16 @@
                         <h6 class="card-title" style="margin-bottom: 0">Release Notes</h6>
                     </div>
                     <div class="card-body" style="padding:10px;">
+    <!--                Bluenanta-->
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">Bluenanta V.1 - 2022-10-01</button>
+                        <div id="Change1" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                OrchidRoots Corp was dissolved as a Maryland nonprofit organization in April 2022.
+                                All activities were transfered to a new nonprofit organization incorporated in North Carolina.  The new organization has expanded its missition to
+                                cover selected plant and animal species and hybrid.
+                                Detailed release note for Bluenanta v.1 TBD.
+                            </div>
+                        </div>
 
     <!--                V. 3.1-->
                         <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">OrchidRoots V.3.1 - 2020-10-01</button>
@@ -131,10 +164,10 @@
                         </div>
 
     <!--                Bluenanta -->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2015-?-?</button>
+                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2015-2017</button>
                         <div id="Change3" class="collapse" data-parent="#accordion">
                             <div class="card-body">
-                                TBD
+                                Development stage
                             </div>
                         </div>
 
@@ -148,13 +181,6 @@
                                 </div>
                             </div>
 
-    <!--                Bluenanta -->
-                            <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2021-?-?</button>
-                            <div id="Change3" class="collapse" data-parent="#accordion">
-                                <div class="card-body">
-                                    TBD
-                                </div>
-                            </div>
 
                     {% endif %}
                     </div>
