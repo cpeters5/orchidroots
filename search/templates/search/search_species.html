@@ -3,19 +3,46 @@
 {% include "base.html" %}
 {% block body %}
 {% load testtags %}
+
 <style>
-    table {
-        width: 80%;
-    }
-    @media only screen and (max-width: 600px) {
+table {
+  padding: 100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+td {
+    /*border: 1px solid lightgrey;*/
+    padding: 10px;
+}
+tr {
+    /*border: 1px solid lightgrey;*/
+}
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 100px;
+   width : auto;
+   margin:5px auto;
+}
+@media only screen and (max-width: 600px) {
     table {
         width: 100%;
+        font-size:10px;
     }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
     }
+    td {
+        border: 1px solid lightgrey;
+        padding-left: 10px;
+    }
+
+}
 </style>
+
 <div style="min-height:200px;background-color:white;width: 100%;">
-    <div style="clear:both"></div>
-    <div class="row" style="margin:0 auto;">
+    <div class="row" style="">
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
 <!--                <div style="padding:0; margin: 0">-->
@@ -27,74 +54,106 @@
 <!--                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&alpha=A&syn=N">Full species list</a>{% endif %}-->
 <!--                </div>-->
                 <br>
-                <h5>Search results for "<i>{{search_string}}</i>"</h5>
+                <div style="text-align: center;">
+                    <h5>Search results for "<i>{{search_string}}</i></h5>
+                </div>
                     <table>
+                        <tr><td>
+                            <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                        </td></tr> 
                 {% if genus_list %}
-                    <tr><th>Family</th><th>genedra</th><th class="d-none d-lg-table-cell hidden-xs">#images</th></tr>
+                    <tr><th></th><th>genus</th></tr>
                     {% for genus in genus_list %}
-                        <tr>
-                            <td>
-                                <a href="/common/genera/?app={{app}}&family={{genus.family}}"><i>{{genus.family|default:''}}</i></a>
-                                ({% if genus.family.application == 'other' %}{{genus.family.kingdom}}{% else %}{{genus.family.application}}{% endif %})</td>
-                            <td>
+                        <tr style="border: 1px solid lightgrey;">
+                                <td style="min-width:100px; text-align: center">
+                                    {% if genus.get_best_img %}
+                                     <img class="thumbnails" alt="{{genus.genus}}" src="{% static genus.get_best_img.image_dir %}{{genus.get_best_img.image_file}}">
+                                    {{genus.get_best_img.pid.name|safe}}
+                                    {% endif %}
+                                </td>
+                             <td>
                                 {% if not genus.num_hybrid or genus.num_species > 0 %}
-                                    <a href="/common/species/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/common/species/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}{% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% else %}
                                     <a href="/common/hybrid/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% endif %}
+                                (<a href="/common/genera/?app={{app}}&family={{genus.family}}"><i>{{genus.family|default:''}}</i></a> -
+                                {% if genus.family.application == 'other' %}{{genus.family.kingdom}}{% else %}{{genus.family.application}}{% endif %})
                             </td>
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{genus.num_spcimage}}</td>
+                            {% if user.tier.tier > 3 %}
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{genus.num_spcimage|default:''}}
+                            </td>
+                            {% endif %}
+<!--                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{genus.num_spcimage}}</td>-->
+                                <td>{{genus.common_name|default:''}}</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
+                        <tr><td></td></tr>
                             <tr><td><b></b></td><td><b>Species</b></td></tr>
                 {% if match_spc_list %}
                     {% for species in match_spc_list %}
-                        <tr>
-                            <td><i>{{species.family|default:''}}</i>
-                                   ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
+                        <tr style="border: 1px solid lightgrey;">
+                            <td style="min-width:100px; text-align: center">
+                                {% if species.get_best_img %}
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                {{species.get_best_img.pid.name|safe}}
+                                {% endif %}
+                            </td>
+                            <td>path = {{path}}
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
+                                    <i>{{species.binomial|safe}}</i>
+                                </a>
+                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                                    (<i>{{species.family|default:''}}</i>
+                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
+                            </td>
+                                <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            {% if user.tier.tier > 3 %}
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{species.num_image|default:''}}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% elif other_genus_spc %}
+                        <tr><td></td><td></td><td>Occurences in other genera</td></tr>
+                    {% for species in other_genus_spc %}
+                        <tr style="border: 1px solid lightgrey;">
+                            <td style="min-width:100px; text-align: center">
+                                {% if species.get_best_img %}
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                {{species.get_best_img.pid.name|safe}}
+                                {% endif %}
+                            </td>
                             <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-
+                                    (<i>{{species.family|default:''}}</i>
+                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
+                                <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            {% if user.tier.tier > 3 %}
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.num_image|default:''}}
                             </td>
-                        </tr>
-                    {% endfor %}
-                {% elif other_genus_spc %}
-                        <tr><td></td><td>Occurences in other genera</td></tr>
-                    {% for species in other_genus_spc %}
-                        <tr>
-                            <td><i>{{species.family|default:''}}</i>
-                                ({% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})</td>
-                            <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
-                                    <i>{{species.binomial}}</i>
-                                </a>
-                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn.){% endif %}
-
-                            </td>
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{species.num_image|default:''}}
-                            </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
 
                 {% endif %}
 
-                        </table>
 <!--                    <div style="padding: 0; margin-top: 20px;">-->
 <!--                        Didn't see what you are looking for?<br>-->
 <!--                        <a class="btn btn-custom" style="width: 150px;" href="/other/search_species/?family={{family}}&search_string={{search_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
 <!--                    </div>-->
-                <br>
-                <div class="btn btn-custom" onclick="history.back()">
-                    Go back
-                </div>
+                        <tr><td>
+                            <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                        </td></tr>    </table>
+
             </div>
         </div>
     </div>

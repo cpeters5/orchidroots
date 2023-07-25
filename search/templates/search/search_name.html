@@ -4,14 +4,38 @@
 {% block body %}
 {% load testtags %}
 <style>
-    table {
-        width: 80%;
-    }
-    @media only screen and (max-width: 600px) {
+table {
+  padding: 100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+td {
+    /*border: 1px solid lightgrey;*/
+    padding: 10px;
+}
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 100px;
+   width : auto;
+   margin:5px auto;
+}
+
+@media only screen and (max-width: 600px) {
     table {
         width: 100%;
+        font-size:10px;
     }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
     }
+    td {
+        border: 1px solid lightgrey;
+        padding-left: 10px;
+    }
+
+}
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
     <div style="clear:both"></div>
@@ -19,28 +43,37 @@
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <br>
-                <h5>Search results for "<i>{{search_string}}</i>"</h5>
-                    <table>
-                            <tr><td><b>Application</b></td><td><b>Species</b></td><td><b>common name</b></td></tr>
-                    {% if name_list %}
-                        {% for species in name_list %}
-                            <tr>
-                                <td>{% if species.pid.family.application == 'other' or species.pid.family.application == 'orchidaceae' %}Plantae{% else %}{{species.pid.family.application}}{% endif %}</td>
-                                <td>
-                                    {% if role == 'cur' %}
-                                        <a href="/display/photos/{{path}}{{species.pid_id}}/?family={{species.pid.family}}&role={{role}}">{{species.pid.binomial_it|safe}}</a></td>
-                                    {% else %}
-                                        <a href="/display/information/{{path}}{{species.pid_id}}/?family={{species.pid.family}}">{{species.pid.binomial_it|safe}}</a></td>
-                                    {% endif %}
-                                <td>{{species.common_name}}</td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    </table>
-                <br>
-                <div class="btn btn-custom" onclick="history.back()">
-                    Go back
+                <div style="text-align: center;">
+                    <h5>Search results for "{{commonname}}"</h5>
                 </div>
+                <table class="">
+                    <tr><td>
+                        <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                    </td></tr>
+                    <tr><td></td><td><b>Species</b></td><td><b>common name</b></td></tr>
+                    {% if name_list %}
+                    {% for species in name_list %}
+                        <tr style="border: 1px solid lightgrey; margin-top: 0;">
+                            <td style="min-width:100px;">
+                                 <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                            </td>
+                            <td>
+                                {% if species.pid.family.application == 'other' or species.pid.family.application == 'orchidaceae' %}Plantae{% else %}{{species.pid.family.application|title}}{% endif %} - {{species.gen.family}}
+                                {% if role == 'cur' %}
+                                    <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}">{{species.pid.binomial_it|safe}}</a>
+                                {% else %}
+                                    <a href="{% url 'display:information' species.pid_id %}?family={{species.pid.family}}">{{species.pid.binomial_it|safe}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{species.common_name|default:''}}</td>
+                        </tr>
+                    <tr><td></td></tr>
+                    {% endfor %}
+                    {% endif %}
+                    <tr><td>
+                        <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                    </td></tr>
+                </table>
             </div>
         </div>
     </div>

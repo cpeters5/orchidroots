@@ -585,7 +585,7 @@ def newbrowse(request):
                 Genus = apps.get_model(app.lower(), 'Genus')
                 SpcImages = apps.get_model(app.lower(), 'SpcImages')
                 # genera = Genus.objects.filter(family=family)
-                genera = SpcImages.objects.order_by('gen').values_list('gen', flat=True)
+                genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
                 if genera:
                     genus_list = []
                     genera = set(genera)
@@ -594,6 +594,8 @@ def newbrowse(request):
                         genlist = genlist.filter(genus__istartswith=talpha)
                     genlist = genlist.order_by('genus')
                     for gen in genlist:
+                        if gen.genus == 'Archilochus':
+                            print("gen = ", gen, gen.get_best_img())
                         genus_list = genus_list + [gen.get_best_img()]
                     context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'talpha': talpha, 'alpha_list': alpha_list,}
                     return render(request, 'common/newbrowse.html', context)
