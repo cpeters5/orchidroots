@@ -594,8 +594,6 @@ def newbrowse(request):
                         genlist = genlist.filter(genus__istartswith=talpha)
                     genlist = genlist.order_by('genus')
                     for gen in genlist:
-                        if gen.genus == 'Archilochus':
-                            print("gen = ", gen, gen.get_best_img())
                         genus_list = genus_list + [gen.get_best_img()]
                     context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'talpha': talpha, 'alpha_list': alpha_list,}
                     return render(request, 'common/newbrowse.html', context)
