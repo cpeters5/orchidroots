@@ -257,7 +257,7 @@ class Species(models.Model):
         if self.infraspr:
             spc = '%s <i>%s</i>' % (spc, self.infraspr)
         if self.infraspe:
-            spc = '%s <i>%s</i>' % (name, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
         return spc
