@@ -45,22 +45,26 @@ tr {
     <div class="row" style="">
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
-<!--                <div style="padding:0; margin: 0">-->
-<!--                    <a class="btn btn-custom" href="{% url 'common:genera' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">Show genera</a>-->
-<!--                    {% if not genus or genus.num_hybrid > 0 %}-->
-<!--                        <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N">Show species</a>-->
-<!--                    {% endif %}-->
-<!--                    <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&genus={{genus}}&display=checked">Browse</a>-->
-<!--                    {% if app == 'orchidaceae' %}<a class="btn btn-custom m1" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&alpha=A&syn=N">Full species list</a>{% endif %}-->
-<!--                </div>-->
-                <br>
                 <div style="text-align: center;">
-                    <h5>Search results for "<i>{{search_string}}</i></h5>
+                    <h5>Search results for "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
                 </div>
                     <table>
                         <tr><td>
                             <div class="btn btn-custom" onclick="history.back()">Go back</div>
-                        </td></tr> 
+                            </td>
+                            <td>
+                                <form action="/search/search/?search_string={{ search_string }}&role={{role}}" method="post">
+                                        {% csrf_token %}
+                                  <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
+                                    <option value="">search all</option>
+                                    <option value="aves">Aves</option>
+                                    <option value="animalia">Animalia</option>
+                                    <option value="fungi">Fungi</option>
+                                    <option value="orchidaceae">Orchids</option>
+                                    <option value="other">Other Plant Families</option>
+                                  </select>
+                                </form>
+                            </td></tr>
                 {% if genus_list %}
                     <tr><th></th><th>genus</th></tr>
                     {% for genus in genus_list %}
@@ -109,7 +113,8 @@ tr {
                                     (<i>{{species.family|default:''}}</i>
                                     {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
-                                <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td>{{species.distribution|default:''}}</td>
                             {% if user.tier.tier > 3 %}
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.num_image|default:''}}
@@ -118,7 +123,7 @@ tr {
                         </tr>
                     {% endfor %}
                 {% elif other_genus_spc %}
-                        <tr><td></td><td></td><td>Occurences in other genera</td></tr>
+                        <tr><td></td><td></td></tr>
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
@@ -135,11 +140,10 @@ tr {
                                     (<i>{{species.family|default:''}}</i>
                                     {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
-                                <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td>{{species.distribution|default:''}}</td>
                             {% if user.tier.tier > 3 %}
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{species.num_image|default:''}}
-                            </td>
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{species.num_image|default:''}}</td>
                             {% endif %}
                         </tr>
                     {% endfor %}
@@ -178,6 +182,14 @@ $(document).on('click', '[data-toggle="lightbox"]', function(event) {
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
 });
+
+    function handleSelect(select) {
+      var selectedOption = select.value;
+      console.log("Selected option:", selectedOption);
+      // Perform further actions based on the selected option
+      // e.g., submit the form programmatically, redirect, etc.
+      select.form.submit();
+    }
 
 
 </script>
