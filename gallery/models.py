@@ -99,7 +99,7 @@ class Artwork(models.Model):
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     def image_dir(self):
         return "/media/"
