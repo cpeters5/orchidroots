@@ -415,7 +415,6 @@ class Accepted(models.Model):
 
     def get_best_img(self):
         spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
-        print("spid list = " + str(len(spid_list)))
         img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
         if len(img) > 0:
