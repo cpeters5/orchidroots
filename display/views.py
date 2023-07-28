@@ -191,7 +191,7 @@ def information(request, pid=None):
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
-               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list,
+               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
