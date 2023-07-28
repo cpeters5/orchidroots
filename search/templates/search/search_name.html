@@ -69,7 +69,7 @@ td {
                     {% if name_list %}
                     {% for species in name_list %}
                         <tr style="border: 1px solid lightgrey; margin-top: 0;">
-                            <td style="width:20%; background-color: red">
+                            <td style="width:20%;">
                                  <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                             </td>
                             <td>
