@@ -600,12 +600,17 @@ nav .search-container button:hover {
 </style>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <div class="container" style="width:100% !important;">
-        <div class="navbar-header">
-            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff;"><b>BlueNanta</b></a>
+    <div class="container-fluid">
+        <div class="navbar-header" style="width: 100%;">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff; float: left; width: auto"><b>BlueNanta</b></a>
             <!-- Brand -->
+        </div>
 <!-- Links -->
 
+        <div class="collapse navbar-collapse" id="nav-content">
             <ul class="navbar-nav " style="line-height:25px !important;">
                 <li  class="nav-item">
                         <form class="form-inline" id="search" action="/search/search/" style="display:inline-block; margin-top: 5px;">
