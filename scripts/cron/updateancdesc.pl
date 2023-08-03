@@ -9,14 +9,11 @@
 use strict;
 use warnings FATAL => 'all';
 use DBI;
-require "common.pl";
-our ($sth, $sth1);
-
- # my $host = '134.209.46.210';
+my $host = '134.209.46.210';
 my $db = "bluenanta";
 # Database connection
-# my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
-# $dbh = DBI->connect( "DBI:mysql:$db:localhost","chariya","imh3r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
+my ($sth, $sth1);
 &getASPM("use $db");
 
 if ($ARGV[0]) {
@@ -86,4 +83,17 @@ sub updatedata {
 		# print "$totalpair\t$numberpair\t$aid{$aid}\t$aid\t$pid\n";
 		&getASPM1($stmt);
 	}
+}
+
+
+sub getASPM {
+	my $stmt = shift;
+	$sth = $dbh->prepare( $stmt ) or die( "\n$stmt\nCannot prepare: ", $dbh->errstr(), "\n" );
+	my $rc = $sth->execute() or die("\nDead! \n$stmt\nCannot execute: ", $sth->errstr(),"\n" );
+}
+
+sub getASPM1 {
+	my $stmt = shift;
+	$sth1 = $dbh->prepare( $stmt ) or die( "\n$stmt\nCannot prepare: ", $dbh->errstr(), "\n" );
+	my $rc = $sth1->execute() or die("\nDead! \n$stmt\nCannot execute: ", $sth1->errstr(),"\n" );
 }
