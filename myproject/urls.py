@@ -82,7 +82,10 @@ urlpatterns = [
     # New dev
     path('gallery/', include('gallery.urls')),
 
-                  # legacy applications
+  # apple pay
+  # https://bluenanta.com/.well-known/apple-developer-merchantid-domain-association
+
+  # legacy applications
     # path('natural/', include('detail.urls')),
     # path('orchid/', include('orchidaceae.urls')),
     # path('orchidlite/', include('detail.urls')),

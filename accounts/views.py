@@ -306,3 +306,7 @@ def user_reset_password(request):
             user.save()
 
     return redirect('/login')
+
+
+# def apple_pay(request):
+#     render(request, ".well-known/apple-developer-merchantid-domain-association", context)
