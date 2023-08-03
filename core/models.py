@@ -78,6 +78,7 @@ class Subfamily(models.Model):
     subfamily = models.CharField(primary_key=True, max_length=50, default='', db_column='subfamily')
     author = models.CharField(max_length=200, blank=True, default='')
     year = models.IntegerField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     description = models.TextField(null=True, blank=True)
     num_genus   = models.IntegerField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
