@@ -53,7 +53,6 @@
     <div class="card-body" >
         <ul style="padding-left:5px">
             <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm gallery" href="{% url 'gallery:index' %}"><b>ART GALLERY</b></a></li>
-            <li class="li-side"><a type="button" class="btn sidebtn btn-outline-primary btn-sm bannerfont" href="https://www.orchidroots.com"><b>OrchidRoots</b></a></li>
 
             <li class="li-side"><span class="sidefont" style="color:lightseagreen"><b>Plant Families</b></span></li>
             <li class="li-side"><a type="button" class="btn sidebtn btn-default-primary btn-sm {% if family.family == 'Orchidaceae' %}active{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&role={{role}}&display=checked">Orchidaceae</a></li>
