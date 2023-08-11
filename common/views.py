@@ -585,7 +585,7 @@ def newbrowse(request):
                 Genus = apps.get_model(app.lower(), 'Genus')
                 SpcImages = apps.get_model(app.lower(), 'SpcImages')
                 # genera = Genus.objects.filter(family=family)
-                genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
+                genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
                 if genera:
                     genus_list = []
                     genera = set(genera)
