@@ -59,12 +59,12 @@ class UploadFileForm(forms.ModelForm):
     )
     medium = ModelChoiceField(
         queryset=Medium.objects.order_by('medium'),
-        required=True,
+        required=False,
         widget=Select2Widget
     )
     genre = ModelChoiceField(
         queryset=Genre.objects.order_by('genre'),
-        required=True,
+        required=False,
         widget=Select2Widget
     )
 
@@ -92,6 +92,7 @@ class UploadFileForm(forms.ModelForm):
             'genre': 'style',
             'price': 'price',
             'status': 'status',
+            'is_private': 'set privacy',
             'source_url': 'source url',
             'support': 'e.g. canvas, water color paper 300g',
             'hashtag': 'comma separated hashtags',
@@ -149,7 +150,7 @@ class UploadFileForm(forms.ModelForm):
     def clean_medium(self):
         medium = self.cleaned_data['medium']
         if not medium:
-            medium = Medium.objects.get(pk=' NA')
+            medium = Medium.objects.get(pk='NA')
         return medium
 
     def clean_genre(self):

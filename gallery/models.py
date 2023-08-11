@@ -68,6 +68,8 @@ class Medium(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
+        if self.medium == 'NA':
+            return ''
         return self.medium
 
 
@@ -76,6 +78,8 @@ class Genre(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
+        if self.genre == 'NA':
+            return ''
         return self.genre
 
 # detail
