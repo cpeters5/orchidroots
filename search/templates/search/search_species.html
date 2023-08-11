@@ -101,11 +101,12 @@ tr {
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
                                  <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
-                                {{species.get_best_img.pid.name|safe}}
+                                </a>
                                 {% endif %}
                             </td>
-                            <td>path = {{path}}
+                            <td>
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&syn=N&related={{species.pid}}">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
@@ -129,7 +130,6 @@ tr {
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
                                  <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
-                                {{species.get_best_img.pid.name|safe}}
                                 {% endif %}
                             </td>
                             <td>
