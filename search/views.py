@@ -402,6 +402,8 @@ def search_name(request):
         commonname = request.GET['commonname'].strip()
     elif 'commonname' in request.POST:
         commonname = request.POST['commonname'].strip()
+    commonname = commonname.rstrip('s')
+
     if not commonname or commonname == '':
         context = {'role': role, }
         return render(request, "search/search_name.html", context)
