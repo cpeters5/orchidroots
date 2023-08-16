@@ -540,6 +540,10 @@ def newbrowse(request):
     talpha = ''
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
+    if not talpha:
+        talpha = 'A'
+    elif talpha == 'ALL':
+        talpha = ''
 
     # app must be in browse request
     app = request.GET['app']
@@ -548,9 +552,8 @@ def newbrowse(request):
     if app == 'orchidaceae':
         # Special case for orchids
         family = 'Orchidaceae'
-
     if app in applications:
-        #     If app is requested, find family_list and sample image by family
+        # If app is requested, find family_list and sample image by family
         # If family is requested, get sample list by genera
         if 'genus' in request.GET:
             # App and family must also be in the request.
@@ -585,7 +588,10 @@ def newbrowse(request):
                 Genus = apps.get_model(app.lower(), 'Genus')
                 SpcImages = apps.get_model(app.lower(), 'SpcImages')
                 # genera = Genus.objects.filter(family=family)
-                genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
+                if app == 'orchidaceae':
+                    genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
+                else:
+                    genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
                 if genera:
                     genus_list = []
                     genera = set(genera)
@@ -606,10 +612,9 @@ def newbrowse(request):
         Genus = apps.get_model(app.lower(), 'Genus')
         family_list = []
         for fam in families:
-            genimage = Genus.objects.filter(family=fam.family)
-            genimage = genimage.order_by('?')[0:1]
+            genimage = Genus.objects.filter(family=fam.family).order_by('?')[0:1]
             if len(genimage) > 0:
-                family_list = family_list + [(genimage[0], genimage[0].get_best_img())]
+                family_list = family_list + [(genimage[0])]
         context = {'family_list': family_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list,}
         return render(request, 'common/newbrowse.html', context)
 

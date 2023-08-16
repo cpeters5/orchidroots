@@ -275,16 +275,16 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{x.0.family.application}}&family={{x.0.family.family}}">{{x.0.family}}</a>
-                                {% if x.1.pid_id %}
-                                    <a href="{% url 'display:information'  x.1.pid_id %}?app={{x.0.family.application}}&family={{x.0.family}}">
-                                        <img class="thumbnails p-1" alt="" src="{% static x.1.image_dir %}{{x.1.image_file}}" >
+                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&family={{x.family.family}}">{{x.family}}</a>
+                                {% if x.get_best_img.pid_id %}
+                                    <a href="{% url 'display:information'   x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}">
+                                        <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.image_dir %}{{ x.get_best_img.image_file}}" >
                                     </a>
                                 {% else %}
                                         <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" >
                                 {% endif %}
                                     <div class="imgcaption">
-                                        {{x.1.pid.binomial_it|safe}}
+                                        {{ x.get_best_img.pid.binomial_it|safe}}
                                     </div>
                             </div>
                         {% endfor %}
