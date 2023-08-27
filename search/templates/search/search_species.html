@@ -66,7 +66,7 @@ tr {
                                 </form>
                             </td></tr>
                 {% if genus_list %}
-                    <tr><th></th><th>genus</th></tr>
+                    <tr><th></th><th>Matches genera</th></tr>
                     {% for genus in genus_list %}
                         <tr style="border: 1px solid lightgrey;">
                                 <td style="min-width:100px; text-align: center">
@@ -95,7 +95,7 @@ tr {
                     {% endfor %}
                 {% endif %}
                         <tr><td></td></tr>
-                            <tr><td><b></b></td><td><b>Species</b></td></tr>
+                            <tr><td><b></b></td><td><b>Matched Species</b></td></tr>
                 {% if match_spc_list %}
                     {% for species in match_spc_list %}
                         <tr style="border: 1px solid lightgrey;">
@@ -124,7 +124,6 @@ tr {
                         </tr>
                     {% endfor %}
                 {% elif other_genus_spc %}
-                        <tr><td></td><td></td></tr>
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
