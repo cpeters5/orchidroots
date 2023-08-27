@@ -425,8 +425,8 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env.str("MAILGUN_DOMAIN", default=''),
     "MAILGUN_API_URL": env.str("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
-DEFAULT_FROM_EMAIL = "admin@bluenanta.com"  # if you don't already have this in settings
-SERVER_EMAIL = "admin@bluenanta.com"
+DEFAULT_FROM_EMAIL = env.str('ADMIN_EMAIL', default='ADMIN_EMAIL_DEFAULT')
+SERVER_EMAIL = env.str('ADMIN_EMAIL', default='ADMIN_EMAIL_DEFAULT')
 
 STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY', default='')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')
@@ -434,28 +434,6 @@ STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')
 # paypal settings
 PAYPAL_CLIENT_ID = env('PAYPAL_CLIENT_ID', default='')
 PAYPAL_SECRET =  env('PAYPAL_SECRET', default='')
-#  Use Gmail (Works)
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'admin@bluenanta.com'
-# EMAIL_HOST_PASSWORD = 'kvitodlpllgxuvtl'
-
-# Use Yahoo mail. need to setup twostep verification?
-# EMAIL_HOST = 'smtp.yahoo.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'cpeters5'
-# EMAIL_HOST_PASSWORD = 'srblyfdjfkkdkimm'
-
-# Use django-sendmail
-# EMAIL_USE_TLS = True
-# EMAIL_USE_SSL = False
-# DJANGO_MAILBOX_ADMIN_ENABLED = True
-# DJANGO_MAILBOX_STRIP_UNALLOWED_MIMETYPES = False
-# DJANGO_MAILBOX_ALLOWED_MIMETYPES = False
-# DJANGO_MAILBOX_TEXT_STORED_MIMETYPES = X-Django-Mailbox-Altered-Message
-# DJANGO_MAILBOX_ATTACHMENT_INTERPOLATION_HEADER = mailbox_attachments/%Y/%m/%d/
-# DJANGO_MAILBOX_MAX_MESSAGE_SIZE = False
-# DJANGO_MAILBOX_STORE_ORIGINAL_MESSAGE = False
 
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True
