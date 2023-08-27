@@ -21,7 +21,7 @@
                         <div style="padding: 5px;">
                             <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&myspecies={{myspecies}}">Species list</a>
                             {% if not genus or genus.num_hybrid > 0 %}
-                                <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
+                                <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha}}&syn=N&myspecies={{myspecies}}">Hybrid list</a>
                             {% endif %}
                             <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
