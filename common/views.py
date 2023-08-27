@@ -540,13 +540,13 @@ def newbrowse(request):
     talpha = ''
     if 'talpha' in request.GET:
         talpha = request.GET['talpha']
-    if not talpha:
-        talpha = 'A'
     elif talpha == 'ALL':
         talpha = ''
 
     # app must be in browse request
     app = request.GET['app']
+    if not talpha and app == 'orchidaceae':
+        talpha = 'A'
     if 'family' in request.GET:
         family = request.GET['family']
     if app == 'orchidaceae':
