@@ -57,18 +57,18 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=N"><span style="color:#575757;">All subspecies</span></a>
+                        <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All subspecies</span></a>
                         {% for spc in related_list %}
-                            <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=N"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
+                            <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=Y"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
                         {% endfor %}
                     </div>
 
                 </li>
                 {% endif %}
 
-                {% if syn_list or species.status != 'synonym' %}
+                {% if syn_list %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Synonyms</a>
+                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Include Synonyms</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All synonyms</span></a>
                         {% for spc in syn_list %}

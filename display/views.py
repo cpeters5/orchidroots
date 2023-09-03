@@ -202,10 +202,11 @@ def information(request, pid=None):
 def photos(request, pid=None):
     author = get_reqauthor(request)
     role = ''
-    syn = 'N'
+    syn = 'Y'
     related = ''
     variety = ''
     tail = ''
+    accpid = 0
     if 'role' in request.GET:
         role = request.GET['role']
     if 'syn' in request.GET:
@@ -234,16 +235,22 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
-    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
+    if species.status != 'synonym':
+        related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
+    else:
+        accpid = Synonym.objects.get(pk=pid).acc_id
+        accspecies = Species.objects.get(pk=accpid)
+        related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
     related_pid = related_list.values_list('pid')
-    if 'related' in request.GET:
-        related = request.GET['related']
-        if related != 'ALL':
-            related_pid = [species.pid]
-
     if species:
-        syn_list = Synonym.objects.filter(acc_id__in=related_pid)
-        syn_pid = syn_list.values_list('spid')
+        if species.status != 'synonym':
+            syn_list = Synonym.objects.filter(acc_id=pid)
+        else:
+            syn_list = Synonym.objects.filter(acc_id=accpid)
+        syn_pid = list(syn_list.values_list('spid', flat=True))
+        if species.status == 'synonym':
+            syn_pid = syn_pid + [accpid]
+        print("syn_list = ", len(syn_list))
         if app == 'orchidaceae' and species.type == 'hybrid':
             if syn == 'N':      # input pid is a synonym, just get images of the requested synonym
                 public_list = HybImages.objects.filter(pid__in=related_pid)  # public photos
