@@ -51,9 +51,9 @@
                              {% if species.0.status == 'synonym' %}<span style="font-size:13px;">{{species.0.name|safe}}</span>
                              {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
                                   {% if role == "cur" %}
-                             <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
+                             <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
                                   {% else %}
-                             <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
+                             <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
                                   {% endif %}
                              {%  else %}
                                   {{species.0.name}}
@@ -64,9 +64,9 @@
                                  {% if species.0.getAcc %}
                                      (syn.
                                      {% if role == "cur" %}
-                                          <a href="{% url 'display:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                          <a href="{% url 'display:photos' species.0.getAcc %}?family={{species.0.gen.family}}&role={{role}}&syn=Y">{{species.0.getAccepted.namecasual|safe}}</a>
                                      {% else %}
-                                          <a href="{% url 'display:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}">{{species.0.getAccepted.namecasual|safe}}</a>
+                                          <a href="{% url 'display:information' species.0.getAcc %}?family={{species.0.gen.family}}&pid={{species.0.getAcc}}&role={{role}}&syn=Y">{{species.0.getAccepted.namecasual|safe}}</a>
                                       {% endif %}
                                      )
                                  {% else %}
@@ -87,9 +87,9 @@
                              {% if species.status == 'synonym' %}<span style="font-size:13px;"><strong>{{species.name|safe}}</strong></span>
                                 {% elif species.type == 'species' or species.type == 'hybrid' %}
                                   {% if role == "cur" %}
-                             <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="font-size:13px;">{{species.name|safe}}</span></a>
+                             <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.name|safe}}</span></a>
                                   {% else %}
-                             <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&pid={{species.pid}}&role={{role}}"><span style="font-size:13px;">{{species.name|safe}}</span></a>
+                             <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&pid={{species.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.name|safe}}</span></a>
                                   {% endif %}
                               {%  else %}
                              <span style="font-size:13px;">{{species.name}}</span>
@@ -99,9 +99,9 @@
                                    {% if species.getAcc %}
                                         (syn.
                                        {% if role == "cur" %}
-                                           <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.namecasual|safe}}</a>
+                                           <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}&syn=Y">{{species.getAccepted.namecasual|safe}}</a>
                                        {% else %}
-                                           <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}&pid={{species.getAcc}}&role={{role}}">{{species.getAccepted.namecasual|safe}}</a>
+                                           <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}&pid={{species.getAcc}}&role={{role}}&syn=Y">{{species.getAccepted.namecasual|safe}}</a>
                                         {% endif %}
                                         )
                                    {% else %}
