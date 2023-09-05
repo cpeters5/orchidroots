@@ -52,7 +52,6 @@
                     {% endif %}
                     </div>
                 </li>
-
                 {% if related_list %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
@@ -62,7 +61,6 @@
                             <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=Y"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
                         {% endfor %}
                     </div>
-
                 </li>
                 {% endif %}
 
@@ -72,7 +70,7 @@
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All synonyms</span></a>
                         {% for spc in syn_list %}
-                            <a class="dropdown-item" href="/display/{{view}}/{{spc.spid.pid}}/?family={{spc.spid.gen.family}}&role={{role}}&related={{spc.spid}}"><span style="color:#575757;">{{spc.spid.binomial_it|safe}}</span></a>
+                            <a class="dropdown-item" href="/display/{{view}}/{{spc.spid.pid}}/?family={{spc.spid.gen.family}}&role={{role}}&related={{spc.spid.pid}}"><span style="color:#575757;">{{spc.spid.binomial_it|safe}}</span></a>
                         {% endfor %}
                     </div>
 

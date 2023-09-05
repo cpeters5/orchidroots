@@ -101,13 +101,13 @@ tr {
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related={{species.pid}}&syn=Y">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y">
                                  <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related={{species.pid}}&syn=Y">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
@@ -132,7 +132,7 @@ tr {
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related={{species.pid}}&syn=Y">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}

@@ -204,6 +204,7 @@ def photos(request, pid=None):
     role = ''
     syn = 'Y'
     related = ''
+    related_species = ''
     variety = ''
     tail = ''
     accpid = 0
@@ -235,13 +236,27 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+
+    if 'related' in request.GET:
+        related = request.GET['related']
+        if related == 'ALL':
+            related = ''
+            related_species = ''
+        if not related.isnumeric():
+            related = ''
+        if related:
+            try:
+                related_species = Species.objects.get(pk=related)
+            except Species.DoesNotExist:
+                related_species = ''
+
     if species.status != 'synonym':
         related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
     else:
         accpid = Synonym.objects.get(pk=pid).acc_id
         accspecies = Species.objects.get(pk=accpid)
         related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
-    related_pid = related_list.values_list('pid')
+    related_pid = related_list.values_list('pid', flat=True)
     if species:
         if species.status != 'synonym':
             syn_list = Synonym.objects.filter(acc_id=pid)
@@ -250,14 +265,17 @@ def photos(request, pid=None):
         syn_pid = list(syn_list.values_list('spid', flat=True))
         if species.status == 'synonym':
             syn_pid = syn_pid + [accpid]
-        print("syn_list = ", len(syn_list))
         if app == 'orchidaceae' and species.type == 'hybrid':
-            if syn == 'N':      # input pid is a synonym, just get images of the requested synonym
+            if related_species:
+                public_list = HybImages.objects.filter(pid=related_species.pid)  # public photos
+            elif syn == 'N':      # input pid is a synonym, just get images of the requested synonym
                 public_list = HybImages.objects.filter(pid__in=related_pid)  # public photos
             else:                   # input pid is an accepted species, include images of its synonyms
                 public_list = HybImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
         else:
-            if syn == 'N':
+            if related_species:
+                public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
+            elif syn == 'N':      # input pid is a synonym, just get images of the requested synonym
                 public_list = SpcImages.objects.filter(pid__in=related_pid)  # public photos
             else:
                 public_list = SpcImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
