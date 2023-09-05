@@ -50,8 +50,8 @@
                 <h1 style="display:none">{{species.genus}} {{species.species}}</h1>
                 <h4>
                     <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&display=checked"><i>{{species.gen.family}}</i> -
-                    <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked"><i>{{species.genus}}</i></a>
-                    {% if species.type == 'species' or species.is_hybrid %}<i>{{species.get_species}}</i>{% else %}{{species.get_species}}{% endif %} {{species.author|default:""}}
+                    <a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked"><i>{{species.genus}}</i></a> -
+                    {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %} {{species.author|default:""}}
                     {% if species.year %}{{species.year}}{% endif %}
                     {% if species.sourceurl != None %}
                         <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
@@ -61,7 +61,8 @@
                 </h4>
                 {% if species.status == 'synonym' %}
                     syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>
-                    <br>
+                    {{species.getAccepted.accepted.common_name}}
+                <br>
                 {% endif %}
                 {% if species.type == 'hybrid' and species.status != 'synonym' %}
                     {% if species.hybrid.seed_id.pid %}
