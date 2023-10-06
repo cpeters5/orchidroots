@@ -536,8 +536,8 @@ seedparent, pollparent {
                                                    na
                                                  {% endif %}
                                                     ×
-                                                 {% if off.pollen_id %}error: {{off.pid}}
-                                                    <a href="{ url 'display:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.pid}}</a>
+                                                 {% if off.pollen_id %}
+                                                    <a href="{ url 'display:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_pollen_name|safe}}</a>
                                                  {% else %}
                                                     na
                                                  {% endif %}
