@@ -285,11 +285,9 @@ def species(request):
     subtribe_list = []
     subfamily_obj = ''
     tribe_obj = ''
-    subtribe_obj = ''
     syn = ''
     genus = ''
     this_species_list = []
-    total = 0
     # max_page_length = 1000
 
     # Initialize
@@ -297,10 +295,8 @@ def species(request):
         reqgenus = request.GET['genus']
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
-        if alpha == '':
-            alpha = 'A'
         if alpha == 'ALL':
-            alpha == ''
+            alpha = ''
     if 'syn' in request.GET:
         syn = request.GET['syn']
 
@@ -322,7 +318,6 @@ def species(request):
         if myspecies:
             author = Photographer.objects.get(user_id=request.user)
 
-    # initialize subfamily, tribe subtribe
     # Get list of affected  genus
     genus_list = Genus.objects.all()
 
@@ -339,12 +334,10 @@ def species(request):
             genus_list = genus_list.filter(subtribe=subtribe)
         genus_list = genus_list.values_list('pid',flat=True)
 
-        # logger.error(">>> 1 this species list = " + str(len(this_species_list)))
         if syn == 'N':
             this_species_list = this_species_list.exclude(status='synonym')
         else:
             syn = 'Y'
-        # logger.error(">>> 1 this species list = " + str(len(this_species_list)))
         if this_species_list:
             this_species_list = this_species_list.filter(gen__in=genus_list)
             if alpha:
@@ -353,13 +346,6 @@ def species(request):
             if myspecies and author:
                 pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
                 this_species_list = this_species_list.filter(pid__in=pid_list)
-
-            total = len(this_species_list)
-
-            if total > 5000:
-                msg = 'Your search request generated over 5000 names. Please refine your search criteria.'
-                this_species_list = this_species_list[0:5000]
-                total = 5000
 
     subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0).order_by('subfamily')
     if subfamily_obj:
@@ -371,7 +357,7 @@ def species(request):
 
     write_output(request, str(genus))
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
-               'role': role, 'total': total, 'family': family, 'genus': genus,
+               'role': role, 'family': family, 'genus': genus,
                'subfamily': subfamily, 'subfamily_list': subfamily_list,
                'tribe': tribe, 'tribe_list': tribe_list,
                'subtribe': subtribe, 'subtribe_list': subtribe_list,
@@ -384,139 +370,161 @@ def species(request):
 
 @login_required
 def hybrid(request):
-    myspecies = ''
-    myauthor = ''
-    max_rec = 3000
-    primary = ''
-    role = getRole(request)
-    family = ''
-    if 'family' in request.GET:
-        family = request.GET['family']
-    # logger.error(">>> 1 Family = " + str(family))
-    if family != 'Orchidaceae':
-        send_url = '/common/hybrid/?family=' + str(family) + '&role=' + role
-        # print(send_url)
-        return HttpResponseRedirect(send_url)
-    if 'myspecies' in request.GET:
-        myspecies = request.GET['myspecies']
-        if myspecies:
-            myauthor = Photographer.objects.get(user_id=request.user)
-
-    type = 'hybrid'
-    family = Family.objects.get(family='Orchidaceae')
+    crit = 0
     year = ''
     year_valid = 0
+    status = ''
     author = originator = ''
-    seed, pollen = '', ''
-    # reqgenus = ''
-    msg = ''
-    syn = ''
+    seed_genus = ''
+    pollen_genus = ''
+    seed = pollen = ''
+    alpha = ''
+    sort = prev_sort = ''
     spc = ''
-    total = 0
-    this_species_list = []
+    msg = ''
+
     # Initialization
-    if 'spc' in request.GET:
-        spc = request.GET['spc']
+    if 'genus' in request.GET:
+        genus = request.GET['genus']
+        crit = 1
     if 'seed' in request.GET:
         seed = request.GET['seed']
+        crit = 1
     if 'pollen' in request.GET:
         pollen = request.GET['pollen']
-    seed_genus, prev_seed_genus = getPrev(request, 'seed_genus', 'prev_seed_genus')
-    pollen_genus, prev_pollen_genus = getPrev(request, 'pollen_genus', 'prev_pollen_genus')
-    if 'primary' in request.GET:
-        primary = request.GET['primary']
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
+        crit = 1
+    if 'status' in request.GET:
+        status = request.GET['status']
+    # if not status:
+    #     status = 'accepted'
+
+    if 'spc' in request.GET:
+        spc = request.GET['spc']
+        if spc:
+            crit = 1
+        if len(spc) == 1:
+            alpha = ''
+
     if 'author' in request.GET:
         author = request.GET['author']
+        if author: crit = 1
     if 'originator' in request.GET:
         originator = request.GET['originator']
+        if originator: crit = 1
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
-        # Force alpha = A unless ALL is selected.
-        if alpha == '':
-            alpha = 'A'
-    if alpha == 'ALL':
+        if alpha: crit = 1
+    else:
         alpha = ''
     if 'year' in request.GET:
         year = request.GET['year']
         if valid_year(year):
             year_valid = 1
+            crit = 1
+    if alpha != 'ALL':
+        alpha = alpha[0:1]
+    if crit :
+        reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
+        genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+    else:
+        return render(request, 'orchidaceae/hybrid.html', {})
 
-    # if alpha or seed_genus or pollen_genus or seed or pollen:
-    reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
+    if (reqgenus == prev_genus):
+        seed_genus, prev_seed_genus = getPrev(request,'seed_genus', 'prev_seed_genus')
+        pollen_genus, prev_pollen_genus = getPrev(request,'pollen_genus', 'prev_pollen_genus')
 
-    if reqgenus or spc or seed or pollen or seed_genus or pollen_genus or year or author or originator or alpha:
-        genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', '')
+    if seed and seed_genus:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_genus__istartswith=seed_genus, hybrid__seed_species__istartswith=seed)
+            |
+            Q(hybrid__pollen_genus__istartswith=seed_genus, hybrid__pollen_species__istartswith=seed)
+        )
+    elif seed:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_species__istartswith=seed)
+            |
+            Q(hybrid__pollen_species__istartswith=seed)
+        )
+    elif seed_genus:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_genus__istartswith=seed_genus)
+            |
+            Q(hybrid__pollen_genus__istartswith=seed_genus)
+        )
 
-        if syn == 'N':
-            this_species_list = this_species_list.exclude(status='synonym')
-        else:
-            syn = 'Y'
+    if pollen and pollen_genus:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_genus__istartswith=pollen_genus, hybrid__seed_species__istartswith=pollen)
+            |
+            Q(hybrid__pollen_genus__istartswith=pollen_genus, hybrid__pollen_species__istartswith=pollen)
+        )
+    elif pollen:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_species__istartswith=pollen)
+            |
+            Q(hybrid__pollen_species__istartswith=pollen)
+        )
+    elif pollen_genus:
+        this_species_list = this_species_list.filter(
+            Q(hybrid__seed_genus__istartswith=pollen_genus)
+            |
+            Q(hybrid__pollen_genus__istartswith=pollen_genus)
+        )
+    print("this_species_list = ", this_species_list)
+
+    # Building pid ;list
+    if crit and this_species_list:
         if spc:
-            this_species_list = this_species_list.filter(species__icontains=spc)
-
-        if (reqgenus == prev_genus):
-
-            if seed_genus and pollen_genus:
-                this_species_list = this_species_list.filter(
-                    Q(hybrid__seed_genus=seed_genus) & Q(hybrid__pollen_genus=pollen_genus) | Q(
-                        hybrid__seed_genus=pollen_genus) & Q(hybrid__pollen_genus=seed_genus))
-            elif seed_genus:
-                this_species_list = this_species_list.filter(
-                    Q(hybrid__seed_genus=seed_genus) | Q(hybrid__pollen_genus=seed_genus))
-            elif pollen_genus:
-                this_species_list = this_species_list.filter(Q(hybrid__seed_genus=pollen_genus)
-                                                             | Q(hybrid__pollen_genus=pollen_genus))
-            if seed:
-                this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=seed)
-                                                             | Q(hybrid__pollen_species__icontains=seed))
-            if pollen:
-                this_species_list = this_species_list.filter(Q(hybrid__seed_species__icontains=pollen)
-                                                             | Q(hybrid__pollen_species__icontains=pollen))
-        if primary and primary == 'Y':
-            this_species_list = this_species_list.filter(hybrid__seed_id__type='species').filter(hybrid__pollen_type='species')
-        else:
-            primary = 'N'
-
-        # Building pid ;list
-
-        if this_species_list:
-            if alpha:
-                if len(alpha) == 1:
-                    this_species_list = this_species_list.filter(species__istartswith=alpha)
-            if author and not originator:
-                this_species_list = this_species_list.filter(author__icontains=author)
-            if author and originator:
-                this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
-            if originator and not author:
-                this_species_list = this_species_list.filter(originator__icontains=originator)
-            if year_valid:
-                year = int(year)
-                this_species_list = this_species_list.filter(year=year)
-            # If private request
-            if myspecies and myauthor:
-                pid_list = HybImages.objects.filter(author_id=myauthor).values_list('pid', flat=True).distinct()
-                this_species_list = this_species_list.filter(pid__in=pid_list)
-            if this_species_list:
-                total = len(this_species_list)
+            if len(spc) >= 2:
+                this_species_list = this_species_list.filter(species__icontains=spc)
             else:
-                total = 0
-            if total > max_rec:
-                msg = 'Your search request generated over maximum limit. Please refine your search criteria.'
-                this_species_list = this_species_list[0:max_rec]
-                total = max_rec
+                this_species_list = this_species_list.filter(species__istartswith=spc)
 
-    genus_list = list(Genus.objects.exclude(status='synonym').values_list('genus', flat=True))
-    genus_list.sort()
+        elif alpha:
+            if len(alpha) == 1:
+                this_species_list = this_species_list.filter(species__istartswith=alpha)
+        if author or originator:
+            this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
+        if author and originator:
+            this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
+        # if originator and not author:
+        #     this_species_list = this_species_list.filter(originator__icontains=originator)
+        if year_valid:
+            year = int(year)
+            this_species_list = this_species_list.filter(year=year)
+    else:
+        this_species_list = []
+        msg = "Please select a search criteria"
+
+    if request.GET.get('sort'):
+        sort = request.GET['sort']
+        sort.lower()
+    if sort:
+        if request.GET.get('prev_sort'):
+            prev_sort = request.GET['prev_sort']
+        if prev_sort == sort:
+            if sort.find('-', 0) >= 0:
+                sort = sort.replace('-', '')
+            else:
+                sort = '-' + sort
+        else:
+            # sort = '-' + sort
+            prev_sort = sort
+    if this_species_list:
+        if sort:
+            this_species_list = this_species_list.order_by(sort)
+        else:
+            this_species_list = this_species_list.order_by('genus', 'species')
+
+    role = getRole(request)
     write_output(request, str(reqgenus))
-    context = {'my_list': this_species_list, 'genus_list': genus_list, 'family': family,
-               'total': total, 'alpha_list': alpha_list, 'alpha': alpha,
-               'genus': reqgenus, 'genobj': genus, 'year': year, 'syn': syn,
+    context = {'my_list': this_species_list,
+               'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
+               'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
                'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
                'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
-               'role': role, 'title': 'taxonomy', 'msg': msg,
-               'myspecies': myspecies, 'primary': primary,
+               'sort': sort, 'prev_sort': prev_sort,
+               'role': role, 'level': 'list', 'title': 'hybrid_list',
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
@@ -914,7 +922,7 @@ def progeny(request, pid):
 
 
     if len(des_list) > 5000:
-        des_list = des_list.filter(pct__gt=40)
+        des_list = des_list.filter(pct__gt=30)
 
     result_list = []
     for x in des_list:
@@ -967,9 +975,6 @@ def progenyimg(request, pid=None):
             y.name = offspring.pid.namecasual()
             y.pct = x.pct
             y.image_dir = y.image_dir()
-            # y.image_file = y.image_file
-            # y.author = y.author
-            # y.source_url = y.source_url
             if offspring.pollen_id:
                 y.pollen = offspring.pollen_id.pid
                 y.pollen_name = offspring.pollen_id.namecasual()
@@ -978,13 +983,11 @@ def progenyimg(request, pid=None):
                 y.seed_name = offspring.seed_id.namecasual()
             img_list.append(y)
 
-    total = len(img_list)
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
             request, img_list, page_length, num_show)
 
     write_output(request, species.textname())
     context = {'img_list': page_list, 'species': species, 'tab': 'proimg', 'proimg': 'active',
-               'total': total,
                'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,
                'genus': genus, 'page': page,
                'page_range': page_range, 'last_page': last_page, 'next_page': next_page, 'prev_page': prev_page,

@@ -225,9 +225,10 @@ option {
             <form action="?" id="hybrid">
                 <input type="hidden" name="family" value="{{family.family}}" >
                 <input type="hidden" name="alpha" value="{{alpha}}" >
-                <input class="btn btn-custom p-1 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard">
+<!--                <input class="btn btn-custom p-1 m-1" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="Genus" data-toggle="tooltip" data-placement="top"  title="Genus. Begin and/or end with * for wildcard">-->
             </form>
             <!--            Others-->
+            <input class="btn btn-custom p-1 m-1" form="hybrid" name="genus" value="{{genus}}"  placeholder="Genus" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Genus">
             <input class="btn btn-custom p-1 m-1" form="hybrid" name="spc" value="{{spc}}"  placeholder="Epithet" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Hybrid name (no wildcard)">
             <input class="btn btn-custom p-1 m-1" form="hybrid" name="year" value='{{year}}' placeholder="Year" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="YYYY">
             <input class="btn btn-custom p-1 m-1" form="hybrid" name="author" value='{{author}}' placeholder="Registrant" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Registrant name match string">
@@ -240,19 +241,16 @@ option {
                 <input type="hidden" name="spc" value="" >
                 <input type="hidden" name="author" value="" >
                 <input type="hidden" name="originator" value="" >
-                <input class="btn btn-custom p-1 m-1" form="parents" list="genus_list" name="seed_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center; background-image: none" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus">
+                <input class="btn btn-custom p-1 m-1" form="parents" name="seed_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center; background-image: none" data-toggle="tooltip"  data-placement="bottom"  title="Select a parent genus">
                 <input class="btn btn-custom p-1 m-1" form="parents" name="seed" value='{{seed}}' data-toggle="tooltip" data-placement="bottom"  title="a parent species" placeholder="Parent sp. #1" onfocus="this.select()">
                 <!--Pollen Genus-->
-                <input  class="btn btn-custom p-1 m-1" form="parents" list="genus_list" name="pollen_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus">
+                <input  class="btn btn-custom p-1 m-1" form="parents" name="pollen_genus" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_genus}}" class="custom-select" placeholder="Select a parent genus" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select another parent genus">
                 <input class="btn btn-custom p-1 m-1" form="parents" name="pollen" value='{{pollen}}' data-toggle="tooltip" data-placement="bottom"  title="another parent species"  placeholder="Parent sp. #2" onfocus="this.select()">
                 <button form="parents" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
+
             </form>
              <span style="color: red;">{{msg|default:''}}</span>
-           <datalist id="genus_list">
-                {% for g in genus_list %}
-                    <option value="{{g}}">{{g}}</option>
-                {% endfor %}
-            </datalist>
+
             {% if subtotal == 0 %}
                 <div style="margin: 50px 0 0 10px;">No results available! Please try {% if status == 'accepted' %}synonym{% else %}accepted{% endif %} status, or select different filters.</div>
             {% endif %}
