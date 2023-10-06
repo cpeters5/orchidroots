@@ -48,15 +48,15 @@
                      <tr>
 <!--                          <td class=" d-none d-sm-table-cell" align="center">{{ species.1 }}</td>-->
                          <td style="padding-left: 10px; ">
-                             {% if species.0.status == 'synonym' %}<span style="font-size:13px;">{{species.0.name|safe}}</span>
+                             {% if species.0.status == 'synonym' %}<span style="font-size:13px;">{{species.0.binomial|safe}}</span>
                              {% elif species.0.type == 'species' or species.0.type == 'hybrid' %}
                                   {% if role == "cur" %}
-                             <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
+                             <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.binomial|safe}}</strong></span></a>
                                   {% else %}
-                             <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.name|safe}}</strong></span></a>
+                             <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}&pid={{species.0.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;"><strong>{{species.0.binomial|safe}}</strong></span></a>
                                   {% endif %}
                              {%  else %}
-                                  {{species.0.name}}
+                                  {{species.0.binomial}}
                              {% endif %}
 
                              {% if species.0.author %}{{species.0.author}}{% endif %}
@@ -84,12 +84,12 @@
                      {% for species in result_list %}
                      <tr>
                          <td style="padding-left: 10px; ">
-                             {% if species.status == 'synonym' %}<span style="font-size:13px;"><strong>{{species.name|safe}}</strong></span>
+                             {% if species.status == 'synonym' %}<span style="font-size:13px;"><strong>{{species.binomial|safe}}</strong></span>
                                 {% elif species.type == 'species' or species.type == 'hybrid' %}
                                   {% if role == "cur" %}
-                             <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.name|safe}}</span></a>
+                             <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.binomial|safe}}</span></a>
                                   {% else %}
-                             <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&pid={{species.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.name|safe}}</span></a>
+                             <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&pid={{species.pid}}&role={{role}}&syn=Y"><span style="font-size:13px;">{{species.binomial|safe}}</span></a>
                                   {% endif %}
                               {%  else %}
                              <span style="font-size:13px;">{{species.name}}</span>
