@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'session_cleanup',
     'django_crontab',
     # 'django_admin_global_sidebar',
-    'dbview',
+    # 'dbview',
     # 'thumbnails',
     'imagekit',
     # 'rest_framework',
