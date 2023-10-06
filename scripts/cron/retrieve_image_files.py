@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.request import urlopen
 from PIL import Image
 
+debug = 1
 genus = ''
 app = sys.argv[1]
 tab = app.lower() + "_spcimages"
@@ -29,6 +30,9 @@ for row in cur:
     i = i + 1
     if i > 10: exit
     url = row[1]
+    if debug:
+        print("url = ", row[0], url)
+
     if row[3]:
         if app in ('other', 'fungi', 'aves', 'animalia'):
             family = row[3].title()
