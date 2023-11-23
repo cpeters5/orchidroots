@@ -1,0 +1,349 @@
+{% load static %}
+{% include "base.html" %}
+{% include "detail-title.html" %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
+    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
+</head>
+<style>
+    /*Styles for Top Descendants*/
+[class*="col-"] {
+    float: left;
+    padding: 10px;
+    margin-left: 15px;
+    height: 100%;
+}
+
+.imageitem {
+    display:inline-block;
+    margin:2px;
+    width : 17vw;
+    height: 20vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+.imageitem-cur {
+    display:inline-block;
+    margin:2px;
+    width : 17vw;
+    height: 24vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
+.box {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    color: white;
+    margin: 0 auto;
+    width:100%;
+}
+        /*Display square image*/
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 14vw;
+   width : 14vw;
+   padding:2px;
+    margin:5px auto;
+}
+
+.thumbnail-tiny {
+   object-fit: cover;
+   overflow: hidden;
+   height: 11vw;
+   width : 11vw;
+   padding:2px;
+    margin:5px auto;
+}
+
+.imgcaption {
+    font-size: 10px;
+    text-align: center;
+    /*height:60px;*/
+    margin-top: -7px;
+    /*overflow: hidden;*/
+}
+.imgcaption-cur {
+    font-size: 10px;
+    text-align: center;
+    /*height:80px;*/
+    margin-top: -7px;
+    /*overflow: hidden;*/
+}
+
+div.text {
+    position: absolute;
+    font-size:10px;
+    color: white
+}
+
+
+div.text-br {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+}
+
+div.text-bl a {
+    color: #2fffff;
+}
+
+.mybtn {
+    font-size: 12px;
+}
+
+@media only screen and (max-width: 800px){
+    .imageitem {
+        width: 28vw;
+        height: 36vw;
+    }
+    .imageitem-cur {
+        width: 28vw;
+        height: 40vw;
+    }
+    .imgcaption {
+        font-size: 10px;
+    }
+    .imgcaption-cur {
+        font-size: 9px;
+    }
+    .box {
+        width: 27vw;
+        height: 27vw;
+        font-size: 10px;
+        /*margin-left:-3px;*/
+       margin: 0 auto;
+    }
+    .thumbnails {
+       height: 26vw !important;
+       width: 26vw !important;
+    }
+    /*.thumbnails {*/
+    /*   height: 190px !important;*/
+    /*   width : 95% !important;*/
+    /*}*/
+    div.text {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (max-width: 500px){
+    .imageitem {
+        width: 36vw;
+        height: 44vw;
+    }
+    .box {
+        width: 34vw;
+        height: 34vw;
+        font-size: 10px;
+        margin-left:-3px;
+    }
+    .thumbnails {
+       height: 30vw !important;
+       width: 30vw !important;
+    }
+    .imageitem-cur {
+        width: 36vw;
+        height: 56vw !important;
+        padding:2px;
+        margin:5px auto;
+    }
+    .box-tiny {
+        width: 18vw;
+        font-size: 9px;
+        margin-left:-3px;
+    }
+    .thumbnail-tiny {
+        height: 15vw;
+        width : 15vw;
+        padding:2px;
+        margin:3px auto;
+
+    }
+    .imgcaption {
+       width : 34vw;
+        font-size: 9px;
+        height: 59px;
+    }
+    .imgcaption-cur {
+       width : 34vw;
+        font-size: 9px;
+        height: 62px;
+    }
+    div.text {
+        font-size: 10px;
+    }
+
+    .mybtn {
+        font-size: 11px !important;
+    }
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+label {
+    display: inline-block;
+    width: 250px;
+    margin-right: 5px;
+}
+
+.tab-content {
+    min-height: 200px !important;
+    background:white;
+    padding:10px 0;
+    border-left:1px solid lightgrey;
+    border-right:1px solid lightgrey;
+    border-bottom:1px solid lightgrey;
+}
+
+a:hover {
+    color:darkblue;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding  : 8px 5px;
+    width: 147px;
+    /*padding  : .5rem .5rem;*/
+    font-size  : .8rem;
+    line-height  : .65;
+    border-radius : .2rem;
+}
+
+
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+    /*min-height:400px;*/
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
+/*.litebox-overlay .litebox-close{*/
+/*    width: 36px;*/
+/*    height: 36px;*/
+/*    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAMAAADW3miqAAAABGdBT&hellip;vNcsmRuX4vc8d6dD9cGMVFL231VGoNUdfFRq2y/t8SS7NvNfRFXoyOLJ8AAAAASUVORK5CYII=) no-repeat center;*/
+/*    top: 20px;*/
+/*    right: 20px;*/
+/*}*/
+
+/* Styles for curate links */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+</style>
+
+<div style="width:95%;margin:0 auto;padding:0;">
+    {% include 'common/detail-nav.html' %}
+    <!-- Main -->
+    <div class="tab-content clearfix p-2">
+        <!--Author list-->
+
+
+<!--            Main section-->
+    {% if video_list %}
+        Display video urls here
+        <table class="table table-sm table-hover table-condensed table-border offsp" style="margin: 0 auto;width:100%; padding:0;border:1px solid #ccc;">
+            <tr >
+                <th class="border-rb">Url</th><th class="border-rb">Description</th>
+            </tr>
+            {% for vid in video_list %}
+             <tr >
+                 <td class="border-lb" style="text-align: left">
+                     <a href="{{vid.source_url}}">{{vid.name}}</a>, {{vid.get_displayname}}
+                 </td>
+                 <td class="border-rb" style="text-align: left;">
+                     {{vid.description|default:''}} {{vid.description|default:''}}
+                 </td>
+             </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div  class="p-2 justify-content-center align-items-center">
+            No video available for this species
+        </div>
+    {% endif %}
+
+    {% if msg %}
+        <h6>{{msg|default:''}}</h6>
+    {% endif %}
+
+</div>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+//
+// $(this).ekkoLightbox({
+//     alwaysShowClose: true
+// });
+
+// This function supposed to change position of lightbox close icon.
+// Lightbox.prototype.build = function() {
+//     var self = this;
+//     $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox">' +
+//         '<div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div>' +
+//         '<div class="lb-closeContainer"><a class="lb-close"></a></div></div></div><div class="lb-outerContainer"><div class="lb-container">' +
+//         '<img class="lb-image" src="/statics/utils/images/icon-close-512.png" />' +
+//         '<div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div>' +
+//         '<div class="lb-loader"><a class="lb-cancel"></a></div></div></div></div>').appendTo($('body'));
+// }
+</script>
+
+
+
+{% endblock %}
+
+
+
