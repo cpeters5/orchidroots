@@ -50,16 +50,18 @@ class SpeciesForm(ModelForm):
         self.fields['infraspr'].required = False
         self.fields['infraspe'].required = False
         self.fields['year'].required = False
+        self.fields['comment'].required = True
 
     class Meta:
         model = Species
-        fields = ('genus','species','infraspr','infraspe','year')
+        fields = ('genus','species','infraspr','infraspe','year', 'comment')
         labels = {
             'genus':'Genus',
             'species':'Species',
             'infraspr':'infraspecific rank (e.g. var.)',
             'infraspe':'infraspecific value (e.g. alba)',
             'year':'year',
+            'comment': 'comment',
         }
         widgets = {
             # 'pid': forms.HiddenInput(),
@@ -68,6 +70,7 @@ class SpeciesForm(ModelForm):
             'infraspr': TextInput(attrs={'size': 50, 'style': 'font-size: 13px',}),
             'infraspe': TextInput(attrs={'size': 50, 'style': 'font-size: 13px',}),
             'year': TextInput(attrs={'size': 50, 'style': 'font-size: 13px',}),
+            'comment': Textarea(attrs={'cols': 52, 'rows': 3, 'style': 'font-size: 13px'}),
         }
 
     def clean_genus(self):
