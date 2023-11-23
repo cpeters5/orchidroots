@@ -181,8 +181,6 @@ def information(request, pid=None):
         # if request pid is a synopnym, return the synonym instance
         species = req_species
     # if len(display_items) > 0:
-    ads_insert = int(random.random() * len(display_items)) + 1
-    sponsor = get_random_sponsor()
     role = ''
     if 'role' in request.GET:
         role = request.GET['role']
@@ -193,7 +191,7 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'ancspc_list': ancspc_list, 'ads_insert': ads_insert, 'sponsor': sponsor,
+               'app': app, 'ancspc_list': ancspc_list,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
     return render(request, "display/information.html", context)
@@ -330,8 +328,6 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
-    ads_insert = int(random.random() * len(public_list)) + 1
-    sponsor = get_random_sponsor()
     write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
@@ -339,6 +335,55 @@ def photos(request, pid=None):
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
-               'ads_insert': ads_insert, 'sponsor': sponsor, 'view': 'photos',
                }
     return render(request, 'display/photos.html', context)
+
+
+def videos(request, pid):
+    author = get_reqauthor(request)
+    accpid = 0
+    if 'syn' in request.GET:
+        syn = request.GET['syn']
+    if not author or author == 'anonymous':
+        author = None
+    # author_list = Photographer.objects.all().order_by('displayname')
+    app, family = get_application(request)
+    if app == '':
+        return HttpResponseRedirect('/')
+    Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
+    Video = apps.get_model(app, 'Video')
+
+    try:
+        species = Species.objects.get(pk=pid)
+        print("species = ", species.binomial)
+    except Species.DoesNotExist:
+        return HttpResponseRedirect('/')
+
+    # Get synonym list
+    # TODO: Get video list from Video class
+    if species:
+        if species.status != 'synonym':
+            print("Not a synonym", pid)
+            syn_list = Synonym.objects.filter(acc_id=pid)
+            related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by(
+                'binomial')
+            # video_list = []
+            video_list = Video.objects.filter(pid=pid)
+            print(":vidio_list = ", str(len(video_list)))
+        else:
+            syn_list = Synonym.objects.filter(acc_id=accpid)
+            video_list = Video.objects.filter(pid=accpid)
+            accpid = Synonym.objects.get(pk=pid).acc_id
+            accspecies = Species.objects.get(pk=accpid)
+            related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
+
+    write_output(request, str(family))
+    context = {'species': species, 'author': author,
+               'family': family,
+               'vid': 'active', 'tab': 'vid', 'app':app,
+               'video_list': video_list,
+               'related_list': related_list, 'syn_list': syn_list,
+               'view': 'videos',
+               }
+    return render(request, 'display/videos.html', context)

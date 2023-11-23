@@ -31,6 +31,7 @@
             {% if species %}
                 <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role={{role}}">Summary<br></a></li>
                 <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:{{related}}&syn={{syn}}">Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:{{related}}&syn={{syn}}">Videos<br></a></li>
                 <li class="nav-item"><a class="nav-link {{sbs}}" href="/{{species.gen.family.application}}/compare/{{species.pid}}/?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link {{loc}} {{web}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">

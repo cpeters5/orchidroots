@@ -683,6 +683,49 @@ class SpcImages(models.Model):
         return author.user_id
 
 
+class Video(models.Model):
+    pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='funvideopid',on_delete=models.DO_NOTHING)
+    binomial = models.CharField(max_length=100, null=True, blank=True)
+    author = models.ForeignKey(Photographer, db_column='author', related_name='funvideoauthor', on_delete=models.DO_NOTHING)
+    credit_to = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=10, default='TBD')
+    quality = models.IntegerField(choices=QUALITY, default=3,)
+    source_url = models.CharField(max_length=1000, null=True, blank=True)
+    video_url = models.CharField(max_length=500, null=True, blank=True)
+    text_data = models.TextField(null=True, blank=True)
+    description = models.CharField(max_length=100, null=True, blank=True)
+    location = models.CharField(max_length=100, null=True, blank=True)
+    video_file = models.CharField(max_length=100, null=True, blank=True)
+    video_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
+    family = models.ForeignKey(Family, db_column='family', related_name='funvideofamily', on_delete=models.DO_NOTHING)
+    download_date = models.DateField(null=True, blank=True)
+    user_id = models.ForeignKey(User, db_column='user_id',related_name='funvideouser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
+    approved_by = models.ForeignKey(User, db_column='approved_by', related_name='funvideoapproved_by', null=True, blank=True,on_delete=models.DO_NOTHING)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.pid.textname()
+
+    def video_dir(self):
+        return 'utils/images/' + self.family.family + '/'
+        # return 'utils/images/hybrid/' + block_id + '/'
+
+    # def get_image_file_path(self):
+    #     return 'utils/images/' + self.family.family + '/' + self.image_file
+    #
+
+    def get_displayname(self):
+        if self.credit_to:
+            return self.credit_to
+        return self.author.displayname
+
+    def get_userid(self):
+        author = Photographer.objects.get(author=self.author_id)
+        return author.user_id
+
+
 class UploadFile(models.Model):
     pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid', related_name='funpid',on_delete=models.DO_NOTHING)
     author     = models.ForeignKey(Photographer, db_column='author', related_name='funauthor', null=True, blank=True,on_delete=models.DO_NOTHING)
