@@ -44,6 +44,7 @@
                         {% if user.tier.tier > 2 %}
                             <a class="dropdown-item" href="/{{app}}/uploadweb/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                         {% endif %}
+                        <a class="dropdown-item" href="/{{app}}/uploadvid/{{species.pid}}/?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;;">upload video</span></a>
                     {% else %}
 <!--                        <span style="color: red">You will be redirected to OrchidRoots</span>-->
                         <a class="dropdown-item" href="https://orchidroots.com/detail/uploadweb/{{species.pid}}/?role={{role}}"><span style="color:#575757;;">upload url</span></a>
@@ -55,11 +56,11 @@
                 </li>
                 {% if related_list %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Subspecies</a>
+                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Infraspecific</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All subspecies</span></a>
+                        <a class="dropdown-item" href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All Infraspecific</span></a>
                         {% for spc in related_list %}
-                            <a class="dropdown-item" href="/display/{{view}}/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=Y"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
+                            <a class="dropdown-item" href="/display/photos/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=Y"><span style="color:#575757;">{{spc.binomial_it|safe}}</span></a>
                         {% endfor %}
                     </div>
                 </li>
@@ -69,9 +70,9 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Include Synonyms</a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/display/{{view}}/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All synonyms</span></a>
+                        <a class="dropdown-item" href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y"><span style="color:#575757;">All synonyms</span></a>
                         {% for spc in syn_list %}
-                            <a class="dropdown-item" href="/display/{{view}}/{{spc.spid.pid}}/?family={{spc.spid.gen.family}}&role={{role}}&related={{spc.spid.pid}}"><span style="color:#575757;">{{spc.spid.binomial_it|safe}}</span></a>
+                            <a class="dropdown-item" href="/display/photos/{{spc.spid.pid}}/?family={{spc.spid.gen.family}}&role={{role}}&related={{spc.spid.pid}}"><span style="color:#575757;">{{spc.spid.binomial_it|safe}}</span></a>
                         {% endfor %}
                     </div>
 
