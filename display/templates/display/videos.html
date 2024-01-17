@@ -279,7 +279,6 @@ a:hover {
 
 <!--            Main section-->
     {% if video_list %}
-        Display video urls here
         <table class="table table-sm table-hover table-condensed table-border offsp" style="margin: 0 auto;width:100%; padding:0;border:1px solid #ccc;">
             <tr >
                 <th class="border-rb">Url</th><th class="border-rb">Description</th>
@@ -287,7 +286,7 @@ a:hover {
             {% for vid in video_list %}
              <tr >
                  <td class="border-lb" style="text-align: left">
-                     <a href="{{vid.source_url}}">{{vid.name}}</a>, {{vid.get_displayname}}
+                     <a href="{{vid.source_url}}" target="_blank">{{vid.name}}</a>, {{vid.get_displayname}}
                  </td>
                  <td class="border-rb" style="text-align: left;">
                      {{vid.description|default:''}} {{vid.description|default:''}}

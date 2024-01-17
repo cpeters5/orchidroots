@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from aves.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
+from aves.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus, Video
 from accounts.models import Photographer
 import copy
 
@@ -549,6 +549,70 @@ class UploadHybWebForm(forms.ModelForm):
     #     data = {**initial, **data}
     #     super().__init__(data, **kwargs)
 
+
+class UploadVidForm(forms.ModelForm):
+    author = ModelChoiceField(
+        queryset=Photographer.objects.order_by('fullname'),
+        required=False,
+        widget=Select2Widget
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(UploadVidForm, self).__init__(*args, **kwargs)
+        self.fields['source_url'].required = True
+        # self.fields['author'].required = True
+        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
+        self.fields['author'].widget.is_localized = True
+
+    class Meta:
+        model = Video
+        rank = forms.IntegerField(initial=5)
+        fields = (
+        'author', 'source_url', 'credit_to', 'name', 'text_data', 'description')
+        labels = {
+            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
+            '': 'Link to source',
+            'credit_to': 'or, credit name. Enter only when author does not exist in the dropdown list.',
+            'name': 'Clonal name',
+            'text_data': 'Comment',
+            'description': 'Tags',
+        }
+        widgets = {
+            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
+            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+        }
+        error_messages = {
+            # 'author': {
+            # 'required': _("Please select a name for credit attribution."),
+            # },
+            'source_url': {
+                'required': _("Please enter video url"),
+            },
+        }
+
+    def clean_credit_to(self):
+        credit_to = self.cleaned_data['credit_to']
+        # print("a. author = ", self.cleaned_data['author'])
+        if not credit_to:
+            return None
+        return credit_to
+
+    def clean_source_url(self):
+        import re
+        """ Validation of image_url specifically """
+        source_url = self.cleaned_data['source_url']
+        if not re.search('https', source_url):
+            raise ValidationError(
+                _('Not a valid URL'),
+                params={'source_url': source_url},
+            )
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return source_url
 
 
 class UploadFileForm(forms.ModelForm):

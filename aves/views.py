@@ -39,7 +39,7 @@ applications = config.applications
 # from django.views.generic.list_detail import object_list
 from aves.forms import UploadFileForm
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
-    SpeciesForm, RenameSpeciesForm
+    SpeciesForm, RenameSpeciesForm, UploadVidForm
 from accounts.models import User, Profile, Photographer
 from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
@@ -470,6 +470,59 @@ def uploadweb(request, pid, orid=None):
                'species': species, 'family': family,
                'role': role}
     return render(request, 'aves/uploadweb.html', context)
+
+
+@login_required
+def uploadvid(request, pid, orid=None):
+    sender = 'vid'
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponse(redirect_message)
+
+    # For Other application only
+    family = species.gen.family
+    role = getRole(request)
+    if request.method == 'POST':
+        form = UploadSpcWebForm(request.POST)
+
+        if form.is_valid():
+            spc = form.save(commit=False)
+            if not spc.author and not spc.credit_to:
+                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            spc.user_id = request.user
+            spc.pid = species
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            if orid and orid > 0:
+                spc.id = orid
+
+            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
+            if spc.author.user_id and request.user.tier.tier < 3:
+                if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
+                    spc.rank = 0
+            if spc.image_url == 'temp.jpg':
+                spc.image_url = None
+            if spc.image_file == 'None':
+                spc.image_file = None
+            if spc.created_date == '' or not spc.created_date:
+                spc.created_date = timezone.now()
+            spc.save()
+
+            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
+            write_output(request, species.textname())
+            return HttpResponseRedirect(url)
+
+    if not orid:  # upload, initialize author. Get image count
+        form = UploadVidForm(initial={'author': request.user.photographer.author_id})
+        vid = ''
+    else:  # update. initialize the form iwht current image
+        vid = Video.objects.get(pk=orid)
+        form = UploadVidForm(instance=vid)
+
+    context = {'form': form, 'vid': vid, 'loc': 'active',
+               'species': species, 'family': family,
+               'role': role}
+    return render(request, 'aves/uploadvid.html', context)
 
 
 def mypaginator(request, full_list, page_length, num_show):
