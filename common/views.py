@@ -258,6 +258,8 @@ def species(request):
         req_type = request.GET['type']
         if req_type not in ['species', 'hybrid']:
             req_type = 'species'
+    else:
+        req_type = 'species'
     if 'family' in request.GET:
         req_family = request.GET['family']
     if 'genus' in request.GET:
@@ -340,7 +342,6 @@ def species(request):
                         species_list = this_species_list
                     else:
                         species_list = species_list.union(this_species_list)
-
     if not genus_list and not species_list and not req_genus:
         #     No filter requested, return family list
         family_list = Family.objects.all()
