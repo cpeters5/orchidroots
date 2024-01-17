@@ -44,7 +44,7 @@ td {
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <br>
                 <div style="text-align: center;">
-                    <h5>Search results for "{{commonname}}" {% if  selected_app %}}in {{selected_app}} {% endif %}
+                    <h5>Search results for "{{commonname}}" {% if  selected_app %}in {{selected_app}} {% endif %}
                     </h5>
                 </div>
                 <table class="">
@@ -55,7 +55,7 @@ td {
                         <form action="/search/search_name/" method="post">
                                 {% csrf_token %}
                           <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
-                            <option value="">search all</option>
+                            <option value="">{{selected_app|default:"select all"}}</option>
                             <option value="aves">Aves</option>
                             <option value="animalia">Animalia</option>
                             <option value="fungi">Fungi</option>

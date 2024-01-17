@@ -167,9 +167,7 @@ option {
     <div class="card m-2">
         <div class="card-header">
             <h4>{{genus|title}} Hybrid List
-                {% if genobj.num_species > 0 %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?family={{family}}&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Species List</a>
-                {% endif %}
+                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Species List</a>
 
                 {% if total > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
                     <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
@@ -209,6 +207,7 @@ option {
                     <input type="hidden" name="role" value="{{role}}" >
                     <input type="hidden" name="primary" value="{{primary}}" >
                     <input type="hidden" name="syn" value="{{syn}}" >
+                    <input type="hidden" name="req_type" value="hybrid" >
                     {% if myspecies %}
                     <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">Show My hybrids</span>
                     {% else %}

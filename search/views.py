@@ -397,7 +397,8 @@ def search_name(request):
         genre = request.POST['genre']
     if 'selected_app' in request.POST:
         selected_app = request.POST['selected_app']
-
+    elif 'selected_app' in request.GET:
+        selected_app = request.GET['selected_app']
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
     elif 'commonname' in request.POST:

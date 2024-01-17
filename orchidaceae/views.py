@@ -205,10 +205,10 @@ def getPartialPid(reqgenus, type, status):
     intragen_list = Intragen.objects.all()
     if status == 'synonym' or type == 'hybrid':
         intragen_list = []
-    pid_list = Species.objects.filter(type=type)
+    pid_list = Species.objects.filter(type__iexact=type)
     if status == 'synonym':
         pid_list = pid_list.filter(status='synonym')
-    elif status == 'accepted':
+    else:
         pid_list = pid_list.exclude(status='synonym')
     if reqgenus:
         if reqgenus[0] != '*' and reqgenus[-1] != '*':
@@ -217,7 +217,7 @@ def getPartialPid(reqgenus, type, status):
             except Genus.DoesNotExist:
                 genus = ''
             if genus:
-                pid_list = pid_list.filter(genus=genus)
+                pid_list = pid_list.filter(genus=reqgenus)
                 if intragen_list:
                     intragen_list = intragen_list.filter(genus=genus)
             else:
@@ -423,13 +423,16 @@ def hybrid(request):
             crit = 1
     if alpha != 'ALL':
         alpha = alpha[0:1]
+    crit = 1
+    print("start hybrid species")
     if crit :
         reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
     else:
         return render(request, 'orchidaceae/hybrid.html', {})
+    print("start hybrid species 2")
 
-    if (reqgenus == prev_genus):
+    if (reqgenus and (reqgenus == prev_genus)):
         seed_genus, prev_seed_genus = getPrev(request,'seed_genus', 'prev_seed_genus')
         pollen_genus, prev_pollen_genus = getPrev(request,'pollen_genus', 'prev_pollen_genus')
 

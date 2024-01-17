@@ -632,6 +632,7 @@ nav .search-container button:hover {
                 </li>
                 <li  class="nav-item">
                         <form class="form-inline" id="name" action="/search/search_name/" style="display:inline-block; margin-top: 5px;">
+                            <input  form="name" type="hidden" name="selected_app" value="{{ selected_app }}">
                             <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">
                         </form>
                 </li>

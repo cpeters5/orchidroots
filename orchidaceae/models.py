@@ -1057,6 +1057,8 @@ class SpcImages(models.Model):
         return 'utils/images/species/'
         # return 'utils/images/hybrid/' + block_id + '/'
 
+    def thumb_dir(self):
+        return 'utils/thumbs/species/'
 
     def get_displayname(self):
         if self.credit_to:
@@ -1173,6 +1175,9 @@ class HybImages(models.Model):
     def image_dir(self):
         # return 'utils/images/hybrid/' + block_id + '/'
         return 'utils/images/hybrid/'
+
+    def thumb_dir(self):
+        return 'utils/thumbs/hybrid/'
 
     def get_displayname(self):
         if self.credit_to:
