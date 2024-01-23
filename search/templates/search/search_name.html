@@ -68,29 +68,25 @@ td {
                     <tr><td></td><td><b>Species</b></td><td><b>common name</b></td></tr>
                     {% if name_list %}
                     {% for species in name_list %}
-                        <tr style="border: 1px solid lightgrey; margin-top: 0;">
+                        <tr>
                             <td style="width:20%;">
                                 <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=Y">
                                  <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                             </td>
-                            <td>
-                                {% if species.pid.family.application == 'other' or species.pid.family.application == 'orchidaceae' %}Plantae{% else %}{{species.pid.family.application|title}}{% endif %} - {{species.gen.family}}
+                            <td style="width:10%;">
                                 {% if role == 'cur' %}
                                     <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=Y">{{species.pid.binomial_it|safe}}</a>
                                 {% else %}
                                     <a href="{% url 'display:information' species.pid_id %}?family={{species.pid.family}}&syn=Y">{{species.pid.binomial_it|safe}}</a>
                                 {% endif %}
                             </td>
-                            <td>{{species.common_name|default:''}}</td>
+                            <td style="width:25%;">{{species.common_name|default:''}}</td>
                             <td>{{species.distribution|default:''}}</td>
                         </tr>
                     <tr><td></td></tr>
                     {% endfor %}
                     {% endif %}
-                    <tr><td>
-                        <div class="btn btn-custom" onclick="history.back()">Go back</div>
-                    </td></tr>
                 </table>
             </div>
         </div>
