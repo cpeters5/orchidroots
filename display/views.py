@@ -10,7 +10,7 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application
+from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, get_searchdata
 from common.views import rank_update, quality_update
 from core.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -30,20 +30,26 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
+    selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)
     app, family = get_application(request)
     if app == '':
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponseRedirect('/')
+
     Synonym = apps.get_model(app, 'Synonym')
-    SpcImages = apps.get_model(app, 'SpcImages')
     Hybrid = apps.get_model(app, 'hybrid')
     AncestorDescendant = apps.get_model(app, 'AncestorDescendant')
+
+    SpcImages = apps.get_model(app, 'SpcImages')
     if app == 'orchidaceae':
         HybImages = apps.get_model(app, 'HybImages')
     else:
         HybImages = apps.get_model(app, 'SpcImages')
-
 
     ps_list = pp_list = ss_list = sp_list = ()
     max_items = 3000
@@ -51,13 +57,6 @@ def information(request, pid=None):
     seedimg_list = []
     pollimg_list = []
     distribution_list = []
-    if not pid:
-        pid = 0
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
-
     related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
 
     # If pid is a synonym, convert to accept
@@ -171,7 +170,11 @@ def information(request, pid=None):
                 elif pp_type == 'hybrid':
                     pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
 
-        ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
+        if species.status == 'synonym':
+            accid = species.getAcc()
+            ancspc_list = AncestorDescendant.objects.filter(did=accid).filter(anctype='species').order_by('-pct')
+        else:
+            ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
         if ancspc_list:
             for x in ancspc_list:
                 img = x.aid.get_best_img()
@@ -191,6 +194,7 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
+               'selected_app': selected_app, 'area': area,
                'app': app, 'ancspc_list': ancspc_list,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
@@ -199,6 +203,7 @@ def information(request, pid=None):
 
 def photos(request, pid=None):
     author = get_reqauthor(request)
+    selected_app, area = get_searchdata(request)
     role = ''
     syn = 'Y'
     related = ''
@@ -218,9 +223,15 @@ def photos(request, pid=None):
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
-    SpcImages = apps.get_model(app, 'SpcImages')
-    if app == 'orchidaceae':
-        HybImages = apps.get_model(app, 'HybImages')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponseRedirect('/')
+
+    if app == 'orchidaceae' and species.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
     UploadFile = apps.get_model(app, 'UploadFile')
 
     if not pid and 'pid' in request.GET:
@@ -230,10 +241,17 @@ def photos(request, pid=None):
         else:
             pid = 0
 
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
+    if species.status == 'synonym':
+        public_list = SpcImages.objects.filter(pid=pid)  # public photos
+        private_list = public_list.filter(rank=0)  # rejected photos
+        upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
+        context = {'species': species, 'author': author, 'family': family,
+                   'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
+                   'related_list': '', 'public_list': public_list, 'private_list': private_list,
+                   'upload_list': upload_list, 'syn_list': '',
+                   'related': related, 'syn': syn, 'role': role, 'selected_app': selected_app, 'area': area,
+                   }
+        return render(request, 'display/photos.html', context)
 
     if 'related' in request.GET:
         related = request.GET['related']
@@ -248,35 +266,20 @@ def photos(request, pid=None):
             except Species.DoesNotExist:
                 related_species = ''
 
-    if species.status != 'synonym':
-        related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
-    else:
-        accpid = Synonym.objects.get(pk=pid).acc_id
-        accspecies = Species.objects.get(pk=accpid)
-        related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
+    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
     related_pid = related_list.values_list('pid', flat=True)
     if species:
-        if species.status != 'synonym':
-            syn_list = Synonym.objects.filter(acc_id=pid)
-        else:
-            syn_list = Synonym.objects.filter(acc_id=accpid)
+        syn_list = Synonym.objects.filter(acc_id=pid)
         syn_pid = list(syn_list.values_list('spid', flat=True))
-        if species.status == 'synonym':
-            syn_pid = syn_pid + [accpid]
-        if app == 'orchidaceae' and species.type == 'hybrid':
-            if related_species:
-                public_list = HybImages.objects.filter(pid=related_species.pid)  # public photos
-            elif syn == 'N':      # input pid is a synonym, just get images of the requested synonym
-                public_list = HybImages.objects.filter(pid__in=related_pid)  # public photos
-            else:                   # input pid is an accepted species, include images of its synonyms
-                public_list = HybImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
+        if related_species:
+            public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
         else:
-            if related_species:
-                public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
-            elif syn == 'N':      # input pid is a synonym, just get images of the requested synonym
-                public_list = SpcImages.objects.filter(pid__in=related_pid)  # public photos
-            else:
-                public_list = SpcImages.objects.filter(Q(pid__in=related_pid) | Q(pid__in=syn_pid))  # public photos
+            public_list = SpcImages.objects.filter(pid=pid)  # public photos
+        print("public_list = ", pid, len(public_list))
+        if syn == 'Y':
+            public_pid_list = public_list.values_list('pid', flat=True)
+            public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
+
         upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
@@ -289,12 +292,8 @@ def photos(request, pid=None):
 
     # Request rank/quality change.
     # Remove after implementing a dedicated curator task view.
-    if app == 'orchidaceae' and species.type == 'hybrid':
-        rank_update(request, HybImages)
-        quality_update(request, HybImages)
-    else:
-        rank_update(request, SpcImages)
-        quality_update(request, SpcImages)
+    rank_update(request, SpcImages)
+    quality_update(request, SpcImages)
 
     # Create lists
 
@@ -334,6 +333,7 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
+               'selected_app': selected_app, 'area': area,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                }
     return render(request, 'display/photos.html', context)
@@ -341,6 +341,7 @@ def photos(request, pid=None):
 
 def videos(request, pid):
     author = get_reqauthor(request)
+    selected_app, area = get_searchdata(request)
     accpid = 0
     if 'syn' in request.GET:
         syn = request.GET['syn']
@@ -356,7 +357,8 @@ def videos(request, pid):
 
     try:
         species = Species.objects.get(pk=pid)
-        print("species = ", species.binomial)
+
+
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
@@ -364,13 +366,11 @@ def videos(request, pid):
     # TODO: Get video list from Video class
     if species:
         if species.status != 'synonym':
-            print("Not a synonym", pid)
             syn_list = Synonym.objects.filter(acc_id=pid)
             related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by(
                 'binomial')
             # video_list = []
             video_list = Video.objects.filter(pid=pid)
-            print(":vidio_list = ", str(len(video_list)))
         else:
             syn_list = Synonym.objects.filter(acc_id=accpid)
             video_list = Video.objects.filter(pid=accpid)
@@ -384,6 +384,7 @@ def videos(request, pid):
                'vid': 'active', 'tab': 'vid', 'app':app,
                'video_list': video_list,
                'related_list': related_list, 'syn_list': syn_list,
+               'selected_app': selected_app, 'area': area,
                'view': 'videos',
                }
     return render(request, 'display/videos.html', context)
