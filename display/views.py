@@ -57,7 +57,6 @@ def information(request, pid=None):
     seedimg_list = []
     pollimg_list = []
     distribution_list = []
-    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).exclude(pid=pid).exclude(status='synonym').order_by('binomial')
 
     # If pid is a synonym, convert to accept
     req_pid = pid
@@ -189,7 +188,7 @@ def information(request, pid=None):
         role = request.GET['role']
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
-               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus, 'related_list': related_list,
+               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
@@ -208,6 +207,8 @@ def photos(request, pid=None):
     syn = 'Y'
     related = ''
     related_species = ''
+    related_list = []
+    related_pids = []
     variety = ''
     tail = ''
     accpid = 0
@@ -247,35 +248,36 @@ def photos(request, pid=None):
         upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
         context = {'species': species, 'author': author, 'family': family,
                    'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
-                   'related_list': '', 'public_list': public_list, 'private_list': private_list,
-                   'upload_list': upload_list, 'syn_list': '',
+                   'public_list': public_list, 'private_list': private_list,
+                   'upload_list': upload_list,
                    'related': related, 'syn': syn, 'role': role, 'selected_app': selected_app, 'area': area,
                    }
         return render(request, 'display/photos.html', context)
 
+    this_species_name = species.genus + ' ' + species.species
+    related_list = Species.objects.filter(binomial__istartswith=this_species_name)
     if 'related' in request.GET:
         related = request.GET['related']
-        if related == 'ALL':
+        if related == 'ALL' or not related.isnumeric():
+            #  Include all infraspecifics
+            related_pids = related_list.values_list('pid', flat=True)
             related = ''
             related_species = ''
-        if not related.isnumeric():
-            related = ''
         if related:
             try:
                 related_species = Species.objects.get(pk=related)
             except Species.DoesNotExist:
                 related_species = ''
 
-    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species).order_by('binomial')
-    related_pid = related_list.values_list('pid', flat=True)
     if species:
         syn_list = Synonym.objects.filter(acc_id=pid)
         syn_pid = list(syn_list.values_list('spid', flat=True))
         if related_species:
             public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
+        elif related_list:
+            public_list = SpcImages.objects.filter(pid__in=related_pids)  # public photos
         else:
             public_list = SpcImages.objects.filter(pid=pid)  # public photos
-        print("public_list = ", pid, len(public_list))
         if syn == 'Y':
             public_pid_list = public_list.values_list('pid', flat=True)
             public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
