@@ -421,7 +421,13 @@ a:hover {
                 {% endfor %}
 
             {% else %}
-                <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
+                {% if species.status == 'synonym' %}
+                    <br><br><div style="text-align:center">No images available.  Please try the accepted species
+                                <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}">{{species.getAccepted.binomial|safe}}</a>
+                            </div>
+                {% else %}
+                    <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
+                {% endif %}
             {% endif %}
        </div>
     </div>
