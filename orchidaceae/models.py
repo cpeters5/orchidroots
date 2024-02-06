@@ -179,14 +179,6 @@ class Gensyn(models.Model):
         db_column='pid',
         on_delete=models.CASCADE,
         primary_key=True)
-    # accepted = models.CharField(max_length=50, default='')
-    # acc_author = models.CharField(max_length=50, default='')
-    # acc_year = models.IntegerField(null=True)
-    # status = models.CharField(max_length=20, default='')
-    # type = models.CharField(max_length=20, default='')
-    # description = models.CharField(max_length=255, default='')
-    # source = models.CharField(max_length=50, default='')
-    # abrev = models.CharField(max_length=50, default='')
     acc = models.ForeignKey(Genus, verbose_name='genus', related_name='oracc', null=True,on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
