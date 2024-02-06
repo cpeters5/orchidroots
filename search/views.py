@@ -14,81 +14,10 @@ from utils import config
 applications = config.applications
 alpha_list = config.alpha_list
 
-def xsearch(request):
-    role = getRole(request)
-    # print("role = ", role)
-    search_list = []
-    match_spc_list = []
-    full_path = request.path
-    path = 'information'
-    if request.user.is_authenticated and request.user.tier.tier > 2:
-        path = 'photos'
-
-    # Get search string
-    if 'search_string' in request.GET:
-        search_string = request.GET['search_string'].strip()
-    if 'search_string' in request.POST:
-        search_string = request.POST['search_string'].strip()
-    if not search_string or search_string == '':
-        message = 'Empty search term'
-        return HttpResponse(message)
-
-    if ' ' not in search_string:
-        genus_string = search_string
-    else:
-        genus_string, search_list = search_string.split(' ', 1)
-        search_list = search_list.split()
-
-    genus_list = []
-    # collection all matching genus in each app
-    for app in applications:
-        Genus = apps.get_model(app, 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-        if genus and genus != '':
-            genus_list.append(genus)
-    if genus_list:
-        match_spc_list = []
-        for genus in genus_list:
-            if ' ' not in search_string:
-                continue
-            family = genus.family
-            Species = apps.get_model(family.application, 'Species')
-            this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-            match_spc_list = list(chain(match_spc_list, this_match_spc_list))
-        # Incase no species found where search_string is more than one word, then look at other genus
-        other_genus_spc = []
-        if genus_list and not match_spc_list and ' ' in search_string:
-            other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-
-        context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'other_genus_spc': other_genus_spc, 'role': role,
-                   'path': path, 'full_path': full_path
-                   }
-        return render(request, "search/search_species.html", context)
-
-    else:
-        other_genus_spc = []
-        for app in applications:
-            Species = apps.get_model(app, 'Species')
-            this_spc_list = Species.objects.filter(
-                    Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-            other_genus_spc = list(chain(other_genus_spc, this_spc_list))
-        if other_genus_spc:
-            context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                       'other_genus_spc': other_genus_spc, 'role': role,
-                       'path': path, 'full_path': full_path
-                       }
-            return render(request, "search/search_species.html", context)
-
-    # looks like only search string is given.
-    url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
-    return HttpResponseRedirect(url)
-
 
 def search(request):
+    # requested from scientific name search in navbar
+    # Handles search genus. Then call search_species if there is another word(s) in the search straing
     role = getRole(request)
     # print("role = ", role)
     search_list = []
@@ -390,8 +319,6 @@ def search_species(request):
 def search_name(request):
     commonname = ''
     selected_app = ''
-    # app = 'other'
-    # Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen = getModels(request)
     role = getRole(request)
     if 'genre' in request.POST:
         genre = request.POST['genre']
@@ -399,12 +326,13 @@ def search_name(request):
         selected_app = request.POST['selected_app']
     elif 'selected_app' in request.GET:
         selected_app = request.GET['selected_app']
+
     if 'commonname' in request.GET:
         commonname = request.GET['commonname'].strip()
     elif 'commonname' in request.POST:
         commonname = request.POST['commonname'].strip()
-    commonname = commonname.rstrip('s')
 
+    commonname = commonname.rstrip('s')
     if not commonname or commonname == '':
         context = {'role': role, }
         return render(request, "search/search_name.html", context)
