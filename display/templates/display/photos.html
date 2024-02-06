@@ -330,7 +330,7 @@ a:hover {
                                 {% if image.source_url %}
                                     <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
                                 {% else %}
-                                    {{image.imgname|safe}}<br>{{image.get_displayname }}
+                                    {{image.get_displayname }}
                                 {% endif %}
                                 {% if role == 'cur' %}
                                     {% include 'common/curate_links.html' %}

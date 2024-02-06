@@ -286,7 +286,7 @@ a:hover {
             {% for vid in video_list %}
              <tr >
                  <td class="border-lb" style="text-align: left">
-                     <a href="{{vid.source_url}}" target="_blank">{{vid.name}}</a>, {{vid.get_displayname}}
+                     <a href="{{vid.source_url|default:''}}" target="_blank">{{vid.name}}</a>, {{vid.get_displayname}}
                  </td>
                  <td class="border-rb" style="text-align: left;">
                      {{vid.description|default:''}} {{vid.description|default:''}}
