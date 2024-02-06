@@ -200,7 +200,7 @@ def information(request, pid=None):
     return render(request, "display/information.html", context)
 
 
-def photos(request, pid=None):
+def photos(request, pid):
     author = get_reqauthor(request)
     selected_app, area = get_searchdata(request)
     role = ''
@@ -228,6 +228,8 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+
+
 
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
@@ -258,38 +260,40 @@ def photos(request, pid=None):
     related_list = Species.objects.filter(binomial__istartswith=this_species_name)
     if 'related' in request.GET:
         related = request.GET['related']
-        if related == 'ALL' or not related.isnumeric():
-            #  Include all infraspecifics
-            related_pids = related_list.values_list('pid', flat=True)
-            related = ''
+    if related == 'ALL' or not related.isnumeric():
+        #  Include all infraspecifics
+        related_pids = related_list.values_list('pid', flat=True)
+        related = ''
+        related_species = ''
+
+    # Incase a variety is requested, then show var. images only
+    if not related and species.infraspe:
+        related = pid
+
+    if related:
+        try:
+            related_species = Species.objects.get(pk=related)
+        except Species.DoesNotExist:
             related_species = ''
-        if related:
-            try:
-                related_species = Species.objects.get(pk=related)
-            except Species.DoesNotExist:
-                related_species = ''
 
-    if species:
-        syn_list = Synonym.objects.filter(acc_id=pid)
-        syn_pid = list(syn_list.values_list('spid', flat=True))
-        if related_species:
-            public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
-        elif related_list:
-            public_list = SpcImages.objects.filter(pid__in=related_pids)  # public photos
-        else:
-            public_list = SpcImages.objects.filter(pid=pid)  # public photos
-        if syn == 'Y':
-            public_pid_list = public_list.values_list('pid', flat=True)
-            public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
-
-        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
-        private_list = public_list.filter(rank=0)  # rejected photos
-        if role == 'pri':
-            upload_list = upload_list.filter(author=author) # Private photos
-            private_list = private_list.filter(author=author) # Private photos
-
+    syn_list = Synonym.objects.filter(acc_id=pid)
+    syn_pid = list(syn_list.values_list('spid', flat=True))
+    if related_species:
+        public_list = SpcImages.objects.filter(pid=related_species.pid)  # public photos
+    elif len(related_list) > 0:
+        public_list = SpcImages.objects.filter(pid__in=related_pids)  # public photos
     else:
-        private_list = public_list = upload_list = []
+        public_list = SpcImages.objects.filter(pid=pid)  # public photos
+    if syn == 'Y':
+        public_pid_list = public_list.values_list('pid', flat=True)
+        public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
+
+    upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
+    private_list = public_list.filter(rank=0)  # rejected photos
+    if role == 'pri':
+        upload_list = upload_list.filter(author=author) # Private photos
+        private_list = private_list.filter(author=author) # Private photos
+
     public_list = public_list.filter(rank__gt=0)  # public photos
 
     # Request rank/quality change.
@@ -335,7 +339,7 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
-               'selected_app': selected_app, 'area': area,
+               'selected_app': selected_app, 'area': area, 'related': related,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                }
     return render(request, 'display/photos.html', context)

@@ -44,47 +44,42 @@ td {
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <br>
                 <div style="text-align: center;">
-                    <h5>Search results for "{{commonname}}" {% if  selected_app %}in {{selected_app}} {% endif %}
-                    </h5>
+                    <h5>Search results in <b>{{selected_app|default:'all'|title }}</b> domain for "{{commonname}}"</h5>
                 </div>
-                <table class="">
-                    <tr><td>
-                        <div class="btn btn-custom" onclick="history.back()">Go back</div>
-                    </td>
-                        <td>
-                        <form action="/search/search_name/" method="post">
-                                {% csrf_token %}
-                          <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
-                            <option value="">{{selected_app|default:"select all"}}</option>
+                <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                <form action="/search/search_name/" method="post">
+                   {% csrf_token %}
+                   <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
+                            <option value="">select all</option>
                             <option value="aves">Aves</option>
                             <option value="animalia">Animalia</option>
                             <option value="fungi">Fungi</option>
                             <option value="orchidaceae">Orchids</option>
                             <option value="other">Other Plant Families</option>
                           </select>
-                          <input type="hidden" name="commonname" value="{{ commonname }}">
-                        </form>
-                    </td></tr>
-                    <tr><td></td><td><b>Species</b></td><td><b>common name</b></td></tr>
+                      <input type="hidden" name="commonname" value="{{ commonname }}">
+                </form>
+                <table class="table-bordered">
+                    <tr><td></td><td style="width:20%"><b>Species</b></td><td><b>common name</b></td></tr>
                     {% if name_list %}
                     {% for species in name_list %}
                         <tr>
                             <td style="width:20%;">
-                                <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=Y">
+                                <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=N&area={{area}}&selectred_app={{selected_app}}&searchdata={{search_data}}">
                                  <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                             </td>
                             <td style="width:10%;">
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=Y">{{species.pid.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:photos' species.pid_id %}?family={{species.pid.family}}&role={{role}}&syn=&area={{area}}&selectred_app={{selected_app}}&searchdata={{search_data}}">{{species.pid.binomial_it|safe}}</a>
                                 {% else %}
-                                    <a href="{% url 'display:information' species.pid_id %}?family={{species.pid.family}}&syn=Y">{{species.pid.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:information' species.pid_id %}?family={{species.pid.family}}&syn=Y&area={{area}}&selectred_app={{selected_app}}&searchdata={{search_data}}">{{species.pid.binomial_it|safe}}</a>
                                 {% endif %}
+                                {% if species.pid.status == 'synonym' %}<br> (syn. {{species.pid.getAccepted.binomial}}){% endif %}
                             </td>
                             <td style="width:25%;">{{species.common_name|default:''}}</td>
                             <td>{{species.distribution|default:''}}</td>
                         </tr>
-                    <tr><td></td></tr>
                     {% endfor %}
                     {% endif %}
                 </table>
