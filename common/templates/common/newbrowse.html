@@ -278,7 +278,7 @@ img{
                                 <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&family={{x.family.family}}">{{x.family}}</a>
                                 {% if x.get_best_img.pid_id %}
                                     <a href="{% url 'display:photos'   x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}">
-                                        <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.image_dir %}{{ x.get_best_img.image_file}}" >
+                                        <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.thumb_dir %}{{ x.get_best_img.image_file}}" >
                                     </a>
                                 {% else %}
                                         <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" >
@@ -298,7 +298,7 @@ img{
                                 {% if x.pid.pid.type == 'hybrid' and x.pid.pid.family.family == 'Orchidaceae' %}
                                     <a href="{% url 'display:photos' x.pid.pid.pid %}?app={{x.pid.pid.family.application}}&family={{x.pid.pid.family}}">
                                         {% if x.image_file %}
-                                            <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
+                                            <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                         {% else %}
                                             <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                                         {% endif %}
@@ -309,7 +309,7 @@ img{
                                 {% else %}
                                     <a href="{% url 'display:photos' x.pid.pid %}?app={{x.pid.family.application}}&family={{x.pid.family}}">
                                         {% if x.image_file %}
-                                            <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
+                                            <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                         {% else %}
                                             <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                                         {% endif %}
@@ -327,7 +327,7 @@ img{
                         {% for x in species_list %}
                             <div class="imageitem border ">
                                     <a href="{% url 'display:photos'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}">
-                                        <img class="thumbnails p-1" alt="" src="{% static x.image_dir %}{{x.image_file}}" >
+                                        <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
                                         {{x.pid.binomial_it|safe}}
