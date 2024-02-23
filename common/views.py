@@ -1038,6 +1038,58 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
+
+def delete_image_files(app, spc_obj, orid):
+    try:
+        UploadFile = apps.get_model(app, 'UploadFile')
+        upl = UploadFile.objects.get(id=orid)
+        filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+        if os.path.isfile(filename):
+            try:
+                os.remove(filename)
+                print("Uploaded File deleted successfully.")
+            except FileNotFoundError:
+                print("IUploaded File not found.")
+        upl.delete()
+    except UploadFile.DoesNotExist:
+        pass
+
+    if spc_obj.status == 'hybrid' and spc_obj.family == 'Orchidaceae':
+        try:
+            HybImages = apps.get_model(app, 'HybImages')
+            spc = HybImages.objects.get(id=orid)
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                try:
+                    os.remove(filename)
+                    print("Image File deleted successfully.")
+                except FileNotFoundError:
+                    print("Image File not found.")
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                try:
+                    os.remove(filename)
+                    print("Thumb File deleted successfully.")
+                except FileNotFoundError:
+                    print("Thumb File not found.")
+            spc.delete()
+        except HybImages.DoesNotExist:
+            pass
+    else:
+        try:
+            SpcImages = apps.get_model(app, 'SpcImages')
+            spc = SpcImages.objects.get(id=orid)
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                os.remove(filename)
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                os.remove(filename)
+            spc.delete()
+        except SpcImages.DoesNotExist:
+            pass
+
+
 @login_required
 def deletephoto(request, orid, pid):
     next = ''
@@ -1058,17 +1110,17 @@ def deletephoto(request, orid, pid):
             if app not in applications:
                 app = ''
     if app == '':
-        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), '', '')
+        # url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), '', '')
         return render(request, "display/photos.html", {})
 
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
-    UploadFile = apps.get_model(app, 'UploadFile')
-    try:
-        image = UploadFile.objects.get(pk=orid)
-    except UploadFile.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
+    # UploadFile = apps.get_model(app, 'UploadFile')
+    # try:
+    #     image = UploadFile.objects.get(pk=orid)
+    # except UploadFile.DoesNotExist:
+    #     message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+    #     return HttpResponse(message)
 
     try:
         species = Species.objects.get(pk=image.pid.pid)
@@ -1076,14 +1128,24 @@ def deletephoto(request, orid, pid):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
 
+    delete_image_files(app, species, orid)
+
+    # (Historical) synonym files may be tagged as accepted species
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=species.pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
 
-    upl = UploadFile.objects.get(id=orid)
-    filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-    upl.delete()
+    delete_image_files(app, species, orid)
+
+    # upl = UploadFile.objects.get(id=orid)
+    # filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    # upl.delete()
+    # spc_img = SpcImages.objects.get(id=orid)
+    # filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    # upl.delete()
+
+
     if 'next' in request.GET:
         next = request.GET['next']
     role = getRole(request)
@@ -1093,11 +1155,12 @@ def deletephoto(request, orid, pid):
         url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
 
     # Finally remove file if exist
-    if os.path.isfile(filename):
-        os.remove(filename)
+    # if os.path.isfile(filename):
+    #     os.remove(filename)
 
     write_output(request, str(family))
     return HttpResponseRedirect(url)
+
 
 
 @login_required
@@ -1124,42 +1187,19 @@ def deletewebphoto(request, pid):
 
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
-    SpcImages = apps.get_model(app, 'SpcImages')
-    if app == 'orchidaceae':
-        HybImages = apps.get_model(app, 'HybImages')
 
     species = Species.objects.get(pk=pid)
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
-    spc = ''
-
-    if 'page' in request.GET:
-        page = request.GET['page']
-    else:
-        page = "1"
 
     if 'id' in request.GET:
         orid = request.GET['id']
         orid = int(orid)
 
-        if family.family == 'Orchidaceae' and species.type == 'hybrid':
-            try:
-                spc = HybImages.objects.get(id=orid)
-            except HybImages.DoesNotExist:
-                pass
-        else:
-            try:
-                spc = SpcImages.objects.get(id=orid)
-            except SpcImages.DoesNotExist:
-                pass
-        if spc:
-            if spc.image_file:
-                filename = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid", str(spc.image_file))
-                if os.path.isfile(filename):
-                    os.remove(filename)
-            spc.delete()
+    delete_image_files(app, species, orid)
+
     days = 7
     area = ''
     role = getRole(request)
@@ -1167,6 +1207,11 @@ def deletewebphoto(request, pid):
         area = request.GET['area']
     if 'days' in request.GET:
         days = request.GET['days']
+
+    if 'page' in request.GET:
+        page = request.GET['page']
+    else:
+        page = "1"
     if area == 'allpending':  # from curate_pending (all rank 0)
         url = "%s?role=%s&page=%s&type=%s&days=%s" % (reverse('detail:curate_pending'), role, page, type, days)
     else:
