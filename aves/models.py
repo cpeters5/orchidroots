@@ -670,7 +670,7 @@ class SpcImages(models.Model):
     #
 
     def thumb_dir(self):
-        return 'utils/images/' + self.family + '/'
+        return 'utils/thumbs/' + self.family.family + '/'
 
     def get_displayname(self):
         if self.credit_to:
