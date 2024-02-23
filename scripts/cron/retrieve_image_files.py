@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import urllib
+from urllib.parse import urlparse, parse_qs
 import pymysql
 import shortuuid
 import re, glob, os, sys
@@ -38,10 +39,21 @@ for row in cur:
             family = row[3].title()
     urlparts = re.search('\/(.*)(\?)?', url)
     a = urlparts.group(1)
-    # ext = a.split('.')[-1]
-    ext = 'jpg'
+    # temp_name, ext = os.path.splitext(url)
+
+    parsed_url = urlparse(url)
+    path = parsed_url.path
+    ext = os.path.splitext(path)[1]
+
+    if not ext:
+        query_params = parse_qs(parsed_url.query)
+        ext = f".{query_params['format'][0]}" if 'format' in query_params else ''
+    print(ext)
+    # path = parsed_url.path
+    # ext = os.path.splitext(path)[1]
+
     uid = shortuuid.uuid()
-    fname = row[2] + '_' + shortuuid.uuid() + "." + ext
+    fname = row[2] + '_' + shortuuid.uuid() + ext
     # fname = "%s_%09d_%09d.jpg" % (type, row[0], row[2])
 
     if not url or url == '':
