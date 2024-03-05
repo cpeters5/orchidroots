@@ -6,7 +6,7 @@ from PIL import ExifTags
 from django.conf import settings
 
 from accounts.models import User, Photographer
-from core.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
+from common.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
 import re
 import math
 

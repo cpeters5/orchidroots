@@ -14,7 +14,7 @@ from django.dispatch import receiver
 # from django.apps import apps
 
 
-# Country = apps.get_model('core', 'Country')
+# Country = apps.get_model('common', 'Country')
 
 # import uuid
 
