@@ -43,12 +43,12 @@ from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridI
 from accounts.models import User, Profile
 
 from django.apps import apps
-Family = apps.get_model('core', 'Family')
-Subfamily = apps.get_model('core', 'Subfamily')
-Tribe = apps.get_model('core', 'Tribe')
-Subtribe = apps.get_model('core', 'Subtribe')
-Region = apps.get_model('core', 'Region')
-Subregion = apps.get_model('core', 'Subregion')
+Family = apps.get_model('common', 'Family')
+Subfamily = apps.get_model('common', 'Subfamily')
+Tribe = apps.get_model('common', 'Tribe')
+Subtribe = apps.get_model('common', 'Subtribe')
+Region = apps.get_model('common', 'Region')
+Subregion = apps.get_model('common', 'Subregion')
 Photographer = apps.get_model('accounts', 'Photographer')
 
 app = 'other'

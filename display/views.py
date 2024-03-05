@@ -12,7 +12,7 @@ from itertools import chain
 from django.apps import apps
 from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, get_searchdata
 from common.views import rank_update, quality_update
-from core.models import Family, Subfamily, Tribe, Subtribe
+from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
 from accounts.models import User, Photographer, Sponsor
 

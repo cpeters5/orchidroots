@@ -69,7 +69,6 @@ urlpatterns = [
     path('search/', include('search.urls')),
 
     # Family specific
-    path('core/', include('core.urls')),
     path('common/', include('common.urls')),
     path('display/', include('display.urls')),
     path('animalia/', include('animalia.urls')),

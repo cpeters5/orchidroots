@@ -40,7 +40,7 @@ applications = config.applications
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm, UploadFileForm
 from accounts.models import User, Profile, Photographer
-from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
+from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
 
 app = 'fungi'

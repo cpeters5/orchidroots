@@ -20,7 +20,7 @@ from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 from utils import config
 from utils.views import write_output, getRole, paginator, get_author, get_taxonomy, getModels, getSuperGeneric, pathinfo, get_random_sponsor, get_application
-from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
+from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
 
@@ -1079,10 +1079,10 @@ def delete_image_files(app, spc_obj, orid):
         try:
             SpcImages = apps.get_model(app, 'SpcImages')
             spc = SpcImages.objects.get(id=orid)
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
             if os.path.isfile(filename):
                 os.remove(filename)
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
             if os.path.isfile(filename):
                 os.remove(filename)
             spc.delete()

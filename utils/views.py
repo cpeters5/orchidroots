@@ -8,10 +8,7 @@ from django.http import HttpResponse
 from django.urls import resolve, get_resolver, URLResolver, URLPattern
 from django.apps import apps
 
-from core.models import Family
-from core.models import Subfamily
-from core.models import Tribe
-from core.models import Subtribe
+from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
 from accounts.models import Photographer
 
@@ -19,9 +16,11 @@ logger = logging.getLogger(__name__)
 import utils.config
 applications = utils.config.applications
 
+
 def pathinfo(request):
     path  = request.path.split('/')[2:][0]
     return path
+
 
 def get_random_sponsor():
     from accounts.models import Sponsor
@@ -33,9 +32,65 @@ def get_random_sponsor():
         sponsor = sponsors[0]
     return sponsor
 
+
+def get_searchdata(request):
+    selected_app = ''
+    area = ''
+    if 'selected_app' in request.POST:
+        selected_app = request.POST['selected_app']
+    elif 'selected_app' in request.GET:
+        selected_app = request.GET['selected_app']
+    # else:
+    #     area = ''
+
+    if 'area' in request.POST:
+        area = request.POST['area'].strip()
+    elif 'area' in request.GET:
+        area = request.GET['area'].strip()
+    # else:
+    #     area = ''
+
+    return selected_app, area
+
+
+def xget_searchdata(request):
+    searchdata = 0
+
+    if 'searchdata' in request.POST:
+        searchdata = request.POST['searchdata']
+    elif 'searchdata' in request.GET:
+        searchdata = request.GET['searchdata']
+
+    option_mapping = {
+        1: ('', 'name'),
+        2: ('', 'taxon'),
+        3: ('aves', 'name'),
+        4: ('aves', 'taxon'),
+        5: ('animalia', 'name'),
+        6: ('animalia', 'taxon'),
+        7: ('fungi', 'name'),
+        8: ('fungi', 'taxon'),
+        9: ('other', 'name'),
+        10: ('other', 'taxon'),
+        11: ('orchidaceae', 'name'),
+        12: ('orchidaceae', 'taxon')
+
+    }
+    selected_app, area = option_mapping.get(searchdata, (None,None))
+    print(">>>> searchdata        = ", searchdata)
+    print(">>>> selected_app        = ", selected_app)
+    print(">>>> area        = ", area)
+
+    return selected_app, area
+
+
 def get_application(request):
     family = ''
     if 'family' in request.GET:
+
+
+
+
         family = request.GET['family']
         try:
             family = Family.objects.get(family=family)
@@ -54,6 +109,7 @@ def get_application(request):
         else:
             app = ''
     return app, family
+
 
 def get_taxonomy(request):
     alpha = ''
@@ -427,52 +483,6 @@ def getSuperGeneric(request):
     return family, subfamily, tribe, subtribe
 
 
-def xgetmyphotos(request, author, app, species, Species, Synonym, UploadFile, SpcImages, HybImages, role):
-    # Get species and hybrid lists that the user has at least one photo
-    myspecies_list = Species.objects.filter(type='species')
-    myhybrid_list = Species.objects.filter(type='hybrid')
-    my_spc_list = []
-    my_hyb_list = []
-    my_upl_list = []
-    if author and author.author_id != '' and author is not None:
-        my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
-        my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-        if app == 'orchidaceae':
-            my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    # list for dropdown select
-        myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
-        myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
-
-    # Get list for display
-    if species:
-        req_pid = species.pid
-        pid = species.pid
-        syn_list = ()
-        syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
-        if app == 'orchidaceae' and species.type == 'hybrid':
-            if req_pid != pid:      # input pid is a synonym, just get images of the requested synonym
-                public_list = HybImages.objects.filter(pid=req_pid)  # public photos
-            else:                   # input pid is an accepted species, include images of its synonyms
-                public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
-        else:
-            if req_pid != pid:
-                public_list = SpcImages.objects.filter(pid=req_pid)  # public photos
-            else:
-                public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
-        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
-        private_list = public_list.filter(rank=0)  # rejected photos
-        if role == 'pri':
-            upload_list = upload_list.filter(author=author) # Private photos
-            private_list = private_list.filter(author=author) # Private photos
-
-        if not author or author == 'anonymous' :  # Display only rank > 0
-            public_list  = public_list.filter(rank__gt=0)
-    else:
-        private_list = public_list = upload_list = []
-
-    return private_list, public_list, upload_list, myspecies_list, myhybrid_list
-
-
 # Used in myphotos views only
 def getmyphotos(author, app):
     # Get species and hybrid lists that the user has at least one photo
@@ -518,50 +528,3 @@ def getphotos(author, app, species=None):
 
     return private_list, public_list, upload_list
 
-
-# def get_view_name_by_path(path):
-#     result = resolve(path=path)
-#     return result.view_name
-#
-#
-# def find_url_pattern_by_name(name):
-#     if name is None:
-#         return None
-#
-#     def deep_find(rs):
-#         for r in rs.url_patterns:
-#             if isinstance(r, URLResolver):
-#                 result = deep_find(r)
-#                 if result is not None:
-#                     return result
-#             elif isinstance(r, URLPattern):
-#                 if r.name == name:
-#                     return r.pattern
-#
-#     return deep_find(get_resolver())
-#
-
-# @require_GET
-# def robots_txt(request):
-#     lines = [
-#         "User-Agent: *",
-#         "Disallow: /accounts/",
-#         "Disallow: /core/",
-#         "Disallow: /detail/",
-#         "Disallow: /documents/",
-#         "Disallow: /donations/",
-#         "Disallow: /natural/",
-#         "Disallow: /orchid/",
-#         "Disallow: /orchidaceae/",
-#         "Disallow: /orchidlist/",
-#         "Disallow: /orchidlight/",
-#         "Disallow: /orchiddb/",
-#         "Disallow: /other/",
-#         "Disallow: /search/",
-#         "Disallow: /utils/",
-#         "User-Agent: PetalBot",
-#         "Disallow: /",
-#
-#     ]
-#     return HttpResponse("\n".join(lines), content_type="text/plain")
-#

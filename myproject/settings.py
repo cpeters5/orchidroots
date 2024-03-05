@@ -78,7 +78,7 @@ INSTALLED_APPS = [
     'myproject',
     'accounts',
     'common',
-    'core',
+    # 'core',
     'display',
     'documents',
     'donation',
@@ -93,7 +93,7 @@ INSTALLED_APPS = [
     # New development
     'gallery',
     # Third Party
-    'ads',
+    # 'ads',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

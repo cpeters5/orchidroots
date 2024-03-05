@@ -30,7 +30,6 @@ def robots_txt(request):
         "Disallow: /animalia/",
         "Disallow: /aves/",
         "Disallow: /common/",
-        "Disallow: /core/",
         "Disallow: /data/",
         "Disallow: /detail/",
         "Disallow: /display/information/",

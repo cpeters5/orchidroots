@@ -38,12 +38,12 @@ from accounts.models import User, Profile
 from common.views import quality_update, rank_update, deletephoto
 
 from django.apps import apps
-Family = apps.get_model('core', 'Family')
-Subfamily = apps.get_model('core', 'Subfamily')
-Tribe = apps.get_model('core', 'Tribe')
-Subtribe = apps.get_model('core', 'Subtribe')
-Region = apps.get_model('core', 'Region')
-Subregion = apps.get_model('core', 'Subregion')
+Family = apps.get_model('common', 'Family')
+Subfamily = apps.get_model('common', 'Subfamily')
+Tribe = apps.get_model('common', 'Tribe')
+Subtribe = apps.get_model('common', 'Subtribe')
+Region = apps.get_model('common', 'Region')
+Subregion = apps.get_model('common', 'Subregion')
 
 Genus = apps.get_model('orchidaceae', 'Genus')
 GenusRelation = apps.get_model('orchidaceae', 'GenusRelation')

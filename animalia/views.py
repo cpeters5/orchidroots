@@ -38,16 +38,8 @@ applications = config.applications
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm, UploadFileForm
 from accounts.models import User, Profile, Photographer
-from core.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
+from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
-
-# from django.apps import apps
-# Family = apps.get_model('core', 'Family')
-# Subfamily = apps.get_model('core', 'Subfamily')
-# Tribe = apps.get_model('core', 'Tribe')
-# Subtribe = apps.get_model('core', 'Subtribe')
-# Region = apps.get_model('core', 'Region')
-# Subregion = apps.get_model('core', 'Subregion')
 
 app = 'animalia'
 MAX_HYB = 500

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import (Family, Subfamily, Tribe, Subtribe)
+from common.models import (Family, Subfamily, Tribe, Subtribe)
 from .models import Genus, Species, Accepted, Hybrid, Synonym, SpcImages, TestSpecies
 # from .models import (Country, Continent, Region, SubRegion, LocalRegion, GeoLocation,
 #                    GeoLoc, Subgenus, Section, Subsection, Series)
