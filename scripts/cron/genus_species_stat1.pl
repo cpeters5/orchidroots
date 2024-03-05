@@ -82,12 +82,12 @@ sub getFamImage {
 
 	# foreach (sort keys %num_famspcimage) {
 	# 	# print "$_\t$num_famspcimage{$_}\n";
-	# 	$stmt = "update core_family set num_spcimage = $num_famspcimage{$_} where family = '$_';";
+	# 	$stmt = "update common_family set num_spcimage = $num_famspcimage{$_} where family = '$_';";
 	# 	# print "$stmt\n";
 	# 	&getASPM($stmt);
 	# }
 	# foreach (sort keys %num_famhybimage) {
-	# 	$stmt = "update core_family set num_hybimage = $num_famhybimage{$_} where family = '$_';";
+	# 	$stmt = "update common_family set num_hybimage = $num_famhybimage{$_} where family = '$_';";
 	# 	# print "$stmt\n";
 	# 	&getASPM($stmt);
 	#
