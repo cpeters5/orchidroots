@@ -11,12 +11,13 @@ from io import BytesIO
 import os, shutil
 from django.core.files import File
 from django.db.models.signals import post_save
+from django.db.models import Manager
 from django.conf import settings
 # from django.utils import timezone
 
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
-from core.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
+from common.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
 import re
 import math
 import logging
@@ -305,6 +306,12 @@ class Intragen (models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
+class SpeciesManager(Manager):
+    def search(self, query):
+        return self.raw(
+            'SELECT * FROM orchidaceae_species WHERE MATCH(binomial, author) AGAINST (%s IN NATURAL LANGUAGE MODE)',
+            [query]
+        )
 
 class Species(models.Model):
     pid = models.BigAutoField(primary_key=True)
@@ -324,14 +331,12 @@ class Species(models.Model):
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
     cit_status = models.CharField(max_length=20, null=True)
-    conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='')
+    # conservation_status = models.CharField(max_length=20,default='')
     type = models.CharField(max_length=10,choices=TYPE_CHOICES,default='')
     year = models.IntegerField(null=True)
     date = models.DateField(null=True)
     comment = models.TextField(null=True, blank=True)
-    distribution = models.TextField(blank=True)
-    physiology = models.CharField(max_length=200, blank=True)
     url = models.CharField(max_length=200, blank=True)
     url_name = models.CharField(max_length=100, blank=True)
     num_image = models.IntegerField(blank=True)
@@ -340,16 +345,17 @@ class Species(models.Model):
     num_descendant = models.IntegerField(null=True, blank=True)
     num_dir_descendant = models.IntegerField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='or5gen', default=0,on_delete=models.DO_NOTHING)
-    notepad = models.CharField(max_length=500, default='')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     description = models.TextField(null=True, blank=True)
 
+    objects = SpeciesManager()
+
     # TODO: add reference column
     def __str__(self):
-        name = self.species
-        if self.infraspr:
-            name = '%s %s %s' % (name, self.infraspr, self.infraspe)
+        name = self.binomial
+        # if self.infraspr:
+        #     name = '%s %s %s' % (name, self.infraspr, self.infraspe)
         return name
 
     def binomial_it(self):

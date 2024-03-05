@@ -8,6 +8,7 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('search_species/', views.search_species, name='search_species'),
     path('search_name/', views.search_name, name='search_name'),
+    path('search_binomial/', views.search_binomial, name='search_binomial'),
     # path('search_distribution/', views.search_distribution, name='search_distribution'),
     path('search_fuzzy/', views.search_fuzzy, name='search_fuzzy'),
 

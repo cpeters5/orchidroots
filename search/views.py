@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from itertools import chain
 from fuzzywuzzy import fuzz, process
-from core.models import Family, Subfamily, Tribe, Subtribe
+from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
 from utils.views import write_output, getRole
@@ -110,6 +110,55 @@ def search(request):
     # looks like only search string is given.
     url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
     return HttpResponseRedirect(url)
+
+def search_binomial(request):
+    import jellyfish
+    from orchidaceae.models import Species
+
+    # requested from scientific name search in navbar
+    # Handles search genus. Then call search_species if there is another word(s) in the search straing
+    role = getRole(request)
+    # print("role = ", role)
+    search_list = []
+    match_spc_list = []
+    selected_app = ''
+    full_path = request.path
+    path = 'information'
+    if request.user.is_authenticated and request.user.tier.tier > 2:
+        path = 'photos'
+    if 'selected_app' in request.POST:
+        selected_app = request.POST['selected_app']
+
+    # Get search string
+    # if 'search_string' in request.GET:
+    #     search_string = request.GET['search_string'].strip()
+    # if 'search_string' in request.POST:
+    #     search_string = request.POST['search_string'].strip()
+    # if not search_string or search_string == '' or selected_app != 'orchidaceae':
+    #     message = 'Empty search term'
+    #     return HttpResponse(message)
+
+    query = request.GET.get('query', '')
+    print(query)
+    results = Species.objects.search(query)
+    jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
+    str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
+    str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
+
+    result_list = []
+    print("results = ", len(str_with_scores_dicts))
+    for i in range(10):
+        if i == len(str_with_scores_dicts):
+            break
+        result_list.append(str_with_scores_dicts[i])
+
+    for x in result_list:
+         print(f"{x['score']} : '{query}' and '{x['match'].author} {x['match'].binomial}'")
+    print("results = ", len(result_list))
+    role = getRole(request)
+
+    context = {'result_list': result_list, 'query': query, 'role': role }
+    return render(request, "search/search_binomial.html", context)
 
 
 def getResultByGenus(family, search_string, genus):
@@ -448,7 +497,7 @@ def search_fuzzy(request):
     search_string = ''
     result_list = []
     result_score = []
-    Family = apps.get_model('core', 'Family')
+    Family = apps.get_model('common', 'Family')
     Genus = apps.get_model('orchidaceae', 'Genus')
     Alliance = apps.get_model('orchidaceae', 'Alliance')
     Species = apps.get_model('orchidaceae', 'Species')

@@ -622,9 +622,14 @@ nav .search-container button:hover {
 <!-- Links -->
 
         <div class="collapse navbar-collapse" id="nav-content">
+            <form class="form-inline" id="binomial" action="/search/search_binomial/" style="margin-top: 5px;">
+                <input type="hidden" form="binomial" name="app" value="orchidaceae" >
+                <input type="hidden" form="binomial" name="role" value="{{ role }}" >
+                <input class="searchbox" form="binomial" value="{{search_string}}" type="text" name="query"  pattern=".{3,}" placeholder="orchid search" style="border:1px solid #ccc; border-right: 0">
+            </form>
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
-                <input type="hidden" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
-                <input type="hidden" name="role" value="{{ role }}" >
+                <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
+                <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="scientific name" style="border:1px solid #ccc; border-right: 0">
             </form>
             <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">
