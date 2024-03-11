@@ -1,23 +1,14 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Manager
 from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
-# from io import BytesIO
-# import os, shutil
-# from django.core.files import File
-# from django.db.models.signals import post_save
 from django.conf import settings
-from colorful.fields import RGBColorField
-# from django.utils import timezone
-# from mptt.models import MPTTModel, TreeForeignKey
-
-# from utils.utils import rotate_image
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
 import re
 import math
-
+from colorful.fields import RGBColorField
 RANK_CHOICES = [(i, str(i)) for i in range(0, 10)]
 QUALITY = (
     (1, 'Top'),
@@ -145,6 +136,7 @@ class Genus(models.Model):
             return img
         return None
 
+
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
     pid = models.OneToOneField(
@@ -169,11 +161,6 @@ class GenusRelation(models.Model):
     def get_parentlist(self):
         x = self.parentlist.split('|')
         return x
-
-
-class TestSpecies(models.Model):
-    pid = models.BigAutoField(primary_key=True)
-    genus = models.CharField(max_length=50)
 
 
 class Species(models.Model):
@@ -377,6 +364,14 @@ class Species(models.Model):
         return len(img) + len(upl)
 
 
+class OtherManager(Manager):
+    def search(self, query):
+        return self.raw(
+            'SELECT * FROM other_accepted WHERE MATCH(binomial, common_name) AGAINST (%s IN NATURAL LANGUAGE MODE)',
+            [query]
+        )
+
+
 class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
@@ -416,6 +411,8 @@ class Accepted(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     operator = models.ForeignKey(User, db_column='operator', related_name='othoperator', null=True, on_delete=models.DO_NOTHING)
+
+    objects = OtherManager()
 
     def __str__(self):
         return self.pid.name()

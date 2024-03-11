@@ -1,6 +1,6 @@
 from django.contrib import admin
 from common.models import (Family, Subfamily, Tribe, Subtribe)
-from .models import Genus, Species, Accepted, Hybrid, Synonym, SpcImages, TestSpecies
+from .models import Genus, Species, Accepted, Hybrid, Synonym, SpcImages
 # from .models import (Country, Continent, Region, SubRegion, LocalRegion, GeoLocation,
 #                    GeoLoc, Subgenus, Section, Subsection, Series)
 
@@ -30,14 +30,6 @@ class AcceptedInline(admin.TabularInline):
     model = Accepted
     fields = [('pid', 'common_name', 'distribution', 'introduced')]
 
-class TestSpeciesAdmin(admin.ModelAdmin):
-    pass
-    list_display = ('genus',)
-    fields = [('genus',)]
-    ordering = ['genus']
-    list_filter = ('genus',)
-    search_fields = ['genus']
-
 
 class SpeciesAdmin(admin.ModelAdmin):
     pass
@@ -66,7 +58,6 @@ class AcceptedAdmin(admin.ModelAdmin):
     list_filter = ('binomial',)
     search_fields = ['genus', 'binomial', 'common_name', 'distribution']
 
-admin.site.register(TestSpecies, TestSpeciesAdmin)
 admin.site.register(Genus, GenusAdmin)
 admin.site.register(Species, SpeciesAdmin)
 admin.site.register(Synonym, SynonymAdmin)

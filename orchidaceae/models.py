@@ -306,12 +306,14 @@ class Intragen (models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
+
 class SpeciesManager(Manager):
     def search(self, query):
         return self.raw(
             'SELECT * FROM orchidaceae_species WHERE MATCH(binomial, author) AGAINST (%s IN NATURAL LANGUAGE MODE)',
             [query]
         )
+
 
 class Species(models.Model):
     pid = models.BigAutoField(primary_key=True)

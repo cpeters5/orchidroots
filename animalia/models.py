@@ -1,17 +1,9 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Manager
 from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
-# from io import BytesIO
-# import os, shutil
-# from django.core.files import File
-# from django.db.models.signals import post_save
 from django.conf import settings
-# from django.utils import timezone
-# from mptt.models import MPTTModel, TreeForeignKey
-
-# from utils.utils import rotate_image
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
 import re
@@ -27,6 +19,7 @@ QUALITY = (
 )
 
 STATUS_CHOICES = [('accepted', 'accepted'), ('unplaced', 'unplaced'), ('published', 'published'), ('synonym', 'synonym')]
+
 TYPE_CHOICES = [('species', 'species'), ('hybrid', 'hybrid')]
 
 
@@ -143,6 +136,7 @@ class Genus(models.Model):
             return img
         return None
 
+
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
     pid = models.OneToOneField(
@@ -215,9 +209,7 @@ class Species(models.Model):
     def __str__(self):
         name = self.species
         if self.infraspr:
-            name = '%s %s' % (name, self.infraspr)
-        if self.infraspe:
-            name = '%s %s' % (name, self.infraspe)
+            name = '%s %s %s' % (name, self.infraspr, self.infraspe)
         return name
 
     def binomial_it(self):
@@ -368,6 +360,14 @@ class Species(models.Model):
         return len(img) + len(upl)
 
 
+class AnimaliaManager(Manager):
+    def search(self, query):
+        return self.raw(
+            'SELECT * FROM animalia_accepted WHERE MATCH(binomial, common_name) AGAINST (%s IN NATURAL LANGUAGE MODE)',
+            [query]
+        )
+
+
 class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
@@ -409,6 +409,8 @@ class Accepted(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     operator = models.ForeignKey(User, db_column='operator', related_name='anioperator', null=True, on_delete=models.DO_NOTHING)
+
+    objects = AnimaliaManager()
 
     def __str__(self):
         return self.pid.name()

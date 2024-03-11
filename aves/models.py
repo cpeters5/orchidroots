@@ -1,10 +1,9 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Manager
 from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
 from django.conf import settings
-
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
 import re
@@ -20,6 +19,7 @@ QUALITY = (
 )
 
 STATUS_CHOICES = [('accepted', 'accepted'), ('unplaced', 'unplaced'), ('published', 'published'), ('synonym', 'synonym')]
+
 TYPE_CHOICES = [('species', 'species'), ('hybrid', 'hybrid')]
 
 
@@ -135,6 +135,7 @@ class Genus(models.Model):
             img = img[0:1][0]
             return img
         return None
+
 
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
@@ -360,6 +361,14 @@ class Species(models.Model):
         return len(img) + len(upl)
 
 
+class AcceptedManager(Manager):
+    def search(self, query):
+        return self.raw(
+            'SELECT * FROM aves_accepted WHERE MATCH(binomial, common_name) AGAINST (%s IN NATURAL LANGUAGE MODE)',
+            [query]
+        )
+
+
 class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
@@ -401,6 +410,8 @@ class Accepted(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     operator = models.ForeignKey(User, db_column='operator', related_name='aveoperator', null=True, on_delete=models.DO_NOTHING)
+
+    objects = AcceptedManager()
 
     def __str__(self):
         return self.pid.name()
