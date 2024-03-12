@@ -34,16 +34,13 @@ from datetime import datetime, timedelta
 from utils.views import write_output, is_int, getRole, get_reqauthor
 from utils import config
 applications = config.applications
-# import pytz
-# MPTT stuff
-# from django.views.generic.list_detail import object_list
-from aves.forms import UploadFileForm
+
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
-    SpeciesForm, RenameSpeciesForm, UploadVidForm
+    SpeciesForm, RenameSpeciesForm, UploadVidForm, UploadFileForm
 from accounts.models import User, Profile, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
-
+from common.views import rank_update, quality_update
 app = 'aves'
 
 MAX_HYB = 500
@@ -52,46 +49,6 @@ logger = logging.getLogger(__name__)
 
 redirect_message = "<br><br>Species does not exist! "
 
-
-@login_required
-def rank_update(request, species):
-    rank = 0
-    if 'rank' in request.GET:
-        rank = request.GET['rank']
-        rank = int(rank)
-        if 'id' in request.GET:
-            orid = request.GET['id']
-            orid = int(orid)
-            image = ''
-            try:
-                image = SpcImages.objects.get(pk=orid)
-            except SpcImages.DoesNotExist:
-                return 0
-                # acc = Accepted.objects.get(pk=pid)
-            image.rank = rank
-            image.save()
-    return rank
-
-
-@login_required
-def quality_update(request, species):
-    if request.user.tier.tier > 2 and 'quality' in request.GET:
-        quality = request.GET['quality']
-        quality = int(quality)
-        if 'id' in request.GET:
-            orid = request.GET['id']
-            orid = int(orid)
-            image = ''
-            try:
-                image = SpcImages.objects.get(pk=orid)
-            except SpcImages.DoesNotExist:
-                return 3
-            image.quality = quality
-            image.save()
-    # return quality
-
-
-# All access - at least role = pub
 def compare(request, pid):
     # TODO:  Use Species form instead
     role = getRole(request)
@@ -303,8 +260,8 @@ def curate_newapproved(request):
         file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
     file_list = file_list.order_by('-created_date')
     if species:
-        rank_update(request, species)
-        quality_update(request, species)
+        rank_update(request, SpcImages)
+        quality_update(request, SpcImages)
 
     num_show = 5
     page_length = 20

@@ -183,9 +183,7 @@ def information(request, pid=None):
         # if request pid is a synopnym, return the synonym instance
         species = req_species
     # if len(display_items) > 0:
-    role = ''
-    if 'role' in request.GET:
-        role = request.GET['role']
+    role = request.GET.get('role', None)
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
@@ -212,10 +210,8 @@ def photos(request, pid):
     variety = ''
     tail = ''
     accpid = 0
-    if 'role' in request.GET:
-        role = request.GET['role']
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
+    role = request.GET.get('role', None)
+    syn = request.GET.get('syn', None)
     if not author or author == 'anonymous':
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
@@ -237,13 +233,6 @@ def photos(request, pid):
         SpcImages = apps.get_model(app, 'SpcImages')
     UploadFile = apps.get_model(app, 'UploadFile')
 
-    if not pid and 'pid' in request.GET:
-        pid = request.GET['pid']
-        if pid:
-            pid = int(pid)
-        else:
-            pid = 0
-
     if species.status == 'synonym':
         public_list = SpcImages.objects.filter(pid=pid)  # public photos
         private_list = public_list.filter(rank=0)  # rejected photos
@@ -258,13 +247,12 @@ def photos(request, pid):
 
     this_species_name = species.genus + ' ' + species.species
     related_list = Species.objects.filter(binomial__istartswith=this_species_name)
-    if 'related' in request.GET:
-        related = request.GET['related']
+    related = request.GET.get('related', '')
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
         related_pids = related_list.values_list('pid', flat=True)
-        related = ''
-        related_species = ''
+        related = None
+        related_species = None
 
     # Incase a variety is requested, then show var. images only
     if not related and species.infraspe:
@@ -274,7 +262,7 @@ def photos(request, pid):
         try:
             related_species = Species.objects.get(pk=related)
         except Species.DoesNotExist:
-            related_species = ''
+            related_species = None
 
     syn_list = Synonym.objects.filter(acc_id=pid)
     syn_pid = list(syn_list.values_list('spid', flat=True))
@@ -298,20 +286,22 @@ def photos(request, pid):
 
     # Request rank/quality change.
     # Remove after implementing a dedicated curator task view.
-    rank_update(request, SpcImages)
-    quality_update(request, SpcImages)
+    if 'rank' in request.GET:
+        rank_update(request, SpcImages)
+    if 'quality' in request.GET:
+        quality_update(request, SpcImages)
 
     # Create lists
 
     # Handle Variety filter
-    rel = ''
-    if 'variety' in request.GET:
-        variety = request.GET['variety']
-        if variety == 'semi alba':
-            variety = 'semialba'
+    variety = request.GET.get('variety', None)
+    if variety == 'semi alba':
+        variety = 'semialba'
 
     # Extract first term, possibly an infraspecific
-    parts = variety.split(' ', 1)
+    parts = ()
+    if variety:
+        parts = variety.split(' ', 1)
     if len(parts) > 1:
         tail = parts[1]
     var = variety
@@ -349,8 +339,7 @@ def videos(request, pid):
     author = get_reqauthor(request)
     selected_app, area = get_searchdata(request)
     accpid = 0
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
+    syn = request.GET.get('syn', None)
     if not author or author == 'anonymous':
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')

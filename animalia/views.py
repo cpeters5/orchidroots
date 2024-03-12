@@ -40,6 +40,7 @@ from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridI
 from accounts.models import User, Profile, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
+from common.views import rank_update, quality_update
 
 app = 'animalia'
 MAX_HYB = 500
@@ -47,45 +48,6 @@ list_length = 1000  # Length of species_list and hybrid__list in hte navbar
 logger = logging.getLogger(__name__)
 
 redirect_message = "<br><br>Species does not exist! "
-
-
-@login_required
-def rank_update(request, species):
-    rank = 0
-    if 'rank' in request.GET:
-        rank = request.GET['rank']
-        rank = int(rank)
-        if 'id' in request.GET:
-            orid = request.GET['id']
-            orid = int(orid)
-            image = ''
-            try:
-                image = SpcImages.objects.get(pk=orid)
-            except SpcImages.DoesNotExist:
-                return 0
-                # acc = Accepted.objects.get(pk=pid)
-            image.rank = rank
-            image.save()
-    return rank
-
-
-@login_required
-def quality_update(request, species):
-    if request.user.tier.tier > 2 and 'quality' in request.GET:
-        quality = request.GET['quality']
-        quality = int(quality)
-        if 'id' in request.GET:
-            orid = request.GET['id']
-            orid = int(orid)
-            image = ''
-            try:
-                image = SpcImages.objects.get(pk=orid)
-            except SpcImages.DoesNotExist:
-                return 3
-            image.quality = quality
-            image.save()
-    # return quality
-
 
 # All access - at least role = pub
 def compare(request, pid):
@@ -299,8 +261,8 @@ def curate_newapproved(request):
         file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
     file_list = file_list.order_by('-created_date')
     if species:
-        rank_update(request, species)
-        quality_update(request, species)
+        rank_update(request, SpcImages)
+        quality_update(request, SpcImages)
 
     num_show = 5
     page_length = 20

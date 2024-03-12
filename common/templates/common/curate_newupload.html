@@ -112,13 +112,13 @@ img{
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                 </a>
                                 <div style="font-size:12px">
-                                    <a href="{% url 'display:photos' image.pid %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a>
-                                    <br>{{image.created_date.date}}
+                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a>
+                                    <br>{{image.modified_date.date}}
                                     <br>
                                     {% if image.approved %}
                                         <b>Approved</b>
                                     {% else %}
-                                        <a href="{% url 'common:approvemediaphoto' image.pid %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
+                                        <a href="{% url 'common:approvemediaphoto' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
                                     {% endif %}
                                     <a href="/common/deletephoto/{{image.id}}/{{image.pid}}/?family={{family.family}}&app={{app}}&role={{role}}&tab={{tab}}&page={{page}}&next=curate_newupload" >Delete</a>
                                 </div>

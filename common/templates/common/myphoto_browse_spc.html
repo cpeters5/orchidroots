@@ -118,6 +118,7 @@ img{
                     <div class="d-flex flex-row justify-content-center p-2">
                          {% if user.is_authenticated and user.tier.tier > 2 %}
                             <form class="form-inline" action="?" id="filter">
+                            <input type="hidden" name="family" value="{{family}}" >
                             <input type="hidden" name="genus" value="{{genus}}" >
                             <input type="hidden" name="role" value="cur" >
                             <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">

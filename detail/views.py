@@ -82,35 +82,34 @@ redirect_message = "<br><br>Species does not exist! <br>You may try <a href='/co
 # Curator only - role = cur
 def createhybrid(request):
     genus1 = genus2 = species1 = species2 = ''
-    if 'pid1' in request.GET:
-        pid1 = request.GET['pid1']
+    pid1 = request.GET.get('pid1', None)
+    if not pid1:
+        return HttpResponse(redirect_message)
+    try:
+        species1 = Species.objects.get(pk=pid1)
+    except Species.DoesNotExist:
+        return HttpResponse(redirect_message)
+    if species1.status == 'synonym':
+        species1 = species1.getAccepted()
+
+    pid2 = request.GET.get('pid2', none)
+    if not pid2:
+        species2 = ''
+    else:
         try:
-            species1 = Species.objects.get(pk=pid1)
+            species2 = Species.objects.get(pk=pid2)
         except Species.DoesNotExist:
             return HttpResponse(redirect_message)
-        if species1.status == 'synonym':
-            species1 = species1.getAccepted()
 
-        if 'pid2' in request.GET:
-            pid2 = request.GET['pid2']
-            try:
-                species2 = Species.objects.get(pk=pid2)
-            except Species.DoesNotExist:
-                return HttpResponse(redirect_message)
-        else:
-            species2 = ''
+    if species2.status == 'synonym':
+        species2 = species2.getAccepted()
 
-        if species2.status == 'synonym':
-            species2 = species2.getAccepted()
-
-        spc1 = species1.species
-        if species1.infraspe:
-            spc1 += ' ' + species1.infraspe
-        spc2 = species2.species
-        if species2.infraspe:
-            spc2 += ' ' + species2.infraspe
-    else:
-        return HttpResponse(redirect_message)
+    spc1 = species1.species
+    if species1.infraspe:
+        spc1 += ' ' + species1.infraspe
+    spc2 = species2.species
+    if species2.infraspe:
+        spc2 += ' ' + species2.infraspe
 
     role = getRole(request)
     if not role or role != 'cur':
@@ -200,25 +199,12 @@ def compare(request, pid):
 
     # Handle comparison request. Should use SpcForm instead.
     spcimg2_list = []
-    if 'species2' in request.GET:
-        spc2 = request.GET['species2']
-        spc2 = spc2.strip()
-    if 'genus2' in request.GET:
-        gen2 = request.GET['genus2']
-        gen2 = gen2.strip()
-    if 'infraspe2' in request.GET:
-        infraspe2 = request.GET['infraspe2']
-        infraspe2 = infraspe2.strip()
-    if 'infraspr2' in request.GET:
-        infraspr2 = request.GET['infraspr2']
-        infraspr2 = infraspr2.strip()
-    if 'author2' in request.GET:
-        author2 = request.GET['author2']
-        author2 = author2.strip()
-    if 'year2' in request.GET:
-        year2 = request.GET['year2']
-        if year2:
-            year2 = year2.strip()
+    spc2 = request.GET.get('species2', '').strip()
+    gen2 = request.GET.get('genus2', '').strip()
+    infraspe2 = request.GET.get('infraspe2', '').strip()
+    infraspr2 = request.GET.get('infraspr2', '').strip()
+    author2 = request.GET.get('author2', '').strip()
+    year2 = request.GET.get('year2', '').strip()
     binomial2 = gen2 + ' ' + spc2
     if infraspr2:
         binomial2 = binomial2 + ' ' + infraspr2
@@ -287,8 +273,7 @@ def compare(request, pid):
             spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     msgnogenus = ''
-    if 'msgnogenus' in request.GET:
-        msgnogenus = request.GET['msgnogenus']
+    msgnogenus = request.GET.get('msgnogenus', '')
 
     write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
     context = {'pid': pid, 'genus': genus, 'species': species,
@@ -349,10 +334,7 @@ def comment(request):
 @login_required
 def comments(request):
     # Handle sort
-    sort = ''
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
+    sort = request.GET.get('sort', '').lower()
 
     from django.db.models import Max
     comment_list = []
@@ -392,8 +374,7 @@ def curateinfospc(request, pid):
     accepted = Accepted.objects.get(pk=pid)
 
     tab = 'ins'
-    if 'tab' in request.GET:
-        tab = request.GET['tab']
+    tab = request.GET.get('tab', None)
     role = getRole(request)
 
     distribution_list = Distribution.objects.filter(pid=species.pid)
@@ -461,9 +442,7 @@ def curateinfohyb(request, pid):
             url = "%s?tab=info" % (reverse('detail:curateinfospc', args=(species.pid,)),)
             return HttpResponseRedirect(url)
 
-    tab = 'inh'
-    if 'tab' in request.GET:
-        tab = request.GET['tab']
+    tab = request.GET.get('tab', 'inh')
     role = getRole(request)
 
     hybrid = Hybrid.objects.get(pk=species.pid)
@@ -610,96 +589,6 @@ def reidentify(request, orid, pid):
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': family}
     return render(request, 'detail/reidentify.html', context)
-
-
-@login_required
-def xxapprovemediaphoto(request, pid):
-    species = Species.objects.get(pk=pid)
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    # Only curator can approve
-    role = getRole(request)
-    if role != "cur":
-        message = 'You do not have privilege to approve photos.'
-        return HttpResponse(message)
-
-    if 'id' in request.GET:
-        orid = request.GET['id']
-        orid = int(orid)
-    else:
-        message = 'This photo does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    try:
-        upl = UploadFile.objects.get(pk=orid)
-    except UploadFile.DoesNotExist:
-        msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%s?role=%s&msg=%s" % (reverse('display:photos', args=(species.pid,)), role, msg)
-        return HttpResponseRedirect(url)
-
-    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-    tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
-
-    filename, ext = os.path.splitext(str(upl.image_file_path))
-    if species.type == 'species':
-        spc = SpcImages(pid=species.pid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
-                        credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation,
-                        form=upl.forma, rank=0, description=upl.description, location=upl.location,
-                        created_date=upl.created_date, source_url=upl.source_url)
-        spc.approved_by = request.user
-        hist = SpcImgHistory(pid=Species.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
-                             action='approve file')
-        newdir = os.path.join(settings.STATIC_ROOT, "utils/images/species")
-        image_file = "spc_"
-    else:
-        spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
-                        source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                        description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
-        spc.approved_by = request.user
-        hist = HybImgHistory(pid=Hybrid.objects.get(pk=pid), user_id=request.user, img_id=spc.id, action='approve file')
-        newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
-        image_file = "hyb_"
-
-    image_file = image_file + str(format(upl.pid_id, "09d")) + "_" + str(format(upl.id, "09d"))
-    new_name = os.path.join(newdir, image_file)
-    if not os.path.exists(new_name + ext):
-        try:
-            shutil.copy(old_name, tmp_name)
-            shutil.move(old_name, new_name + ext)
-        except shutil.Error:
-            # upl.delete()
-            url = "%s?role=%s" % (reverse('display:photos', args=(species.pid,)), role)
-            return HttpResponseRedirect(url)
-        spc.image_file = image_file + ext
-    else:
-        i = 1
-        while True:
-            image_file = image_file + "_" + str(i) + ext
-            x = os.path.join(newdir, image_file)
-            if not os.path.exists(x):
-                try:
-                    shutil.copy(old_name, tmp_name)
-                    shutil.move(old_name, x)
-                except shutil.Error:
-                    upl.delete()
-                    url = "%s?role=%s" % (reverse('display:photos', args=(species.pid,)), role)
-                    return HttpResponseRedirect(url)
-                spc.image_file = image_file
-                break
-            i += 1
-
-    spc.image_file_path =  newdir + image_file
-    print("image_file_path = ", spc.image_file_path)
-    spc.save()
-    hist.save()
-    upl.approved = True
-    upl.delete(0)
-    write_output(request, species.textname() + "-" + str(orid))
-    url = "%s?role=%s" % (reverse('display:photos', args=(species.pid,)), role)
-    return HttpResponseRedirect(url)
 
 
 def get_author(request):
@@ -884,10 +773,8 @@ def approvemediaphoto(request, pid):
         message = 'You do not have privilege to approve photos.'
         return HttpResponse(message)
 
-    if 'id' in request.GET:
-        orid = request.GET['id']
-        orid = int(orid)
-    else:
+    orid = int(request.GET.get('id', 0))
+    if not orid:
         message = 'This photo does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     try:
