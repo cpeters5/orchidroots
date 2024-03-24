@@ -384,8 +384,9 @@ def uploadweb(request, pid, orid=None):
 
         if form.is_valid():
             spc = form.save(commit=False)
-            if not spc.author and not spc.credit_to:
-                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            print("authior = ", spc.credit_to)
+            # if not spc.author and not spc.credit_to:
+            #     return HttpResponse("Please select an author, or enter a new name for credit allocation.")
             spc.user_id = request.user
             spc.pid = species
             spc.text_data = spc.text_data.replace("\"", "\'\'")
@@ -393,9 +394,9 @@ def uploadweb(request, pid, orid=None):
                 spc.id = orid
 
             # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
-            if spc.author.user_id and request.user.tier.tier < 3:
-                if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
-                    spc.rank = 0
+            # if spc.author.user_id and request.user.tier.tier < 3:
+            #     if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
+            #         spc.rank = 0
             if spc.image_url == 'temp.jpg':
                 spc.image_url = None
             if spc.image_file == 'None':
