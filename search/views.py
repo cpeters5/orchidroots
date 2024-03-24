@@ -185,7 +185,7 @@ def search_species(request):
     selected_app = ''
     # If no match found, perform fuzzy match
 
-    search_string = request.GET.get('search_string', none)
+    search_string = request.GET.get('search_string', None)
     if 'search_string' in request.POST:
         search_string = request.POST['search_string']
     if not search_string:
