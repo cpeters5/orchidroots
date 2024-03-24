@@ -254,10 +254,6 @@ def photos(request, pid):
         related = None
         related_species = None
 
-    # Incase a variety is requested, then show var. images only
-    if not related and species.infraspe:
-        related = pid
-
     if related:
         try:
             related_species = Species.objects.get(pk=related)
