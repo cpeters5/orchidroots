@@ -246,7 +246,8 @@ def photos(request, pid):
         return render(request, 'display/photos.html', context)
 
     this_species_name = species.genus + ' ' + species.species
-    related_list = Species.objects.filter(binomial__istartswith=this_species_name)
+    related_list = Species.objects.filter(genus=species.genus).filter(species=species.species)
+    # related_list = Species.objects.filter(binomial__istartswith=this_species_name)
     related = request.GET.get('related', '')
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
