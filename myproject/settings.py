@@ -46,7 +46,7 @@ PYTHONUNBUFFERED=True
 ALLOWED_HOSTS = [
     'bluenanta.com',
     'www.bluenanta.com',
-    'beta.bluenanta.com',
+    # 'beta.bluenanta.com',
     '157.245.210.148',
     '127.0.0.1',
     'localhost',
