@@ -90,9 +90,8 @@ INSTALLED_APPS = [
     'fungi',
     'aves',
     'animalia',
-
-    # New development
     'gallery',
+
     # Third Party
     # 'ads',
     'allauth',
@@ -107,6 +106,7 @@ INSTALLED_APPS = [
     'sekizai',  # required by django-ads
 ]
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 AUTH_USER_MODEL = 'accounts.User'
@@ -123,7 +123,7 @@ MIDDLEWARE = [
 
 INTERNAL_IPS = [
     # ...
-    '157.245.210.148',
+    '45.55.134.164',
     # ...
 ]
 
@@ -263,14 +263,9 @@ LOGIN_URL = '/login/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = '/webapps/static/'
-MEDIA_ROOT  = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT  = '/webapps/media/'
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES' : ('rest_framework.permissions.IsAuthenticated',),
-    'DEFAULT_AUTHENTICATION_CLASSES' : ('rest_framework_simplejwt.authentication.JWTAuthentication',)
-}
 
 CACHES = {
     'default': {
