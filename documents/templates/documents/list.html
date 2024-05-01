@@ -13,20 +13,10 @@
     .card-body {
         font-size: 15px;
     }
-    .sidebtn {
-        text-align: left;
-        width: 200px;
-    }
 </style>
 <br>
 
 <div class="container-fluid" style="min-height:200px;">
-    <div style="clear:both"></div>
-    <div class="row">
-        <div class="d-none d-sm-block col-sm-3 col-lg-2 ">
-            {% include "side_home.html" %}
-        </div>
-
         <div class="col-sm-7 col-lg-8" style="margin-top:7px;">
             <div id="accordion">
 <!--                Privacy policy-->
@@ -35,14 +25,14 @@
                         <h6 class="card-title" style="margin-bottom: 0">Policies</h6>
                     </div>
                     <div class="card-body">
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Privacy">Privacy policy</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Privacy">Privacy policy</button>
                         <div id="Privacy" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/privacy_policy1.html' %}
                             </div>
                         </div>
         <!--                Terms of Use-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#TermsofUse">Terms of Use</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#TermsofUse">Terms of Use</button>
                         <div id="TermsofUse" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/termsofuse1.html' %}
@@ -57,7 +47,7 @@
                     </div>
                     <div class="card-body">
                 <!--                Upload instruction-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Webupload">Upload from a webpage</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Webupload">Upload from a webpage</button>
                         <div id="Webupload" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/instructionupload1.html' %}
@@ -65,7 +55,7 @@
                         </div>
 
 <!--                Photo Submission Policy-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Submission">Photo submission policy</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Submission">Photo submission policy</button>
                         <div id="Submission" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/photosubmissionguideline1.html' %}
@@ -80,7 +70,7 @@
                     </div>
                     <div class="card-body">
                 <!--                Upload instruction-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Maintenance">Scheduled Maintenance</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Maintenance">Scheduled Maintenance</button>
                         <div id="Maintenance" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/maintenance.html' %}
@@ -88,7 +78,7 @@
                         </div>
                 <!--                Upload instruction-->
 <!--                        wcsp-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">WCSP Upload: Inactive (combined with POWO)</span></button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#WCSP">WCSP Upload: Inactive (combined with POWO)</span></button>
                         <div id="WCSP" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 <span style="color: red">merged into PWOW in 2022</span>
@@ -96,28 +86,28 @@
                             </div>
                         </div>
 <!--                        POWO-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#WCSP">POWO</span></button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#WCSP">POWO</span></button>
                         <div id="WCSP" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 TBD
                             </div>
                         </div>
 <!--                                RHS Upload-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">RHS</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#IOA">RHS</button>
                         <div id="IOA" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 TBD
                             </div>
                         </div>
 <!--                                IPNI Upload-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IPNI: Inactive (combined with POWO)</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#IOA">IPNI: Inactive (combined with POWO)</button>
                         <div id="IOA" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 TBD
                             </div>
                         </div>
 <!--                                IOA Upload-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#IOA">IOA: Inactive (combined with POWO)</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#IOA">IOA: Inactive (combined with POWO)</button>
                         <div id="IOA" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/datasources/IOA.html' %}
@@ -137,7 +127,7 @@
                     </div>
                     <div class="card-body" style="padding:10px;">
     <!--                Bluenanta-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">Bluenanta V.1 - 2022-10-01</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Change1">Bluenanta V.1 - 2022-10-01</button>
                         <div id="Change1" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 OrchidRoots Corp was dissolved as a Maryland nonprofit organization in April 2022.
@@ -148,7 +138,7 @@
                         </div>
 
     <!--                V. 3.1-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change1">OrchidRoots V.3.1 - 2020-10-01</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Change1">OrchidRoots V.3.1 - 2020-10-01</button>
                         <div id="Change1" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/changes1.html' %}
@@ -156,7 +146,7 @@
                         </div>
 
     <!--                V. 3.0-->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change2">OrchidRoots V.3 - 2019/06/01</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Change2">OrchidRoots V.3 - 2019/06/01</button>
                         <div id="Change2" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 {% include 'documents/changes2.html' %}
@@ -164,7 +154,7 @@
                         </div>
 
     <!--                Bluenanta -->
-                        <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2015-2017</button>
+                        <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#Change3">BlueNanta V.1.0 - 2015-2017</button>
                         <div id="Change3" class="collapse" data-parent="#accordion">
                             <div class="card-body">
                                 Development stage
@@ -174,7 +164,7 @@
 
                     {% if user.tier.tier > 3 %}
     <!--                Bluenanta -->
-                            <button type="button" class="btn btn-xs info-collapse sidebtn" data-toggle="collapse" data-target="#migration">Deployment Procedures</button>
+                            <button type="button" class="btn btn-xs info-collapse" data-toggle="collapse" data-target="#migration">Deployment Procedures</button>
                             <div id="migration" class="collapse" data-parent="#accordion">
                                 <div class="card-body">
                                     TBD
@@ -228,5 +218,4 @@
 
             </div>
         </div>
-    </div>
 </div>

@@ -47,9 +47,8 @@
                 <thead>
                     <th>Descendants</th>
                     <th>Level</th>
-                    <th style="border-right:0; text-align:right;">Seed Parent</th>
-                    <th style="border-left:0; border-right:0;">×</th>
-                    <th style="border-left:0">Pollen Parent</th>
+                    <th>Seed Parent</th>
+                    <th>Pollen Parent</th>
                     <th class="text-center d-none d-sm-block" >pct</th>
                     <th class="text-center d-none d-sm-table-cell"># images</th>
                 </thead>
@@ -66,7 +65,7 @@
                     <td class="border-lb">
                         {{hybrid.1}}
                     </td>
-                    <td style="border-right:0; text-align:right;">
+                    <td style="border-right:0;">
                         {% if hybrid.0.did.seed_id.pid %}
                             {% if role == 'cur' %}
                                 <a href="{% url 'display:photos' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
@@ -77,8 +76,8 @@
                             na
                         {% endif %}
                     </td>
-                    <td align="center"  style="border-left:0; border-right:0;">×</td>
-                    <td  style="border-left:0">
+<!--                    <td align="center"  style="border-left:0; border-right:0;">×</td>-->
+                    <td>
 <!--                        Some hybrrid's parent(s) are missing-->
                         {% if hybrid.0.did.pollen_id.pid %}
                             {% if role == 'cur' %}

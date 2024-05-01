@@ -29,37 +29,21 @@
                         <input type="hidden" name="role" value="{{role}}">
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' species.pid %}?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
-                        {{form.author|as_crispy_field}}
-
-        <!--                <hr  class="my-4">-->
                         <div class="form-row">
                             <div class="form-group col-md-6 mb-0">
-                               <br><h5>{{species.name|safe}}</h5>
+                                <h6><br>Author: {{request.user}}</h6>
                             </div>
                             <div class="form-group col-md-6 mb-0">
-                                {{form.image_file_path|as_crispy_field}}
+                                {{form.credit_to|as_crispy_field}}
                             </div>
                         </div>
+                        <hr>
+                        {{form.image_file_path|as_crispy_field}}
                         {{form.source_url|as_crispy_field}}
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6 mb-0">
-                                 {{form.variation|as_crispy_field}}
-                            </div>
-                            <div class="form-group col-md-6 mb-0">
-                                {{form.forma|as_crispy_field}}
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-4 mb-0">
-                                {{form.name|as_crispy_field}}
-                            </div>
-                            <div class="form-group col-md-4 mb-0">
-                                {{form.location|as_crispy_field}}
-                            </div>
-                         </div>
-
+                        {{form.location|as_crispy_field}}
+                        {{form.variation|as_crispy_field}}
+                        {{form.forma|as_crispy_field}}
+                        {{form.name|as_crispy_field}}
                         {{form.description|as_crispy_field}}
                         {{form.text_data|as_crispy_field}}
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>

@@ -296,10 +296,8 @@ def reidentify(request, orid, pid):
 
     form = SpeciesForm(request.POST or None)
     old_img = SpcImages.objects.get(pk=orid)
-    logger.error(">>> 1 old_img = " + str(old_img.id))
 
     if request.method == 'POST':
-        logger.error(">>> 2 old_img = " + str(old_img.id))
         if form.is_valid():
             new_pid = form.cleaned_data.get('species')
             try:
@@ -344,18 +342,14 @@ def reidentify(request, orid, pid):
             new_img.user_id = request.user
 
             # ready to save
-            logger.error(">>> 3 new_img = " + str(new_img.image_url))
             new_img.save()
 
-            logger.error(">>> 4 old_img = " + str(old_img.id))
             # Delete old record
             old_img.delete()
 
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
             url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
             return HttpResponseRedirect(url)
-        else:
-            logger.error(">>> 5 form not valid")
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
     return render(request, 'fungi/reidentify.html', context)
 
@@ -388,6 +382,7 @@ def uploadweb(request, pid, orid=None):
             #     return HttpResponse("Please select an author, or enter a new name for credit allocation.")
             spc.user_id = request.user
             spc.pid = species
+            spc.author = request.user.photographer
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
@@ -570,7 +565,7 @@ def uploadfile(request, pid):
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species
-            x = spc.pid
+            spc.author = request.user.photographer
             spc.type = species.type
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")

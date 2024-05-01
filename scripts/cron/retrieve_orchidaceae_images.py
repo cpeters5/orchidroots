@@ -3,16 +3,17 @@
 from __future__ import print_function
 import urllib
 import pymysql
+import time
 # import mysqlclient
 from urllib.request import urlopen
 from PIL import Image
 import glob, os, sys
+from dotenv import load_dotenv
+load_dotenv()
 
 size = 500, 400
 
-HOST = '134.209.46.210'
-conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='bluenanta')
-# conn = pymysql.connect(host='134.209.46.210', user='chariya', port=3306, passwd='Imh#r3r3', db='orchiddev')
+conn = pymysql.connect(host=os.getenv('DBHOST'), user='chariya', port=3306, passwd=os.getenv('MYDBPSSWD'), db=os.getenv('DBNAME'))
 cur = conn.cursor()
 
 type = sys.argv[1]

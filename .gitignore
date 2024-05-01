@@ -1,9 +1,9 @@
 #settings.py # lets add this git, add local_settings instead
 myproject/local_settings.py
 __pycache__/
-__init__.py
 old/
 src/
+venv/
 data/
 dbview/
 .coverage
@@ -11,6 +11,7 @@ dbview/
 .idea/
 *.pyc
 myproject/.env
-myproject.sock
+*.sock
+run/
 *_test*
 *-test*

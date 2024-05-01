@@ -9,13 +9,17 @@ Disallow: /detail/
 Disallow: /display/information/
 Disallow: /documents/
 Disallow: /fungi/
+Disallow: /gallery/
 Disallow: /donations/
 Disallow: /orchidaceae/
-Disallow: /orchid/
-Disallow: /orchidlist/
 Disallow: /other/
 Disallow: /search/
 Disallow: /utils/
+Disallow: /tags/
+Disallow: /orchidlite/
+Disallow: /natural/
+Disallow: /orchid/
+Disallow: /data/
 
 User-Agent: PetalBot
 Disallow: /

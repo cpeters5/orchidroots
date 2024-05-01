@@ -65,8 +65,9 @@ table {
             &lt;a href='url' target='_blank'&gt;Name of the link&lt;/a&gt;
             <br>
             <br>
-            <form method="post" action="{{app}}/curateinfohyb/{{species.pid}}">
+            <form method="post" action="{% url 'aves:curateinfohyb' species.pid %}">
             {% csrf_token %}
+                <input type="hidden" name="app" value="{{ app }}">
                 <input type="hidden" name="pid" value="{{ species.pid }}">
                 <input type="hidden" name="role" value="{{ role }}">
                 <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
@@ -78,7 +79,6 @@ table {
                 {% if redirect_field_value %}
                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
                 {% endif %}
-                <input type="hidden" name="role" value="{{ role }}" >
             </form>
         </div>
     </div>

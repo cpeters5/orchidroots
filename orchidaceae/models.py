@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from PIL import Image as Img
 from PIL import ExifTags
 from io import BytesIO
-import os, shutil
+import re, os, shutil
 from django.core.files import File
 from django.db.models.signals import post_save
 from django.db.models import Manager
@@ -18,7 +18,6 @@ from django.conf import settings
 from utils.utils import rotate_image
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
-import re
 import math
 import logging
 logger = logging.getLogger(__name__)
@@ -43,8 +42,8 @@ class Genus(models.Model):
     is_hybrid = models.CharField(max_length=1, null=True)
     genus = models.CharField(max_length=50, default='', unique=True)
     author = models.CharField(max_length=200, default='')
-    citation = models.CharField(max_length=200, default='')
-    cit_status = models.CharField(max_length=20, null=True)
+    # citation = models.CharField(max_length=200, default='')
+    # cit_status = models.CharField(max_length=20, null=True)
     alliance = models.CharField(max_length=50, default='')
     family = models.ForeignKey(Family, null=True, default='', db_column='family', related_name='orfamily',on_delete=models.DO_NOTHING)
     subfamily = models.ForeignKey(Subfamily, null=True, default='', db_column='subfamily', related_name='orsubfamily',on_delete=models.DO_NOTHING)
@@ -196,7 +195,7 @@ class Subgenus(models.Model):
     subgen      = models.IntegerField(default=0, db_column='subgen')
     subgenus    = models.CharField(primary_key=True, max_length=50, unique=True)
     author      = models.CharField(max_length=200, null=True)
-    citation    = models.CharField(max_length=200, null=True)
+    # citation    = models.CharField(max_length=200, null=True)
     year        = models.IntegerField(null=True)
     description = models.TextField(null=True)
     distribution = models.TextField(null=True)
@@ -218,7 +217,7 @@ class Section(models.Model):
     section = models.CharField(primary_key=True, max_length=50, unique=True)
     subgenus = models.ForeignKey(Subgenus, null=True, db_column='subgenus', related_name='orsubgen',on_delete=models.DO_NOTHING)
     author  = models.CharField(max_length=200, null=True)
-    citation = models.CharField(max_length=200, null=True)
+    # citation = models.CharField(max_length=200, null=True)
     year    = models.IntegerField(null=True)
     description = models.TextField(null=True)
     distribution = models.TextField(blank=True)
@@ -241,7 +240,7 @@ class Subsection(models.Model):
     section     = models.ForeignKey(Section, null=True, db_column='section', related_name='orsection',on_delete=models.CASCADE)
     subsection  = models.CharField(primary_key=True, max_length=50, unique=True)
     author      = models.CharField(max_length=200, null=True)
-    citation    = models.CharField(max_length=200, null=True)
+    # citation    = models.CharField(max_length=200, null=True)
     year        = models.IntegerField(null=True)
     description = models.TextField(null=True)
     sec         = models.IntegerField(Section, null=True, default=None, db_column='sec')
@@ -266,7 +265,7 @@ class Series(models.Model):
     subsection     = models.ForeignKey(Subsection, null=True,db_column='subsection', related_name='orsubsection',on_delete=models.DO_NOTHING)
     series  = models.CharField(primary_key=True,max_length=50, unique=True)
     author  = models.CharField(max_length=200, null=True)
-    citation    = models.CharField(max_length=200, null=True)
+    # citation    = models.CharField(max_length=200, null=True)
     year    = models.IntegerField(null=True)
     description = models.TextField(null=True)
     distribution = models.TextField(null=True)
@@ -328,11 +327,11 @@ class Species(models.Model):
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=500, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='sportfamily', on_delete=models.DO_NOTHING)
-    citation = models.CharField(max_length=200)
+    # citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
-    cit_status = models.CharField(max_length=20, null=True)
+    # cit_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='')
     # conservation_status = models.CharField(max_length=20,default='')
     type = models.CharField(max_length=10,choices=TYPE_CHOICES,default='')
@@ -956,6 +955,7 @@ class UploadFile(models.Model):
 
 
 class SpcImages(models.Model):
+    binomial = models.CharField(max_length=100, null=True, blank=True)
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -1058,7 +1058,14 @@ class SpcImages(models.Model):
         # return 'utils/images/hybrid/' + block_id + '/'
 
     def thumb_dir(self):
-        return 'utils/thumbs/species/'
+        if not self.image_file:
+            return None
+        path = settings.STATIC_ROOT + 'utils/thumbs/species/' + self.image_file
+        if os.path.exists(path):
+            return 'utils/thumbs/species/'
+        else:
+            return 'utils/images/species/'
+        # return 'utils/thumbs/species/'
 
     def get_displayname(self):
         if self.credit_to:
@@ -1071,6 +1078,7 @@ class SpcImages(models.Model):
 
 
 class HybImages(models.Model):
+    binomial = models.CharField(max_length=100, null=True, blank=True)
     form = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
@@ -1177,7 +1185,13 @@ class HybImages(models.Model):
         return 'utils/images/hybrid/'
 
     def thumb_dir(self):
-        return 'utils/thumbs/hybrid/'
+        if not self.image_file:
+            return None
+        path = settings.STATIC_ROOT + 'utils/thumbs/hybrid/' + self.image_file
+        if os.path.exists(path):
+            return 'utils/thumbs/hybrid/'
+        else:
+            return 'utils/images/hybrid/'
 
     def get_displayname(self):
         if self.credit_to:

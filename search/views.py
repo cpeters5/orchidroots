@@ -115,22 +115,22 @@ def search_binomial(request):
     from orchidaceae.models import Species
 
     query = request.GET.get('query', '')
-    print(query)
+    # print(query)
     results = Species.objects.search(query)
     jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
     str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
     str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
 
     result_list = []
-    print("results = ", len(str_with_scores_dicts))
+    # print("results = ", len(str_with_scores_dicts))
     for i in range(10):
         if i == len(str_with_scores_dicts):
             break
         result_list.append(str_with_scores_dicts[i])
 
-    for x in result_list:
-         print(f"{x['score']} : '{query}' and '{x['match'].author} {x['match'].binomial}'")
-    print("results = ", len(result_list))
+    # for x in result_list:
+    #      print(f"{x['score']} : '{query}' and '{x['match'].author} {x['match'].binomial}'")
+    # print("results = ", len(result_list))
     role = getRole(request)
 
     context = {'result_list': result_list, 'query': query, 'role': role }

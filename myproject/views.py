@@ -30,19 +30,22 @@ def robots_txt(request):
         "Disallow: /animalia/",
         "Disallow: /aves/",
         "Disallow: /common/",
-        "Disallow: /data/",
         "Disallow: /detail/",
         "Disallow: /display/information/",
         "Disallow: /documents/",
         "Disallow: /donations/",
         "Disallow: /fungi/",
-        "Disallow: /old/",
+        "Disallow: /gallery/",
         "Disallow: /orchidaceae/",
-        "Disallow: /orchidlist/",
-        "Disallow: /orchid/",
         "Disallow: /other/",
         "Disallow: /search/",
         "Disallow: /utils/",
+        # non-existed pages
+        "Disallow: /tags/",
+        "Disallow: /orchidlite/",
+        "Disallow: /natural/",
+        "Disallow: /orchid/",
+        "Disallow: /data/",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 

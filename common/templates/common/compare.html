@@ -138,7 +138,7 @@ input[type=text] {
 <!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
         {% if pid and pid2 %}
             {% if pid != pid2 %}
-                {{species.name|safe}} v.s. {{species2.name|safe}}
+                {{species.binomial|safe}} V.S. {{species2.binomial|safe}}
             {% else %}
                 The two orchids are the identical or synonymous!
             {% endif %}
@@ -296,7 +296,7 @@ input[type=text] {
                             <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             <input type="hidden" name="role" value="{{role}}">
                             <input type="hidden" name="pid" value="{{species.pid}}">
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" value="{{genus2}}" placeholder="Genus" title="">
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" value="{{genus2}}" placeholder="{{genus2}}" title="">
                             <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" value="{{species2.species}}" placeholder="Species"  title="">
                             <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" value="{{species2.infraspr|default_if_none:' '}}" placeholder="infraspecific rank" title="">
                             <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" value="{{species2.infraspe|default_if_none:' '}}" placeholder="infraspecific value" title="">

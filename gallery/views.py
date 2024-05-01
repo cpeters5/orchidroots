@@ -37,7 +37,7 @@ def index(request):
     # Get a sample image of orchids
     artwork_list = Artwork.objects.filter(rank__lt=7).filter(rank__gt=0).exclude(artist='test')
     artwork_list = artwork_list.order_by('-rank', '?')[0:3]
-    print("artwork_list = ", len(artwork_list))
+    # print("artwork_list = ", len(artwork_list))
     context = {'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
                'genre_list': genre_list, 'medium_list': medium_list,
                }
@@ -71,7 +71,7 @@ def browse_gallery(request):
     if medium and medium != 'NA':
         artwork_list = artwork_list.filter(medium=medium)
     artwork_list = artwork_list.order_by('-rank', '?')[0:6]
-    print("artwork_list = ", len(artwork_list))
+    # print("artwork_list = ", len(artwork_list))
     context = {'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
                'genre_list': genre_list, 'medium_list': medium_list,
                }
@@ -92,7 +92,7 @@ def my_gallery(request):
             artist = Artist.objects.get(artist=artist)
         except Artist.DoesNotExist:
             artist = ''
-    print("type artist = ", type(artist))
+    # print("type artist = ", type(artist))
     if 'genre' in request.POST:
         genre = request.POST['genre']
         if genre and genre != '':
@@ -173,7 +173,7 @@ def browse_artist(request):
         else:
             sample_image = sample_image[0]
         artist_list_sample = artist_list_sample + [[artist, sample_image]]
-        print("artist = ", artist)
+        # print("artist = ", artist)
     artist_list = artist_list_sample
     context = {'artist_list': artist_list, 'medium_list': medium_list, 'genre_list': genre_list, 'medium': medium,}
     return render(request, 'gallery/browse_artist.html', context)
@@ -185,7 +185,7 @@ def detail(request, id):
     try:
         image = Artwork.objects.get(pk=id)
     except Artwork.DoesNotExist:
-        print("incorrect requested image")
+        # print("incorrect requested image")
         return HttpResponseRedirect('/')
     context = {'image': image, 'genre_list': genre_list, 'medium_list': medium_list,
                }
@@ -193,7 +193,7 @@ def detail(request, id):
 
 
 def uploadfile(request):
-    print("Start rendering upload file")
+    # print("Start rendering upload file")
     artist = ''
     if 'artist' in request.POST:
         artist = request.POST['artist']
@@ -232,7 +232,7 @@ def deletephoto(request, id):
         return HttpResponse(message)
     image_dir = image.image_dir()
     filename = os.path.join(settings.MEDIA_ROOT, str(image.image_file))
-    print("filename = ", filename)
+    # print("filename = ", filename)
     image.delete()
     artist = image.artist
     if 'next' in request.GET:

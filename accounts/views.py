@@ -53,7 +53,7 @@ def login_page(request):
         password = form.cleaned_data.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            logging.error(">>> " + request.get_host() + " - user " + str(request.user))
+            # logging.error(">>> " + request.get_host() + " - user " + str(request.user))
             try:
                 del request.session['guest_email_id']
             except:

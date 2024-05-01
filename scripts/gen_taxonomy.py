@@ -5,8 +5,10 @@ import pymysql
 import mysql.connector
 
 from urllib.request import urlopen
+from dotenv import load_dotenv
+load_dotenv()
 
-conn = pymysql.connect(host='134.209.46.210', port=3306, user='chariya', passwd='Imh#r3r3', db='bluenanta')
+conn = pymysql.connect(host='134.209.46.210', port=3306, user='chariya', passwd=os.getenv('MYDBPSSWD'),  db=os.getenv('DBNAME'))
 cur = conn.cursor()
 curinsert = conn.cursor()
 

@@ -24,7 +24,7 @@
     {% elif genus %}
         <title>{{genus}}</title>
     {% elif family %}
-        <title>{{family.family}}</title>
+        <title>{{family.family|default:'Orchidaceae'}}</title>
     {% elif app %}
         <title>{{app}}</title>
     {% else %}
@@ -616,7 +616,8 @@ nav .search-container button:hover {
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff; float: left; width: auto"><b>BlueNanta</b></a>
+<!--            <a class="navbar-brand mb-0 bannerfont d-lg-block" href="/" style="color: #07f7ff; float: left; width: auto"><b>BlueNanta</b></a>-->
+            <a class="navbar-brand mb-0 bannerfont" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; float: left"><b>Orchid<br>R<span style="font-size:14px;">oots</span></b></a>
             <!-- Brand -->
         </div>
 <!-- Links -->
@@ -648,29 +649,33 @@ nav .search-container button:hover {
                                 <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}">Maintenance</a></li>
                                 <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
                                 {% if species %}
-                                    <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family}}&role=pub">Public</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub">Public</a></li>
                                 {% else %}
-                                    <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family}}&display=checked">Browse</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked">Browse</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'gallery:index' %}">Gallery</a></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Species</a></li>
                             <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Hybrids</a></li>
-                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family}}&tab=brg&role=pri">My Collection</a></li>
+                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&tab=brg&role=pri">My Collection</a></li>
 <!--                            <hr style="margin:0;padding:0;">-->
                             <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/">Update profile</a></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}?next=/">Logout</a></li>
+                            {% if user.tier.tier > 1 %}
                             <li>Role</li>
-                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family}}&role=pub&display=checked">Public</a></li>
-                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family}}&role=pri&display=checked">Private</a></li>
-                            <li><a class="btn btn-custom dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family}}&role=cur&display=checked">Curate</a></li>
+                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked">Public</a></li>
+                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked">Private</a></li>
+                            {% if user.tier.tier > 2 %}
+                            <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked">Curate</a></li>
+                            {% endif %}
+                            {% endif %}
                         </ul>
                     </div>
                 </li>
                 {% else %}
-<!--                    <li class="nav-item" style="margin-top:8px;">-->
-<!--                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login"><span style="color:white">Register</span></a>-->
-<!--                    </li>-->
+                    <li class="nav-item" style="margin-top:8px;">
+                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login"><span style="color:white">Register</span></a>
+                    </li>
                     <li class="nav-item" style="margin-top:8px;">
                         <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
                     </li>
@@ -696,15 +701,17 @@ nav .search-container button:hover {
 
 
 
-<div class="p-2" style="background-color:black; font-size: 11px;">
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&display=checked">Orchids</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked">Fungi</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked">Plants</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked">Birds</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked">Animals</a>
-     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?">Gallery</a>
-<!--     &nbsp;&nbsp;<a class="btn btn-info fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family}}&role={{cur}}">Native Plants</a>-->
+<div class="p-2" style="background-color:black; color: white !important; font-size: 11px;">
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked">Orchids</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked">Fungi</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked">Plants</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked">Birds</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked">Animals</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?">Gallery</a>
+<!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
     </div>
+
+
 
 
 
@@ -751,16 +758,16 @@ nav .search-container button:hover {
 </html>
 
 
-<ins class="adsbygoogle infeed"
-     style="display:block;"
-     data-ad-format="fluid"
-     data-ad-layout="image-top"
-     data-ad-layout-key="xxxxxxxx"
-     data-ad-client="ca-pub-12345"
-     data-ad-slot="123456"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+<!--<ins class="adsbygoogle infeed"-->
+<!--     style="display:block;"-->
+<!--     data-ad-format="fluid"-->
+<!--     data-ad-layout="image-top"-->
+<!--     data-ad-layout-key="xxxxxxxx"-->
+<!--     data-ad-client="ca-pub-12345"-->
+<!--     data-ad-slot="123456"></ins>-->
+<!--<script>-->
+<!--     (adsbygoogle = window.adsbygoogle || []).push({});-->
+<!--</script>-->
 
 
 

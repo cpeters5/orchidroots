@@ -6,7 +6,7 @@ from PIL import ExifTags
 from django.conf import settings
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Country, Region, Continent, SubRegion, LocalRegion
-import re
+import re, os
 import math
 
 RANK_CHOICES = [(i, str(i)) for i in range(0, 10)]
@@ -29,8 +29,8 @@ class Genus(models.Model):
     is_hybrid = models.CharField(max_length=1, null=True)
     genus = models.CharField(max_length=50, default='', unique=True)
     author = models.CharField(max_length=200, blank=True)
-    citation = models.CharField(max_length=200, default='')
-    cit_status = models.CharField(max_length=20, null=True)
+    # citation = models.CharField(max_length=200, default='')
+    # cit_status = models.CharField(max_length=20, null=True)
     family = models.ForeignKey(Family, null=True, blank=True, db_column='family', related_name='funfamily', on_delete=models.DO_NOTHING)
     subfamily = models.ForeignKey(Subfamily, null=True, blank=True, db_column='subfamily', related_name='funsubfamily', on_delete=models.DO_NOTHING)
     tribe = models.ForeignKey(Tribe, null=True, blank=True, db_column='tribe', related_name='funtribe', on_delete=models.DO_NOTHING)
@@ -180,11 +180,11 @@ class Species(models.Model):
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=500, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcfunfamily', on_delete=models.DO_NOTHING)
-    citation = models.CharField(max_length=200)
+    # citation = models.CharField(max_length=200)
     is_poisonous = models.BooleanField(null=True, default=False)
     is_edible = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
-    cit_status = models.CharField(max_length=20, null=True)
+    # cit_status = models.CharField(max_length=20, null=True)
     conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
@@ -673,7 +673,13 @@ class SpcImages(models.Model):
         # return 'utils/images/hybrid/' + block_id + '/'
 
     def thumb_dir(self):
-        return 'utils/thumbs/' + self.family.family + '/'
+        if not self.image_file:
+            return None
+        path = settings.STATIC_ROOT + 'utils/thumbs/' + self.family.family + '/' + self.image_file
+        if os.path.exists(path):
+            return 'utils/thumbs/' + self.family.family + '/'
+        else:
+            return 'utils/images/' + self.family.family + '/'
 
     def get_displayname(self):
         if self.credit_to:
@@ -755,4 +761,9 @@ class UploadFile(models.Model):
 
     def __str__(self):
         return self.pid.name()
+
+    def get_displayname(self):
+        if self.credit_to:
+            return self.credit_to
+        return self.author.displayname
 

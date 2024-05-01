@@ -6,14 +6,15 @@
 ##############################
 use warnings FATAL => 'all';
 use strict;
+use Dotenv;
 use DBI;
 use Time::Duration;
 use POSIX qw(strftime);
+Dotenv->load("/webapps/bluenanta/.env");
 
 my $HOST = '134.209.46.210';
-my $DB = "bluenanta";
-my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
-# my $dbh = DBI->connect( "DBI:ODBC:$DB") or die( "Could not connect to: $DBI::errstr" );		#local
+my $DB = $ENV{'DBNAME'};
+my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
 &getASPM("use $DB");
 
@@ -104,16 +105,16 @@ sub procGenus {
 
     # First, set all statistic fields to empty
     &getASPM("UPDATE " . $app . "_genus
-	            set num_species = '',
-	            num_species_synonym = '',
-	            num_spcimage = '',
-	            num_species_total = '',
-	            num_spc_with_image = '',
-	            num_hybrid = '',
-	            num_hybrid_synonym = '',
-	            num_hybimage = '',
-	            num_hybrid_total = '',
-	            num_hyb_with_image = ''");
+	            set num_species = NULL,
+	            num_species_synonym = NULL,
+	            num_spcimage = NULL,
+	            num_species_total = NULL,
+	            num_spc_with_image = NULL,
+	            num_hybrid = NULL,
+	            num_hybrid_synonym = NULL,
+	            num_hybimage = NULL,
+	            num_hybrid_total = NULL,
+	            num_hyb_with_image = NULL");
 	foreach my $pid (sort keys %genus) {
 		next if not $num_spcimage{$pid} and not $num_species_synonym{$pid} and not $num_species{$pid};
         $stmt = "update " . $app . "_genus set ";

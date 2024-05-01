@@ -77,11 +77,11 @@ tr {
                                 </td>
                              <td>
                                 {% if not genus.num_hybrid or genus.num_species > 0 %}
-                                    <a href="/common/species/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}{% if genus.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/common/species/?family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}{% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% else %}
-                                    <a href="/common/hybrid/?family={{genus.family}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/common/hybrid/?family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                                 {% endif %}
-                                (<a href="/common/genera/?app={{app}}&family={{genus.family}}"><i>{{genus.family|default:''}}</i></a> -
+                                (<a href="/common/genera/?app={{app}}&family={{genus.family|default:'Orchidaceae'}}"><i>{{genus.family|default:''}}</i></a> -
                                 {% if genus.family.application == 'other' %}{{genus.family.kingdom}}{% else %}{{genus.family.application}}{% endif %})
                             </td>
                             {% if user.tier.tier > 3 %}
@@ -101,13 +101,13 @@ tr {
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
                                  <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
@@ -132,7 +132,7 @@ tr {
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
@@ -151,7 +151,7 @@ tr {
 
 <!--                    <div style="padding: 0; margin-top: 20px;">-->
 <!--                        Didn't see what you are looking for?<br>-->
-<!--                        <a class="btn btn-custom" style="width: 150px;" href="/other/search_species/?family={{family}}&search_string={{search_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
+<!--                        <a class="btn btn-custom" style="width: 150px;" href="/other/search_species/?family={{family|default:'Orchidaceae'}}&search_string={{search_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
 <!--                    </div>-->
                         <tr><td>
                             <div class="btn btn-custom" onclick="history.back()">Go back</div>

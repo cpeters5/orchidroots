@@ -48,11 +48,15 @@ def getFamilyImage(family):
 def home(request):
     all_list = []
     role = getRole(request)
-    num_samples = 4
+    num_samples = 5
 
     # Get a sample image of orchids
     SpcImages = apps.get_model('orchidaceae', 'SpcImages')
-    orcimage = SpcImages.objects.filter(rank__lt=7).filter(rank__gt=0).order_by('-rank','quality', '?')[0:1][0]
+    orcimage = SpcImages.objects.filter(rank__lt=7).filter(rank__gt=0).order_by('-rank','quality', '?')[0:1]
+    if len(orcimage):
+        orcimage = orcimage[0]
+    else:
+        orcimage = ''
     all_list = all_list + [['orchidaceae', orcimage]]
 
     # Get random other families
@@ -67,7 +71,10 @@ def home(request):
         all_list = all_list + [[other_obj.pid.family, other_obj]]
 
     # get random suculents
-    sample_genus = Genus.objects.filter(is_succulent=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
+    try:
+        sample_genus = Genus.objects.filter(is_succulent=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
+    except:
+        sample_genus = ''
     try:
         succulent_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
     except:
@@ -75,13 +82,28 @@ def home(request):
     all_list = all_list + [['Succulent', succulent_obj]]
 
     # get random carnivorous
-    sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
-    carnivorous_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
+    try:
+        sample_genus = Genus.objects.filter(is_carnivorous=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
+    except:
+        sample_genus = ''
+
+    try:
+        carnivorous_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
+    except:
+        carnivorous_obj = ''
+
     all_list = all_list + [['Carnivorous', carnivorous_obj]]
 
     # get random parasitic
-    sample_genus = Genus.objects.filter(is_parasitic=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
-    parasitic_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
+    try:
+        sample_genus = Genus.objects.filter(is_parasitic=True).filter(num_spcimage__gt=0).order_by('?')[0:1][0]
+    except:
+        sample_genus = ''
+
+    try:
+        parasitic_obj = SpcImages.objects.filter(genus=sample_genus).order_by('?')[0:1][0]
+    except:
+        parasitic_obj = ''
     all_list = all_list + [['Parasitic', parasitic_obj]]
 
     num_samples = 1
@@ -93,7 +115,7 @@ def home(request):
         try:
             fungi_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
         except:
-            continue
+            fungi_obj = ''
         all_list = all_list + [["Fungi", fungi_obj]]
 
     num_samples = 1
@@ -105,7 +127,7 @@ def home(request):
         try:
             aves_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
         except:
-            continue
+            aves_obj = ''
         all_list = all_list + [["Aves", aves_obj]]
 
     num_samples = 1
@@ -117,18 +139,19 @@ def home(request):
         try:
             animalia_obj = SpcImages.objects.filter(family=fam).order_by('?')[0:1][0]
         except:
-            continue
+            animalia_obj = ''
         all_list = all_list + [["Aves", animalia_obj]]
 
     # Advertisement
-    num_blocks = 5
-    ads_insert = int(random.random() * num_blocks) + 1
-    sponsor = get_random_sponsor()
+    # num_blocks = 5
+    # ads_insert = int(random.random() * num_blocks) + 1
+    # sponsor = get_random_sponsor()
     random.shuffle(all_list)
 
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
-               'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj,
-               'ads_insert': ads_insert, 'sponsor': sponsor, 'role': role }
+               'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj, 'role': role,
+               # 'ads_insert': ads_insert, 'sponsor': sponsor,
+               }
     return render(request, 'home.html', context)
 
 
@@ -235,18 +258,18 @@ def species(request):
     path_link = 'information'
     if str(request.user) == 'chariya':
         path_link = 'photos'
-    req_type = request.GET.get('type', None)
-    if req_type not in ['species', 'hybrid']:
-        req_type = 'species'
-    else:
-        req_type = 'species'
+    req_type = request.GET.get('type', 'species')
+    # if req_type not in ['species', 'hybrid']:
+    #     req_type = 'species'
+    # else:
+    #     req_type = 'species'
 
     req_family = request.GET.get('family', None)
     req_genus = request.GET.get('genus', None)
     myspecies = request.GET.get('myspecies', None)
     if myspecies:
         author = Photographer.objects.get(user_id=request.user)
-    talpha = request.GET.get('talpha', '')
+    alpha = request.GET.get('alpha', '')
     syn = request.GET.get('syn', None)
 
     # If Orchidaceae, go to full table.
@@ -280,8 +303,8 @@ def species(request):
                 species_list = Species.objects.filter(genus=req_genus).filter(family=req_family)
                 if req_type != '':
                     species_list = species_list.filter(type=req_type)
-                if talpha != '':
-                    species_list = species_list.filter(species__istartswith=talpha)
+                if alpha != '':
+                    species_list = species_list.filter(species__istartswith=alpha)
                 if syn == 'N':
                     species_list = species_list.exclude(status='synonym')
                     syn = 'N'
@@ -306,8 +329,8 @@ def species(request):
                 this_species_list = Species.objects.filter(genus=req_genus)
                 if req_type != '':
                     this_species_list = this_species_list.filter(type=req_type)
-                if talpha != '':
-                    this_species_list = this_species_list.filter(species__istartswith=talpha)
+                if alpha != '':
+                    this_species_list = this_species_list.filter(species__istartswith=alpha)
                 if syn == 'N':
                     this_species_list = this_species_list.exclude(status='synonym')
                     syn = 'N'
@@ -344,7 +367,7 @@ def species(request):
         'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
         'syn': syn, 'type': req_type, 'role':role,
         'family': req_family,
-        'alpha_list': alpha_list, 'talpha': talpha, 'myspecies': myspecies,
+        'alpha_list': alpha_list, 'alpha': alpha, 'myspecies': myspecies,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
     return render(request, "common/species.html", context)
@@ -663,6 +686,7 @@ def mypaginator(request, full_list, page_length, num_show):
 
 
 def delete_image_files(app, spc_obj, orid):
+    # look in uploaded files first
     try:
         UploadFile = apps.get_model(app, 'UploadFile')
         upl = UploadFile.objects.get(id=orid)
@@ -670,31 +694,31 @@ def delete_image_files(app, spc_obj, orid):
         if os.path.isfile(filename):
             try:
                 os.remove(filename)
-                print("Uploaded File deleted successfully.")
             except FileNotFoundError:
-                print("IUploaded File not found.")
+                pass
         upl.delete()
     except UploadFile.DoesNotExist:
         pass
 
-    if spc_obj.status == 'hybrid' and spc_obj.family == 'Orchidaceae':
+    # Then look in the system
+    if spc_obj.type == 'hybrid' and spc_obj.family.family == 'Orchidaceae':
         try:
             HybImages = apps.get_model(app, 'HybImages')
             spc = HybImages.objects.get(id=orid)
             filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+
             if os.path.isfile(filename):
                 try:
                     os.remove(filename)
-                    print("Image File deleted successfully.")
                 except FileNotFoundError:
-                    print("Image File not found.")
+                    pass
             filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
             if os.path.isfile(filename):
                 try:
                     os.remove(filename)
-                    print("Thumb File deleted successfully.")
+                    # print("Thumb File deleted successfully.")
                 except FileNotFoundError:
-                    print("Thumb File not found.")
+                    pass
             spc.delete()
         except HybImages.DoesNotExist:
             pass
@@ -702,9 +726,12 @@ def delete_image_files(app, spc_obj, orid):
         try:
             SpcImages = apps.get_model(app, 'SpcImages')
             spc = SpcImages.objects.get(id=orid)
+
             filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
-            if os.path.isfile(filename):
+            if os.path.isfile(filename) and spc.image_file:
                 os.remove(filename)
+
+
             filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
             if os.path.isfile(filename):
                 os.remove(filename)
@@ -723,6 +750,7 @@ def deletephoto(request, orid, pid):
     except Family.DoesNotExist:
         family = ''
         app = None
+
     if not family:
         app = request.GET.get('app', None)
         if app not in applications:
@@ -733,12 +761,6 @@ def deletephoto(request, orid, pid):
 
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
-    # UploadFile = apps.get_model(app, 'UploadFile')
-    # try:
-    #     image = UploadFile.objects.get(pk=orid)
-    # except UploadFile.DoesNotExist:
-    #     message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-    #     return HttpResponse(message)
 
     try:
         species = Species.objects.get(pk=pid)

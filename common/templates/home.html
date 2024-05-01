@@ -141,26 +141,19 @@ img{
 
 </style>
 
-<div style="clear:both"></div>
-
-<div class="container-fluid" style="min-height:200px;border:0 solid grey">
-    <div style="clear:both"></div>
-    <div class="row">
-        <div class="d-none d-sm-block col-sm-3 col-lg-2" style="padding:0;">
-            {% include "side_home.html" %}
-        </div>
-
-        <div class="col-sm-8 col-lg-9" style="margin-top:8px;">
+<div class="container-fluid">
             <div class="card mt-3">
                 <div class="card-body" style="font-size:15px">
                     <h6 class="card-title d-inline-block">Welcome to OrchidRoots</h6>
-                    <div class="d-inline-block p-1" style="background-color: rgba(255,0,0,0.38); font-size:16px">
-                        We at OrchidRoots and Bluenanta are committed to serving you for many years to come.
+                    <div class="d-inline-block p-1" style="font-size:16px">
+                        We at OrchidRoots are committed to serving you for many years to come.
                         To make this possible, we are asking for your support.
-                        You can explore orchids on orchidroots.com, and other life forms can be found on bluenanta.com for free.
-                        Since only a very small percentage of our users donate, any amount you are able to contribute would be greatly appreciated.
+                        You can explore orchids and other life forms on orchidroots.com.
+                        Any amount you are able to contribute would be greatly appreciated.
                         <br>
                             <a class="btn btn-primary" style="width: 120px; color: white" href="{% url 'donation:donateapp' %}">Donate</a>
+                            <a class="btn btn-primary" href="{% url 'documents:list' %}">Documentation</a>
+
                         <br>
 
                     </div>
@@ -174,30 +167,31 @@ img{
 
 <!--                    Other families-->
                     {% for othimage in all_list %}
-                        {% if ads_insert == forloop.counter %}
-                            <div class="imageitem aditem">
-                                <div class="imgtitle"><span style="font-size:15px;"><a href="https://bluenanta.com/documents/sponsor" target="_blank">ADVERTISEMENT</a></span></div>
-                                <a href="{{sponsor.sponsor_url}}" target="_blank">
-                                    <div class="box">
-                                        <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">
-<!--                                        <div class="text text-br">{{sponsor.pitch}}</div>-->
-                                    </div>
-                                </a>
-                                <div class="imgcaption">
-                                    <a href="{{sponsor.sponsor_url}}" target="_blank">
-                                        {{sponsor.short_description}}
-                                    </a>
+<!--                        {% if ads_insert == forloop.counter %}-->
+<!--                            <div class="imageitem aditem">-->
+<!--                                <div class="imgtitle"><span style="font-size:15px;"><a href="https://bluenanta.com/documents/sponsor" target="_blank">ADVERTISEMENT</a></span></div>-->
+<!--                                    <a href="{{sponsor.sponsor_url}}" target="_blank">-->
+<!--                                    <div class="box">-->
+<!--                                        <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">-->
+<!--&lt;!&ndash;                                        <div class="text text-br">{{sponsor.pitch}}</div>&ndash;&gt;-->
+<!--                                    </div>-->
+<!--                                    </a>-->
+<!--                                <div class="imgcaption">-->
+<!--                                    <a href="{{sponsor.sponsor_url}}" target="_blank">-->
+<!--                                        {{sponsor.short_description}}-->
+<!--                                    </a>-->
 
-                                </div>
-                            </div>
-                        {% endif %}
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        {% endif %}-->
+                        {% if othimage.1 %}
                         <div class="imageitem">
                             <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
-                            <a href="{% url 'display:photos' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">
+                                <a href="{% url 'display:photos' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.image_dir %}{{othimage.1.image_file}}">
                                 </div>
-                            </a>
+                                </a>
                             <div class="imgcaption">
                                 <a href="{% url 'display:information' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}">
                                     {{othimage.1.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.1.gen.family}}){% endif %}
@@ -205,34 +199,28 @@ img{
                                 <br><a href="{{othimage.1.source_url}}" target="_blank" >{{othimage.1.get_displayname}},</a>
                             </div>
                         </div>
+                        {% endif %}
                     {% endfor %}
 
-
-                <div class="card-body" style="text-align: left;font-size: 13px;">
-               <p>
-                   You are invited to submit an advertisement about your plant related business, a meeting announcement,
-                or anything else related to plants that you want the world to know about.  See the example above.
-               </p>
-                <p>
-                To submit your ad, email the following information to admin@bluenanta.com:
-
-                The name of your business, Title, Brief description, your orchidroots account name,
-                a jpg file (see example in the home page above), url of your website,
-                Brief address (country, state, city), Type of plants involved (genus, general, cactus, etc.),
-                start and end date (or indefinitely).
-                </p>
-                This ad is currently free. However, we encourage advertisers to donate to orchidRoots to support our work.
-                </div>
+<!--                <div class="card-body" style="text-align: left;font-size: 13px;">-->
+<!--                   <p>-->
+<!--                       You are invited to submit an advertisement about your plant related business, a meeting announcement,-->
+<!--                    or anything else related to plants that you want the world to know about.  See the example above.-->
+<!--                   </p>-->
+<!--                    <p>-->
+<!--                    To submit your ad, email the following information to admin@bluenanta.com:-->
+<!--    -->
+<!--                    The name of your business, Title, Brief description, your orchidroots account name,-->
+<!--                    a jpg file (see example in the home page above), url of your website,-->
+<!--                    Brief address (country, state, city), Type of plants involved (genus, general, cactus, etc.),-->
+<!--                    start and end date (or indefinitely).-->
+<!--                    </p>-->
+<!--                    This ad is currently free. However, we encourage advertisers to donate to orchidRoots to support our work.-->
+<!--                </div>-->
 
                </div>
             </div>
             <br>
-        </div>
-    </div>
-
-
-
-
 </div> <!--Summary-->
 
 
