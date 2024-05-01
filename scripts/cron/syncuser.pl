@@ -5,16 +5,18 @@
 #
 use strict;
 use warnings FATAL => 'all';
+use Dotenv;
+Dotenv->load("/webapps/bluenanta/.env");
+
 use DateTime;
 
 use DBI;
 my $host = '134.209.46.210';
-my $db = "bluenanta";
+my $DB = $ENV{'DBNAME'};
 # Database connection
-my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
-# $dbh = DBI->connect( "DBI:mysql:$db:localhost","chariya","imh3r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
-&getASPM("use $db");
+&getASPM("use $DB");
 my (@user, %author, %credit_name, %credit_name_id, %fullname, %username);
 my $id = 0;
 
@@ -48,7 +50,7 @@ sub setAuthor {
                             where author_id = '$credit_name_id{$_}'";
                 getASPM($stmt);
                 print "$sttime\tUpdate: userid: $_\t$credit_name_id{$_}\t$credit_name{$_}\t$fullname{$_}\n";
-                # print "Update photographer, $_ - set displayname = creditname = $credit_name{$_}\n";
+                print "Update photographer, $_ - set displayname = creditname = $credit_name{$_}\n";
             }
             else {
                 my $stmt = "update accounts_photographer set
@@ -67,14 +69,14 @@ sub setAuthor {
                             values($_, '$fullname{$_}', '$credit_name{$_}', '$credit_name_id{$_}')";
                 getASPM($stmt);
                 print "$sttime\tCreate: userid: $_\t$credit_name_id{$_}\t$credit_name{$_}\t$fullname{$_}\n";
-                # print "Create photographer, $_ - fullname = $fullname{$_}, display = $credit_name{$_}, userid = $credit_name_id{$_}  \n";
+                print "Create photographer, $_ - fullname = $fullname{$_}, display = $credit_name{$_}, userid = $credit_name_id{$_}  \n";
             }
             else {
                 my $stmt = "insert into accounts_photographer (user_id, fullname, displayname, author_id)
                             values($_, '$fullname{$_}', '$fullname{$_}', '$credit_name_id{$_}')";
                 getASPM($stmt);
                 print "$sttime\tCreate: userid: $_\t$credit_name_id{$_}\t$fullname{$_}\t$fullname{$_}\n";
-                # print "Create photographer, $_ - fullname = $fullname{$_} = displaynamed = $fullname{$_}, userid = $credit_name_id{$_}  \n";
+                print "Create photographer, $_ - fullname = $fullname{$_} = displaynamed = $fullname{$_}, userid = $credit_name_id{$_}  \n";
             }
 
         }
@@ -84,12 +86,12 @@ sub setAuthor {
 sub setProfile {
     foreach (@user) {
         if ($credit_name{$_}) {
-            my $stmt = "update accounts_profile set current_credit_name_id = '$credit_name_id{$_}', profile_pic = 'DONE'
+            my $stmt = "update accounts_profile set current_credit_name_id = '$credit_name_id{$_}'
                         where user_id = '$_'";
             getASPM($stmt);
         }
         else {
-            my $stmt = "update accounts_profile set current_credit_name_id = '$credit_name_id{$_}', photo_credit_name = '$fullname{$_}', profile_pic = 'DONE'
+            my $stmt = "update accounts_profile set current_credit_name_id = '$credit_name_id{$_}', photo_credit_name = '$fullname{$_}'
                         where user_id = '$_'";
             getASPM($stmt);
         }

@@ -336,300 +336,249 @@ class AcceptedInfoForm(forms.ModelForm):
         return description.replace("\"", "\'\'")
 
 
-class UploadFileForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=False,
-        widget=Select2Widget
-    )
-    # pid = forms.IntegerField(widget= forms.TextInput(attrs={'class':'Species', 'id':'pid'}))
-    def __init__(self, *args, **kwargs):
-        super(UploadFileForm, self).__init__(*args, **kwargs)
-        # Making UploadForm required
-        # self.fields['image_file_path'].required = True
-        self.fields['author'].required = True
-        # role = forms.CharField(required=True)
-
-    class Meta:
-        model = UploadFile
-        fields = (
-        'image_file_path', 'author', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
-        'location', 'image_file',)
-
-        labels = {
-            'author': "Your credit attribution name",
-            'image_file_path': 'Select image file',
-            'name': 'Clonal name',
-            'awards': 'Awards',
-            'variation': 'Varieties',
-            'forma': 'Form',
-            'originator': 'If author is not in the list, enter a name to be used for credit attribution here',
-            'description': 'Tags. Comma separated keywords to help in searching',
-            'text_data': 'Comment',
-            'location': 'Location',
-        }
-        widgets = {
-            # 'role': forms.HiddenInput(),
-            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'originator': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
-            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-        }
-        help_texts = {
-            'name': 'Clonal name only. DO NOT include the grex name',
-            #     'name': 'Clonal name of the plant',
-            #     'awards': 'Awards received, comma separated',
-            #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
-            #     'forma': 'E.g. color forms, peloric, region...',
-            #     'originator': 'e.g. hybridizer, cultivator, vender',
-            #     'description': 'Comma separated terms used for search',
-            #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
-            #     'location': 'Geolocation where this plant was originated from',
-            #     'image_file_path': _('Only JPG files are accepted, and file name MUST not have a leading undescore.'),
-        }
-        error_messages = {
-            'image_file_path': {
-                'required': _("Please select a file to upload."),
-            },
-        }
-
-
-class UploadSpcWebForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=False,
-        widget=Select2Widget
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(UploadSpcWebForm, self).__init__(*args, **kwargs)
-        self.fields['rank'].choices = CHOICES
-        self.fields['quality'].choices = QUALITY
-        self.fields['image_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        self.fields['author'].widget.is_localized = True
-        self.fields['is_private'].initial = False
-
-    class Meta:
-        model = SpcImages
-        rank = forms.IntegerField(initial=5)
-        fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
-        'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
-        labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            # 'author':'Your name for credit: select a name, if not exists, see next box',
-            'source_url': 'Link to source',
-            'credit_to': 'or, credit name. Enter only when author does not exist in the dropdown list.',
-            'image_url': 'Image URL',
-            'source_file_name': 'Alternate name, e.g. a synonym',
-            'name': 'Clonal name',
-            'awards': 'Awards',
-            'quality': 'Quality',
-            'variation': 'Varieties',
-            'form': 'Form',
-            'certainty': 'Certainty',
-            'rank': 'Rank',
-            'text_data': 'Comment',
-            'description': 'Tags',
-            'is_private': 'Private photo',
-        }
-        widgets = {
-            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
-            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'image_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
-            'source_file_name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'form': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
-            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
-        }
-        choices = {
-            'rank': CHOICES,
-            'quality': QUALITY,
-            'is_private': PRIVATE,
-        }
-        # help_texts = {
-        #     # 'author': 'The name for credit attribution',
-        #     'credit_to': 'Enter the photo owner neme here if it is not listed under author',
-        #     'source_url': 'The URL where the photo is uploaded from, eg Facebook post',
-        #     'image_url': "Right click on the image and select 'copy image address'",
-        #     'source_file_name': 'Identified name if differs from the accepted name for the species, e.g. a synonym or undescribed/unpublished or unregistered name. (Put infra specific if exists in Variety box below.',
-        #     'name': 'Clonal name of the plant',
-        #     'awards': 'Awards received, comma separated',
-        #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
-        #     'form': 'E.g. color forms, peloric, region...',
-        #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
-        #     'description': 'Short description of the plant. E.g. aroma, color, pattern, shape...',
-        #     'certainty': 'Put one or more ? to show level of certainty',
-        #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
-        # }
-        error_messages = {
-            # 'author': {
-            # 'required': _("Please select a name for credit attribution."),
-            # },
-            'image_url': {
-                'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
-            },
-        }
-
-    # def clean_author(self):
-    #     author = self.cleaned_data['author']
-    #     if not Photographer.objects.get(pk=author):
-    #         if not clean_credit_to['credit_to']:
-    #             raise forms.ValidationError('You must enter an author, or a new credit name')
-    #     return author
-
-    def clean_credit_to(self):
-        credit_to = self.cleaned_data['credit_to']
-        # print("a. author = ", self.cleaned_data['author'])
-        if not credit_to:
-            return None
-        return credit_to
-
-    def clean_image_url(self):
-        import re
-        """ Validation of image_url specifically """
-        image_url = self.cleaned_data['image_url']
-        if not re.search('jpg', image_url) and not re.search('png', image_url):
-            raise ValidationError(
-                _('Not a valid image URL'),
-                params={'image_url': image_url},
-            )
-        # Always return a value to use as the new cleaned data, even if
-        # this method didn't change it.
-        return image_url
-
-    def clean_image_file(self):
-        return self.cleaned_data['image_file']
-
-
-class UploadHybWebForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=True,
-        widget=Select2Widget
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(UploadHybWebForm, self).__init__(*args, **kwargs)
-        self.fields['image_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        # self.fields['author'].queryset = Photographer.objects.all().values_list('fullname','displayname').order_by('fullname')
-        self.fields['rank'].choices = CHOICES
-        self.fields['quality'].choices = QUALITY
-        self.fields['is_private'].initial = False
-
-    class Meta:
-        model = SpcImages
-        rank = forms.IntegerField(initial=5)
-        fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
-        'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
-        labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            'credit_to': 'or credit name. Enter only when name does not exist in Author list',
-            'source_url': 'Link to source',
-            'image_url': 'Image URL',
-            'source_file_name': 'Alternate name, e.g. a synonym',
-            'name': 'Clonal name',
-            'awards': 'Awards',
-            'quality': 'Quality',
-            'variation': 'Varieties',
-            'form': 'Form',
-            'certainty': 'Certainty',
-            'rank': 'Rank',
-            'text_data': 'Comment',
-            'description': 'Tags',
-            'is_private': 'Private photo',
-        }
-        widgets = {
-            # 'author':TextInput(attrs={'size': 35}),
-            'source_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
-            'credit_to': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'image_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
-            'source_file_name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'variation': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'certainty': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'form': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            'text_data': Textarea(attrs={'cols': 47, 'rows': 4, 'style': 'font-size: 13px', }),
-            'description': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
-            # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
-        }
-        choices = {
-            'rank': CHOICES,
-            'quality': QUALITY,
-            'is_private': PRIVATE,
-        }
-        # help_texts = {
-        #     # 'author': 'The name for credit attribution',
-        #     'credit_to': 'Enter the photo owner neme here if it is not listed under author',
-        #     'source_url': 'The URL from address bar of the browser',
-        #     'image_url': "Right click on the image and select 'copy image address'",
-        #     'source_file_name': 'The name you prefer, if different from accepted name for the species, e.g. a synonym, an undescribed or unregistered name. (Place infraspecific in Variety box below.',
-        #     'name': 'Clonal name of the plant',
-        #     'awards': 'Awards received, comma separated',
-        #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
-        #     'certainty': 'Put one or more ? to show level of certainty',
-        #     'form': 'E.g. color forms, peloric, region...',
-        #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
-        #     'description': 'Short description of the plant. E.g. aroma, color, pattern, shape...',
-        #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
-        # }
-        error_messages = {
-            # 'author': {
-            #     'required': _("Please select a name for credit attribution."),
-            # },
-            'image_url': {
-                'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
-            },
-        }
-
-        # A work around for non curator user.  Form will post empty rank.
-        def clean_rank(self):
-            data = self.cleaned_data['rank']
-            if not data:
-                return 5
-            return data
-
-        def clean_author(self):
-            data = self.cleaned_data['author']
-            if not Photographer.objects.filter(pk=data):
-                raise forms.ValidationError('Invalid Author')
-            return data
-
-    def clean_image_url(self):
-        import re
-        """ Validation of image_url specifically """
-        image_url = self.cleaned_data['image_url']
-        if not re.search('jpg', image_url) and not re.search('png', image_url):
-            raise ValidationError(
-                _('Not a valid image URL'),
-                params={'image_url': image_url},
-            )
-        # Always return a value to use as the new cleaned data, even if
-        # this method didn't change it.
-        return image_url
-
-    def clean_image_file(self):
-        return self.cleaned_data['image_file']
-
-    # def __init__(self, data, **kwargs):
-    #     initial = kwargs.get('initial', {})
-    #     data = {**initial, **data}
-    #     super().__init__(data, **kwargs)
+# class UploadFileForm(forms.ModelForm):
+#     # pid = forms.IntegerField(widget= forms.TextInput(attrs={'class':'Species', 'id':'pid'}))
+#     def __init__(self, *args, **kwargs):
+#         super(UploadFileForm, self).__init__(*args, **kwargs)
+#         # Making UploadForm required
+#         # self.fields['image_file_path'].required = True
+#         # role = forms.CharField(required=True)
+#
+#     class Meta:
+#         model = UploadFile
+#         fields = (
+#         'image_file_path', 'name', 'awards', 'variation', 'forma', 'originator', 'description', 'text_data',
+#         'location', 'image_file',)
+#
+#         labels = {
+#             'image_file_path': 'Select image file',
+#             'name': 'Clonal name',
+#             'awards': 'Awards',
+#             'variation': 'Varieties',
+#             'forma': 'Form',
+#             'originator': 'or a name for credit attribution',
+#             'description': 'Tags. Comma separated keywords to help in searching',
+#             'text_data': 'Comment',
+#             'location': 'Location',
+#         }
+#         widgets = {
+#             # 'role': forms.HiddenInput(),
+#             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'originator': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
+#             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#         }
+#         help_texts = {
+#             'name': 'Clonal name only. DO NOT include the grex name',
+#             #     'name': 'Clonal name of the plant',
+#             #     'awards': 'Awards received, comma separated',
+#             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
+#             #     'forma': 'E.g. color forms, peloric, region...',
+#             #     'originator': 'e.g. hybridizer, cultivator, vender',
+#             #     'description': 'Comma separated terms used for search',
+#             #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
+#             #     'location': 'Geolocation where this plant was originated from',
+#             #     'image_file_path': _('Only JPG files are accepted, and file name MUST not have a leading undescore.'),
+#         }
+#         error_messages = {
+#             'image_file_path': {
+#                 'required': _("Please select a file to upload."),
+#             },
+#         }
+#
+#
+# class UploadSpcWebForm(forms.ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(UploadSpcWebForm, self).__init__(*args, **kwargs)
+#         self.fields['rank'].choices = CHOICES
+#         self.fields['quality'].choices = QUALITY
+#         self.fields['image_url'].required = True
+#         self.fields['is_private'].initial = False
+#
+#     class Meta:
+#         model = SpcImages
+#         rank = forms.IntegerField(initial=5)
+#         fields = (
+#         'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
+#         'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
+#         labels = {
+#             'source_url': 'Link to source',
+#             'credit_to': 'Credit allocation name',
+#             'image_url': 'Image URL',
+#             'source_file_name': 'Alternate name, e.g. a synonym',
+#             'name': 'Clonal name',
+#             'awards': 'Awards',
+#             'quality': 'Quality',
+#             'variation': 'Varieties',
+#             'form': 'Form',
+#             'certainty': 'Certainty',
+#             'rank': 'Rank',
+#             'text_data': 'Comment',
+#             'description': 'Tags',
+#             'is_private': 'Private photo',
+#         }
+#         widgets = {
+#             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+#             'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'image_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+#             'source_file_name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'form': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
+#             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+#             # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
+#         }
+#         choices = {
+#             'rank': CHOICES,
+#             'quality': QUALITY,
+#             'is_private': PRIVATE,
+#         }
+#         # help_texts = {
+#         #     'credit_to': 'Credit allocation name',
+#         #     'source_url': 'The URL where the photo is uploaded from, eg Facebook post',
+#         #     'image_url': "Right click on the image and select 'copy image address'",
+#         #     'source_file_name': 'Identified name if differs from the accepted name for the species, e.g. a synonym or undescribed/unpublished or unregistered name. (Put infra specific if exists in Variety box below.',
+#         #     'name': 'Clonal name of the plant',
+#         #     'awards': 'Awards received, comma separated',
+#         #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
+#         #     'form': 'E.g. color forms, peloric, region...',
+#         #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
+#         #     'description': 'Short description of the plant. E.g. aroma, color, pattern, shape...',
+#         #     'certainty': 'Put one or more ? to show level of certainty',
+#         #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
+#         # }
+#         error_messages = {
+#             'image_url': {
+#                 'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
+#             },
+#         }
+#
+#     def clean_credit_to(self):
+#         credit_to = self.cleaned_data['credit_to']
+#         if not credit_to:
+#             return None
+#         return credit_to
+#
+#     def clean_image_url(self):
+#         import re
+#         """ Validation of image_url specifically """
+#         image_url = self.cleaned_data['image_url']
+#         if not re.search('jpg', image_url) and not re.search('png', image_url):
+#             raise ValidationError(
+#                 _('Not a valid image URL'),
+#                 params={'image_url': image_url},
+#             )
+#         # Always return a value to use as the new cleaned data, even if
+#         # this method didn't change it.
+#         return image_url
+#
+#     def clean_image_file(self):
+#         return self.cleaned_data['image_file']
+#
+#
+# class UploadHybWebForm(forms.ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(UploadHybWebForm, self).__init__(*args, **kwargs)
+#         self.fields['image_url'].required = True
+#         self.fields['rank'].choices = CHOICES
+#         self.fields['quality'].choices = QUALITY
+#         self.fields['is_private'].initial = False
+#
+#     class Meta:
+#         model = SpcImages
+#         rank = forms.IntegerField(initial=5)
+#         fields = (
+#         'source_url', 'image_url', 'source_file_name', 'name', 'awards', 'variation', 'form', 'text_data',
+#         'description', 'certainty', 'rank', 'credit_to', 'is_private', 'image_file', 'quality')
+#         labels = {
+#             'credit_to': 'Credit allocation name',
+#             'source_url': 'Link to source',
+#             'image_url': 'Image URL',
+#             'source_file_name': 'Alternate name, e.g. a synonym',
+#             'name': 'Clonal name',
+#             'awards': 'Awards',
+#             'quality': 'Quality',
+#             'variation': 'Varieties',
+#             'form': 'Form',
+#             'certainty': 'Certainty',
+#             'rank': 'Rank',
+#             'text_data': 'Comment',
+#             'description': 'Tags',
+#             'is_private': 'Private photo',
+#         }
+#         widgets = {
+#             'source_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+#             'credit_to': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'image_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+#             'source_file_name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'name': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'awards': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'variation': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'certainty': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'form': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             'text_data': Textarea(attrs={'cols': 47, 'rows': 4, 'style': 'font-size: 13px', }),
+#             'description': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
+#             # 'is_private': CheckboxInput(attrs={'class': 'required checkbox form-control'}),
+#         }
+#         choices = {
+#             'rank': CHOICES,
+#             'quality': QUALITY,
+#             'is_private': PRIVATE,
+#         }
+#         # help_texts = {
+#         #     'credit_to': 'Credit allocation name',
+#         #     'source_url': 'The URL from address bar of the browser',
+#         #     'image_url': "Right click on the image and select 'copy image address'",
+#         #     'source_file_name': 'The name you prefer, if different from accepted name for the species, e.g. a synonym, an undescribed or unregistered name. (Place infraspecific in Variety box below.',
+#         #     'name': 'Clonal name of the plant',
+#         #     'awards': 'Awards received, comma separated',
+#         #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
+#         #     'certainty': 'Put one or more ? to show level of certainty',
+#         #     'form': 'E.g. color forms, peloric, region...',
+#         #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
+#         #     'description': 'Short description of the plant. E.g. aroma, color, pattern, shape...',
+#         #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
+#         # }
+#         error_messages = {
+#             'image_url': {
+#                 'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
+#             },
+#         }
+#
+#         # A work around for non curator user.  Form will post empty rank.
+#         def clean_rank(self):
+#             data = self.cleaned_data['rank']
+#             if not data:
+#                 return 5
+#             return data
+#
+#     def clean_image_url(self):
+#         import re
+#         """ Validation of image_url specifically """
+#         image_url = self.cleaned_data['image_url']
+#         if not re.search('jpg', image_url) and not re.search('png', image_url):
+#             raise ValidationError(
+#                 _('Not a valid image URL'),
+#                 params={'image_url': image_url},
+#             )
+#         # Always return a value to use as the new cleaned data, even if
+#         # this method didn't change it.
+#         return image_url
+#
+#     def clean_image_file(self):
+#         return self.cleaned_data['image_file']
+#
+#     # def __init__(self, data, **kwargs):
+#     #     initial = kwargs.get('initial', {})
+#     #     data = {**initial, **data}
+#     #     super().__init__(data, **kwargs)
 
 # # class xUpdateForm(forms.Form):
 # class ChangeSpeciesForm(forms.Form):

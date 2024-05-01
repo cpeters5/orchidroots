@@ -33,7 +33,7 @@ def information(request, pid=None):
     selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)
     app, family = get_application(request)
-    if app == '':
+    if app == '' or not app:
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
     try:
@@ -184,7 +184,7 @@ def information(request, pid=None):
         species = req_species
     # if len(display_items) > 0:
     role = request.GET.get('role', None)
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
@@ -198,7 +198,7 @@ def information(request, pid=None):
     return render(request, "display/information.html", context)
 
 
-def photos(request, pid):
+def photos(request, pid=None):
     author = get_reqauthor(request)
     selected_app, area = get_searchdata(request)
     role = ''
@@ -216,7 +216,7 @@ def photos(request, pid):
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
     app, family = get_application(request)
-    if app == '':
+    if not app or app == '':
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
@@ -247,7 +247,10 @@ def photos(request, pid):
 
     this_species_name = species.genus + ' ' + species.species
     # related_list = Species.objects.filter(genus=species.genus).filter(species=species.species)
-    related_list = Species.objects.filter(binomial__istartswith=this_species_name)
+    if species.type != 'hybrid':
+        related_list = Species.objects.filter(binomial__istartswith=this_species_name)
+    else:
+        related_list = Species.objects.filter(binomial=this_species_name)
     related = request.GET.get('related', '')
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
@@ -320,7 +323,7 @@ def photos(request, pid):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
@@ -370,7 +373,7 @@ def videos(request, pid):
             accspecies = Species.objects.get(pk=accpid)
             related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
 
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
                'vid': 'active', 'tab': 'vid', 'app':app,

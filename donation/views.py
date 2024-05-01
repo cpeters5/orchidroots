@@ -155,7 +155,6 @@ def donate(request,donateamt=None): # new
                 'country_code': charge['billing_details']['address']['country']
             }
             Donation.objects.create(**payload)
-            logger.error(">>> donate/donate   " + str(request.user) + " " + donateamt_display)
             return redirect(reverse_lazy('donation:thankyou', kwargs={'donateamt': int(donateamt)}))
         except Exception as e:
             print(e)

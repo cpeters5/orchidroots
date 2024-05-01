@@ -45,7 +45,6 @@ urlpatterns = [
     # path("ads.txt", RedirectView.as_view(url=staticfiles_storage.url("ads.txt")),),
 
     # User accounts
-    path('accounts/', include('allauth.urls')),
     path('login/', login_page, name='login'),
     path('register/', register_page, name='register'),
     path('set_email/', SetEmailView.as_view(), name='set_email'),
@@ -56,10 +55,11 @@ urlpatterns = [
     path('accounts/password/change/', PasswordChangeRedirect.as_view(), name="account_password_change"),
     path('accounts/password/user_reset_password/', user_reset_password, name="user_account_reset_password"),
     re_path(
-        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+        r"accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
         CustomPasswordResetFromKeyView.as_view(),
         name="account_reset_password_from_key",
     ),
+    path('accounts/', include('allauth.urls')),
 
     # Landing
     path('', home, name='home'),

@@ -183,19 +183,21 @@ def createhybrid(request):
 
 
 # All access - at least role = pub
+@login_required
 def compare(request, pid):
     # TODO:  Use Species form instead
     role = getRole(request)
-    pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
+    pid2 = species2 = genus2 = ''
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
-
-    spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    if species.type == 'hybrid':
+        spcimg1_list = HybImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    else:
+        spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     family = species.gen.family
     genus = species.genus
-    species1 = species
 
     # Handle comparison request. Should use SpcForm instead.
     spcimg2_list = []
@@ -211,7 +213,6 @@ def compare(request, pid):
     if infraspe2:
         binomial2 = binomial2 + ' ' + infraspe2
     if binomial2:
-        print("binomial2 = >", binomial2,"<")
         species2 = Species.objects.filter(binomial__iexact=binomial2)
         if len(species2) == 0:
             message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
@@ -244,7 +245,7 @@ def compare(request, pid):
             else:  # length = 0
                 message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                 context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'genus2': gen2, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message1': message, 'family': family,
                            'tab': 'sbs', 'sbs': 'active', 'role': role}
                 return render(request, 'common/compare.html', context)
@@ -257,10 +258,6 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted1 = accepted2 = ''
 
-    # if species2 and species2.status == 'synonym':
-    #     pid2 = species2.getAcc()
-    #     accepted2 = species2.getAccepted()
-
     # A second species is found
     if pid2:
         cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
@@ -270,22 +267,27 @@ def compare(request, pid):
             cross = cross[0]
         else:
             cross = ''
-            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
-    msgnogenus = ''
+    if species2:
+        if species2.type == 'species':
+            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+        else:
+            spcimg2_list = HybImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
     msgnogenus = request.GET.get('msgnogenus', '')
 
     write_output(request, str(genus) + " " + str(species) + " vs " + str(genus2) + " " + str(species2))
     context = {'pid': pid, 'genus': genus, 'species': species,
                'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
                'spcimg1_list': spcimg1_list,
-               'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
+               'genus2': gen2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role}
     return render(request, 'common/compare.html', context)
 
 
+@login_required
 def comment(request):
     from string import digits
     if request.method == 'POST':
@@ -512,7 +514,6 @@ def reidentify(request, orid, pid):
 
     form = SpeciesForm(request.POST or None)
     oldtype = old_species.type
-    logger.error(">>> oldspecies type = " + oldtype)
     if old_species.type == 'hybrid':
         old_img = HybImages.objects.get(pk=orid)
     elif old_species.type == 'species':
@@ -533,7 +534,7 @@ def reidentify(request, orid, pid):
             if new_species.type == old_species.type:
                 if new_species.type == 'species':
                     new_img = SpcImages.objects.get(pk=old_img.id)
-                    new_img.pid = new_species.pid
+                    new_img.pid = new_species
                 else:
                     new_img = HybImages.objects.get(pk=old_img.id)
                     new_img.pid = new_species.hybrid
@@ -614,6 +615,7 @@ def get_author(request):
 def uploadweb(request, pid, orid=None):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
+    print("user tier = ", request.user.tier.tier)
     if request.user.is_authenticated and request.user.tier.tier < 2:
         message = 'You dont have access to upload files. Please update your profile to gain access.'
         return HttpResponse(message)
@@ -636,16 +638,15 @@ def uploadweb(request, pid, orid=None):
             accepted = species.hybrid
             form = UploadHybWebForm(request.POST)
         elif species.type == 'species':
-            accepted = species.accepted
+            accepted = species
             form = UploadSpcWebForm(request.POST)
         else:
             return HttpResponse("image id " + str(orid) + "does not exist")
 
         if form.is_valid():
             spc = form.save(commit=False)
-            if not spc.author and not spc.credit_to:
-                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
             spc.user_id = request.user
+            spc.author = request.user.photographer
             spc.pid = accepted
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
@@ -739,7 +740,7 @@ def uploadfile(request, pid):
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species
-
+            spc.author = request.user.photographer
             spc.type = species.type
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")
@@ -805,7 +806,7 @@ def approvemediaphoto(request, pid):
             newdir = os.path.join(settings.STATIC_ROOT, "utils/images/species")
         else:
             spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
-                            source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
+                            credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
                             description=upl.description, location=upl.location, created_date=upl.created_date,
                             source_url=upl.source_url)
             spc.approved_by = request.user

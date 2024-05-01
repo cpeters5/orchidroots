@@ -9,12 +9,15 @@
 use strict;
 use warnings FATAL => 'all';
 use DBI;
+use Dotenv;
+Dotenv->load("/webapps/bluenanta/.env");
+
 my $host = '134.209.46.210';
-my $db = "bluenanta";
+my $DB = $ENV{'DBNAME'};
 # Database connection
-my $dbh = DBI->connect( "DBI:mysql:$db:$host","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
-&getASPM("use $db");
+&getASPM("use $DB");
 
 if ($ARGV[0]) {
 	my $pid = $ARGV[0];

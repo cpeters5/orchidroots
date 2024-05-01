@@ -123,7 +123,7 @@ def compare(request, pid):
             else:  # length = 0
                 message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                 context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus2': genus, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                           'genus2': gen2, 'species2': species2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message1': message, 'family': family,
                            'tab': 'sbs', 'sbs': 'active', 'role': role}
                 return render(request, 'common/compare.html', context)
@@ -159,7 +159,7 @@ def compare(request, pid):
     context = {'pid': pid, 'genus': genus, 'species': species,
                'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
                'spcimg1_list': spcimg1_list,
-               'genus2': genus2, 'species2': species2, 'spcimg2_list': spcimg2_list,
+               'genus2': gen2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role}
@@ -296,10 +296,8 @@ def reidentify(request, orid, pid):
 
     form = SpeciesForm(request.POST or None)
     old_img = SpcImages.objects.get(pk=orid)
-    logger.error(">>> 1 old_img = " + str(old_img.id))
 
     if request.method == 'POST':
-        logger.error(">>> 2 old_img = " + str(old_img.id))
         if form.is_valid():
             new_pid = form.cleaned_data.get('species')
             try:
@@ -344,18 +342,14 @@ def reidentify(request, orid, pid):
             new_img.user_id = request.user
 
             # ready to save
-            logger.error(">>> 3 new_img = " + str(new_img.image_url))
             new_img.save()
 
-            logger.error(">>> 4 old_img = " + str(old_img.id))
             # Delete old record
             old_img.delete()
 
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
             url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
             return HttpResponseRedirect(url)
-        else:
-            logger.error(">>> 5 form not valid")
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
     return render(request, 'aves/reidentify.html', context)
 
@@ -387,6 +381,7 @@ def uploadweb(request, pid, orid=None):
             print("authior = ", spc.credit_to)
             # if not spc.author and not spc.credit_to:
             #     return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            spc.author = request.user.photographer
             spc.user_id = request.user
             spc.pid = species
             spc.text_data = spc.text_data.replace("\"", "\'\'")
@@ -432,36 +427,26 @@ def uploadweb(request, pid, orid=None):
 
 @login_required
 def uploadvid(request, pid, orid=None):
-    sender = 'vid'
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
-
+    print("1. species = ", species)
     # For Other application only
     family = species.gen.family
     role = getRole(request)
     if request.method == 'POST':
-        form = UploadSpcWebForm(request.POST)
-
+        form = UploadVidForm(request.POST)
+        print("1. Imh3r3")
         if form.is_valid():
+            print("2. Form is valid")
             spc = form.save(commit=False)
-            if not spc.author and not spc.credit_to:
-                return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            spc.author = request.user.photographer
             spc.user_id = request.user
             spc.pid = species
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
-
-            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
-            if spc.author.user_id and request.user.tier.tier < 3:
-                if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
-                    spc.rank = 0
-            if spc.image_url == 'temp.jpg':
-                spc.image_url = None
-            if spc.image_file == 'None':
-                spc.image_file = None
             if spc.created_date == '' or not spc.created_date:
                 spc.created_date = timezone.now()
             spc.save()
@@ -623,9 +608,10 @@ def uploadfile(request, pid):
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species
-
+            spc.author = request.user.photographer
             spc.type = species.type
             spc.user_id = request.user
+            print("credit = ",spc.credit_to)
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             spc.save()
             url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
@@ -646,17 +632,10 @@ def approvemediaphoto(request, pid):
         family = request.GET['family']
         try:
             family = Family.objects.get(family=family)
-            if family != '' and family.family != 'Orchidaceae':
-                crit = 1
-
+            # if family != '' and family.family != 'Orchidaceae':
+            #     crit = 1
         except Family.DoesNotExist:
             family = ''
-            app = None
-    if not family:
-        if 'app' in request.GET:
-            app = request.GET['app']
-            if app not in applications:
-                app = ''
 
     species = Species.objects.get(pk=pid)
     if species.status == 'synonym':
@@ -672,60 +651,63 @@ def approvemediaphoto(request, pid):
         message = 'You do not have privilege to approve photos.'
         return HttpResponse(message)
 
-    if 'id' in request.GET:
-        orid = request.GET['id']
-        orid = int(orid)
-    else:
+    orid = request.GET.get('id', None)
+    try:
+        int(orid)
+    except ValueError:
         message = 'This photo does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+
     try:
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
         msg = "uploaded file #" + str(orid) + "does not exist"
         url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
         return HttpResponseRedirect(url)
-    upls = UploadFile.objects.filter(pid=pid)
 
-    for upl in upls:
-        old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-        tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
+    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
+    print("old name = ", old_name)
+    print("new name = ", tmp_name)
+    filename, ext = os.path.splitext(str(upl.image_file_path))
+    spc = SpcImages(
+                pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, credit_to=upl.credit_to,
+                source_file_name=upl.source_file_name, variation=upl.variation,
+                form=upl.forma, rank=0, description=upl.description, location=upl.location,
+                created_date=upl.created_date, source_url=upl.source_url)
+    spc.approved_by = request.user
 
-        filename, ext = os.path.splitext(str(upl.image_file_path))
-        spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name,
-                    source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                    description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
-        spc.approved_by = request.user
-
-        image_file = species.genus + '_' + str(format(upl.pid.pid, "09d")) + "_" + str(format(upl.id, "09d"))
-        newpath = os.path.join(newdir, image_file)
-        if not os.path.exists(newpath + ext):
-            try:
-                shutil.copy(old_name, tmp_name)
-                shutil.move(old_name, newpath + ext)
-            except shutil.Error:
-                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
-                return HttpResponseRedirect(url)
-            spc.image_file = image_file + ext
-        else:
-            i = 1
-            while True:
-                image_file = image_file + "_" + str(i) + ext
-                x = os.path.join(newdir, image_file)
-                if not os.path.exists(x):
-                    try:
-                        shutil.copy(old_name, tmp_name)
-                        shutil.move(old_name, x)
-                    except shutil.Error:
-                        upl.delete()
-                        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
-                        return HttpResponseRedirect(url)
-                    spc.image_file = image_file
-                    break
-                i += 1
-        # spc.image_file_path = image_dir + image_file
-        spc.save()
-        upl.approved = True
-        upl.delete(0)
+    image_file = species.genus + '_' + str(format(upl.pid.pid, "09d")) + "_" + str(format(upl.id, "09d"))
+    newpath = os.path.join(newdir, image_file)
+    if not os.path.exists(newpath + ext):
+        try:
+            shutil.copy(old_name, tmp_name)
+            shutil.move(old_name, newpath + ext)
+        except shutil.Error:
+            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+            return HttpResponseRedirect(url)
+        spc.image_file = image_file + ext
+    else:
+        i = 1
+        while True:
+            image_file = image_file + "_" + str(i) + ext
+            x = os.path.join(newdir, image_file)
+            if not os.path.exists(x):
+                try:
+                    shutil.copy(old_name, tmp_name)
+                    shutil.move(old_name, x)
+                except shutil.Error:
+                    upl.delete()
+                    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+                    return HttpResponseRedirect(url)
+                spc.image_file = image_file
+                break
+            i += 1
+    # spc.image_file_path = image_dir + image_file
+    spc.save()
+    upl.approved = True
+    upl.delete(0)
     write_output(request, str(family))
     url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
     return HttpResponseRedirect(url)
+

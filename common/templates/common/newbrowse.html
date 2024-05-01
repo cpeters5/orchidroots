@@ -330,7 +330,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        {{x.pid.binomial_it|safe}}<p>{{x.pid.accepted.common_name|default:''}}</p>
+                                        {{x.pid|safe}}<p>{{x.pid.accepted.common_name|default:''}}</p>
                                     </div>
                             </div>
                         {% endfor %}

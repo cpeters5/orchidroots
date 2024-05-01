@@ -9,10 +9,10 @@ import copy
 CHOICES = (
     ('0', '0 Private'),
     ('1', '1 Habitat'),
-    ('2', '2 Plant'),
-    ('3', '3 Inflorescences'),
-    ('4', '4 Group of Flowers'),
-    ('5', '5 Single Fl.'),
+    ('2', '2 activities'),
+    ('3', '3 in flight'),
+    ('4', '4 Group of birds'),
+    ('5', '5 portrait'),
     # ('6', '6 Selected'),
     ('7', '7 Closed up'),
     ('8', '8 Information'),
@@ -331,32 +331,22 @@ class AcceptedInfoForm(forms.ModelForm):
 
 
 class UploadSpcWebForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
-        required=False,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadSpcWebForm, self).__init__(*args, **kwargs)
         self.fields['rank'].choices = CHOICES
         self.fields['quality'].choices = QUALITY
         self.fields['image_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        self.fields['author'].widget.is_localized = True
 
     class Meta:
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
-        'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
+        'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
+        'location', 'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            # 'author':'Your name for credit: select a name, if not exists, see next box',
             'source_url': 'Link to source',
-            'credit_to': 'or, credit name. Enter only when author does not exist in the dropdown list.',
+            'credit_to': 'Credit allocation name',
+            'location': 'location',
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
             'name': 'Clonal name',
@@ -371,6 +361,7 @@ class UploadSpcWebForm(forms.ModelForm):
         widgets = {
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'image_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'source_file_name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
@@ -385,8 +376,7 @@ class UploadSpcWebForm(forms.ModelForm):
             'quality': QUALITY,
         }
         # help_texts = {
-        #     # 'author': 'The name for credit attribution',
-        #     'credit_to': 'Enter the photo owner neme here if it is not listed under author',
+        #     'credit_to': 'Enter the photo owner neme',
         #     'source_url': 'The URL where the photo is uploaded from, eg Facebook post',
         #     'image_url': "Right click on the image and select 'copy image address'",
         #     'source_file_name': 'Identified name if differs from the accepted name for the species, e.g. a synonym or undescribed/unpublished or unregistered name. (Put infra specific if exists in Variety box below.',
@@ -399,24 +389,13 @@ class UploadSpcWebForm(forms.ModelForm):
         #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
         # }
         error_messages = {
-            # 'author': {
-            # 'required': _("Please select a name for credit attribution."),
-            # },
             'image_url': {
                 'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
             },
         }
 
-    # def clean_author(self):
-    #     author = self.cleaned_data['author']
-    #     if not Photographer.objects.get(pk=author):
-    #         if not clean_credit_to['credit_to']:
-    #             raise forms.ValidationError('You must enter an author, or a new credit name')
-    #     return author
-
     def clean_credit_to(self):
         credit_to = self.cleaned_data['credit_to']
-        # print("a. author = ", self.cleaned_data['author'])
         if not credit_to:
             return None
         return credit_to
@@ -439,18 +418,9 @@ class UploadSpcWebForm(forms.ModelForm):
 
 
 class UploadHybWebForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
-        required=True,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadHybWebForm, self).__init__(*args, **kwargs)
         self.fields['image_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        # self.fields['author'].queryset = Photographer.objects.all().values_list('fullname','displayname').order_by('fullname')
         self.fields['rank'].choices = CHOICES
         self.fields['quality'].choices = QUALITY
 
@@ -458,11 +428,10 @@ class UploadHybWebForm(forms.ModelForm):
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
+        'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
         'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            'credit_to': 'or credit name. Enter only when name does not exist in Author list',
+            'credit_to': 'Credit allocation name',
             'source_url': 'Link to source',
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
@@ -476,7 +445,6 @@ class UploadHybWebForm(forms.ModelForm):
             'description': 'Tags',
         }
         widgets = {
-            # 'author':TextInput(attrs={'size': 35}),
             'source_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'credit_to': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', }),
             'image_url': TextInput(attrs={'size': 45, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
@@ -493,8 +461,7 @@ class UploadHybWebForm(forms.ModelForm):
             'quality': QUALITY,
         }
         # help_texts = {
-        #     # 'author': 'The name for credit attribution',
-        #     'credit_to': 'Enter the photo owner neme here if it is not listed under author',
+        #     'credit_to': 'Credit to',
         #     'source_url': 'The URL from address bar of the browser',
         #     'image_url': "Right click on the image and select 'copy image address'",
         #     'source_file_name': 'The name you prefer, if different from accepted name for the species, e.g. a synonym, an undescribed or unregistered name. (Place infraspecific in Variety box below.',
@@ -507,9 +474,6 @@ class UploadHybWebForm(forms.ModelForm):
         #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
         # }
         error_messages = {
-            # 'author': {
-            #     'required': _("Please select a name for credit attribution."),
-            # },
             'image_url': {
                 'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
             },
@@ -520,12 +484,6 @@ class UploadHybWebForm(forms.ModelForm):
             data = self.cleaned_data['rank']
             if not data:
                 return 5
-            return data
-
-        def clean_author(self):
-            data = self.cleaned_data['author']
-            if not Photographer.objects.filter(pk=data):
-                raise forms.ValidationError('Invalid Author')
             return data
 
     def clean_image_url(self):
@@ -551,29 +509,20 @@ class UploadHybWebForm(forms.ModelForm):
 
 
 class UploadVidForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
-        required=False,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadVidForm, self).__init__(*args, **kwargs)
         self.fields['source_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        self.fields['author'].widget.is_localized = True
 
     class Meta:
         model = Video
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'credit_to', 'name', 'text_data', 'description')
+        'source_url', 'credit_to', 'name', 'text_data', 'description', 'location')
         labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            '': 'Link to source',
-            'credit_to': 'or, credit name. Enter only when author does not exist in the dropdown list.',
-            'name': 'Clonal name',
+            'source_url': 'Link to video',
+            'credit_to': 'Credit allocation name',
+            'name': 'Name',
+            'location': 'location',
             'text_data': 'Comment',
             'description': 'Tags',
         }
@@ -581,25 +530,22 @@ class UploadVidForm(forms.ModelForm):
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
         }
         error_messages = {
-            # 'author': {
-            # 'required': _("Please select a name for credit attribution."),
-            # },
             'source_url': {
                 'required': _("Please enter video url"),
             },
         }
 
-    def clean_credit_to(self):
-        credit_to = self.cleaned_data['credit_to']
-        # print("a. author = ", self.cleaned_data['author'])
-        if not credit_to:
-            return None
-        return credit_to
+    # def clean_credit_to(self):
+    #     credit_to = self.cleaned_data['credit_to']
+    #     if not credit_to:
+    #         return None
+    #     return credit_to
 
     def clean_source_url(self):
         import re
@@ -616,33 +562,25 @@ class UploadVidForm(forms.ModelForm):
 
 
 class UploadFileForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=False,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadFileForm, self).__init__(*args, **kwargs)
         # Making UploadForm required
         # self.fields['image_file_path'].required = True
-        self.fields['author'].required = True
         # role = forms.CharField(required=True)
 
     class Meta:
         model = UploadFile
         fields = (
-        'image_file_path', 'author', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
+        'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
         'text_data', 'location',)
 
         labels = {
-            'author': "Your credit attribution name",
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
-            'name': 'Clonal name',
+            'name': 'name',
             'variation': 'Varieties',
             'forma': 'Form',
-            'credit_to': 'If author is not in the list, enter a name to be used for credit attribution here',
+            'credit_to': 'credit allocation name',
             'description': 'Tags. Comma separated keywords to help in searching',
             'text_data': 'Comment',
             'location': 'Location',

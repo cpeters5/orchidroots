@@ -27,6 +27,10 @@
 ##############################
 use warnings FATAL => 'all';
 use strict;
+use Dotenv;
+Dotenv->load("/webapps/bluenanta/.env");
+print $ENV{'MYDBPSSWD'}; exit;
+
 use DBI;
 use Time::Duration;
 use POSIX qw(strftime);
@@ -39,8 +43,8 @@ use WWW::Mechanize;
 
 # my $HOST = '134.209.46.210'; #prod
 my $HOST = '134.209.93.40'; #dev
-my $DB = "orchiddev";
-my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $DB = $ENV{'DBNAME'};
+my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 # my $dbh = DBI->connect( "DBI:ODBC:$DB") or die( "Could not connect to: $DBI::errstr" );		#local
 my ($sth, $sth1);
 &getASPM("use $DB");

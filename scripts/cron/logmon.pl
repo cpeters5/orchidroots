@@ -6,15 +6,17 @@
 
 use strict;
 use warnings qw(all);
+use Dotenv;
+Dotenv->load("/webapps/bluenanta/.env");
+
 use Encode qw(encode decode);
 use utf8;
 use open qw(:locale);
 use Time::Piece;
 
 use DBI;
-my $HOST = '134.209.46.210';   # orchiddb
-my $DB = "bluenanta";
-my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $DB = $ENV{'DBNAME'};
+my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
 &getASPM("use $DB");
 
@@ -98,7 +100,7 @@ sub extractLog {
 
 sub getExistedDate {
     my $stmt = "select dt, app from $tab\n";
-    print "$stmt\n";
+    # print "$stmt\n";
 	&getASPM($stmt);
 	while (my @row = $sth->fetchrow_array()) {
         $dt{$row[0].$row[1]}++;
@@ -113,7 +115,7 @@ sub outputResult {
             my $app = $2;
             my $dt = $3;
             next if $ip{$_} < $maxhit{$app};
-            # print "$ip\t$dt\t$app\t$ip{$_} \n";
+            print "$ip\t$dt\t$app\t$ip{$_} \n" if $ip{$_} > 10000;
             &getASPM("insert ignore into $tab (ip, app, dt, count) values ('$ip', '$app', '$dt', $ip{$_})");
         }
     }

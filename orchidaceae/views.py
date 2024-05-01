@@ -41,6 +41,7 @@ alpha_list = config.alpha_list
 
 @login_required
 def genera(request):
+    write_output(request)
     family = 'Orchidaceae'
     min_lengenus_req = 2
     year = ''
@@ -167,7 +168,6 @@ def genera(request):
                'formula1': formula1, 'formula2': formula2, 'alpha': alpha, 'alpha_list': alpha_list,
                'sort': sort, 'prev_sort': prev_sort, 'role': role,
                }
-    write_output(request)
     return render(request, 'orchidaceae/genera.html', context)
 
 
@@ -205,11 +205,11 @@ def getPartialPid(reqgenus, type, status):
     intragen_list = Intragen.objects.all()
     if status == 'synonym' or type == 'hybrid':
         intragen_list = []
-    pid_list = Species.objects.filter(type__iexact=type)
     if status == 'synonym':
-        pid_list = pid_list.filter(status='synonym')
+        pid_list = Species.objects.filter(type__iexact=type).filter(status='synonym')
     else:
-        pid_list = pid_list.exclude(status='synonym')
+        pid_list = Species.objects.filter(type__iexact=type).exclude(status='synonym')
+
     if reqgenus:
         if reqgenus[0] != '*' and reqgenus[-1] != '*':
             try:
@@ -269,7 +269,6 @@ def species(request):
         family = request.GET['family']
     if family != 'Orchidaceae':
         send_url = '/common/species/?family=' + str(family) + '&role=' + role
-        # print(send_url)
         return HttpResponseRedirect(send_url)
 
     family = Family.objects.get(pk='Orchidaceae')
@@ -324,6 +323,7 @@ def species(request):
     # Start building th elist
     if reqgenus or alpha or subfamily or tribe or subtribe:
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, type, '')
+        write_output(request, str(genus))
         # if not subfamily and not reqgenus:
         #     subfamily = 'Epidendroideae'
         if subfamily:
@@ -355,7 +355,6 @@ def species(request):
     elif subfamily_obj:
         subtribe_list = Subtribe.objects.filter(subfamily=subfamily_obj.subfamily).order_by ('subtribe')
 
-    write_output(request, str(genus))
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'family': family, 'genus': genus,
                'subfamily': subfamily, 'subfamily_list': subfamily_list,
@@ -384,6 +383,8 @@ def hybrid(request):
     msg = ''
 
     # Initialization
+    reqgenus = request.GET.get('reqgenus', None)
+    prev_genus = request.GET.get('reqgenus', None)
     if 'genus' in request.GET:
         genus = request.GET['genus']
         crit = 1
@@ -424,13 +425,11 @@ def hybrid(request):
     if alpha != 'ALL':
         alpha = alpha[0:1]
     crit = 1
-    print("start hybrid species")
     if crit :
-        reqgenus, prev_genus = getPrev(request,'genus', 'prev_genus')
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
     else:
         return render(request, 'orchidaceae/hybrid.html', {})
-    print("start hybrid species 2")
+    write_output(request, str(reqgenus))
 
     if (reqgenus and (reqgenus == prev_genus)):
         seed_genus, prev_seed_genus = getPrev(request,'seed_genus', 'prev_seed_genus')
@@ -473,7 +472,6 @@ def hybrid(request):
             |
             Q(hybrid__pollen_genus__istartswith=pollen_genus)
         )
-    print("this_species_list = ", this_species_list)
 
     # Building pid ;list
     if crit and this_species_list:
@@ -499,34 +497,12 @@ def hybrid(request):
         this_species_list = []
         msg = "Please select a search criteria"
 
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
-    if this_species_list:
-        if sort:
-            this_species_list = this_species_list.order_by(sort)
-        else:
-            this_species_list = this_species_list.order_by('genus', 'species')
-
     role = getRole(request)
-    write_output(request, str(reqgenus))
     context = {'my_list': this_species_list,
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
                'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
                'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
-               'sort': sort, 'prev_sort': prev_sort,
                'role': role, 'level': 'list', 'title': 'hybrid_list',
                }
     return render(request, 'orchidaceae/hybrid.html', context)
@@ -560,6 +536,7 @@ def ancestor(request, pid=None):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    write_output(request, species.binomial)
     genus = species.gen
 
     if request.GET.get('sort'):
@@ -579,22 +556,22 @@ def ancestor(request, pid=None):
     # List of ancestors in the left panel
     anc_list = AncestorDescendant.objects.filter(did=pid)
 
-    if sort:
-        if sort == 'pct':
-            anc_list = anc_list.order_by('-pct')
-        elif sort == '-pct':
-            anc_list = anc_list.order_by('pct')
-        elif sort == 'img':
-            anc_list = anc_list.order_by('-aid__num_image')
-        elif sort == '-img':
-            anc_list = anc_list.order_by('aid__num_image')
-        elif sort == 'name':
-            anc_list = anc_list.order_by('aid__genus', 'aid__species')
-        elif sort == '-name':
-            anc_list = anc_list.order_by('-aid__genus', '-aid__species')
+    # if sort:
+    #     if sort == 'pct':
+    #         anc_list = anc_list.order_by('-pct')
+    #     elif sort == '-pct':
+    #         anc_list = anc_list.order_by('pct')
+    #     elif sort == 'img':
+    #         anc_list = anc_list.order_by('-aid__num_image')
+    #     elif sort == '-img':
+    #         anc_list = anc_list.order_by('aid__num_image')
+    #     elif sort == 'name':
+    #         anc_list = anc_list.order_by('aid__genus', 'aid__species')
+    #     elif sort == '-name':
+    #         anc_list = anc_list.order_by('-aid__genus', '-aid__species')
 
     for x in anc_list:
-        x.anctype = "orchidaceae:" + x.anctype
+        x.anctype = "orchidaceae:" + str(x.anctype)
 
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
@@ -602,7 +579,6 @@ def ancestor(request, pid=None):
                'sort': sort, 'prev_sort': prev_sort,
                'title': 'ancestor', 'role': role, 'state': state,
                }
-    write_output(request, species.textname())
     return render(request, 'orchidaceae/ancestor.html', context)
 
 
@@ -621,6 +597,7 @@ def ancestrytree(request, pid=None):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    write_output(request, species.binomial)
 
     hybrid = species
     s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = ssss = sssp = ssps = sspp = spss =\
@@ -859,7 +836,6 @@ def ancestrytree(request, pid=None):
                'pppp': pppp,
                'title': 'ancestrytree', 'role': role,
                }
-    write_output(request, species.textname())
     return render(request, 'orchidaceae/ancestrytree.html', context)
 
 
@@ -877,6 +853,7 @@ def progeny_old(request, pid):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    write_output(request, species.binomial)
     genus = species.genus
     des_list = AncestorDescendant.objects.filter(aid=pid)
     if len(des_list) > 5000:
@@ -891,12 +868,12 @@ def progeny_old(request, pid):
 
     total = des_list.count()
 
-    write_output(request, species.textname())
     context = {'des_list': des_list, 'species': species, 'total': total, 'alpha': alpha, 'alpha_list': alpha_list,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role,
                }
     return render(request, 'orchidaceae/progeny_old.html', context)
+
 
 def progeny(request, pid):
     direct = ''
@@ -911,6 +888,8 @@ def progeny(request, pid):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    write_output(request, species.binomial)
+
     genus = species.genus
 
     #All descendants
@@ -938,7 +917,6 @@ def progeny(request, pid):
 
     # total = des_list.count()
 
-    write_output(request, species.textname())
     context = {'result_list': result_list, 'species': species, 'family': family,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role,
@@ -965,6 +943,7 @@ def progenyimg(request, pid=None):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    write_output(request, species.binomial)
     genus = species.genus
 
     des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt= min_pct)
@@ -989,7 +968,6 @@ def progenyimg(request, pid=None):
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
             request, img_list, page_length, num_show)
 
-    write_output(request, species.textname())
     context = {'img_list': page_list, 'species': species, 'tab': 'proimg', 'proimg': 'active',
                'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,
                'genus': genus, 'page': page,

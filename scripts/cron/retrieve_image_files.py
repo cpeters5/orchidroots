@@ -9,14 +9,15 @@ import re, glob, os, sys
 from pathlib import Path
 from urllib.request import urlopen
 from PIL import Image
+from dotenv import load_dotenv
+load_dotenv()
 
 debug = 1
 genus = ''
 app = sys.argv[1]
 tab = app.lower() + "_spcimages"
 size = 500, 400
-HOST = '134.209.46.210'
-conn = pymysql.connect(host=HOST, user='chariya', port=3306, passwd='Imh#r3r3', db='bluenanta')
+conn = pymysql.connect(host=os.getenv('DBHOST'), user='chariya', port=3306, passwd=os.getenv('MYDBPSSWD'), db=os.getenv('DBNAME'))
 cur = conn.cursor()
 if app != 'other':
     family = app.title()
@@ -48,7 +49,6 @@ for row in cur:
     if not ext:
         query_params = parse_qs(parsed_url.query)
         ext = f".{query_params['format'][0]}" if 'format' in query_params else ''
-    print(ext)
     # path = parsed_url.path
     # ext = os.path.splitext(path)[1]
 

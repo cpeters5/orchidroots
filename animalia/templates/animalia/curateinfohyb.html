@@ -65,7 +65,7 @@ table {
             &lt;a href='url' target='_blank'&gt;Name of the link&lt;/a&gt;
             <br>
             <br>
-            <form method="post" action="{{app}}/curateinfohyb/{{species.pid}}">
+            <form method="post" action="{% url 'animalia:curateinfohyb' species.pid %}">
             {% csrf_token %}
                 <input type="hidden" name="pid" value="{{ species.pid }}">
                 <input type="hidden" name="role" value="{{ role }}">

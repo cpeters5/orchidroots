@@ -74,13 +74,8 @@ def xget_searchdata(request):
         10: ('other', 'taxon'),
         11: ('orchidaceae', 'name'),
         12: ('orchidaceae', 'taxon')
-
     }
     selected_app, area = option_mapping.get(searchdata, (None,None))
-    print(">>>> searchdata        = ", searchdata)
-    print(">>>> selected_app        = ", selected_app)
-    print(">>>> area        = ", area)
-
     return selected_app, area
 
 
@@ -137,7 +132,7 @@ def write_output(request, detail=None):
         message = "ACCESS: " + request.path + " - " + str(request.user)
         if detail:
             message += " - " + detail
-        logger.error(message)
+        logger.warn(message)
     return
 
 

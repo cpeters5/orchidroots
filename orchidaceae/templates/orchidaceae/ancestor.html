@@ -2,6 +2,10 @@
 {% include "base.html" %}
 {% include "detail-title.html" %}
 {% block body %}
+<!--<head>-->
+<!--    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.bootstrap4.min.css">-->
+<!--    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>-->
+<!--</head>-->
 <style>
 
 .border-lb {
@@ -47,7 +51,7 @@
 </style>
 
 
-<div style="margin:0 auto;padding:0;width:100%;">
+<div style="margin:0 auto;padding:0;width:70%;">
         <!--main section-->
     <br>
     {% include 'common/detail-nav.html' %}
@@ -55,12 +59,14 @@
         {% if species.type == 'hybrid' %}
             <br>
             {% if anc_list %}
-               <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover" style="margin-left:auto;margin-right:auto;font-size:13px;">
+               <table id="myTable" class="table table-condensed table-sm  table-bordered table-hover" style="margin-left:auto;margin-right:auto;font-size:13px;">
+                <thead  class="thead-light">
                     <tr  style="background-color: #f2f2f2">
                         <th class="border-lb text-left">Ancestors<span> (total {{anc_list.count}})</span></th>
                         <th class="border-rb text-center">%</th>
                         <th class="border-lb text-center">Img</th>
                     </tr>
+                   </thead>
                     {% for anc in anc_list %}
                     <tr class="center">
                         <td class="border-rb" style="text-align: left"><a href="{% url 'display:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a></td>
@@ -80,9 +86,34 @@
 </div>
 
 <script>
-$(document).ready(function () {
-$('#sortTable').DataTable();
-$('.dataTables_length').addClass('bs-select');
+$(document).ready(function() {
+    var dataTable = $('#myTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "pagingType": "full",
+        "bPaginate": true,
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Search table'});//tips
+        },
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
+
 });
 
 </script>

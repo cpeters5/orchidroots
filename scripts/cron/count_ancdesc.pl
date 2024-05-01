@@ -6,13 +6,16 @@
 ##############################
 use strict;
 use warnings FATAL => 'all';
+use Dotenv;
 use DBI;
 use Time::Duration;
 use POSIX qw(strftime);
 
-my $HOST = '134.209.46.210';
-my $DB = "bluenanta";
-my $dbh = DBI->connect( "DBI:mysql:$DB:$HOST","chariya","Imh#r3r3") or die( "Could not connect to: $DBI::errstr" );
+my $dotenv_path = "/webapps/bluenanta/.env";
+Dotenv->load($dotenv_path);
+
+my $DB = $ENV{'DBNAME'};
+my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
 my ($sth, $sth1);
 &getASPM("use $DB");
 

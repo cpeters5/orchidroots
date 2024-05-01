@@ -24,7 +24,7 @@
 <div style="dixplay:inline; text-align:center; margin:0 auto">
     <h4>Login</h4>
     <h6 style="color: red; font-weight: bold">
-        To register for a new account, please visit <a href="https://orchidroots.com/register/?next=/login">OrchidRoots</a>
+        <a href="{% url 'register' %}?next=/login">OrchidRoots</a>
     </h6>
     <div class="container loginform">
         <form method='POST'>
@@ -44,17 +44,17 @@
         </form>
         <hr>
 
-<!--        <div class="text-center">-->
-<!--            <a href="{% url 'account_reset_password' %}">Forgot Password?</a>-->
-<!--        </div>-->
-<!--        <div class="text-center">-->
-<!--            <a  href="{% url 'register' %} ">Create an Account</a>-->
-<!--        </div>-->
-<!--        <div class="form-row text-justify text-center">-->
-<!--                <a href="{% provider_login_url 'facebook' method='oauth2' %}" class="btn btn-block btn-social btn-facebook" style="background-color:#3b5998; color:#fff; text-align:center">-->
-<!--                    <span class="fa fa-facebook"></span> Sign in with Facebook-->
-<!--                </a>-->
-<!--        </div>-->
+        <div class="text-center">
+            <a href="{% url 'account_reset_password' %}">Forgot Password?</a>
+        </div>
+        <div class="text-center">
+            <a  href="{% url 'register' %} ">Create an Account</a>
+        </div>
+        <div class="form-row text-justify text-center">
+                <a href="{% provider_login_url 'facebook' method='oauth2' %}" class="btn btn-block btn-social btn-facebook" style="background-color:#3b5998; color:#fff; text-align:center">
+                    <span class="fa fa-facebook"></span> Sign in with Facebook
+                </a>
+        </div>
     </div>
 </div>
 {% endblock %}

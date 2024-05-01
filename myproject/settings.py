@@ -40,17 +40,19 @@ SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default=''),
 SITE_ID = 1
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
     # 'bluenanta.com',
     # 'www.bluenanta.com',
-    # '157.245.210.148',
-    'beta.bluenanta.com',
-    '45.55.134.164',
-    '127.0.0.1',
-    'localhost',
+    # 'beta.bluenanta.com',
+    # 'www.beta.bluenanta.com',
+    'orchidroots.com',
+    'www.orchidroots.com',
+    # '45.55.134.164',
+    # '127.0.0.1',
+    # 'localhost',
 ]
 
 
@@ -174,7 +176,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bluenanta',
+        'NAME': env.str('DBNAME', default=''),
         'PORT': env.str('PORT', default=''),
         'HOST': env.str('DBHOST', default=''),
         'USER': env.str('DBUSER', default=''),
@@ -262,8 +264,8 @@ MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-STATIC_ROOT = '/webapps/static/'
-MEDIA_ROOT  = '/webapps/media/'
+STATIC_ROOT = env.str('DJANGO_STATIC_ROOT')
+MEDIA_ROOT  = env.str('DJANGO_MEDIA_ROOT')
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
@@ -384,7 +386,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'METHOD': 'oauth2',
         'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
         'SCOPE': ['email', 'public_profile'],
-        # 'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
         'INIT_PARAMS': {'cookie': True},
         'FIELDS': [
             'id',
@@ -396,7 +398,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'picture'
         ],
         'EXCHANGE_TOKEN': True,
-        'VERIFIED_EMAIL': True,
+        'VERIFIED_EMAIL': False,
         'VERSION': 'v7.0',
     }
 }

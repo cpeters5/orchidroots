@@ -331,32 +331,21 @@ class AcceptedInfoForm(forms.ModelForm):
 
 
 class UploadSpcWebForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('fullname'),
-        required=False,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadSpcWebForm, self).__init__(*args, **kwargs)
         self.fields['rank'].choices = CHOICES
         self.fields['quality'].choices = QUALITY
         self.fields['image_url'].required = True
-        # self.fields['author'].required = True
-        # self.fields['author'].queryset = Photographer.objects.all().order_by('fullname')
-        self.fields['author'].widget.is_localized = True
 
     class Meta:
         model = SpcImages
         rank = forms.IntegerField(initial=5)
         fields = (
-        'author', 'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
+        'source_url', 'image_url', 'source_file_name', 'name', 'variation', 'form', 'text_data',
         'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
-            'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            # 'author':'Your name for credit: select a name, if not exists, see next box',
             'source_url': 'Link to source',
-            'credit_to': 'or, credit name. Enter only when author does not exist in the dropdown list.',
+            'credit_to': 'Credit allocation name',
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
             'name': 'Clonal name',
@@ -385,7 +374,6 @@ class UploadSpcWebForm(forms.ModelForm):
             'quality': QUALITY,
         }
         # help_texts = {
-        #     # 'author': 'The name for credit attribution',
         #     'credit_to': 'Enter the photo owner neme here if it is not listed under author',
         #     'source_url': 'The URL where the photo is uploaded from, eg Facebook post',
         #     'image_url': "Right click on the image and select 'copy image address'",
@@ -399,20 +387,10 @@ class UploadSpcWebForm(forms.ModelForm):
         #     'rank': 'Range from 9 (highest quality to 1 (lowest).  Set rank = 0 if you reject the identity of the photo',
         # }
         error_messages = {
-            # 'author': {
-            # 'required': _("Please select a name for credit attribution."),
-            # },
             'image_url': {
                 'required': _("Please enter, the url of the image (right click and select 'copy image address'."),
             },
         }
-
-    # def clean_author(self):
-    #     author = self.cleaned_data['author']
-    #     if not Photographer.objects.get(pk=author):
-    #         if not clean_credit_to['credit_to']:
-    #             raise forms.ValidationError('You must enter an author, or a new credit name')
-    #     return author
 
     def clean_credit_to(self):
         credit_to = self.cleaned_data['credit_to']
@@ -462,7 +440,7 @@ class UploadHybWebForm(forms.ModelForm):
         'description', 'certainty', 'rank', 'credit_to', 'image_file', 'quality')
         labels = {
             'author': "Name that has been used to credit your photos. Warning: Your account will be removed if you select a name that is not yours!",
-            'credit_to': 'or credit name. Enter only when name does not exist in Author list',
+            'credit_to': 'Credit allocation name',
             'source_url': 'Link to source',
             'image_url': 'Image URL',
             'source_file_name': 'Alternate name, e.g. a synonym',
@@ -552,33 +530,25 @@ class UploadHybWebForm(forms.ModelForm):
 
 
 class UploadFileForm(forms.ModelForm):
-    author = ModelChoiceField(
-        queryset=Photographer.objects.order_by('displayname'),
-        required=False,
-        widget=Select2Widget
-    )
-
     def __init__(self, *args, **kwargs):
         super(UploadFileForm, self).__init__(*args, **kwargs)
         # Making UploadForm required
         # self.fields['image_file_path'].required = True
-        self.fields['author'].required = True
         # role = forms.CharField(required=True)
 
     class Meta:
         model = UploadFile
         fields = (
-        'image_file_path', 'author', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
+        'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
         'text_data', 'location',)
 
         labels = {
-            'author': "Your credit attribution name",
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
             'name': 'Clonal name',
             'variation': 'Varieties',
             'forma': 'Form',
-            'credit_to': 'If author is not in the list, enter a name to be used for credit attribution here',
+            'credit_to': 'Credit allocation name',
             'description': 'Tags. Comma separated keywords to help in searching',
             'text_data': 'Comment',
             'location': 'Location',
