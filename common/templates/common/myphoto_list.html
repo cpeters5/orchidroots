@@ -32,28 +32,28 @@
                     <h5>{{user|title}}'s {{family.family}} Photos</h5>
                 </div>
                 <div class="card-body">
-                    {% if user.is_authenticated and user.tier.tier > 2 %}
-                        <form class="form-inline justify-content-center" action="?" id="filter">
-                        <input type="hidden" name="genus" value="{{genus}}" >
-                        <input type="hidden" name="role" value="cur" >
-                        <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">
-                            {% if author %}
-                                <option selected disabled>{{author}}</option>
-                            {% else %}
-                                <option selected disabled>Select an author</option>
-                           {% endif %}
-                            <option></option>
-                            {% for author in author_list %}
-                                {% if author == author.author_id %}
-                                    <option selected="selected" disabled>{{author.displayname}}</option>
-                                {% else %}
-                                    <option value="{{author.author_id}}">{{author.displayname}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                        <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
-                        </form>
-                    {% endif %}
+<!--                    {% if user.is_authenticated and user.tier.tier > 2 %}-->
+<!--                        <form class="form-inline justify-content-center" action="?" id="filter">-->
+<!--                        <input type="hidden" name="genus" value="{{genus}}" >-->
+<!--                        <input type="hidden" name="role" value="cur" >-->
+<!--                        <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">-->
+<!--                            {% if author %}-->
+<!--                                <option selected disabled>{{author}}</option>-->
+<!--                            {% else %}-->
+<!--                                <option selected disabled>Select an author</option>-->
+<!--                           {% endif %}-->
+<!--                            <option></option>-->
+<!--                            {% for author in author_list %}-->
+<!--                                {% if author == author.author_id %}-->
+<!--                                    <option selected="selected" disabled>{{author.displayname}}</option>-->
+<!--                                {% else %}-->
+<!--                                    <option value="{{author.author_id}}">{{author.displayname}}</option>-->
+<!--                                {% endif %}-->
+<!--                            {% endfor %}-->
+<!--                        </select>-->
+<!--                        <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
+<!--                        </form>-->
+<!--                    {% endif %}-->
 
                     <div class="p-2 m-2" style="text-align: left;min-height:200px;">
                         {% include "common/private-nav.html" %}
