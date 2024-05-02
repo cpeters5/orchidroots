@@ -158,32 +158,9 @@ img{
 
                     </div>
                     <br>
-                    <p>
-                    <br>
-                    </p>
-
-                    <div class="clearfix"></div>
-
 
 <!--                    Other families-->
                     {% for othimage in all_list %}
-<!--                        {% if ads_insert == forloop.counter %}-->
-<!--                            <div class="imageitem aditem">-->
-<!--                                <div class="imgtitle"><span style="font-size:15px;"><a href="https://bluenanta.com/documents/sponsor" target="_blank">ADVERTISEMENT</a></span></div>-->
-<!--                                    <a href="{{sponsor.sponsor_url}}" target="_blank">-->
-<!--                                    <div class="box">-->
-<!--                                        <img class="thumbnails" alt="Sample advertisement" src="{% static sponsor.image_file_path %}{{sponsor.image_file}}">-->
-<!--&lt;!&ndash;                                        <div class="text text-br">{{sponsor.pitch}}</div>&ndash;&gt;-->
-<!--                                    </div>-->
-<!--                                    </a>-->
-<!--                                <div class="imgcaption">-->
-<!--                                    <a href="{{sponsor.sponsor_url}}" target="_blank">-->
-<!--                                        {{sponsor.short_description}}-->
-<!--                                    </a>-->
-
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        {% endif %}-->
                         {% if othimage.1 %}
                         <div class="imageitem">
                             <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
