@@ -70,24 +70,23 @@ a:hover {
         <!--Filter-->
 <div class="justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 95%; text-align:left">
     <div class="card m-2">
-        <div class="card-header">
-            <h4 align="center"> Genera &nbsp;({{total}})</h4>
-        </div>
+            <h4 style="text-align:center"> Genera</h4>
 
         <div class="card-body d-flex flex-wrap" style="padding:0;">
 
             <!--Filter by Hybrid Formula 1-->
             <div class="" data-toggle="tooltip" data-placement="bottom" title="Genus">
-                <button class="btn btn-custom p-1 m-1" type="button" data-toggle="dropdown">
+                <button class="btn-custom p-1 m-1" type="button" data-toggle="dropdown">
                     <dev style="color:blue">
-                    {% if genustype == 'species' %}Genus
+                    {% if genustype == 'species' %}Accepted Genus
                     {% elif genustype == 'hybrid' %}Nothogenus
                     {% elif genustype == 'synonym' %}Synonym
-                        {% endif %}
+                    {% else %}Select type
+                    {% endif %}
                     </dev>
                 </button>
                 <ul class="dropdown-menu scrollable-menu" style="margin:0">
-                    <li><a href="?family=Orchidaceae&genustype=species&year={{ year }}&genus={{genus}}&author={{author}}" >&nbsp;&nbsp;<span style="font-size: 12px;">Genus&nbsp;</span></a></li>
+                    <li><a href="?family=Orchidaceae&genustype=species&year={{ year }}&genus={{genus}}&author={{author}}" >&nbsp;&nbsp;<span style="font-size: 12px;">Accepted Genus&nbsp;</span></a></li>
                     <li><a href="?family=Orchidaceae&genustype=hybrid&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Nothogenus &nbsp;&nbsp;</span></a></li>
                     <li><a href="?family=Orchidaceae&genustype=synonym&status=synonym&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Synonym </span></a></li>
                     <li><a href="?family=Orchidaceae&genustype=all&year={{ year }}&genus={{genus}}" >&nbsp;&nbsp;<span style="font-size: 12px;">All Genera</span></a></li>
@@ -229,11 +228,11 @@ a:hover {
                                     {% if genus.status == 'synonym' %}
                                         <i>{{genus.genus}}</i> {% if genus.author %}{{genus.author}}{% endif %} {% if genus.year > 0 %}{{genus.year}}{% endif %}
                                     {% elif genus.type == 'species' %}
-                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i> {% if genus.author %}{{genus.author}}{% endif %}</a> {{genus.year}}
+                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
                                     {% elif genus.type == 'hybrid' %}
-                                        <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i> {% if genus.author %}{{genus.author}}{% endif %}</a> {{genus.year}}
+                                        <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
                                     {% else %}
-                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i> {{genus.year}}</a>
+                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {{genus.year}}
                                     {% endif %}
                                     </td>
 
