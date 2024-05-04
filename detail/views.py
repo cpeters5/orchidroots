@@ -184,8 +184,11 @@ def createhybrid(request):
 
 # All access - at least role = pub
 @login_required
-def compare(request, pid):
+def compare(request, pid=None):
     # TODO:  Use Species form instead
+    if not pid:
+        pid = request.GET.get('pid', '')
+
     role = getRole(request)
     pid2 = species2 = genus2 = ''
     try:
@@ -615,7 +618,7 @@ def get_author(request):
 def uploadweb(request, pid, orid=None):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
-    print("user tier = ", request.user.tier.tier)
+    # print("user tier = ", request.user.tier.tier)
     if request.user.is_authenticated and request.user.tier.tier < 2:
         message = 'You dont have access to upload files. Please update your profile to gain access.'
         return HttpResponse(message)
@@ -717,7 +720,6 @@ def uploadfile(request, pid):
         return HttpResponse(message)
 
     author = get_reqauthor(request)
-    author_list = Photographer.objects.all().order_by('displayname')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -750,7 +752,7 @@ def uploadfile(request, pid):
             return HttpResponseRedirect(url)
 
     context = {'form': form, 'species': species, 'web': 'active',
-               'author_list': author_list, 'author': author, 'family': family,
+               'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
 
@@ -785,7 +787,6 @@ def approvemediaphoto(request, pid):
         url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
         return HttpResponseRedirect(url)
     upls = UploadFile.objects.filter(pid=pid)
-    print("upload file path = ", upl.image_file_path)
     for upl in upls:
         old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
         tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
@@ -818,7 +819,6 @@ def approvemediaphoto(request, pid):
 
         image_file = species.genus + '_' + str(format(upl.pid.pid, "09d")) + "_" + str(format(upl.id, "09d"))
         newpath = os.path.join(newdir, image_file)
-        print("newpath = ", newpath)
         if not os.path.exists(newpath + ext):
             try:
                 shutil.copy(old_name, tmp_name)
@@ -844,7 +844,6 @@ def approvemediaphoto(request, pid):
                     break
                 i += 1
         # spc.image_file_path = image_dir + image_file
-        print("spc.image_file = ", spc.image_file)
         spc.save()
         upl.approved = True
         upl.delete(0)
