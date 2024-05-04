@@ -90,7 +90,6 @@ def compare(request, pid):
     if infraspe2:
         binomial2 = binomial2 + ' ' + infraspe2
     if binomial2:
-        print("binomial2 = >", binomial2,"<")
         species2 = Species.objects.filter(binomial__iexact=binomial2)
         if len(species2) == 0:
             message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
@@ -378,7 +377,6 @@ def uploadweb(request, pid, orid=None):
 
         if form.is_valid():
             spc = form.save(commit=False)
-            print("authior = ", spc.credit_to)
             # if not spc.author and not spc.credit_to:
             #     return HttpResponse("Please select an author, or enter a new name for credit allocation.")
             spc.author = request.user.photographer
@@ -426,20 +424,65 @@ def uploadweb(request, pid, orid=None):
 
 
 @login_required
+def uploadfile(request, pid):
+    role = getRole(request)
+    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@bluenanta.com'
+        return HttpResponse(message)
+    species = Species.objects.get(pk=pid)
+    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
+        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
+                'Please delete one or more of your photos before uploading a new one.'
+        return HttpResponse(message)
+
+    author = get_reqauthor(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    family = species.gen.family
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            if isinstance(species, Species):
+                spc.pid = species
+            spc.author = request.user.photographer
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, family)
+            return HttpResponseRedirect(url)
+
+    context = {'form': form, 'species': species, 'web': 'active',
+               'author': author, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, app + '/uploadfile.html', context)
+
+
+@login_required
 def uploadvid(request, pid, orid=None):
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
-    print("1. species = ", species)
     # For Other application only
     family = species.gen.family
     role = getRole(request)
     if request.method == 'POST':
         form = UploadVidForm(request.POST)
-        print("1. Imh3r3")
         if form.is_valid():
-            print("2. Form is valid")
             spc = form.save(commit=False)
             spc.author = request.user.photographer
             spc.user_id = request.user
@@ -575,56 +618,6 @@ def curateinfospc(request, pid):
 
 
 @login_required
-def uploadfile(request, pid):
-    role = getRole(request)
-    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@bluenanta.com'
-        return HttpResponse(message)
-    species = Species.objects.get(pk=pid)
-    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
-        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
-                'Please delete one or more of your photos before uploading a new one.'
-        return HttpResponse(message)
-
-    author = get_reqauthor(request)
-    author_list = Photographer.objects.all().order_by('displayname')
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, species.textname())
-            spc = form.save(commit=False)
-            if isinstance(species, Species):
-                spc.pid = species
-            spc.author = request.user.photographer
-            spc.type = species.type
-            spc.user_id = request.user
-            print("credit = ",spc.credit_to)
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, family)
-            return HttpResponseRedirect(url)
-
-    context = {'form': form, 'species': species, 'web': 'active',
-               'author_list': author_list, 'author': author, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
-
-
-@login_required
 def approvemediaphoto(request, pid):
     # !!! UNTESTED
     # Move to a utiles method
@@ -667,8 +660,6 @@ def approvemediaphoto(request, pid):
 
     old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
     tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
-    print("old name = ", old_name)
-    print("new name = ", tmp_name)
     filename, ext = os.path.splitext(str(upl.image_file_path))
     spc = SpcImages(
                 pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, credit_to=upl.credit_to,
