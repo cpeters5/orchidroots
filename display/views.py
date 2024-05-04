@@ -30,9 +30,17 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
+    if not pid:
+        pid = request.GET.get('pid', None)
+    if not pid:
+        return HttpResponseRedirect('/')
+
     selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)
     app, family = get_application(request)
+    if not family:
+        family = 'Orchidaceae'
+        app = 'orchidaceae'
     if app == '' or not app:
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
@@ -216,6 +224,9 @@ def photos(request, pid=None):
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
     app, family = get_application(request)
+    if not family:
+        family = 'Orchidaceae'
+        app = 'orchidaceae'
     if not app or app == '':
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
@@ -344,6 +355,9 @@ def videos(request, pid):
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
     app, family = get_application(request)
+    if not family:
+        family = 'Orchidaceae'
+        app = 'orchidaceae'
     if app == '':
         return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
