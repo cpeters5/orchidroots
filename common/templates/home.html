@@ -144,27 +144,68 @@ img{
 <div class="container-fluid">
             <div class="card mt-3">
                 <div class="card-body" style="font-size:15px">
-                    <h6 class="card-title d-inline-block">Welcome to OrchidRoots</h6>
+                    <h6 class="card-title d-inline-block">Welcome! to OrchidRoots</h6>
                     <div class="d-inline-block p-1" style="font-size:16px">
                         We at OrchidRoots are committed to serving you for many years to come.
                         To make this possible, we are asking for your support.
                         You can explore orchids and other life forms on orchidroots.com.
                         Any amount you are able to contribute would be greatly appreciated.
-                        <br>
-                            <a class="btn btn-primary" style="width: 120px; color: white" href="{% url 'donation:donateapp' %}">Donate</a>
-                            <a class="btn btn-primary" href="{% url 'documents:list' %}">Documentation</a>
+                        <a class="btn btn-primary border" style="width: 120px;" href="{% url 'donation:donateapp' %}">Donate</a>
+                        <a class="btn btn-primary border" href="{% url 'documents:list' %}">Documents</a>
 
-                        <br>
-
-                    </div>
                     <br>
-
-<!--                    Other families-->
+                    </div>
+                    <br><br>
+                    <div class="d-flex justify-content-center">
+                        <h5>Orchids</h5>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <form action="/search/search_binomial/">
+                           <input value="{{search_string}}" type="text" name="query" pattern=".{3,}" size="50" placeholder="Search Orchids" height="10px">
+                           <input type="hidden" name="app" value="orchidaceae" >
+                           <input type="hidden" name="role" value="{{ role }}" >
+                        </form>
+                    </div>
+                    {% for image in orcimage %}
+                        <div class="imageitem">
+                            <div class="imgtitle">
+                                <a href="{% url 'common:newbrowse' %}?app={{image.pid.gen.family.application}}&family={{image.gen.family}}&role={{role}}&display=checked">{{image.pid.genus}}</a></div>
+<!--                                <a href="{% url 'display:photos' image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">-->
+                                <div class="box">
+                                    <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
+                                </div>
+<!--                                </a>-->
+                            <div class="imgcaption">
+                                <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}">
+                                    {{image.pid.name|safe}} {% if cacfamily.application == 'other' %}({{image.gen.family}}){% endif %}
+                                </a>
+                                <br><a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}},</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <br>
+                    <div class="d-flex justify-content-center">
+                        <h5>Other Families <span style="color:blue;"><b>(NEW!)</b></span></h5>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <form action="/search/search_name/">
+                            <input type="hidden" name="selected_app" value="{{ selected_app }}">
+                            <input value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" size="30" placeholder="common name" height="10px">
+                        </form>
+                        &nbsp;
+                        &nbsp;
+                        <form action="/search/search/">
+                            <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
+                            <input type="hidden" form="search" name="role" value="{{ role }}" >
+                            <input value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" size="30" placeholder="scientific name" height="10px">
+                        </form>
+                    </div>
                     {% for othimage in all_list %}
                         {% if othimage.1 %}
                         <div class="imageitem">
                             <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
-                                <a href="{% url 'display:photos' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">
+                                <a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.image_dir %}{{othimage.1.image_file}}">
                                 </div>
@@ -178,7 +219,7 @@ img{
                         </div>
                         {% endif %}
                     {% endfor %}
-
+                </div>
 <!--                <div class="card-body" style="text-align: left;font-size: 13px;">-->
 <!--                   <p>-->
 <!--                       You are invited to submit an advertisement about your plant related business, a meeting announcement,-->
