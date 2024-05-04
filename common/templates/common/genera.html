@@ -19,29 +19,10 @@
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:species' %}?family={{family}}&type=species&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&myspecies={{myspecies}}">Species list</a>
-                            {% if not genus or genus.num_hybrid > 0 %}
-                                <a class="btn btn-custom m1" href="{% url 'common:species' %}?family={{family}}&genus={{genus}}&type=hybrid&syn=N&myspecies={{myspecies}}">Hybrid list</a>
-                            {% endif %}
                             <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
-                                <a class="btn border" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Go to full genus list</a>
+                                <a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Detailed list</a>
                             {% endif %}
-                            <form action="?" id="myspecies" style="display:inline-block">
-                                <input type="hidden" name="family" value="{{family}}" >
-                                <input type="hidden" name="app" value="{{family.application}}" >
-                                <input type="hidden" name="talpha" value="{{talpha}}" >
-                                <input type="hidden" name="type" value="{{type}}" >
-                                <input type="hidden" name="role" value="{{role}}" >
-                                {% if myspecies %}
-                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My genera</span>
-                                {% else %}
-                                <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin-left:1px;"> <span style="margin-left:20px;font-size:13px;">Show My genera</span>
-                                {% endif %}
-                            </form>
-
-
-
                         </div>
                         <!--   Main table-->
                         {% if genus_list %}
@@ -51,7 +32,7 @@
                                 <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <th>Genus</th>
-                                        <th class="d-none d-lg-table-cell hidden-xs">Family Subfamily Tribe Subtribe</th>
+                                        <th class="d-none d-lg-table-cell hidden-xs">{% if app != 'orchidaceae' %}Family  {% endif %} Subfamily  Tribe  Subtribe</th>
                                         <th>#images</th>
                                     </thead>
                                         {% for genus in genus_list %}
@@ -61,7 +42,8 @@
                                             </td>
 
                                             <td class="d-none d-lg-table-cell hidden-xs">
-                                                {{genus.family}} {% if genus.subfamily %} {{genus.subfamily}} {% endif %} {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
+                                                {% if app != 'orchidaceae' %}{{genus.family}} {% endif %} {% if genus.subfamily %}  {{genus.subfamily}} {% endif %}
+                                                {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
                                             </td>
                                             <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
