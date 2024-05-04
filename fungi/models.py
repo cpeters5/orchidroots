@@ -702,7 +702,7 @@ class Video(models.Model):
     source_url = models.CharField(max_length=1000, null=True, blank=True)
     video_url = models.CharField(max_length=500, null=True, blank=True)
     text_data = models.TextField(null=True, blank=True)
-    description = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     video_file = models.CharField(max_length=100, null=True, blank=True)
     video_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
