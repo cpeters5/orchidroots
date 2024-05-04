@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, TextInput, ValidationError, CheckboxInput, ModelChoiceField, HiddenInput
 from django_select2.forms import Select2Widget
 from django.utils.translation import gettext_lazy as _
-from animalia.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus
+from animalia.models import UploadFile, Species, Accepted, Hybrid, SpcImages, Genus, Video
 from accounts.models import Photographer
 import copy
 
@@ -504,6 +504,59 @@ class UploadHybWebForm(forms.ModelForm):
     #     initial = kwargs.get('initial', {})
     #     data = {**initial, **data}
     #     super().__init__(data, **kwargs)
+
+
+class UploadVidForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(UploadVidForm, self).__init__(*args, **kwargs)
+        self.fields['source_url'].required = True
+
+    class Meta:
+        model = Video
+        rank = forms.IntegerField(initial=5)
+        fields = (
+        'source_url', 'credit_to', 'name', 'text_data', 'description', 'location')
+        labels = {
+            'source_url': 'Link to video',
+            'credit_to': 'Credit allocation name',
+            'name': 'Name',
+            'location': 'location',
+            'text_data': 'Comment',
+            'description': 'Tags',
+        }
+        widgets = {
+            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
+            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+        }
+        error_messages = {
+            'source_url': {
+                'required': _("Please enter video url"),
+            },
+        }
+
+    # def clean_credit_to(self):
+    #     credit_to = self.cleaned_data['credit_to']
+    #     if not credit_to:
+    #         return None
+    #     return credit_to
+
+    def clean_source_url(self):
+        import re
+        """ Validation of image_url specifically """
+        source_url = self.cleaned_data['source_url']
+        if not re.search('https', source_url):
+            raise ValidationError(
+                _('Not a valid URL'),
+                params={'source_url': source_url},
+            )
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return source_url
 
 
 class UploadFileForm(forms.ModelForm):

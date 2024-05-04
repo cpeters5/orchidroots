@@ -20,6 +20,7 @@ urlpatterns = [
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
+    path('uploadvid/<int:pid>/', views.uploadvid, name='uploadvid'),
     path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
 
 ]
