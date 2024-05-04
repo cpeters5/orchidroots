@@ -36,7 +36,7 @@ from utils import config
 applications = config.applications
 
 from .forms import UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
-    SpeciesForm, RenameSpeciesForm, UploadFileForm
+    SpeciesForm, RenameSpeciesForm, UploadVidForm, UploadFileForm
 from accounts.models import User, Profile, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from .models import Genus, Species, Synonym, Accepted, Hybrid, SpcImages, Distribution, UploadFile
@@ -474,6 +474,49 @@ def uploadfile(request, pid):
                'author_list': author_list, 'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
+
+
+@login_required
+def uploadvid(request, pid, orid=None):
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponse(redirect_message)
+    print("1. species = ", species)
+    # For Other application only
+    family = species.gen.family
+    role = getRole(request)
+    if request.method == 'POST':
+        form = UploadVidForm(request.POST)
+        print("1. Imh3r3")
+        if form.is_valid():
+            print("2. Form is valid")
+            spc = form.save(commit=False)
+            spc.author = request.user.photographer
+            spc.user_id = request.user
+            spc.pid = species
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            if orid and orid > 0:
+                spc.id = orid
+            if spc.created_date == '' or not spc.created_date:
+                spc.created_date = timezone.now()
+            spc.save()
+
+            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
+            write_output(request, species.textname())
+            return HttpResponseRedirect(url)
+
+    if not orid:  # upload, initialize author. Get image count
+        form = UploadVidForm(initial={'author': request.user.photographer.author_id})
+        vid = ''
+    else:  # update. initialize the form iwht current image
+        vid = Video.objects.get(pk=orid)
+        form = UploadVidForm(instance=vid)
+
+    context = {'form': form, 'vid': vid, 'loc': 'active',
+               'species': species, 'family': family,
+               'role': role}
+    return render(request, 'aves/uploadvid.html', context)
 
 
 @login_required
