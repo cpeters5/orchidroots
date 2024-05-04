@@ -441,7 +441,6 @@ def uploadfile(request, pid):
         return HttpResponse(message)
 
     author = get_reqauthor(request)
-    author_list = Photographer.objects.all().order_by('displayname')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -471,7 +470,7 @@ def uploadfile(request, pid):
             return HttpResponseRedirect(url)
 
     context = {'form': form, 'species': species, 'web': 'active',
-               'author_list': author_list, 'author': author, 'family': family,
+               'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
 
