@@ -48,16 +48,19 @@ def getFamilyImage(family):
 def home(request):
     all_list = []
     role = getRole(request)
-    num_samples = 5
+    num_samples = 1
+    num_orchids = 4
 
-    # Get a sample image of orchids
+    # Get sample images of orchids
     SpcImages = apps.get_model('orchidaceae', 'SpcImages')
-    orcimage = SpcImages.objects.filter(rank__lt=7).filter(rank__gt=0).order_by('-rank','quality', '?')[0:1]
-    if len(orcimage):
-        orcimage = orcimage[0]
-    else:
-        orcimage = ''
-    all_list = all_list + [['orchidaceae', orcimage]]
+    Genus = apps.get_model('orchidaceae', 'Genus')
+    genera = Genus.objects.order_by('?')
+    orcimage = []
+    for x in genera:
+        if x.get_best_img():
+            orcimage = orcimage + [x.get_best_img()]
+        if len(orcimage) > 3:
+            break
 
     # Get random other families
     SpcImages = apps.get_model('other', 'SpcImages')
@@ -149,6 +152,7 @@ def home(request):
     random.shuffle(all_list)
 
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
+               # 'orchid_list': orchid_list,
                'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj, 'role': role,
                # 'ads_insert': ads_insert, 'sponsor': sponsor,
                }
@@ -176,7 +180,6 @@ def taxonomy(request):
 
 @login_required
 def genera(request):
-    myspecies = ''
     author = ''
     path = resolve(request.path).url_name
     talpha = request.GET.get('talpha','')
@@ -192,7 +195,10 @@ def genera(request):
     except Family.DoesNotExist:
         family = ''
         app = request.GET.get('app',None)
-        family_list = Family.objects.filter(application=app)
+        if app == 'orchidaceae':
+            family = Family.objects.get(family='Orchidaceae')
+        else:
+            family_list = Family.objects.filter(application=app)
 
     if app:
         Genus = apps.get_model(app, 'Genus')
@@ -201,9 +207,6 @@ def genera(request):
     if family_list and talpha:
         family_list = family_list.filter(family__istartswith=talpha)
 
-    myspecies = request.GET.get('myspecies','')
-    if myspecies:
-        author = Photographer.objects.get(user_id=request.user)
     if family:
         newfamily, subfamily, tribe, subtribe = getSuperGeneric(request)
         if subtribe:
@@ -223,10 +226,6 @@ def genera(request):
         genus_list = ''
     # If private request
     if genus_list or family:
-        if myspecies and author:
-            pid_list = SpcImages.objects.filter(author_id=author).values_list('gen', flat=True).distinct()
-            genus_list = genus_list.filter(pid__in=pid_list)
-
         # Complete building genus list
         if talpha:
             genus_list = genus_list.filter(genus__istartswith=talpha)
@@ -236,7 +235,6 @@ def genera(request):
         context = {
             'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
             'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-            'myspecies': myspecies,
             'alpha_list': alpha_list,
             'path': path
         }
@@ -245,7 +243,7 @@ def genera(request):
         context = {
             'app': app, 'total':len(family_list), 'talpha': talpha,
             'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-            'family_list': family_list, 'myspecies': myspecies,
+            'family_list': family_list,
             'alpha_list': alpha_list,
             'path': path
         }
@@ -256,19 +254,12 @@ def genera(request):
 def species(request):
     # path = resolve(request.path).url_name
     path_link = 'information'
+    talpha = request.GET.get('talpha','')
     if str(request.user) == 'chariya':
         path_link = 'photos'
     req_type = request.GET.get('type', 'species')
-    # if req_type not in ['species', 'hybrid']:
-    #     req_type = 'species'
-    # else:
-    #     req_type = 'species'
-
     req_family = request.GET.get('family', None)
     req_genus = request.GET.get('genus', None)
-    myspecies = request.GET.get('myspecies', None)
-    if myspecies:
-        author = Photographer.objects.get(user_id=request.user)
     alpha = request.GET.get('alpha', '')
     syn = request.GET.get('syn', None)
 
@@ -303,8 +294,8 @@ def species(request):
                 species_list = Species.objects.filter(genus=req_genus).filter(family=req_family)
                 if req_type != '':
                     species_list = species_list.filter(type=req_type)
-                if alpha != '':
-                    species_list = species_list.filter(species__istartswith=alpha)
+                if talpha != '':
+                    species_list = species_list.filter(species__istartswith=talpha)
                 if syn == 'N':
                     species_list = species_list.exclude(status='synonym')
                     syn = 'N'
@@ -329,8 +320,8 @@ def species(request):
                 this_species_list = Species.objects.filter(genus=req_genus)
                 if req_type != '':
                     this_species_list = this_species_list.filter(type=req_type)
-                if alpha != '':
-                    this_species_list = this_species_list.filter(species__istartswith=alpha)
+                if talpha != '':
+                    this_species_list = this_species_list.filter(species__istartswith=talpha)
                 if syn == 'N':
                     this_species_list = this_species_list.exclude(status='synonym')
                     syn = 'N'
@@ -367,7 +358,7 @@ def species(request):
         'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
         'syn': syn, 'type': req_type, 'role':role,
         'family': req_family,
-        'alpha_list': alpha_list, 'alpha': alpha, 'myspecies': myspecies,
+        'alpha_list': alpha_list, 'talpha': talpha,
         'msg': msg, 'path_link': path_link, 'from_path': 'species',
     }
     return render(request, "common/species.html", context)
@@ -705,20 +696,20 @@ def delete_image_files(app, spc_obj, orid):
         try:
             HybImages = apps.get_model(app, 'HybImages')
             spc = HybImages.objects.get(id=orid)
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
-
-            if os.path.isfile(filename):
-                try:
-                    os.remove(filename)
-                except FileNotFoundError:
-                    pass
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
-            if os.path.isfile(filename):
-                try:
-                    os.remove(filename)
-                    # print("Thumb File deleted successfully.")
-                except FileNotFoundError:
-                    pass
+            if spc.image_file:
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+                if os.path.isfile(filename):
+                    try:
+                        os.remove(filename)
+                    except FileNotFoundError:
+                        pass
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+                if os.path.isfile(filename):
+                    try:
+                        os.remove(filename)
+                        # print("Thumb File deleted successfully.")
+                    except FileNotFoundError:
+                        pass
             spc.delete()
         except HybImages.DoesNotExist:
             pass
@@ -727,14 +718,15 @@ def delete_image_files(app, spc_obj, orid):
             SpcImages = apps.get_model(app, 'SpcImages')
             spc = SpcImages.objects.get(id=orid)
 
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
-            if os.path.isfile(filename) and spc.image_file:
-                os.remove(filename)
+            if spc.image_file:
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
+                if os.path.isfile(filename) and spc.image_file:
+                    os.remove(filename)
 
 
-            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
-            if os.path.isfile(filename):
-                os.remove(filename)
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
+                if os.path.isfile(filename):
+                    os.remove(filename)
             spc.delete()
         except SpcImages.DoesNotExist:
             pass
@@ -1117,9 +1109,9 @@ def myphoto_browse_spc(request):
 
     pid_list = SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
 
-    img_list = Species.objects.filter(pid__in=pid_list)
-    if img_list:
-        img_list = img_list.order_by('genus', 'species')
+    img_list = Species.objects.filter(pid__in=pid_list).order_by('genus', 'species')
+    # if img_list:
+    #     img_list = img_list.order_by('genus', 'species')
 
     num_show = 5
     page_length = 20
@@ -1242,9 +1234,7 @@ def curate_pending(request):
     if app == 'orchidaceae':
         HybImages = apps.get_model(app, 'HybImages')
 
-
-    ortype = ''
-    ortype = request.GET.get('type', 'species')
+    ortype = request.GET.get('type', '')
 
     days = 7
     days = int(request.GET.get('days', 3))
@@ -1264,7 +1254,7 @@ def curate_pending(request):
     # file_list = file_list.order_by('-modified_date')
 
     days = int(request.GET.get('days', 3))
-    file_list = SpcImages.objects.filter(rank=0)
+    file_list = file_list.filter(rank=0)
     file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
     if days == 7:
         file_list = file_list.exclude(modified_date__gt=timezone.now() - timedelta(days=3))
