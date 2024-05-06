@@ -19,7 +19,7 @@ from django.apps import apps
 from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 from utils import config
-from utils.views import write_output, getRole, paginator, get_author, get_taxonomy, getSuperGeneric, pathinfo, get_random_sponsor, get_application
+from utils.views import write_output, getRole, paginator, get_author, get_reqauthor, get_taxonomy, getSuperGeneric, pathinfo, get_random_sponsor, get_application
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
@@ -401,6 +401,7 @@ def newbrowse(request):
     app = request.GET.get('app','')
     family = request.GET.get('family', '')
     genus = request.GET.get('genus', '')
+    display = request.GET.get('display', 'checked')
 
     # if app == 'orchidaceae':
         # Special case for orchids
@@ -467,7 +468,8 @@ def newbrowse(request):
                 context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'talpha': talpha, 'alpha_list': alpha_list,}
                 return render(request, 'common/newbrowse.html', context)
 
-        # Building sample by families
+        # Neither app, family, nor genus were requested. Building sample by families
+        #  Typically requested from navbar buttons
         families = Family.objects.filter(application=app)
         if talpha:
             families = families.filter(family__istartswith=talpha)
@@ -476,9 +478,11 @@ def newbrowse(request):
         family_list = []
         for fam in families:
             genimage = Genus.objects.filter(family=fam.family).order_by('?')[0:1]
-            if len(genimage) > 0:
+            if len(genimage) > 0 and genimage[0].get_best_img():
                 family_list = family_list + [(genimage[0])]
-        context = {'family_list': family_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list,}
+        role = request.GET.get('role', '')
+        context = {'family_list': family_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list, 'role': role,
+                   'display': display}
         return render(request, 'common/newbrowse.html', context)
 
     # Bad application, and neither families nor genus are valid, list all genera in the app
@@ -486,56 +490,6 @@ def newbrowse(request):
     return HttpResponseRedirect('/')
 
     # Now we get family_list of sample genera
-
-
-# def getPartialPid(reqgenus, type, status, app):
-#     if app == 'orchidaceae':
-#         Genus = apps.get_model(app.lower(), 'Genus')
-#         Species = apps.get_model(app.lower(), 'Species')
-#         Intragen = apps.get_model(app.lower(), 'Intragen')
-#         intragen_list = Intragen.objects.all()
-#         if status == 'synonym' or type == 'hybrid':
-#             intragen_list = []
-#     else:
-#         Genus = apps.get_model(app.lower(), 'Genus')
-#         Species = apps.get_model(app.lower(), 'Species')
-#         intragen_list = []
-#
-#     pid_list = []
-#     pid_list = Species.objects.filter(type=type)
-#     pid_list = pid_list.exclude(status='synonym')
-#
-#     if reqgenus:
-#         if reqgenus[0] != '*' and reqgenus[-1] != '*':
-#             try:
-#                 genus = Genus.objects.get(genus=reqgenus)
-#             except Genus.DoesNotExist:
-#                 genus = ''
-#             if genus:
-#                 pid_list = pid_list.filter(genus=genus)
-#                 if intragen_list:
-#                     intragen_list = intragen_list.filter(genus=genus)
-#             return genus, pid_list, intragen_list
-#
-#         elif reqgenus[0] == '*' and reqgenus[-1] != '*':
-#             mygenus = reqgenus[1:]
-#             pid_list = pid_list.filter(genus__iendswith=mygenus)
-#             if intragen_list:
-#                 intragen_list = intragen_list.filter(genus__iendswith=mygenus)
-#
-#         elif reqgenus[0] != '*' and reqgenus[-1] == '*':
-#             mygenus = reqgenus[:-1]
-#             pid_list = pid_list.filter(genus__istartswith=mygenus)
-#             if intragen_list:
-#                 intragen_list = intragen_list.filter(genus__istartswith=mygenus)
-#         elif reqgenus[0] == '*' and reqgenus[-1] == '*':
-#             mygenus = reqgenus[1:-1]
-#             pid_list = pid_list.filter(genus__icontains=mygenus)
-#             if intragen_list:
-#                 intragen_list = intragen_list.filter(genus__icontains=mygenus)
-#     else:
-#         reqgenus = ''
-#     return reqgenus, pid_list, intragen_list
 
 
 def distribution(request):
@@ -675,7 +629,6 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
-
 def delete_image_files(app, spc_obj, orid):
     # look in uploaded files first
     try:
@@ -732,8 +685,26 @@ def delete_image_files(app, spc_obj, orid):
             pass
 
 
+def delete_bad_image_files(orid, app):
+    # Delete file
+    try:
+        UploadFile = apps.get_model(app, 'UploadFile')
+        upl = UploadFile.objects.get(id=orid)
+        filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+        if os.path.isfile(filename):
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
+        upl.delete()
+    except UploadFile.DoesNotExist:
+        pass
+
+
 @login_required
-def deletephoto(request, orid, pid):
+def deletephoto(request, orid, pid=None):
+    # pid not available for upload new species
+
     family = request.GET.get('family', None)
     try:
         family = Family.objects.get(family=family)
@@ -742,44 +713,50 @@ def deletephoto(request, orid, pid):
     except Family.DoesNotExist:
         family = ''
         app = None
+    role = getRole(request)
 
     if not family:
         app = request.GET.get('app', None)
         if app not in applications:
             app = None
     if not app:
-        # url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), '', '')
         return render(request, "display/photos.html", {})
 
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
 
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
+    if pid:
+        try:
+            species = Species.objects.get(pk=pid)
+        except Species.DoesNotExist:
+            message = 'This item does not exist! Use arrow key to go back to previous page.'
+            return HttpResponse(message)
+        delete_image_files(app, species, orid)
+    else:
+        delete_bad_image_files(orid, app)
+        # Delete file
+        # delete uploadfile record
+        # Exit to curate new upload
+    if pid:
+        # (Historical) synonym files may be tagged as accepted species
+        if species.status == 'synonym':
+            synonym = Synonym.objects.get(pk=species.pid)
+            pid = synonym.acc_id
+            species = Species.objects.get(pk=pid)
 
-    delete_image_files(app, species, orid)
+        delete_image_files(app, species, orid)
 
-    # (Historical) synonym files may be tagged as accepted species
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=species.pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
+        next = request.GET.get('next','photos')
+        if next == 'photos':
+            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+        else:
+            url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
 
-    delete_image_files(app, species, orid)
-
-    next = request.GET.get('next','photos')
-    role = getRole(request)
-    if next == 'photos':
-        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+        write_output(request, str(family))
+        return HttpResponseRedirect(url)
     else:
         url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
-
-    write_output(request, str(family))
-    return HttpResponseRedirect(url)
-
+        return HttpResponseRedirect(url)
 
 
 @login_required
@@ -832,123 +809,64 @@ def deletewebphoto(request, pid):
 
 @login_required
 def approvemediaphoto(request, pid):
-    # !!! UNTESTED
-    # Move to a utiles method
-    family = request.GET.get('family', None)
-    if family:
-        try:
-            family = Family.objects.get(family=family)
-            if family.family != 'Orchidaceae':
-                crit = 1
-            app = family.application
-
-        except Family.DoesNotExist:
-            family = None
-            app = None
-    if not family:
-        app = request.GET.get('app', None)
-        if app not in applications:
-            app = None
-        else:
-            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), '', '')
-            return render(request, "display/photos.html", {})
-
-    Species = apps.get_model(app, 'Species')
-    Synonym = apps.get_model(app, 'Synonym')
-    UploadFile = apps.get_model(app, 'UploadFile')
-
-    species = Species.objects.get(pk=pid)
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-
-    image_dir = "utils/images/"
-    if family.family == 'Orchidaceae':
-        if species.type == 'species':
-            image_dir = image_dir + "species"
-        else:
-            image_dir = image_dir + "hybrid"
-    else:
-        image_dir = image_dir + str(family)
-    newdir = os.path.join(settings.STATIC_ROOT, image_dir)
-    # Only curator can approve
+    from utils.views import regenerate_file
     role = getRole(request)
     if role != "cur":
         message = 'You do not have privilege to approve photos.'
         return HttpResponse(message)
 
-    orid = int(request.GET.get('id', ''))
-    if not orid:
+    # !!! UNTESTED
+    # Move to a utiles method
+    family = request.GET.get('family', None)
+    try:
+        family = Family.objects.get(family=family)
+        # if family != '' and family.family != 'Orchidaceae':
+        #     crit = 1
+    except Family.DoesNotExist:
+        msg = "uploaded file #" + str(orid) + "does not exist"
+        url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
+        return HttpResponseRedirect(url)
+
+    UploadFile = apps.get_model(family.application, 'UploadFile')
+    Species = apps.get_model(family.application, 'Species')
+    SpcImages = apps.get_model(family.application, 'SpcImages')
+    species = Species.objects.get(pk=pid)
+    family = species.family
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+
+    image_dir = "utils/images/" + str(family)
+    orid = request.GET.get('id', None)
+    try:
+        int(orid)
+    except ValueError:
         message = 'This photo does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+
     try:
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
         msg = "uploaded file #" + str(orid) + "does not exist"
         url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
         return HttpResponseRedirect(url)
-    upls = UploadFile.objects.filter(pid=pid)
 
-    for upl in upls:
-        old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-        tmp_name = os.path.join("/webapps/static/tmp/", str(upl.image_file_path))
+    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    new_path = os.path.join(settings.STATIC_ROOT, image_dir)
+    unique_filename = regenerate_file(old_name, new_path)
 
-        filename, ext = os.path.splitext(str(upl.image_file_path))
-        if family.family != 'Orchidaceae' or species.type == 'species':
-            SpcImages = apps.get_model(app, 'SpcImages')
-            if family.family == 'Orchidaceae':
-                spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
-                            source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
-            else:
-                SpcImages = apps.get_model(app, 'SpcImages')
-                spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name,
-                            source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
-            spc.approved_by = request.user
-            image_file = "spc_"
-        else:
-            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name,
-                            source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
-                            description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
-            spc.approved_by = request.user
-            # if family.family == 'Orchidaceae':
-            #     newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
-            # else:
-            #     newdir = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(family))
-            image_file = "hyb_"
 
-        image_file = image_file + str(format(upl.pid.pid, "09d")) + "_" + str(format(upl.id, "09d"))
-        newpath = os.path.join(newdir, image_file)
-        if not os.path.exists(newpath + ext):
-            try:
-                shutil.copy(old_name, tmp_name)
-                shutil.move(old_name, newpath + ext)
-            except shutil.Error:
-                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
-                return HttpResponseRedirect(url)
-            spc.image_file = image_file + ext
-        else:
-            i = 1
-            while True:
-                image_file = image_file + "_" + str(i) + ext
-                x = os.path.join(newdir, image_file)
-                if not os.path.exists(x):
-                    try:
-                        shutil.copy(old_name, tmp_name)
-                        shutil.move(old_name, x)
-                    except shutil.Error:
-                        upl.delete()
-                        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
-                        return HttpResponseRedirect(url)
-                    spc.image_file = image_file
-                    break
-                i += 1
-        # spc.image_file_path = image_dir + image_file
-        spc.save()
-        upl.approved = True
-        upl.delete(0)
+    spc = SpcImages(
+                pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, credit_to=upl.credit_to,
+                source_file_name=upl.source_file_name, variation=upl.variation,
+                form=upl.forma, rank=0, description=upl.description, location=upl.location,
+                created_date=upl.created_date, source_url=upl.source_url)
+    spc.approved_by = request.user
+    spc.image_file = unique_filename
+    spc.save()
+    upl.approved = True
+    upl.delete(0)
     write_output(request, str(family))
     url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
     return HttpResponseRedirect(url)
@@ -1213,7 +1131,7 @@ def curate_newupload(request):
         return HttpResponseRedirect('/')
 
     UploadFile = apps.get_model(app, 'UploadFile')
-
+    filepath = os.path.join(settings.MEDIA_ROOT)
     file_list = UploadFile.objects.all().order_by('-modified_date')
     days = 7
     num_show = 5
@@ -1227,7 +1145,7 @@ def curate_newupload(request):
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app,
+               'app': app, 'filepath': filepath,
                }
     return render(request, "common/curate_newupload.html", context)
 
@@ -1357,3 +1275,63 @@ def curate_newapproved(request):
                }
     return render(request, 'common/curate_newapproved.html', context)
 
+
+@login_required
+def uploadfile(request, pid):
+    app, family = get_application(request)
+    Species = apps.get_model(app, 'Species')
+    role = getRole(request)
+    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
+                  'Or contact admin@bluenanta.com'
+        return HttpResponse(message)
+    species = Species.objects.get(pk=pid)
+    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
+        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
+                'Please delete one or more of your photos before uploading a new one.'
+        return HttpResponse(message)
+
+    author = get_reqauthor(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This name does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    family = species.gen.family
+    if species.status == 'synonym':
+        synonym = Synonym.objects.get(pk=pid)
+        pid = synonym.acc_id
+        species = Species.objects.get(pk=pid)
+    if app == 'animalia':
+        from animalia.forms import UploadFileForm
+    elif app == 'aves':
+        from aves.forms import UploadFileForm
+    elif app == 'fungi':
+        from fungi.forms import UploadFileForm
+    elif app == 'other':
+        from other.forms import UploadFileForm
+
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role, 'binomial': species.binomial})
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            write_output(request, species.textname())
+            spc = form.save(commit=False)
+            if isinstance(species, Species):
+                spc.pid = species
+            if species.binomial != spc.binomial:
+                spc.pid = None
+            spc.author = request.user.photographer
+            spc.type = species.type
+            spc.user_id = request.user
+            spc.text_data = spc.text_data.replace("\"", "\'\'")
+            spc.save()
+            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, family)
+            return HttpResponseRedirect(url)
+
+    context = {'form': form, 'species': species, 'web': 'active',
+               'author': author, 'family': family,
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, app + '/uploadfile.html', context)

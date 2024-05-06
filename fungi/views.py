@@ -530,55 +530,6 @@ def curateinfospc(request, pid):
         return render(request, 'fungi/curateinfospc.html', context)
 
 
-
-@login_required
-def uploadfile(request, pid):
-    role = getRole(request)
-    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@bluenanta.com'
-        return HttpResponse(message)
-    species = Species.objects.get(pk=pid)
-    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
-        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
-                'Please delete one or more of your photos before uploading a new one.'
-        return HttpResponse(message)
-
-    author = get_reqauthor(request)
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, species.textname())
-            spc = form.save(commit=False)
-            if isinstance(species, Species):
-                spc.pid = species
-            spc.author = request.user.photographer
-            spc.type = species.type
-            spc.user_id = request.user
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, family)
-            return HttpResponseRedirect(url)
-
-    context = {'form': form, 'species': species, 'web': 'active',
-               'author': author, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
-
-
 @login_required
 def approvemediaphoto(request, pid):
     # !!! UNTESTED
