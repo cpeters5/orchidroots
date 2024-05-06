@@ -112,15 +112,13 @@ img{
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                 </a>
                                 <div style="font-size:12px">
-                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid.name|safe}}</a>
-                                    <br>{{image.modified_date.date}}
-                                    <br>
-                                    {% if image.approved %}
-                                        <b>Approved</b>
+                                    {% if image.binomial == image.pid.binomial %}
+                                        <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
                                     {% else %}
-                                        <a href="/{{app}}/approvemediaphoto/{{image.pid_id}}/?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}">Approve</a>
+                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                    <br>
+                                        <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
                                     {% endif %}
-                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}/?family={{family.family}}&app={{app}}&role={{role}}&tab={{tab}}&page={{page}}&next=curate_newupload" >Delete</a>
                                 </div>
                             </div>
                         {% endfor %}
