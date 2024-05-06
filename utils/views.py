@@ -1,5 +1,8 @@
 from django.shortcuts import render
 import logging
+import os
+import shutil
+import shortuuid
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET
 # from django.core.urlresolvers import resolve
@@ -15,6 +18,25 @@ from accounts.models import Photographer
 logger = logging.getLogger(__name__)
 import utils.config
 applications = utils.config.applications
+
+
+def regenerate_file(source_path, destination_folder):
+    filename = os.path.basename(source_path)
+    while True:
+        # Generate a new unique filename using shortuuid
+        unique_filename = shortuuid.uuid() + "_" + filename
+        destination_path = os.path.join(destination_folder, unique_filename)
+
+        # Check if the destination file already exists
+        if not os.path.exists(destination_path):
+            # If it doesn't exist, copy the file
+            shutil.copy(source_path, destination_path)
+            print(f"File regenerated successfully: {destination_path}")
+            break
+        else:
+            print(f"Filename already exists: {unique_filename}. Regenerating...")
+
+    return unique_filename
 
 
 def pathinfo(request):
