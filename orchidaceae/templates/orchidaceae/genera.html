@@ -98,9 +98,9 @@ a:hover {
                         {% if formula1 %}<span style="color:black">{{formula1}}</span>{% else %} Parent Genus 1{% endif %}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year=orchidroots.com&formula2={{formula2}}">-----</a></li>
+                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{formula2}}">-----</a></li>
                         {% for g in genus_lookup %}
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year=orchidroots.com&formula1={{g.genus}}&Cattleya&formula2={{formula2}}">&nbsp;{{g.genus}}</a></li>
+                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{g.genus}}&Cattleya&formula2={{formula2}}">&nbsp;{{g.genus}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -109,9 +109,9 @@ a:hover {
                         {% if formula2 %}<span style="color:black">{{formula2}}</span>{% else %} Parent Genus 2{% endif %}
                     </button>
                     <ul class="dropdown-menu scrollable-menu" >
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year=orchidroots.com&formula1={{formula1}}">-----</a></li>
+                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{formula1}}">-----</a></li>
                         {% for g in genus_lookup %}
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year=orchidroots.com&formula2={{g.genus}}&formula1={{formula1}}">&nbsp;{{g.genus}}</a></li>
+                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{g.genus}}&formula1={{formula1}}">&nbsp;{{g.genus}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
