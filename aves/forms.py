@@ -533,7 +533,6 @@ class UploadVidForm(forms.ModelForm):
             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4}),
             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'certainty': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
         }
         error_messages = {
             'source_url': {
