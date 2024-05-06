@@ -519,14 +519,13 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = UploadFile
         fields = (
-        'image_file_path', 'source_url', 'name', 'awards', 'variation', 'forma', 'credit_to', 'description',
+        'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
         'text_data', 'location',)
 
         labels = {
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
             'name': 'Clonal name',
-            'awards': 'Awards',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'or a name for credit attribution',
@@ -538,7 +537,6 @@ class UploadFileForm(forms.ModelForm):
             # 'role': forms.HiddenInput(),
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
-            'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
@@ -548,7 +546,6 @@ class UploadFileForm(forms.ModelForm):
         }
         help_texts = {
             'name': 'Clonal name only. DO NOT include the grex name',
-            #     'awards': 'Awards received, comma separated',
             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
             #     'forma': 'E.g. color forms, peloric, region...',
             #     'credit_to': 'e.g. hybridizer, cultivator, vender',
