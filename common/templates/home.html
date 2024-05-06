@@ -170,11 +170,11 @@ img{
                         <div class="imageitem">
                             <div class="imgtitle">
                                 <a href="{% url 'common:newbrowse' %}?app={{image.pid.gen.family.application}}&family={{image.gen.family}}&role={{role}}&display=checked">{{image.pid.genus}}</a></div>
-<!--                                <a href="{% url 'display:photos' image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">-->
+                                <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
                                 </div>
-<!--                                </a>-->
+                                </a>
                             <div class="imgcaption">
                                 <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}">
                                     {{image.pid.name|safe}} {% if cacfamily.application == 'other' %}({{image.gen.family}}){% endif %}
