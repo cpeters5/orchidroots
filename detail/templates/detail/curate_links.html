@@ -73,6 +73,6 @@
         {% if image.rank == 0 %}
             <a href="{% url 'detail:deletewebphoto' image.pid_id %}?id={{image.id}}&role={{role}}&tab=sum" >Delete</a> |
         {% endif %}
-        <a href='https://www.orchidroots.com/detail/reidentify/{{image.id}}/{{species.pid}}/?role={{role}}&tab=sum&gen={{species.gen.pid}}'>Reidentify</a>
+        <a href="{% url 'detail:reidentify' image.id species.pid %}?role={{role}}&tab=sum&gen={{species.gen.pid}}">Reidentify</a>
     {% endif %}
 </div>

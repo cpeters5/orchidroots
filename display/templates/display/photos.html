@@ -347,7 +347,7 @@ a:hover {
                             {% elif role == 'cur' %}
                                 <a href="/{{app}}/approvemediaphoto/{{image.pid.pid}}/?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
                             {% endif %}
-                            <a href="/common/deletephoto/{{image.id}}/{{image.pid.pid}}/?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
+                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
                         {% endif %}
                      </div>
 
@@ -394,7 +394,7 @@ a:hover {
                                     {{image.get_displayname}}
                                     {{image.text_data|default:''|safe}} </small></h6>">
                                         <img class="thumbnails" alt="" src="{% static image.thumb_dir %}{{image.image_file}}">
-                                        <div class="text text-br">a {{image.id}}</div>
+                                        <div class="text text-br">{{image.id}}</div>
                                 </a>
                             </div>
                             <br>
