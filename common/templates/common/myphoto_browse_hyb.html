@@ -152,7 +152,7 @@ img{
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                     </div>
         <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
-                                   <div class="imgcaption">{{x.pid.pid.name|safe}}</div>
+                                   <div class="imgcaption">{{x.pid.pid.name|safe}} {% if x.credit_to %}- {{x.credit_to}} {% endif %}</div>
                                </a>
                                </div>
                             {% endfor %}
