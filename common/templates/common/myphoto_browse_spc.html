@@ -156,8 +156,7 @@ img{
                                                     <div class="box">
                                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                                     </div>
-                                                    <div class="imgcaption">{{x.pid.binomial_it|safe}} {% if x.credit_to %}- {{x.credit_to}} {% endif %}
-                                                    </div>
+                                                    <div class="imgcaption">{{x.pid.binomial_it|safe}} {% if x.credit_to %}- {{x.credit_to}} {% endif %}</div>
                                                 </a>
                                             </div>
                                         {% endfor %}
