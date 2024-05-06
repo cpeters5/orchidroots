@@ -702,11 +702,11 @@ nav .search-container button:hover {
 
 
 <div class="p-2" style="background-color:black; color: white !important; font-size: 11px;">
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked">Orchids</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked">Fungi</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked">Plants</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked">Birds</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked">Animals</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked&role={{role}}">Orchids</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked&role={{role}}">Fungi</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked&role={{role}}">Plants</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked&role={{role}}">Birds</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked&role={{role}}">Animals</a>
      &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?">Gallery</a>
 <!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
     </div>
