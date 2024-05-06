@@ -375,7 +375,7 @@ class Accepted(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='anigen_id', null=True, blank=True, on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=150, null=True)
+    binomial = models.CharField(max_length=500, null=True)
     distribution = models.TextField(blank=True)
     location = models.TextField(blank=True)
     introduced = models.TextField(blank=True)
@@ -433,7 +433,7 @@ class Hybrid(models.Model):
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='anihybgen', default=0, on_delete=models.DO_NOTHING)
     source = models.CharField(max_length=10, null=True, blank=True)
-    binomial = models.CharField(max_length=150, null=True)
+    binomial = models.CharField(max_length=500, null=True)
     is_hybrid = models.CharField(max_length=5, null=True, blank=True)
     hybrid_type = models.CharField(max_length=20, null=True, blank=True)
     # infraspe = models.CharField(max_length=50, null=True, blank=True)
@@ -588,7 +588,7 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='anispcimgpid',on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='anispcimgauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=10, default='TBD')
@@ -696,7 +696,7 @@ class SpcImages(models.Model):
 
 class Video(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='anivideopid',on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='anivideoauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
@@ -739,6 +739,7 @@ class Video(models.Model):
 
 class UploadFile(models.Model):
     pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid', related_name='anipid',on_delete=models.DO_NOTHING)
+    binomial = models.CharField(max_length=500, blank=True)
     author     = models.ForeignKey(Photographer, db_column='author', related_name='aniauthor', null=True, blank=True,on_delete=models.DO_NOTHING)
     user_id    = models.ForeignKey(User, db_column='user_id', related_name='aniuser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     credit_to  = models.CharField(max_length=100, null=True, blank=True)    #should match author_id inPhotography

@@ -520,12 +520,13 @@ class UploadFileForm(forms.ModelForm):
         model = UploadFile
         fields = (
         'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
-        'text_data', 'location',)
+        'text_data', 'location', 'binomial')
 
         labels = {
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
-            'name': 'Clonal name',
+            'name': 'Common names or local names',
+            'binomial': 'Scientific name',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'or a name for credit attribution',
@@ -543,9 +544,10 @@ class UploadFileForm(forms.ModelForm):
             'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'binomial': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
         }
         help_texts = {
-            'name': 'Clonal name only. DO NOT include the grex name',
+            # 'name': '',
             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
             #     'forma': 'E.g. color forms, peloric, region...',
             #     'credit_to': 'e.g. hybridizer, cultivator, vender',

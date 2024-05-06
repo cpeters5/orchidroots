@@ -259,7 +259,7 @@ class Species(models.Model):
         if self.infraspr:
             spc = '%s <i>%s</i>' % (spc, self.infraspr)
         if self.infraspe:
-            spc = '%s <i>%s</i>' % (name, self.infraspe)
+            spc = '%s <i>%s</i>' % (spc, self.infraspe)
         if self.is_hybrid:
             spc = '%s %s' % (self.is_hybrid, spc)
 
@@ -373,7 +373,7 @@ class Accepted(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='fungen_id', null=True, blank=True, on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=150, null=True)
+    binomial = models.CharField(max_length=500, null=True)
     distribution = models.TextField(blank=True)
     location = models.TextField(blank=True)
     introduced = models.TextField(blank=True)
@@ -431,7 +431,7 @@ class Hybrid(models.Model):
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='funhybgen', default=0, on_delete=models.DO_NOTHING)
     source = models.CharField(max_length=10, null=True, blank=True)
-    binomial = models.CharField(max_length=150, null=True)
+    binomial = models.CharField(max_length=500, null=True)
     is_hybrid = models.CharField(max_length=5, null=True, blank=True)
     hybrid_type = models.CharField(max_length=20, null=True, blank=True)
     author = models.CharField(max_length=200, null=True, blank=True)
@@ -585,7 +585,7 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='funspcimgpid',on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='funspcimgauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=10, default='TBD')
@@ -693,7 +693,7 @@ class SpcImages(models.Model):
 
 class Video(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='funvideopid',on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='funvideoauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
@@ -741,6 +741,7 @@ class UploadFile(models.Model):
     credit_to  = models.CharField(max_length=100, null=True, blank=True)    #should match author_id inPhotography
     source_url = models.CharField(max_length=1000, null=True, blank=True)
     source_file_name = models.CharField(max_length=100, null=True, blank=True)
+    binomial   = models.CharField(max_length=500, null=True, blank=True)
     name        = models.CharField(max_length=100, null=True, blank=True)
     variation   = models.CharField(max_length=50, null=True, blank=True)
     forma       = models.CharField(max_length=50, null=True, blank=True)

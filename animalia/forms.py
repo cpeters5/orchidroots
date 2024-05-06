@@ -570,12 +570,13 @@ class UploadFileForm(forms.ModelForm):
         model = UploadFile
         fields = (
         'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
-        'text_data', 'location',)
+        'text_data', 'location', 'binomial')
 
         labels = {
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
-            'name': 'Clonal name',
+            'name': 'common name',
+            'binomial': 'scientific name',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'Credit allocation name',

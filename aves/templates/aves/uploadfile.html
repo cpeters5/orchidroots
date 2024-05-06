@@ -39,11 +39,12 @@
                         </div>
                     <hr>
                         {{form.image_file_path|as_crispy_field}}
+                        {{form.binomial|as_crispy_field}}
+                        {{form.name|as_crispy_field}}
                         {{form.source_url|as_crispy_field}}
                         {{form.location|as_crispy_field}}
                         {{form.variation|as_crispy_field}}
                         {{form.forma|as_crispy_field}}
-                        {{form.name|as_crispy_field}}
                         {{form.description|as_crispy_field}}
                         {{form.text_data|as_crispy_field}}
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
