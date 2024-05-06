@@ -540,23 +540,25 @@ class UploadFileForm(forms.ModelForm):
         model = UploadFile
         fields = (
         'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
-        'text_data', 'location',)
+        'text_data', 'location', 'binomial',)
 
         labels = {
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
-            'name': 'Clonal name',
+            'name': 'Common name',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'Credit allocation name',
             'description': 'Tags. Comma separated keywords to help in searching',
             'text_data': 'Comment',
             'location': 'Location',
+            'binomial': 'Scientific name',
         }
         widgets = {
             # 'role': forms.HiddenInput(),
             'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'binomial': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
             'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
@@ -565,7 +567,7 @@ class UploadFileForm(forms.ModelForm):
             'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
         }
         help_texts = {
-            'name': 'Clonal name only. DO NOT include the grex name',
+            'name': 'Common names or local names',
             #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
             #     'forma': 'E.g. color forms, peloric, region...',
             #     'credit_to': 'e.g. hybridizer, cultivator, vender',
