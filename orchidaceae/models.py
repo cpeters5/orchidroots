@@ -325,7 +325,7 @@ class Species(models.Model):
     infraspe = models.CharField(max_length=50, null=True)
     author = models.CharField(max_length=200)
     originator = models.CharField(max_length=100, blank=True)
-    binomial = models.CharField(max_length=500, blank=True)
+    binomial = models.CharField(max_length=200, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='sportfamily', on_delete=models.DO_NOTHING)
     # citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
@@ -925,6 +925,7 @@ class AncestorDescendant(models.Model):
 
 class UploadFile(models.Model):
     pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid', related_name='or9pid',on_delete=models.DO_NOTHING)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
     author     = models.ForeignKey(Photographer, db_column='author', related_name='or3author', null=True, blank=True,on_delete=models.DO_NOTHING)
     user_id    = models.ForeignKey(User, db_column='user_id', related_name='or5user_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     credit_to  = models.CharField(max_length=100, null=True, blank=True)    #should match author_id inPhotography
@@ -955,7 +956,7 @@ class UploadFile(models.Model):
 
 
 class SpcImages(models.Model):
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -1078,7 +1079,7 @@ class SpcImages(models.Model):
 
 
 class HybImages(models.Model):
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
     form = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
@@ -1227,7 +1228,7 @@ class HybImages(models.Model):
 
 class Video(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orcvideopid',on_delete=models.DO_NOTHING)
-    binomial = models.CharField(max_length=100, null=True, blank=True)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orcvideoauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
