@@ -903,13 +903,13 @@ def approvemediaphoto(request, pid):
                             description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             else:
                 SpcImages = apps.get_model(app, 'SpcImages')
-                spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+                spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name,
                             source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
                             description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             spc.approved_by = request.user
             image_file = "spc_"
         else:
-            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name,
                             source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
                             description=upl.description, location=upl.location, created_date=upl.created_date, source_url=upl.source_url)
             spc.approved_by = request.user
@@ -956,6 +956,8 @@ def approvemediaphoto(request, pid):
 
 @login_required
 def myphoto(request, pid):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
     role = getRole(request)
     app, family = get_application(request)
     if app == '':
@@ -1041,6 +1043,9 @@ def myphoto_list(request):
     app_list = applications
     my_hyb_list = []
     my_list = []
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
+
     if role == 'cur':
         author = request.GET.get('author', None)
         if author:
@@ -1088,6 +1093,8 @@ def myphoto_list(request):
 
 @login_required
 def myphoto_browse_spc(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
     author, author_list = get_author(request)
     role = getRole(request)
 
@@ -1140,6 +1147,8 @@ def myphoto_browse_spc(request):
 
 @login_required
 def myphoto_browse_hyb(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/login/')
     app, family = get_application(request)
     if app == '':
         return HttpResponseRedirect('/')
