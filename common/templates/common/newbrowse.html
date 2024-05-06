@@ -221,7 +221,7 @@ img{
             <div class="card">
                 <div class="card-header">
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
-                        Sample images
+                        Sample images Role = {{role}}
                             <i>
                         {% if genus %}
                                 of species in <b>{{genus}}</b> genus
@@ -275,9 +275,9 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&family={{x.family.family}}">{{x.family}}</a>
+                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&family={{x.family.family}}&role={{role}}">{{x.family}}</a>
                                 {% if x.get_best_img.pid_id %}
-                                    <a href="{% url 'display:photos'   x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}">
+                                    <a href="{% url 'display:photos'   x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}&role={{role}}">
                                         <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.thumb_dir %}{{ x.get_best_img.image_file}}" >
                                     </a>
                                 {% else %}
@@ -294,9 +294,9 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.gen.genus}}">{{x.gen.genus}}</a>
+                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.gen.genus}}&role={{role}}">{{x.gen.genus}}</a>
                                 {% if x.pid.pid.type == 'hybrid' and x.pid.pid.family.family == 'Orchidaceae' %}
-                                    <a href="{% url 'display:photos' x.pid.pid.pid %}?app={{x.pid.pid.family.application}}&family={{x.pid.pid.family}}">
+                                    <a href="{% url 'display:photos' x.pid.pid.pid %}?app={{x.pid.pid.family.application}}&family={{x.pid.pid.family}}&role={{role}}">
                                         {% if x.image_file %}
                                             <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                         {% else %}
@@ -307,7 +307,7 @@ img{
                                         {{x.pid.accepted.common_name|default:x.pid.pid.binomial_it}}</p>
                                     </div>
                                 {% else %}
-                                    <a href="{% url 'display:photos' x.pid.pid %}?app={{x.pid.family.application}}&family={{x.pid.family}}">
+                                    <a href="{% url 'display:photos' x.pid.pid %}?app={{x.pid.family.application}}&family={{x.pid.family}}&role={{role}}">
                                         {% if x.image_file %}
                                             <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                         {% else %}
@@ -326,7 +326,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in species_list %}
                             <div class="imageitem border ">
-                                    <a href="{% url 'display:photos'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}">
+                                    <a href="{% url 'display:photos'  x.pid_id %}?app=&family={{x.gen.family}}&genus={{x.genus}}&role={{role}}">
                                         <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
