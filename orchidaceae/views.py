@@ -598,6 +598,10 @@ def ancestrytree(request, pid=None):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
+    if species.status == 'synonym':
+        species = species.getAccepted()
+        print("Accepted species = ",species.pid)
+
 
     hybrid = species
     s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = ssss = sssp = ssps = sspp = spss =\
