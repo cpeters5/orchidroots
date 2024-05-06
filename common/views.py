@@ -1335,3 +1335,29 @@ def uploadfile(request, pid):
                'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
+
+
+def get_new_uploads(request):
+    context = {}
+    UploadFile = apps.get_model('animalia', 'UploadFile')
+    animalia_upl = UploadFile.objects.all()
+    if len(animalia_upl):
+        context['animalia_upl'] = animalia_upl
+
+    UploadFile = apps.get_model('aves', 'UploadFile')
+    aves_upl = UploadFile.objects.all()
+    if len(aves_upl):
+        context['aves_upl'] = aves_upl
+
+    UploadFile = apps.get_model('fungi', 'UploadFile')
+    fungi_upl = UploadFile.objects.all()
+    if len(fungi_upl):
+        context['fungi_upl'] = fungi_upl
+
+    UploadFile = apps.get_model('other', 'UploadFile')
+    other_upl = UploadFile.objects.all()
+    if len(other_upl):
+        context['other_upl'] = other_upl
+
+    return render(request, 'common/get_new_uploads.html', context)
+

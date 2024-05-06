@@ -666,6 +666,7 @@ nav .search-container button:hover {
                             <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked">Public</a></li>
                             <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked">Private</a></li>
                             {% if user.tier.tier > 2 %}
+                            <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur">View new uploads</a></li>
                             <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked">Curate</a></li>
                             {% endif %}
                             {% endif %}

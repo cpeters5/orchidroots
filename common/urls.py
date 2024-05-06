@@ -30,6 +30,7 @@ urlpatterns = [
     path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
     path('approvemediaphoto/', views.approvemediaphoto, name='approvemediaphoto'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
+    path('get_new_uploads/', views.get_new_uploads, name='get_new_uploads'),
 
     path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
     path('curate_pending/', views.curate_pending, name='curate_pending'),
