@@ -175,7 +175,7 @@ def getResultByGenus(family, search_string, genus):
 
 
 def search_species(request):
-    print("search species")
+    # print("search species")
     # Only family or genus is given (one or both)
     # print("Enter search species")
     genus_list = []

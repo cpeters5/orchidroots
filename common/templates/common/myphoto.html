@@ -225,7 +225,11 @@ div.text-br {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                {% if family == 'Orchidaceae' %}
+                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                {% else %}
+                                    <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                {% endif %}
                             {% endif %}
                             <a href="{% url 'common:deletephoto' image.id image.pid_id %}?id={{image.id}}&role={{role}}" >Delete</a>
                         {% endif %}

@@ -46,26 +46,23 @@
                             <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                         {% endif %}
                     {% else %}
+                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a>
                         <!--                        Fix common.uploadfile to use family specific form -->
                         {% if app == 'animalia' %}
-                            <a class="dropdown-item" href="{% url 'animalia:uploadfile' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a>
                             {% if user.tier.tier > 1 %}
                             <a class="dropdown-item" href="{% url 'animalia:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                             {% endif %}
                             <a class="dropdown-item" href="{% url 'animalia:uploadvid' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;;">upload video</span></a>
                         {% elif app == 'aves' %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadfile' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a>
                             {% if user.tier.tier > 1 %}
                             <a class="dropdown-item" href="{% url 'aves:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">x upload video</span></a>
+                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload video</span></a>
                         {% elif app == 'fungi' %}
-                            <a class="dropdown-item" href="{% url 'fungi:uploadfile' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a>
                             {% if user.tier.tier > 1 %}
                             <a class="dropdown-item" href="{% url 'fungi:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                             {% endif %}
                         {% elif app == 'other' %}
-                            <a class="dropdown-item" href="{% url 'other:uploadfile' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload file</span></a>
                             {% if user.tier.tier > 1 %}
                             <a class="dropdown-item" href="{% url 'other:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}"><span style="color:#575757;">upload url</span></a>
                             {% endif %}
