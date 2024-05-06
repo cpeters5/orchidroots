@@ -1,0 +1,131 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 12vw;
+   width : 12vw;
+   padding:2px 1px 3px 1px;
+}
+
+
+
+</style>
+<div style="margin:0 auto; text-align: center;min-height:200px;">
+    <br>
+    <h6>New Animalia Uploaded Photos</h6>
+    <br>
+   <div>
+    {% if animalia_upl %}
+        {% for image in animalia_upl %}
+                            <div style="display:inline-block">
+                                <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
+                                        <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                </a>
+                                <div style="font-size:12px">
+                                    {% if image.binomial == image.pid.binomial %}
+                                        <a href="{% url 'display:photos' image.pid_id %}?family={{image.pid.family}}&app={{image.pid.family.application}}&id={{image.id}}&role=cur">{{image.pid.binomial|safe}}</a>
+                                    {% else %}
+                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                    <br>
+                                        <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+        {% endfor %}
+    {% else %}
+       NONE
+    {% endif %}
+   </div>
+</div>
+
+<div style="margin:0 auto; text-align: center;min-height:200px;">
+    <br>
+    <h6>New Aves Uploaded Photos</h6>
+    <br>
+   <div>
+    {% if aves_upl %}
+        {% for image in aves_upl %}
+                            <div style="display:inline-block">
+                                <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
+                                        <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                </a>
+                                <div style="font-size:12px">
+                                    {% if image.binomial == image.pid.binomial %}
+                                        <a href="{% url 'display:photos' image.pid_id %}?family={{image.pid.family}}&app={{image.pid.family.application}}&id={{image.id}}&role=cur">{{image.pid.binomial|safe}}</a>
+                                    {% else %}
+                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                    <br>
+                                        <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+        {% endfor %}
+    {% else %}
+       NONE
+    {% endif %}
+   </div>
+</div>
+
+
+<div style="margin:0 auto; text-align: center;min-height:200px;">
+    <br>
+    <h6>New Fungi Uploaded Photos</h6>
+    <br>
+   <div>
+        {% if fungi_upl %}
+            {% for x in fungi_upl %}
+                             <div style="display:inline-block">
+                                <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
+                                        <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                </a>
+                                <div style="font-size:12px">
+                                    {% if image.binomial == image.pid.binomial %}
+                                        <a href="{% url 'display:photos' image.pid_id %}?family={{image.pid.family}}&app={{image.pid.family.application}}&id={{image.id}}&role=cur">{{image.pid.binomial|safe}}</a>
+                                    {% else %}
+                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                    <br>
+                                        <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+            {% endfor %}
+        {% else %}
+            NONE
+        {% endif %}
+   </div>
+</div>
+
+<div style="margin:0 auto; text-align: center;min-height:200px;">
+    <br>
+    <h6>New Plant Uploaded Photos</h6>
+    <br>
+   <div>
+        {% if other_upl %}
+            {% for x in other_upl %}
+                            <div style="display:inline-block">
+                                <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
+                                        <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
+                                </a>
+                                <div style="font-size:12px">
+                                    {% if image.binomial == image.pid.binomial %}
+                                        <a href="{% url 'display:photos' image.pid_id %}?family={{image.pid.family}}&app={{image.pid.family.application}}&id={{image.id}}&role=cur">{{image.pid.binomial|safe}}</a>
+                                    {% else %}
+                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                    <br>
+                                        <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+            {% endfor %}
+        {% else %}
+            NONE
+        {% endif %}
+   </div>
+</div>
+
+
+       {% endblock %}
