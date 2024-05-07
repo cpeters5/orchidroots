@@ -733,7 +733,7 @@ def uploadfile(request, pid):
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role})
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role, 'binomial': species.binomial})
 
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -742,6 +742,8 @@ def uploadfile(request, pid):
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species
+            if species.binomial != spc.binomial:
+                spc.pid = None
             spc.author = request.user.photographer
             spc.type = species.type
             spc.user_id = request.user
