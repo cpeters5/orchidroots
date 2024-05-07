@@ -340,11 +340,12 @@ class UploadFileForm(forms.ModelForm):
         super(UploadFileForm, self).__init__(*args, **kwargs)
     class Meta:
         model = UploadFile
-        fields = ('image_file_path','source_url','name','awards','variation','forma','credit_to','description','text_data','location',)
+        fields = ('image_file_path','source_url','name','awards','variation','forma','credit_to','description','text_data','location', 'binomial')
 
         labels = {
             'source_url':'Link to source',
             'image_file_path':'Select image file',
+            'binomial':'Scientific name',
             'name':'Clonal name',
             'awards':'Awards',
             'variation':'Varieties',
@@ -358,6 +359,7 @@ class UploadFileForm(forms.ModelForm):
             # 'role': forms.HiddenInput(),
             'source_url':TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete':'off',}),
             'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
+            'binomial': TextInput(attrs={'size': 35, 'style': 'font-size: 18px',}),
             'awards': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
             'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px',}),
