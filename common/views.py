@@ -1310,6 +1310,8 @@ def uploadfile(request, pid):
         from fungi.forms import UploadFileForm
     elif app == 'other':
         from other.forms import UploadFileForm
+    elif app == 'orchidaceae':
+        from detail.forms import UploadFileForm
 
     form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role, 'binomial': species.binomial})
 
@@ -1334,7 +1336,10 @@ def uploadfile(request, pid):
     context = {'form': form, 'species': species, 'web': 'active',
                'author': author, 'family': family,
                'role': role, 'app': app, 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
+    if app == 'orchidaceae':
+        return render(request, 'detail/uploadfile.html', context)
+    else:
+        return render(request, app + '/uploadfile.html', context)
 
 
 def get_new_uploads(request):
