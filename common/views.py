@@ -1339,6 +1339,11 @@ def uploadfile(request, pid):
 
 def get_new_uploads(request):
     context = {}
+    UploadFile = apps.get_model('orchidaceae', 'UploadFile')
+    orchidaceae_upl = UploadFile.objects.all()
+    if len(orchidaceae_upl):
+        context['orchidaceae_upl'] = orchidaceae_upl
+
     UploadFile = apps.get_model('animalia', 'UploadFile')
     animalia_upl = UploadFile.objects.all()
     if len(animalia_upl):
