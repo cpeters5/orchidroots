@@ -453,7 +453,7 @@ def newbrowse(request):
                 genus = ''
             if genus:
                 species = Species.objects.filter(genus=genus)
-                if not talpha and app == 'orchidaceae':
+                if not talpha and app == 'orchidaceae' and len(species) > 2000:
                     talpha = 'A'
                 if talpha:
                     species = species.filter(species__istartswith=talpha)
@@ -1009,116 +1009,63 @@ def myphoto_list(request):
     return render(request, 'common/myphoto_list.html', context)
 
 
-@login_required
 def myphoto_browse_spc(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
-    author, author_list = get_author(request)
+    # author, author_list = get_author(request)
     role = getRole(request)
+    owner = request.GET.get('owner', 'Y')
 
     app, family = get_application(request)
     if app == '':
         return HttpResponseRedirect('/')
-
-    Species = apps.get_model(app, 'Species')
     SpcImages = apps.get_model(app, 'SpcImages')
-
-    if role == 'cur' and 'author' in request.GET:
-        author = request.GET['author']
-        author = Photographer.objects.get(pk=author)
-    else:
-        try:
-            author = Photographer.objects.get(user_id=request.user)
-        except Photographer.DoesNotExist:
-            author = Photographer.objects.get(author_id='anonymous')
-
-    pid_list = SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
-
-    img_list = Species.objects.filter(pid__in=pid_list).order_by('genus', 'species')
-    # if img_list:
-    #     img_list = img_list.order_by('genus', 'species')
+    author = request.user.photographer.author_id
+    img_list = SpcImages.objects.filter(author=author).order_by('binomial')
+    if owner == 'Y':
+        img_list = img_list.filter(credit_to__isnull=True)
 
     num_show = 5
     page_length = 20
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
         request, img_list, page_length, num_show)
 
-    my_list = []
-    for x in page_list:
-        img = x.get_best_img_by_author(request.user.photographer.author_id)
-        if img:
-            my_list.append(img)
-
-    myspecies_list = img_list.filter(type='species')
-    myhybrid_list = img_list.filter(type='hybrid')
-
-    context = {'my_list': my_list, 'type': 'species', 'family': family, 'app': app,
-               'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+    context = {'my_list': page_list, 'type': 'species', 'family': family, 'app': app,
                'role': role, 'brwspc': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list,  'myspc': 'active',
+               'myspc': 'active', 'owner': owner,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_browse_spc.html', context)
 
 
-@login_required
 def myphoto_browse_hyb(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
+    # author, author_list = get_author(request)
+    role = getRole(request)
+    owner = request.GET.get('owner', 'Y')
+
     app, family = get_application(request)
     if app == '':
         return HttpResponseRedirect('/')
-
-    Species = apps.get_model(app, 'Species')
-    SpcImages = apps.get_model(app, 'SpcImages')
-    if app == 'orchidaceae':
-        HybImages = apps.get_model(app, 'HybImages')
-    else:
-        HybImages = apps.get_model(app, 'SpcImages')
-
-
-    if not family:
-        family = 'other'
-    role = getRole(request)
-    author, author_list = get_author(request)
-    if role == 'cur' and 'author' in request.GET:
-        author = request.GET['author']
-        author = Photographer.objects.get(pk=author)
-    else:
-        try:
-            author = Photographer.objects.get(user_id=request.user)
-        except Photographer.DoesNotExist:
-            author = Photographer.objects.get(author_id='anonymous')
-
-    if family and family == 'other':
-        pid_list = SpcImages.objects.filter(author=author).filter(gen__family__application='other').filter(pid__type='hybrid').values_list('pid', flat=True).distinct()
-    else:
-        if family.family == 'Orchidaceae':
-            pid_list = HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct()
-        else:
-            pid_list = SpcImages.objects.filter(author=author).filter(gen__family=family.family).filter(pid__type='hybrid').values_list('pid', flat=True).distinct()
-
-    img_list = Species.objects.filter(pid__in=pid_list)
-    if img_list:
-        img_list = img_list.order_by('genus', 'species')
+    HybImages = apps.get_model(app, 'HybImages')
+    author = request.user.photographer.author_id
+    img_list = HybImages.objects.filter(author=author).order_by('binomial')
+    if owner == 'Y':
+        img_list = img_list.filter(credit_to__isnull=True)
 
     num_show = 5
     page_length = 20
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
         request, img_list, page_length, num_show)
-    my_list = []
-    for x in page_list:
-        img = x.get_best_img_by_author(request.user.photographer.author_id)
-        if img:
-            my_list.append(img)
 
-    context = {'my_list': my_list, 'type': 'hybrid', 'family': family, 'app': app,
+    context = {'my_list': page_list, 'type': 'species', 'family': family, 'app': app,
                'role': role, 'brwhyb': 'active', 'author': author,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'author_list': author_list,
+               'myhyb': 'active', 'owner': owner,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto_browse_hyb.html', context)
