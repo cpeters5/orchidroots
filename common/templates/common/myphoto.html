@@ -115,35 +115,22 @@ div.text-br {
 <div style="width:95%;margin:0 auto;">
 
     {% include "common/private-nav.html" %}
+                <form action="?" style="display:inline-block; margin-top: 5px;">
+                    <input type="hidden" name="family" value="{{family.family}}" >
+                    {% if owner == 'Y' %}
+                    <input type="checkbox" class="form-check-input" name="owner" value="N" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                    <span style="margin:0 30px;font-size:13px;">My own photos</span>
+                    {% else %}
+                    <input type="checkbox" class="form-check-input" name="owner" value="Y" onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                    <span style="margin:0 30px;font-size:13px;">My uploaded photos</span>
+                    {% endif %}
+                </form>
     <br>
-    <br>
-<!--    {% if user.is_authenticated and user.tier.tier > 2 %}-->
-<!--        <form class="form-inline justify-content-center" action="{% url 'display:photos' species.pid %}" id="filter">-->
-<!--        <input type="hidden" name="genus" value="{{genus}}" >-->
-<!--        <input type="hidden" name="role" value="pri" >-->
-<!--        <select form='filter' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">-->
-<!--            {% if author %}-->
-<!--                <option selected disabled>{{author}}</option>-->
-<!--            {% else %}-->
-<!--                <option selected disabled>Select an author</option>-->
-<!--           {% endif %}-->
-<!--            <option></option>-->
-<!--            {% for author in author_list %}-->
-<!--                {% if author == author.author_id %}-->
-<!--                    <option selected="selected" disabled>{{author.displayname}}</option>-->
-<!--                {% else %}-->
-<!--                    <option value="{{author.author_id}}">{{author.displayname}}</option>-->
-<!--                {% endif %}-->
-<!--            {% endfor %}-->
-<!--        </select>-->
-<!--        <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
-<!--        </form>-->
-<!--    {% endif %}-->
-
 </div>
 
        <div class="d-flex flex-wrap justify-content-center align-items-center p-2">
             {% for image in public_list %}
+
                 <div class="imageitem">
                     {% if image.image_file %}
                         <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
@@ -167,19 +154,15 @@ div.text-br {
                     {% endif %}
                     <div class="imgcaption">
                         <div style="width:100%;word-wrap: break-word;">
-                            {% if role == 'cur' %}
-                                {% include 'common/curate_links.html' %}
+                            {% if image.source_url %}
+                                <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
                             {% else %}
-                                {% if image.source_url %}
-                                    <a href="{{image.source_url}}" target="_blank">{{image.imgname|safe}}</a>
-                                {% else %}
-                                    {{image.imgname|safe}}
-                                {% endif %}
-                                {% if image.source_url %}
-                                    <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
-                                {% else %}
-                                    {{image.get_displayname}}
-                                {% endif %}
+                                {{image.imgname|safe}}
+                            {% endif %}
+                            {% if image.source_url %}
+                                <br>Photo: <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
+                            {% else %}
+                                {{image.get_displayname}}
                             {% endif %}
                             {% if role == 'pri' %}
                             - <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{image.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>

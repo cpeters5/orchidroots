@@ -272,41 +272,37 @@ a:hover {
 
 <div style="width:95%;margin:0 auto;padding:0;">
     {% include 'common/detail-nav.html' %}
+
     <!-- Main -->
     <div class="tab-content clearfix p-2">
         <!--Author list-->
         <div  class="p-2 justify-content-center align-items-center">
         {% if msg %}<span style="text-align:center; color: red">{{msg}}</span>{% endif %}
-        {% if user.tier.tier > 1 and role != 'pub' %}
+        {% if user.tier.tier > 2 %}
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
-            {% if role == 'cur' %}
-<!--                <form class="" action="" id="author">-->
-<!--                    <input type="hidden" name="genus" value="{{genus}}" >-->
-<!--                    <input type="hidden" name="family" value="{{species.gen.family}}" >-->
-<!--                    <input type="hidden" name="role" value="{{role}}" >-->
-<!--                    <select form='author' name="author" class="" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0 auto;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip" data-placement="bottom" title="author">-->
-<!--                        {% if not author %}-->
-<!--                            <option disabled selected>Select an author</option>-->
-<!--                        {% endif %}-->
-<!--                        <option value="">-&#45;&#45;</option>-->
-<!--                        {% for aut in author_list %}-->
-<!--                            {% if aut == author %}-->
-<!--                                <option selected="selected" disabled value="{{author}}">{{author.displayname}}</option>-->
-<!--                            {% else %}-->
-<!--                                <option value="{{aut.author_id}}">{{aut.displayname}}</option>-->
-<!--                            {% endif %}-->
-<!--                        {% endfor %}-->
-<!--                    </select>-->
-<!--                    <button form="author" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
+       {% endif %}
+<!--        {% if user.tier.tier > 1 %}-->
+<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
+<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>-->
+<!--        {% endif %}-->
+            &nbsp;&nbsp;
+            {% if owner == 'Y' %}
+                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=N">Click to view all {{species.binomial_it|safe}} photos</a>
+            {%  else %}
+                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=Y">Click to view only my photos</a>
+            {% endif %}
+<!--                <form action="?" style="display:inline-block; margin-top: 5px;">-->
+<!--                    <input type="hidden" name="family" value="{{family.family}}" >-->
+<!--                    {% if owner == 'Y' %}-->
+<!--                    <input type="checkbox" class="form-check-input" name="owner" value="N" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">-->
+<!--                    <span style="margin:0 30px;font-size:13px;">My own photos</span>-->
+<!--                    {% else %}-->
+<!--                    <input type="checkbox" class="form-check-input" name="owner" value="Y" onchange="this.form.submit()" style="margin:10px 0 0 0;">-->
+<!--                    <span style="margin:0 30px;font-size:13px;">All {{species.binomial_it|safe}} photos</span>-->
+<!--                    {% endif %}-->
 <!--                </form>-->
-            {% endif %}
-            {% if role == 'pri' %}
-                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>
-                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>
-            {% endif %}
-        {% endif %}
         </div>
 
 <!--            Main section-->

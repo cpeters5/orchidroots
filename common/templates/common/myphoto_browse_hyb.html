@@ -56,7 +56,7 @@ div.text-c {
 .imgcaption {
     font-size: 12px;
     height:35px;
-    text-align: left;
+    text-align: center;
     padding:0 10px;
     width: 100%;
     color: #0a6aa1;
@@ -104,6 +104,10 @@ div.text-c {
 img{
     width:100%;
 }
+.mybtn {
+    font-size: 12px;
+
+}
 
 </style>
 
@@ -113,35 +117,16 @@ img{
  <!--Main table       -->
         <div class="col" style="text-align:left;font-size:13px;">
             <div class="card m-2">
-                <div class="card-header">
-                    <h5>My Hybrid Collection</h5>
+                <div class="card-header"><div style="text-align:center"><h5>My Hybrid Photo Collection {{app_name|title}}</h5></div>
+                {% include "common/private-nav.html" %}
+                <div style="text-align:center">
+                   <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=Y">Show all uploaded photos</a>&nbsp;&nbsp;
+                   <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=N">Show only your own photos</a>
                 </div>
+            </div>
                 <div class="card-body">
-<!--                    {% if user.is_authenticated and user.tier.tier > 2 %}-->
-<!--                        <form class="form-inline justify-content-center" action="?" id="filter">-->
-<!--                        <input type="hidden" name="genus" value="{{genus}}" >-->
-<!--                        <input type="hidden" name="role" value="cur" >-->
-<!--                        <select form='filter' name="author" tabindex="-1" aria-hidden="true" style="width:150px;height:27px;margin:0;border:1px solid lightgrey;padding:0;"  data-toggle="tooltip"  data-placement="bottom"  title="genus parent #1" style="margin:0 auto">-->
-<!--                            {% if author %}-->
-<!--                                <option selected disabled>{{author}}</option>-->
-<!--                            {% else %}-->
-<!--                                <option selected disabled>Select an author</option>-->
-<!--                           {% endif %}-->
-<!--                            <option></option>-->
-<!--                            {% for author in author_list %}-->
-<!--                                {% if author == author.author_id %}-->
-<!--                                    <option selected="selected" disabled>{{author.displayname}}</option>-->
-<!--                                {% else %}-->
-<!--                                    <option value="{{author.author_id}}">{{author.displayname}}</option>-->
-<!--                                {% endif %}-->
-<!--                            {% endfor %}-->
-<!--                        </select>-->
-<!--                        <button form="filter" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>-->
-<!--                        </form>-->
-<!--                    {% endif %}-->
 
                     <div class="p-2 m-2" style="text-align: left;min-height:200px;">
-                        {% include "common/private-nav.html" %}
                         {% if my_list %}
                         <br>
                             {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
@@ -151,8 +136,7 @@ img{
                                     <div class="box">
                                         <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                     </div>
-        <!--                            {{x.0.pid_id}}-{{x.0.id}}-{{x.0.image_dir}}<br>-->
-                                   <div class="imgcaption">{{x.pid.pid.name|safe}} {% if x.credit_to %}- {{x.credit_to}} {% endif %}</div>
+                                   <div class="imgcaption">{{x.binomial|safe}} {% if x.credit_to %}<br>{{x.credit_to}} {% endif %}</div>
                                </a>
                                </div>
                             {% endfor %}
