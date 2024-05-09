@@ -209,17 +209,14 @@ def information(request, pid=None):
 def photos(request, pid=None):
     author = get_reqauthor(request)
     selected_app, area = get_searchdata(request)
-    role = ''
-    syn = 'Y'
     related = ''
     related_species = ''
-    related_list = []
     related_pids = []
     variety = ''
     tail = ''
-    accpid = 0
     role = request.GET.get('role', None)
     syn = request.GET.get('syn', None)
+    owner = request.GET.get('owner', None)
     if not author or author == 'anonymous':
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
@@ -288,6 +285,9 @@ def photos(request, pid=None):
         public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
 
     upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
+    if owner == 'Y' and request.user.is_authenticated:
+        public_list = public_list.filter(author=request.user.photographer.author_id)
+        upload_list = upload_list.filter(author=request.user.photographer.author_id)
     private_list = public_list.filter(rank=0)  # rejected photos
     if role == 'pri':
         upload_list = upload_list.filter(author=author) # Private photos
@@ -325,7 +325,6 @@ def photos(request, pid=None):
     elif variety:
         public_list = public_list.filter(Q(variation__icontains=var) | Q(form__icontains=var) | Q(name__icontains=var)
                                          | Q(source_file_name__icontains=var) | Q(description__icontains=var))
-
     if public_list:
         if var == "alba":
             public_list = public_list.exclude(variation__icontains="semi")
@@ -340,7 +339,7 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
-               'selected_app': selected_app, 'area': area, 'related': related,
+               'selected_app': selected_app, 'area': area, 'related': related, 'owner': owner,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                }
     return render(request, 'display/photos.html', context)
