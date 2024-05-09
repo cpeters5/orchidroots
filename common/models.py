@@ -1,4 +1,5 @@
 from django.db import models
+from django.apps import apps
 from accounts.models import User, Photographer
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -27,6 +28,14 @@ class Family(models.Model):
 
     def __str__(self):
         return self.family
+
+    def get_best_img(self):
+        Genus = apps.get_model(self.application, 'Genus')
+        genus_list = Genus.objects.filter(family=self.family).filter(num_spcimage__gt=0).order_by('?')
+        for img in genus_list:
+            if img.get_best_img():
+                return img.get_best_img()
+        return None
 
     class Meta:
         ordering = ['family']
@@ -219,6 +228,19 @@ class DataSource(models.Model):
     collaboration = models.TextField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.source
+
+LEVEL_CHOICES = [('Family', 'Family'), ('Genus', 'Genus'), ('Accepted', 'Accepted')]
+APPLICATION_CHOICES = [('animalia', 'animalia'), ('aves', 'aves'), ('fungi', 'fungi'), ('other', 'other'), ('orchidaceae', 'orchidaceae')]
+
+class CommonName(models.Model):
+    common_name = models.CharField(max_length=500, null=True, blank=True)
+    common_name_search = models.CharField(max_length=500, null=True, blank=True)
+    application = models.CharField(max_length=20, choices=APPLICATION_CHOICES, default='')
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='')
+    taxon_id = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return self.source
