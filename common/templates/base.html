@@ -4,6 +4,14 @@
 
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YM7ZEG2RY1');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
@@ -113,14 +121,6 @@
 
 </style>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DVXPK0YWTQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DVXPK0YWTQ');
-</script>
 
 <!--&lt;!&ndash; Google tag (gtag.js) &ndash;&gt;-->
 <!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-NQ3QZB4545"></script>-->
@@ -626,7 +626,7 @@ nav .search-container button:hover {
             <form class="form-inline" id="binomial" action="/search/search_binomial/" style="margin-top: 5px;">
                 <input type="hidden" form="binomial" name="app" value="orchidaceae" >
                 <input type="hidden" form="binomial" name="role" value="{{ role }}" >
-                <input class="searchbox" form="binomial" value="{{search_string}}" type="text" name="query"  pattern=".{3,}" placeholder="orchid search" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="binomial" value="{{search_orchid}}" type="text" name="query"  pattern=".{3,}" placeholder="orchid search" style="border:1px solid #ccc; border-right: 0">
             </form>
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
