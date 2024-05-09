@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from itertools import chain
 from fuzzywuzzy import fuzz, process
-from common.models import Family, Subfamily, Tribe, Subtribe
+from common.models import Family, Subfamily, Tribe, Subtribe, CommonName
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
 from utils.views import write_output, getRole
@@ -241,7 +241,7 @@ def search_species(request):
     return render(request, "search/search_species.html", context)
 
 
-def search_name(request):
+def xsearch_name(request):
     commonname = ''
     selected_app = ''
     role = getRole(request)
@@ -277,6 +277,60 @@ def search_name(request):
                     name_list.append(x)
 
     context = {'name_list': name_list, 'commonname': commonname, 'selected_app': selected_app, 'role': role,}
+    write_output(request, str(commonname))
+    return render(request, "search/search_name.html", context)
+
+
+def search_name(request):
+    # Get search term
+    role = getRole(request)
+    selected_app = request.POST.get('selected_app', '')
+    if not selected_app:
+        selected_app = request.GET.get('selected_app', '')
+
+    commonname = request.GET.get('commonname', '').strip()
+    if not commonname:
+        commonname = request.POST.get('commonname', '').strip()
+    commonname = commonname.rstrip('s')
+
+    if not commonname or commonname == '':
+        context = {'role': role, }
+        return render(request, "search/search_name.html", context)
+    search_string = commonname.replace("-", "").replace(" ", "").replace("'", "")
+
+    # Collect entities contaiing the search string
+    commonname_list = CommonName.objects.filter(common_name_search__icontains=search_string)
+    if selected_app in applications:
+        commonname_list = commonname_list.filter(application=selected_app)
+
+    if len(commonname_list) == 0:
+        return render(request, "search/search_name.html", { 'role': role, 'commonname': commonname})
+
+    # Start with highest level, Families
+    name_list = commonname_list.filter(level='Family')
+    family_list = []
+    for x in name_list:
+        fam_obj = Family.objects.get(pk=x.taxon_id)
+        family_list = family_list + [fam_obj]
+
+    # Search genus with matched common name
+    name_list = commonname_list.filter(level='Genus')
+    genus_list = []
+    for x in name_list:
+        Genus = apps.get_model(x.application, 'Genus')
+        gen_obj = Genus.objects.get(pk=x.taxon_id)
+        genus_list = genus_list + [gen_obj]
+
+    # search species
+    name_list = commonname_list.filter(level='Accepted')
+    species_list = []
+    for x in name_list:
+        Accepted = apps.get_model(x.application, 'Accepted')
+        acc_obj = Accepted.objects.get(pk=x.taxon_id)
+        species_list = species_list + [acc_obj]
+
+    context = {'family_list': family_list, 'genus_list': genus_list, 'species_list': species_list,
+               'commonname': commonname, 'selected_app': selected_app, 'role': role,}
     write_output(request, str(commonname))
     return render(request, "search/search_name.html", context)
 
