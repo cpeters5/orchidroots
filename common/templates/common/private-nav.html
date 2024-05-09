@@ -40,10 +40,15 @@
 </style>
 
     <div class="d-flex justify-content-center mynav" >
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?app={{app}}&family={{family}}&role={{role}}">My List</a>
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&family={{family}}&role={{role}}">My Species</a>
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&family={{family}}&role={{role}}">My Hybrids</a>
-            {% if species %}
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?app={{app}}&family={{family}}&role={{role}}">My List</a>
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&family={{family}}&role={{role}}">My Species</a>
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&family={{family}}&role={{role}}">My Hybrids</a>
+        {% if species %}
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' species.pid %}?app={{app}}&family={{family}}&role={{role}}">All photos</a>
+        {% else %}
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&role={{role}}">All photos</a>
+        {% endif %}
+        {% if species %}
                 {% if author.author_id == 'anonymous' %}
                     <div style="text-align:center; width:100%;padding:0 20%; font-size:14px;">
                         <br>
