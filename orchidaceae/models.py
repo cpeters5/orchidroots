@@ -1,4 +1,3 @@
-from django.db import models
 # from django.contrib.auth.models import (
 #     BaseUserManager, AbstractBaseUser
 # )
@@ -10,8 +9,9 @@ from PIL import ExifTags
 from io import BytesIO
 import re, os, shutil
 from django.core.files import File
+from django.db import models
 from django.db.models.signals import post_save
-from django.db.models import Manager
+from django.db.models import Manager, Q
 from django.conf import settings
 # from django.utils import timezone
 
@@ -96,28 +96,23 @@ class Genus(models.Model):
 
     def getAccepted(self):
         if 'synonym' in self.status:
-            acc_id = Gensyn.objects.get(pid=self.pid).acc_id
-            gen = Genus.objects.get(pid=acc_id)
+            acc_id = self.gensyn.acc_id
+            gen = self.gensyn.acc
             return "<i>%s</i> %s" % (gen.genus, gen.author)
+        return None
 
     def getAcc(self):
         if 'synonym' in self.status:
-            acc_id = Gensyn.objects.get(pid=self.pid).acc_id
+            acc_id = self.gensyn.acc_id
             if acc_id:
-                gen = Genus.objects.get(pid=acc_id)
-                return gen.genus
+                return self.gensyn.acc.genus
             else:
                 return "No accepted name found for this synonym."
-
+        return None
 
     def getGenid(self):
         if 'synonym' in self.status:
-            syn = Gensyn.objects.get(pid=self.pid).acc_id
-            return "%s" % syn
-
-    def getSynAuth(self):
-        if 'synonym' in self.status:
-            syn = Gensyn.objects.get(pid=self.pid).acc_author
+            syn = self.gensyn.acc_id
             return "%s" % syn
 
     def get_roundspcpct(self):
@@ -147,7 +142,7 @@ class Genus(models.Model):
 
 
 class GenusRelation(models.Model):
-    gen = models.OneToOneField(Genus, db_column='gen',primary_key=True,on_delete=models.CASCADE)
+    gen = models.OneToOneField(Genus, db_column='gen',primary_key=True,related_name='genusrelation',on_delete=models.CASCADE)
     genus = models.CharField(max_length=50, default='')
     parentlist = models.CharField(max_length=500, null=True)
     formula = models.CharField(max_length=500, null=True)
@@ -177,9 +172,10 @@ class Gensyn(models.Model):
     pid = models.OneToOneField(
         Genus,
         db_column='pid',
+        related_name='gensyn',
         on_delete=models.CASCADE,
         primary_key=True)
-    acc = models.ForeignKey(Genus, verbose_name='genus', related_name='oracc', null=True,on_delete=models.CASCADE)
+    acc = models.ForeignKey(Genus, verbose_name='genus', related_name = 'accgensyn', null=True,on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
@@ -360,7 +356,7 @@ class Species(models.Model):
         return name
 
     def binomial_it(self):
-        if self.type == 'species':
+        if self.type == 'species' or self.is_hybrid:
             if self.infraspe:
                 return '<i>%s %s</i> %s <i>%s</i>' % (self.genus, self.species, self.infraspr, self.infraspe)
             else:
@@ -463,14 +459,15 @@ class Species(models.Model):
 
     def getAccepted(self):
         if 'synonym' in self.status:
-            return Synonym.objects.get(pk=self.pid).acc
+            return self.synonym.acc
         return None
 
     def getAcc(self):
         if self.status == 'synonym':
-            spid = Synonym.objects.get(spid=self.pid)
-            return spid.acc_id
+            return self.synonym.acc_id
         return "Not a synonym."
+
+
 
     def getAbrevName(self):
         name = self.species
@@ -532,6 +529,25 @@ class Species(models.Model):
                 'quality', '-rank', '?')
             if not img:
                 img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
+                    'quality', '-rank', '?')
+
+        if img.count() > 0:
+            img = img[0:1][0]
+            return img
+        return None
+
+    def get_best_img_by_author_only(self, author):
+        if self.type == 'species':
+            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
+                'quality', '-rank', '?')
+            if not img:
+                img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
+                    'quality', '-rank', '?')
+        else:
+            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
+                'quality', '-rank', '?')
+            if not img:
+                img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
                     'quality', '-rank', '?')
 
         if img.count() > 0:
@@ -601,9 +617,10 @@ class Accepted(models.Model):
     pid = models.OneToOneField(
         Species,
         db_column='pid',
+        related_name='accepted',
         on_delete=models.CASCADE,
         primary_key=True)
-    gen = models.ForeignKey(Genus, db_column='gen', related_name='or6gen', null=True, blank=True,on_delete=models.CASCADE)
+    gen = models.ForeignKey(Genus, db_column='gen', null=True, blank=True,on_delete=models.CASCADE)
     genus = models.CharField(max_length=50)
     species = models.CharField(max_length=50)
     infraspr = models.CharField(max_length=20, null=True)
@@ -648,11 +665,20 @@ class Accepted(models.Model):
     def name(self):
         return '<i>%s</i> %s' % (self.genus, self.pid.speciesname())
 
+    def get_best_img(self):
+        spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
+        img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+                'quality', '-rank', '?')
+        if len(img) > 0:
+            img = img[0:1][0]
+            return img
+        return None
+
 
 class Synonym(models.Model):
     spid = models.OneToOneField(
         Species,
-        related_name='spid',
+        related_name='synonym',
         db_column='spid',
         on_delete=models.CASCADE,
         primary_key=True)
@@ -729,6 +755,7 @@ class Hybrid(models.Model):
     pid = models.OneToOneField(
         Species,
         db_column='pid',
+        related_name='hybrid',
         on_delete=models.DO_NOTHING,
         primary_key=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='or7gen', default=0, on_delete=models.DO_NOTHING)
@@ -906,10 +933,13 @@ class AncestorDescendant(models.Model):
 
     def anc_name(self):
         name = Species.objects.get(pk=self.aid.pid)
-        if name.infraspr:
-            return "%s %s %s %s" % (name.genus, name.species, name.infraspr,name.infraspe)
+        if name.binomial:
+            return name.binomial
         else:
-            return "%s %s" % (name.genus, name.species)
+            if name.infraspr:
+                return "%s %s %s %s" % (name.genus, name.species, name.infraspr,name.infraspe)
+            else:
+                return "%s %s" % (name.genus, name.species)
 
     def anc_abrev(self):
         # name = Species.objects.get(pk=self.aid.pid)
@@ -1074,9 +1104,10 @@ class SpcImages(models.Model):
         return self.author.displayname
 
     def get_userid(self):
-        author = Photographer.objects.get(author=self.author_id)
-        return author.user_id
-
+        if self.author.user_id:
+            return self.author.user_id
+        else:
+            return None
 
 class HybImages(models.Model):
     binomial = models.CharField(max_length=200, null=True, blank=True)
@@ -1200,8 +1231,10 @@ class HybImages(models.Model):
         return self.author.displayname
 
     def get_userid(self):
-        author = Photographer.objects.get(author=self.author_id)
-        return author.user_id
+        if self.author.user_id:
+            return self.author.user_id
+        else:
+            return None
 
     # def save(self, *args, **kwargs):
     #     if self.image_file_path:
@@ -1265,9 +1298,10 @@ class Video(models.Model):
         return self.author.displayname
 
     def get_userid(self):
-        author = Photographer.objects.get(author=self.author_id)
-        return author.user_id
-
+        if self.author.user_id:
+            return self.author.user_id
+        else:
+            return None
 
 class HybImgHistory(models.Model):
     pid = models.ForeignKey(Hybrid, db_column='pid', related_name='or1pid', on_delete=models.CASCADE)
