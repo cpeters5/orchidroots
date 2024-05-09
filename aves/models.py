@@ -340,6 +340,12 @@ class Species(models.Model):
         if img.count() > 0:
             img = img[0:1][0]
             return img
+        else:
+            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).order_by(
+                'quality', '-rank', '?')
+            if img.count() > 0:
+                img = img[0:1][0]
+                return img
         return None
 
     def get_best_img_by_author(self, author):
