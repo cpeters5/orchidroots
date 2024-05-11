@@ -256,10 +256,14 @@ def photos(request, pid=None):
     this_species_name = species.genus + ' ' + species.species
     # related_list = Species.objects.filter(genus=species.genus).filter(species=species.species)
     if species.type != 'hybrid':
-        related_list = Species.objects.filter(binomial__istartswith=this_species_name)
+        related_list = Species.objects.filter(binomial__istartswith=this_species_name).exclude(type='hybrid').exclude(status='synonym')
     else:
-        related_list = Species.objects.filter(binomial=this_species_name)
+        related_list = Species.objects.filter(binomial=this_species_name).exclude(type='species', status='synonym')
     related = request.GET.get('related', '')
+
+    # if species.genus + ' ' + species.species != species.binomial and not related.isnumeric():
+    #     related = str(species.pid)
+
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
         related_pids = related_list.values_list('pid', flat=True)
@@ -339,7 +343,7 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
-               'selected_app': selected_app, 'area': area, 'related': related, 'owner': owner,
+               'selected_app': selected_app, 'area': area, 'owner': owner,
                # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
                }
     return render(request, 'display/photos.html', context)
