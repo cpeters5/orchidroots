@@ -299,7 +299,6 @@ def species(request):
                 reqgenus = reqgenus[0].genus
                 break
 
-    print("reqgenus = ", reqgenus)
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
         if alpha == 'ALL':
@@ -401,10 +400,6 @@ def hybrid(request):
                 reqgenus = reqgenus[0].genus
                 break
         prev_genus = reqgenus
-    print("reqgenus = ", reqgenus)
-
-
-
     if 'genus' in request.GET:
         genus = request.GET['genus']
         crit = 1
@@ -620,8 +615,6 @@ def ancestrytree(request, pid=None):
     write_output(request, species.binomial)
     if species.status == 'synonym':
         species = species.getAccepted()
-        print("Accepted species = ",species.pid)
-
 
     hybrid = species
     s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = ssss = sssp = ssps = sspp = spss =\
