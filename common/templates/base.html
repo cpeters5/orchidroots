@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
 {% load humanize %}
-
 <html lang="en">
 <head>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
@@ -654,9 +653,11 @@ nav .search-container button:hover {
                                     <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked">Browse</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'gallery:index' %}">Gallery</a></li>
+                            {% elif user.tier.tier > 2 %}
+                                <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur">View new uploads</a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Species</a></li>
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Orchid Hybrids</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}">Orchid Species</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}">Orchid Hybrids</a></li>
                             <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&tab=brg&role=pri">My Collection</a></li>
 <!--                            <hr style="margin:0;padding:0;">-->
                             <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/">Update profile</a></li>
@@ -665,10 +666,9 @@ nav .search-container button:hover {
                             <li>Role</li>
                             <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked">Public</a></li>
                             <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked">Private</a></li>
-                            {% if user.tier.tier > 2 %}
-                            <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur">View new uploads</a></li>
-                            <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked">Curate</a></li>
-                            {% endif %}
+                                {% if user.tier.tier > 2 %}
+                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked">Curate</a></li>
+                                {% endif %}
                             {% endif %}
                         </ul>
                     </div>
