@@ -44,6 +44,7 @@
                          <input type="hidden" name="image_url" value="{{img.image_url }}" >
                      {% endif %}
                      {{form.source_url|as_crispy_field}}
+                     {{form.variation|as_crispy_field}}
                      {{form.location|as_crispy_field}}
                      {% if user.tier.tier > 2 %}
                         {{form.rank|as_crispy_field}}
@@ -51,7 +52,6 @@
                      {% endif %}
                      {{form.source_file_name|as_crispy_field}}
                      {{form.name|as_crispy_field}}
-                     {{form.variation|as_crispy_field}}
                      {{form.form|as_crispy_field}}
                      {{form.certainty|as_crispy_field}}
                      {{form.description|as_crispy_field}}
