@@ -260,6 +260,7 @@ def species(request):
     req_type = request.GET.get('type', 'species')
     req_family = request.GET.get('family', None)
     req_genus = request.GET.get('genus', None)
+
     alpha = request.GET.get('alpha', '')
     syn = request.GET.get('syn', None)
 
@@ -1020,7 +1021,15 @@ def myphoto_browse_spc(request):
     if app == '':
         return HttpResponseRedirect('/')
     SpcImages = apps.get_model(app, 'SpcImages')
-    author = request.user.photographer.author_id
+    try:
+        author = request.user.photographer.author_id
+    except Photographer.DoesNotExist:
+        author = None
+        context = {'type': 'species', 'family': family, 'app': app,
+                   'role': role, 'brwhyb': 'active', 'author': author,
+                   'myhyb': 'active', 'owner': owner,
+                   }
+        return render(request, 'common/myphoto_browse_hyb.html', context)
     img_list = SpcImages.objects.filter(author=author).order_by('binomial')
     if owner == 'Y':
         img_list = img_list.filter(credit_to__isnull=True)
@@ -1041,17 +1050,28 @@ def myphoto_browse_spc(request):
 
 
 def myphoto_browse_hyb(request):
+    # Browse hybrid only works for orchids
+    app = 'orchidaceae'
+    family = 'Orchidaceae'
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
     # author, author_list = get_author(request)
     role = getRole(request)
     owner = request.GET.get('owner', 'Y')
 
-    app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
+    # app, family = get_application(request)
+    # if app != 'orchidaceae':
+    #     return HttpResponseRedirect('/')
     HybImages = apps.get_model(app, 'HybImages')
-    author = request.user.photographer.author_id
+    try:
+        author = request.user.photographer.author_id
+    except Photographer.DoesNotExist:
+        author = None
+        context = {'type': 'species', 'family': family, 'app': app,
+                   'role': role, 'brwhyb': 'active', 'author': author,
+                   'myhyb': 'active', 'owner': owner,
+                   }
+        return render(request, 'common/myphoto_browse_hyb.html', context)
     img_list = HybImages.objects.filter(author=author).order_by('binomial')
     if owner == 'Y':
         img_list = img_list.filter(credit_to__isnull=True)
