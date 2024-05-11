@@ -290,8 +290,16 @@ def species(request):
     # max_page_length = 1000
 
     # Initialize
-    if 'genus' in request.GET:
-        reqgenus = request.GET['genus']
+    reqgenus = request.GET.get('genus', '')
+    if reqgenus == '':
+        # Sent from base.html in case no genus info, in which case randomize genus
+        while 1:
+            reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, num_spc_with_image__lt=300).exclude(status='synonym').order_by('?')
+            if reqgenus:
+                reqgenus = reqgenus[0].genus
+                break
+
+    print("reqgenus = ", reqgenus)
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
         if alpha == 'ALL':
@@ -385,6 +393,18 @@ def hybrid(request):
     # Initialization
     reqgenus = request.GET.get('reqgenus', None)
     prev_genus = request.GET.get('reqgenus', None)
+    if reqgenus == None or reqgenus == '':
+        # Sent from base.html in case no genus info, in which case randomize genus
+        while 1:
+            reqgenus = Genus.objects.filter(num_hyb_with_image__gt=100, num_hyb_with_image__lt=300).exclude(status='synonym').order_by('?')
+            if reqgenus:
+                reqgenus = reqgenus[0].genus
+                break
+        prev_genus = reqgenus
+    print("reqgenus = ", reqgenus)
+
+
+
     if 'genus' in request.GET:
         genus = request.GET['genus']
         crit = 1
