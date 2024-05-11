@@ -111,22 +111,23 @@ img{
 
 </style>
 
-<div style="min-height:200px;background-color:white;width: 98%;">
+<div style="min-height:200px;background-color:white;width: 98%;margin-top:20px;">
     <!--Title-->
     <div class="row" style="width:98%; margin:0 auto;">
  <!--Main table       -->
         <div class="col" style="text-align:left;font-size:13px;">
             <div class="card m-2">
-                <div class="card-header"><div style="text-align:center"><h5>My Hybrid Photo Collection {{app_name|title}}</h5></div>
-                {% include "common/private-nav.html" %}
-                <div style="text-align:center">
-                   <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=Y">Show all uploaded photos</a>&nbsp;&nbsp;
-                   <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=N">Show only your own photos</a>
+                <div class="card-header">
+                    <div style="text-align:center"><h5>My Hybrid Photo Collection {{app_name|title}}</h5></div>
+                    {% include "common/private-nav.html" %}
+                    <div style="text-align:center">
+                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=Y">Show all uploaded photos</a>&nbsp;&nbsp;
+                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=N">Show only your own photos</a>
+                    </div>
                 </div>
-            </div>
                 <div class="card-body">
-
-                    <div class="p-2 m-2" style="text-align: left;min-height:200px;">
+                    <div class="p-2">
+                        <div style="text-align: center;">
                         {% if my_list %}
                         <br>
                             {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}

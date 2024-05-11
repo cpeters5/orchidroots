@@ -105,44 +105,39 @@ img{
                     </div>
                 </div>
                 <div class="card-body">
-                            <div class="p-2">
-                                <div style="text-align: center;">
-                                    {% if my_list %}
-                                    <br>
-                                        {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
-                                        {% for x in my_list %}
-                                            <div class="imageitem">
-                                                <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
-                                                    <div class="box">
-                                                        <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
-                                                    </div>
-                                                    <div class="imgcaption">{{x.pid.binomial_it|safe}} {% if x.credit_to %}<br>Photographer: {{x.credit_to}} {% endif %}</div>
-                                                </a>
+                    <div class="p-2">
+                        <div style="text-align: center;">
+                            {% if my_list %}
+                            <br>
+                                {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
+                                {% for x in my_list %}
+                                    <div class="imageitem">
+                                        <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
+                                            <div class="box">
+                                                <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                             </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
+                                            <div class="imgcaption">{{x.pid.binomial_it|safe}} {% if x.credit_to %}<br>Photographer: {{x.credit_to}} {% endif %}</div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div style="width:100%;font-size:14px;text-align:left;padding: 20px;">
 
-                                            <h5>Your photo collection for {{family}} {% if family == 'other' %}families {% else%}family {% endif %} is empty!</h5>
-                                            Start uploading photos to build your collection. You must know the correct name of the orchid in your photo and navigate to its detailed page.
-                                            Two different ways to get to the detail page.
-                                            <ul>
-                                                <li>Search for your orchid using the search box in the navigation bar on the top of the page.  If your orchid is not among the search result, it is likely that yoiu may have misspelled the name.
-                                                    Click on the "MORE RESULTS" button to continue the search.   Note:  You must include genus in your search string for "MORE RESULTS" button to work.</li>
-                                                <li>Another way to navigate to the detail page is to use Advanced search button in the navbar.  In the Advanced search form, you may find your orchid by selecting
-                                                    genus and species or hybrids from pulldown menus.  Or you could go directly to the entire list of genus, spoecies or hybrid. </li>
-                                            </ul>
+                                    <h5>Your photo collection for {{family}} {% if family == 'other' %}families {% else%}family {% endif %} is empty!</h5>
+                                    Start uploading photos to build your collection. You must know the correct name of the orchid in your photo and navigate to its detailed page.
+                                    Two different ways to get to the detail page.
+                                    <ul>
+                                        <li>Search for your orchid using the search box in the navigation bar on the top of the page.  If your orchid is not among the search result, it is likely that yoiu may have misspelled the name.
+                                            Click on the "MORE RESULTS" button to continue the search.   Note:  You must include genus in your search string for "MORE RESULTS" button to work.</li>
+                                        <li>Another way to navigate to the detail page is to use Advanced search button in the navbar.  In the Advanced search form, you may find your orchid by selecting
+                                            genus and species or hybrids from pulldown menus.  Or you could go directly to the entire list of genus, spoecies or hybrid. </li>
+                                    </ul>
 
-                                        </div>
-                                    {% endif %}
                                 </div>
-                            </div>
+                            {% endif %}
                         </div>
                         <br>
                     </div>
-
-
-
                 </div>
             </div>
         </div>
