@@ -180,7 +180,6 @@ def taxonomy(request):
 
 @login_required
 def genera(request):
-    author = ''
     path = resolve(request.path).url_name
     talpha = request.GET.get('talpha','')
     subfamily = ''
@@ -205,18 +204,19 @@ def genera(request):
     else:
         return render(request, "common/family.html", {})
     if family_list and talpha:
+        # Non orchid genera
         family_list = family_list.filter(family__istartswith=talpha)
 
     if family:
-        newfamily, subfamily, tribe, subtribe = getSuperGeneric(request)
-        if subtribe:
-            genus_list = Genus.objects.filter(subtribe=subtribe)
-        elif tribe:
-            genus_list = Genus.objects.filter(tribe=tribe)
-        elif subfamily:
-            genus_list = Genus.objects.filter(subfamily=subfamily)
-        elif family:
-            genus_list = Genus.objects.filter(family=family.family)
+        # Orchid genera
+        subfamily, tribe, subtribe = getSuperGeneric(request)
+        genus_list = Genus.objects.exclude(status='synonym')
+        if subtribe != '':
+            genus_list = genus_list.filter(subtribe=subtribe)
+        elif tribe != '':
+            genus_list = genus_list.filter(tribe=tribe)
+        elif subfamily != '':
+            genus_list = genus_list.filter(subfamily=subfamily)
     elif family_list:
         # No family (e.g. first landing on this page), show all non-Orchidaceae genera
         # OrGenus, OtGenus = getAllGenera()
@@ -255,13 +255,13 @@ def species(request):
     # path = resolve(request.path).url_name
     path_link = 'information'
     talpha = request.GET.get('talpha','')
-    if str(request.user) == 'chariya':
+    if request.user.tier.tier > 3:
         path_link = 'photos'
     req_type = request.GET.get('type', 'species')
     req_family = request.GET.get('family', None)
     req_genus = request.GET.get('genus', None)
 
-    alpha = request.GET.get('alpha', '')
+    # alpha = request.GET.get('alpha', '')
     syn = request.GET.get('syn', None)
 
     # If Orchidaceae, go to full table.
