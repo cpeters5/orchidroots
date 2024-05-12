@@ -442,39 +442,68 @@ def getRole(request):
 #     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
 
 
-def getSuperGeneric(request):
+def xgetSuperGeneric(request):
     family, subfamily, tribe, subtribe = '', '', '', ''
-    subfamily = request.GET.get('subfamily', None)
-    if subfamily:
-        try:
-            subfamily = Subfamily.objects.get(pk=subfamily)
-        except Subfamily.DoesNotExist:
-            subfamily = ''
-        if subfamily.family:
-            family = subfamily.family
-    tribe = request.GET.get('tribe', None)
-    if tribe:
-        try:
-            tribe = Tribe.objects.get(pk=tribe)
-        except Tribe.DoesNotExist:
-            tribe = ''
-        if tribe.subfamily:
-            subfamily = tribe.subfamily
-        if subfamily.family:
-            family = tribe.subfamily.family
+
     subtribe = request.GET.get('subtribe', None)
     if subtribe:
         try:
             subtribe = Subtribe.objects.get(pk=subtribe)
         except Subtribe.DoesNotExist:
             subtribe = ''
-        if subtribe.tribe:
+        if subtribe and subtribe.tribe:
             tribe = subtribe.tribe
-        if tribe.subfamily:
+        if tribe and tribe.subfamily:
             subfamily = tribe.subfamily
-        if subfamily.family:
+        if subfamily and subfamily.family:
             family = subfamily.family
+
+    tribe = request.GET.get('tribe', None)
+    if tribe:
+        try:
+            tribe = Tribe.objects.get(pk=tribe)
+        except Tribe.DoesNotExist:
+            tribe = ''
+        if tribe and tribe.subfamily:
+            subfamily = tribe.subfamily
+        if subfamily and subfamily.family:
+            family = tribe.subfamily.family
+
+    subfamily = request.GET.get('subfamily', None)
+    if subfamily:
+        try:
+            subfamily = Subfamily.objects.get(pk=subfamily)
+        except Subfamily.DoesNotExist:
+            subfamily = ''
+        if subfamily and subfamily.family:
+            family = subfamily.family
+
     return family, subfamily, tribe, subtribe
+
+# Only for Orchidaceae
+def getSuperGeneric(request):
+    subtribe = request.GET.get('subtribe', None)
+    if subtribe:
+        try:
+            subtribe = Subtribe.objects.get(pk=subtribe)
+        except Subtribe.DoesNotExist:
+            subtribe = ''
+
+    tribe = request.GET.get('tribe', None)
+    if tribe:
+        try:
+            tribe = Tribe.objects.get(pk=tribe)
+        except Tribe.DoesNotExist:
+            tribe = ''
+
+    subfamily = request.GET.get('subfamily', None)
+    if subfamily:
+        try:
+            subfamily = Subfamily.objects.get(pk=subfamily)
+        except Subfamily.DoesNotExist:
+            subfamily = ''
+
+    return subfamily, tribe, subtribe
 
 
 # Used in myphotos views only

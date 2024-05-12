@@ -276,15 +276,10 @@ def species(request):
     msg = ''
     type = 'species'
     alpha = ''
-    subfamily = ''
-    tribe = ''
-    subtribe = ''
-    subfamily_list = []
     tribe_list = []
     subtribe_list = []
     subfamily_obj = ''
     tribe_obj = ''
-    syn = ''
     genus = ''
     this_species_list = []
     # max_page_length = 1000
@@ -303,26 +298,18 @@ def species(request):
         alpha = request.GET['alpha']
         if alpha == 'ALL':
             alpha = ''
-    if 'syn' in request.GET:
-        syn = request.GET['syn']
+    syn = request.GET.get('syn', '')
 
-    if 'subfamily' in request.GET:
-        subfamily = request.GET['subfamily']
+    subfamily = request.GET.get('subfamily', '')
+    tribe = request.GET.get('tribe', '')
+    subtribe = request.GET.get('subtribe', '')
 
-    if subfamily:
-        subfamily_obj = Subfamily.objects.get(subfamily=subfamily)
-    if 'tribe' in request.GET:
-        tribe = request.GET['tribe']
-        if tribe:
-            tribe_obj = Tribe.objects.get(tribe=tribe)
-    if 'subtribe' in request.GET:
-        subtribe = request.GET['subtribe']
-        if subtribe:
-            tribe_obj = Subtribe.objects.get(subtribe=subtribe)
-    if 'myspecies' in request.GET:
-        myspecies = request.GET['myspecies']
-        if myspecies:
+    myspecies = request.GET.get('myspecies', '')
+    if myspecies:
+        try:
             author = Photographer.objects.get(user_id=request.user)
+        except Photographer.DoesNotExist:
+            author = ''
 
     # Get list of affected  genus
     genus_list = Genus.objects.all()
@@ -355,12 +342,12 @@ def species(request):
                 this_species_list = this_species_list.filter(pid__in=pid_list)
 
     subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0).order_by('subfamily')
-    if subfamily_obj:
-        tribe_list = Tribe.objects.filter(subfamily=subfamily_obj.subfamily).order_by('tribe')
-    if tribe_obj:
-        subtribe_list = Subtribe.objects.filter(tribe=tribe_obj.tribe).order_by ('subtribe')
-    elif subfamily_obj:
-        subtribe_list = Subtribe.objects.filter(subfamily=subfamily_obj.subfamily).order_by ('subtribe')
+    if subfamily:
+        tribe_list = Tribe.objects.filter(subfamily=subfamily).order_by('tribe')
+    if tribe:
+        subtribe_list = Subtribe.objects.filter(tribe=tribe).order_by ('subtribe')
+    elif subfamily:
+        subtribe_list = Subtribe.objects.filter(subfamily=subfamily).order_by ('subtribe')
 
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'family': family, 'genus': genus,
