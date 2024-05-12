@@ -282,17 +282,19 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
-       {% endif %}
+        {% endif %}
 <!--        {% if user.tier.tier > 1 %}-->
 <!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
 <!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>-->
 <!--        {% endif %}-->
             &nbsp;&nbsp;
+        {% if user.is_authenticated %}
             {% if owner == 'Y' %}
                 <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=N">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
                 <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=Y">Click to view only my photos</a>
             {% endif %}
+        {% endif %}
 <!--                <form action="?" style="display:inline-block; margin-top: 5px;">-->
 <!--                    <input type="hidden" name="family" value="{{family.family}}" >-->
 <!--                    {% if owner == 'Y' %}-->
