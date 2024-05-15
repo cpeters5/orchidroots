@@ -683,72 +683,36 @@ class Synonym(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     acc = models.ForeignKey(Species, verbose_name='accepted genus',related_name='oraccid',on_delete=models.CASCADE)
-    gen = models.ForeignKey(Genus, db_column='gen', related_name='orgen', null=True, blank=True,on_delete=models.CASCADE)
-    year = models.IntegerField(null=True, blank=True)
-    genus = models.CharField(max_length=50, null=True, blank=True)
-    is_hybrid = models.CharField(max_length=5, null=True, blank=True)
-    species = models.CharField(max_length=50, null=True, blank=True)
-    infraspr = models.CharField(max_length=20, null=True, blank=True)
-    infraspe = models.CharField(max_length=50, null=True, blank=True)
-    sgen = models.ForeignKey(Genus, db_column='sgen', related_name='orsgen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    syear = models.IntegerField(null=True, blank=True)
-    sgenus = models.CharField(max_length=50, null=True, blank=True)
-    sis_hybrid = models.CharField(max_length=5, null=True, blank=True)
-    sspecies = models.CharField(max_length=50, null=True, blank=True)
-    sinfraspr = models.CharField(max_length=20, null=True, blank=True)
-    sinfraspe = models.CharField(max_length=50, null=True, blank=True)
-    type = models.CharField(max_length=10, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    comment = models.TextField(null=True, blank=True)
+    # gen = models.ForeignKey(Genus, db_column='gen', related_name='orgen', null=True, blank=True,on_delete=models.CASCADE)
+    # year = models.IntegerField(null=True, blank=True)
+    # genus = models.CharField(max_length=50, null=True, blank=True)
+    # is_hybrid = models.CharField(max_length=5, null=True, blank=True)
+    sbinomial = models.CharField(max_length=200, blank=True)
+    binomial = models.CharField(max_length=200, blank=True)
+    # species = models.CharField(max_length=50, null=True, blank=True)
+    # infraspr = models.CharField(max_length=20, null=True, blank=True)
+    # infraspe = models.CharField(max_length=50, null=True, blank=True)
+    # sgen = models.ForeignKey(Genus, db_column='sgen', related_name='orsgen', null=True, blank=True,on_delete=models.DO_NOTHING)
+    # syear = models.IntegerField(null=True, blank=True)
+    # sgenus = models.CharField(max_length=50, null=True, blank=True)
+    # sis_hybrid = models.CharField(max_length=5, null=True, blank=True)
+    # sspecies = models.CharField(max_length=50, null=True, blank=True)
+    # sinfraspr = models.CharField(max_length=20, null=True, blank=True)
+    # sinfraspe = models.CharField(max_length=50, null=True, blank=True)
+    # type = models.CharField(max_length=10, null=True, blank=True)
+    # description = models.TextField(null=True, blank=True)
+    # comment = models.TextField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.spid.name()
 
-    def get_shortname(self):
-        if self.sis_hybrid:
-            if self.sinfraspe:
-                return '%s %s %s %s %s' % (self.sgenus, self.sis_hybrid, self.sspecies,
-                                           self.sinfraspr, self.sinfraspe)
-            else:
-                return '%s %s %s' % (self.sgenus, self.sis_hybrid, self.sspecies)
-        else:
-            if self.sinfraspe:
-                return '%s %s %s %s' % (self.sgenus, self.sspecies,
-                                        self.sinfraspr, self.sinfraspe)
-            else:
-                return '%s %s' % (self.sgenus, self.sspecies)
+    def get_sname(self):
+        return self.spid.binomial()
 
-    def get_abrevname(self):
-        abrev = self.sgen.abrev
-        if not abrev:
-            abrev = self.sgen.genus
-        if self.sis_hybrid:
-            if self.sinfraspe:
-                return '%s %s %s %s %s' % (abrev, self.sis_hybrid, self.sspecies,
-                                           self.sinfraspr, self.sinfraspe)
-            else:
-                return '%s %s %s' % (abrev, self.sis_hybrid, self.sspecies)
-        else:
-            if self.sinfraspe:
-                return '%s %s %s %s' % (abrev, self.sspecies,
-                                        self.sinfraspr, self.sinfraspe)
-            else:
-                return '%s %s' % (abrev, self.sspecies)
-
-    def get_shortaccepted(self):
-        if self.is_hybrid:
-            if self.infraspe:
-                return '%s %s %s %s %s' % (self.genus, self.is_hybrid, self.species, self.infraspr, self.infraspe)
-            else:
-                return '%s %s %s' % (self.genus, self.is_hybrid, self.species)
-        else:
-            if self.infraspe:
-                return '%s %s %s %s' % (self.genus, self.species, self.infraspr, self.infraspe)
-            else:
-                return '%s %s' % (self.genus, self.species)
-
+    def get_name(self):
+        return self.acc.binomial()
 
 class Hybrid(models.Model):
     # pid                 = models.IntegerField(db_column='pid',primary_key=True)
