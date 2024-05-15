@@ -110,7 +110,7 @@ def my_gallery(request):
     # Get a sample image of orchids
     if request.user.is_authenticated and artist:
         artwork_list = Artwork.objects.filter(artist=artist).filter(rank__gt=0)
-    elif request.user.is_authenticated:
+    elif request.user.is_authenticated and request.user.artist:
         artwork_list = Artwork.objects.filter(artist=request.user.artist).filter(rank__gt=0)
     elif artist:
         artwork_list = Artwork.objects.filter(rank__gt=0).filter(artist=artist)
