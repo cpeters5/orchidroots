@@ -363,7 +363,6 @@ def species(request):
 
 @login_required
 def hybrid(request):
-    crit = 0
     year = ''
     year_valid = 0
     status = ''
@@ -371,13 +370,11 @@ def hybrid(request):
     seed_genus = ''
     pollen_genus = ''
     seed = pollen = ''
-    alpha = ''
-    sort = prev_sort = ''
     spc = ''
     msg = ''
 
     # Initialization
-    reqgenus = request.GET.get('reqgenus', None)
+    reqgenus = request.GET.get('genus', None)
     prev_genus = request.GET.get('reqgenus', None)
     if reqgenus == None or reqgenus == '':
         # Sent from base.html in case no genus info, in which case randomize genus
@@ -387,20 +384,12 @@ def hybrid(request):
                 reqgenus = reqgenus[0].genus
                 break
         prev_genus = reqgenus
-    if 'genus' in request.GET:
-        genus = request.GET['genus']
-        crit = 1
     if 'seed' in request.GET:
         seed = request.GET['seed']
-        crit = 1
     if 'pollen' in request.GET:
         pollen = request.GET['pollen']
-        crit = 1
     if 'status' in request.GET:
         status = request.GET['status']
-    # if not status:
-    #     status = 'accepted'
-
     if 'spc' in request.GET:
         spc = request.GET['spc']
         if spc:
@@ -428,7 +417,7 @@ def hybrid(request):
         alpha = alpha[0:1]
     crit = 1
     if crit :
-        genus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
     else:
         return render(request, 'orchidaceae/hybrid.html', {})
     write_output(request, str(reqgenus))
