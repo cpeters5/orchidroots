@@ -117,9 +117,10 @@ def search_binomial(request):
     query = request.GET.get('query', '')
     # print(query)
     results = Species.objects.search(query)
-    jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
-    str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
-    str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
+    if query != '':
+        jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
+        str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
+        str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
 
     result_list = []
     # print("results = ", len(str_with_scores_dicts))
