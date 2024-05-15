@@ -10,7 +10,7 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, get_searchdata
+from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, get_searchdata, handle_bad_request
 from common.views import rank_update, quality_update
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -30,10 +30,8 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
-    if not pid:
-        pid = request.GET.get('pid', None)
-        if not pid or not pid.isnumeric():
-            return HttpResponseRedirect('/')
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
 
     selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)

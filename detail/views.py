@@ -30,7 +30,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, is_int, getRole, get_reqauthor
+from utils.views import write_output, is_int, getRole, get_reqauthor, handle_bad_request
 
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
@@ -188,11 +188,9 @@ def createhybrid(request):
 @login_required
 def compare(request, pid=None):
     # TODO:  Use Species form instead
-    if not pid:
-        pid = request.GET.get('pid', '')
-        if not pid or not pid.isnumeric():
-            return HttpResponseRedirect('/')
-
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        
     role = getRole(request)
     pid2 = species2 = genus2 = ''
     try:
@@ -707,7 +705,6 @@ def uploadweb(request, pid, orid=None):
                'family': species.gen.family,
                'role': role, 'title': 'uploadweb'}
     return render(request, 'detail/uploadweb.html', context)
-
 
 
 @login_required

@@ -20,6 +20,28 @@ import utils.config
 applications = utils.config.applications
 
 
+def handle_bad_request(request):
+    pid = request.GET.get('pid', '')
+    full_url = request.build_absolute_uri()
+    if not pid or not pid.isnumeric():
+        print(">>> Received URL:", full_url)
+        logger.info(f">>> Received URL: {full_url}")
+        # Try to get the real IP from the X-Real-IP header
+        client_ip = request.META.get('HTTP_X_REAL_IP')
+        # If not available, fall back to X-Forwarded-For
+        if not client_ip:
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                client_ip = x_forwarded_for.split(',')[0]  # Get the first IP in the list
+
+        # If still not found, fall back to REMOTE_ADDR
+        if not client_ip:
+            client_ip = request.META.get('REMOTE_ADDR', '')
+
+        print(">>> Client IP:", client_ip)
+        return HttpResponse("URL and IP address has been logged.")
+
+
 def regenerate_file(source_path, destination_folder):
     filename = os.path.basename(source_path)
     while True:
