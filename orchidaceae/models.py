@@ -96,16 +96,17 @@ class Genus(models.Model):
 
     def getAccepted(self):
         if 'synonym' in self.status:
-            acc_id = self.gensyn.acc_id
-            gen = self.gensyn.acc
-            return "<i>%s</i> %s" % (gen.genus, gen.author)
-        return None
+            if self.gensyn.acc:
+                gen = self.gensyn.acc
+                return "<i>%s</i> %s" % (gen.genus, gen.author)
+        else:
+            return "No accepted name found for this synonym."
 
     def getAcc(self):
         if 'synonym' in self.status:
             acc_id = self.gensyn.acc_id
             if acc_id:
-                return self.gensyn.acc.genus
+                return self.gensyn.acc
             else:
                 return "No accepted name found for this synonym."
         return None
