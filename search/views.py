@@ -121,7 +121,8 @@ def search_binomial(request):
         jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
         str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
         str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
-
+    else:
+        str_with_scores_dicts = []
     result_list = []
     # print("results = ", len(str_with_scores_dicts))
     for i in range(10):
