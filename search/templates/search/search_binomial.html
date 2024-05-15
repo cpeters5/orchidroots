@@ -53,13 +53,17 @@ td {
                         <tr>
                             <td style="width:20%;">
                                 <a href="{% url 'display:photos' species.match.pid %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
-                                    {{species.match.binomial}}</a>  {{species.match.author}} ({{species.match.year}})
+                                    {{species.match.binomial}}</a>  {{species.match.author|default:''}} {{species.match.year|default:''}}
                             </td>
                             <td style="width:10%;">
                                 {% if species.match.status == 'synonym' %}<br> syn.
-                                <a href="{% url 'display:photos' species.match.getAcc %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
-                                    {{species.match.getAccepted.binomial}}
-                                </a>
+                                    {% if species.match.getAcc %}
+                                        <a href="{% url 'display:photos' species.match.getAcc %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                                            {{species.match.getAccepted.binomial}}
+                                        </a>
+                                    {% else %}
+                                        {{species.match.getAccepted.binomial}} (syn)
+                                    {% endif %}
                                 {% elif species.match.type == 'hybrid' %}  {{species.match.hybrid.seed_id.name|safe}} x {{species.match.hybrid.pollen_id.name|safe}}
                                 {% endif %}
                             </td>
