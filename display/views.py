@@ -32,8 +32,8 @@ def information(request, pid=None):
     # NOTE: seed and pollen id must all be accepted.
     if not pid:
         pid = request.GET.get('pid', None)
-    if not pid:
-        return HttpResponseRedirect('/')
+        if not pid or not pid.isnumeric():
+            return HttpResponseRedirect('/')
 
     selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)
