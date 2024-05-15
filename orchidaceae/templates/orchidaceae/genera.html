@@ -242,9 +242,9 @@ a:hover {
                                             {% if genus.status == 'synonym' %}
                                                 Synonym of
                                                 {% if genus.type == 'species' %}
-                                                    <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a>
+                                                    <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
                                                 {% else %}
-                                                    <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a>
+                                                    <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
                                                 {% endif %}
                                             {% elif genus.type == 'species' %}{{genus.get_description}}
                                             {% elif genus.type == 'hybrid' %} hybrid ({{genus.get_description}})
@@ -258,9 +258,9 @@ a:hover {
                                         <td class="align-center">
                                             <span  style="font-size: 10px;">
                                             {% if genus.type == 'species' %}
-                                                <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAccepted.year}}
+                                                <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
                                             {% else %}
-                                                <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a>
+                                                <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
                                             {% endif %}
                                             </span>
                                         </td>
