@@ -630,7 +630,7 @@ nav .search-container button:hover {
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="scientific name" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="scientific/registered name" style="border:1px solid #ccc; border-right: 0">
             </form>
             <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">
                 <input  form="name" type="hidden" name="selected_app" value="{{ selected_app }}">
