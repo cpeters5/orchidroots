@@ -106,6 +106,8 @@ sub getNewUsers {
                 where b.tier = 1 and a.verified = 1 order by a.user_id;";
     &getASPM($stmt);
     while (my @row = $sth->fetchrow_array()) {
+        $row[1] =~ s/'/''/g;
+        $row[2] =~ s/'/''/g;
     	push(@user, $row[0]);
         $fullname{$row[0]} = $row[1] if $row[1];
         $row[2] =~ s/ //g;
