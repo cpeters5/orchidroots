@@ -349,7 +349,7 @@ def reidentify(request, orid, pid):
             # Delete old record
             old_img.delete()
 
-            write_output(request, old_species.textname() + " ==> " + new_species.textname())
+            write_output(request, old_species.binomial + " ==> " + new_species.binomial)
             url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
@@ -403,7 +403,7 @@ def uploadweb(request, pid, orid=None):
             spc.save()
 
             url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
-            write_output(request, species.textname())
+            write_output(request, species.binomial)
             return HttpResponseRedirect(url)
 
     if not orid:  # upload, initialize author. Get image count

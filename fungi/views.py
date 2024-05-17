@@ -90,7 +90,6 @@ def compare(request, pid):
     if infraspe2:
         binomial2 = binomial2 + ' ' + infraspe2
     if binomial2:
-        print("binomial2 = >", binomial2,"<")
         species2 = Species.objects.filter(binomial__iexact=binomial2)
         if len(species2) == 0:
             message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> does not exist in ' + family.family + ' family'
