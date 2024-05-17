@@ -19,7 +19,6 @@ def search(request):
     # requested from scientific name search in navbar
     # Handles search genus. Then call search_species if there is another word(s) in the search straing
     role = getRole(request)
-    # print("role = ", role)
     search_list = []
     match_spc_list = []
     selected_app = ''
@@ -202,13 +201,11 @@ def search_species(request):
     search_string = search_string.replace(' Mem ', ' Memoria ')
     search_string = search_string.replace(' mem. ', ' Memoria ')
     search_string = search_string.replace(' Mem. ', ' Memoria ')
-    # print("search_string", search_string)
     if ' ' not in search_string:
         genus_string = search_string
     elif search_string.split()[0]:
         genus_string, search_list = search_string.split(' ', 1)
         search_list = search_list.split()
-        # print("search_string", search_string)
     role = getRole(request)
 
     if selected_app in request.POST:
