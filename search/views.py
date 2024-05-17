@@ -110,31 +110,36 @@ def search(request):
     url = "%s?search_string=%s" % (reverse('search:search_species'), search_string)
     return HttpResponseRedirect(url)
 
+
 def search_binomial(request):
+    from os.path import join
     import jellyfish
     from orchidaceae.models import Species
 
     query = request.GET.get('query', '')
-    # print(query)
-    results = Species.objects.search(query)
     if query != '':
+        if ' ' in query:
+            (req_genus, rest) = query.split(' ', 1)
+            abrev_obj = Genus.objects.filter(abrev=req_genus)
+            if len(abrev_obj) > 0:
+                replacement = abrev_obj.first().genus
+                query = query.split()
+                abrev = query[0]
+                query = " ".join(query)
+                query = query.replace(abrev, replacement)
+        results = Species.objects.search(query)
         jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
         str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
         str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
     else:
         str_with_scores_dicts = []
     result_list = []
-    # print("results = ", len(str_with_scores_dicts))
     for i in range(10):
         if i == len(str_with_scores_dicts):
             break
         result_list.append(str_with_scores_dicts[i])
 
-    # for x in result_list:
-    #      print(f"{x['score']} : '{query}' and '{x['match'].author} {x['match'].binomial}'")
-    # print("results = ", len(result_list))
     role = getRole(request)
-
     context = {'result_list': result_list, 'query': query, 'role': role }
     return render(request, "search/search_binomial.html", context)
 
@@ -177,9 +182,7 @@ def getResultByGenus(family, search_string, genus):
 
 
 def search_species(request):
-    # print("search species")
     # Only family or genus is given (one or both)
-    # print("Enter search species")
     genus_list = []
     search_list = []
     match_spc_list = []
