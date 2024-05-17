@@ -1107,7 +1107,7 @@ def curate_newupload(request):
         request, file_list, page_length, num_show)
     role = getRole(request)
 
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'file_list': page_list, 'family': family,
                'tab': 'upl', 'role': role, 'upl': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
@@ -1166,7 +1166,7 @@ def curate_pending(request):
         request, file_list, page_length, num_show)
 
     role = getRole(request)
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'file_list': page_list, 'type': ortype, 'family': family,
                'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
@@ -1232,7 +1232,7 @@ def curate_newapproved(request):
         request, file_list, page_length, num_show)
 
     role = getRole(request)
-    write_output(request, str(family))
+    # write_output(request, str(family))
     context = {'file_list': page_list, 'type': ortype, 'family': family,
                'tab': 'pen', 'role': role, 'pen': 'active', 'days': days,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
@@ -1285,7 +1285,7 @@ def uploadfile(request, pid):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            write_output(request, species.textname())
+            write_output(request, app)
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species

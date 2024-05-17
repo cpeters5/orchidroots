@@ -190,7 +190,7 @@ def information(request, pid=None):
         species = req_species
     # if len(display_items) > 0:
     role = request.GET.get('role', None)
-    # write_output(request, str(family))
+    write_output(request, str(family))
     context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
@@ -230,9 +230,6 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
-
-
-
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
@@ -288,8 +285,9 @@ def photos(request, pid=None):
 
     upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
     if owner == 'Y' and request.user.is_authenticated:
-        public_list = public_list.filter(author=request.user.photographer.author_id)
-        upload_list = upload_list.filter(author=request.user.photographer.author_id)
+        if request.user.photographer.author_id:
+            public_list = public_list.filter(author=request.user.photographer.author_id)
+            upload_list = upload_list.filter(author=request.user.photographer.author_id)
     private_list = public_list.filter(rank=0)  # rejected photos
     if role == 'pri':
         upload_list = upload_list.filter(author=author) # Private photos
@@ -335,7 +333,7 @@ def photos(request, pid=None):
             private_list = private_list.order_by('created_date')
     if private_list and author:
         private_list = private_list.filter(author=author)
-    # write_output(request, str(family))
+    write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
@@ -388,7 +386,7 @@ def videos(request, pid):
             accspecies = Species.objects.get(pk=accpid)
             related_list = Species.objects.filter(genus=accspecies.genus).filter(species=accspecies.species).order_by('binomial')
 
-    # write_output(request, str(family))
+    write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
                'vid': 'active', 'tab': 'vid', 'app':app,
