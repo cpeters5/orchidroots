@@ -243,46 +243,6 @@ def search_species(request):
     return render(request, "search/search_species.html", context)
 
 
-def xsearch_name(request):
-    commonname = ''
-    selected_app = ''
-    role = getRole(request)
-    if 'genre' in request.POST:
-        genre = request.POST['genre']
-    if 'selected_app' in request.POST:
-        selected_app = request.POST['selected_app']
-    elif 'selected_app' in request.GET:
-        selected_app = request.GET['selected_app']
-
-    if 'commonname' in request.GET:
-        commonname = request.GET['commonname'].strip()
-    elif 'commonname' in request.POST:
-        commonname = request.POST['commonname'].strip()
-
-    commonname = commonname.rstrip('s')
-    if not commonname or commonname == '':
-        context = {'role': role, }
-        return render(request, "search/search_name.html", context)
-
-    commonname_search = commonname.replace("-", "").replace(" ", "").replace("'", "")
-    name_list = []
-
-    if selected_app in applications:
-        Accepted = apps.get_model(selected_app, 'Accepted')
-        name_list = Accepted.objects.filter(common_name_search__icontains=commonname_search)
-    else:
-        for app in applications:
-            Accepted = apps.get_model(app, 'Accepted')
-            this_name_list = Accepted.objects.filter(common_name_search__icontains=commonname_search)
-            if this_name_list:
-                for x in this_name_list:
-                    name_list.append(x)
-
-    context = {'name_list': name_list, 'commonname': commonname, 'selected_app': selected_app, 'role': role,}
-    write_output(request, str(commonname))
-    return render(request, "search/search_name.html", context)
-
-
 def search_name(request):
     # Get search term
     role = getRole(request)
@@ -299,10 +259,9 @@ def search_name(request):
         context = {'role': role, }
         return render(request, "search/search_name.html", context)
     search_string = commonname.replace("-", "").replace(" ", "").replace("'", "")
-
     # Collect entities contaiing the search string
     commonname_list = CommonName.objects.filter(common_name_search__icontains=search_string)
-    if selected_app in applications:
+    if selected_app != 'ALL' and selected_app in applications:
         commonname_list = commonname_list.filter(application=selected_app)
 
     if len(commonname_list) == 0:
