@@ -10,6 +10,7 @@ from PIL import Image
 import glob, os, sys
 from dotenv import load_dotenv
 load_dotenv()
+current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
 size = 500, 400
 
@@ -17,27 +18,17 @@ conn = pymysql.connect(host=os.getenv('DBHOST'), user='chariya', port=3306, pass
 cur = conn.cursor()
 
 type = sys.argv[1]
-# type = "hyb"
-print(type)
-# dir = "C:/projects/orchids/bluenanta/utils/static/utils/images/"
 dir = "/mnt/static/utils/images/"
 if type == "spc":
-    # thumbdir = dir +"species_thumb/"
     imgdir = dir + "species/"
     stmthead = "UPDATE orchidaceae_spcimages set image_file = '%s' where id = %d"
     cur.execute(
         "SELECT id, image_url, pid  FROM orchidaceae_spcimages where image_url <>'' and image_url is not null and (image_file is null or image_file = '') and pid >= 0 order by pid")
 else:
-    # thumbdir = dir + "hybrid_thumb/"
     imgdir = dir + "hybrid/"
     stmthead = "UPDATE orchidaceae_hybimages set image_file = '%s' where id = %d"
     cur.execute(
         "SELECT id, image_url, pid  FROM orchidaceae_hybimages where image_url <>'' and image_url is not null and (image_file is null or image_file = '') order by pid")
-
-# print(cur.description)
-
-# thumbdir = "thumb/"
-# imgdir = "download/"
 
 i = 0
 for row in cur:
@@ -54,16 +45,16 @@ for row in cur:
         cur.nextset()
 
     fname = "%s_%09d_%09d.jpg" % (type, row[0], row[2])
-    print(fname)
+    # print(fname)
     time.sleep(15)
-    print(str(i))
+    # print(str(i))
 
     try:
-        print(url)
+        # print(url)
         # html = urlopen(url)
         local_filename, headers = urllib.request.urlretrieve(url, imgdir + fname)
         # print("True",url,html.read(),"\n")
-        print(">>", local_filename, headers, "\n\n\n")
+        # print(">>", local_filename, headers, "\n\n\n")
     except urllib.error.URLError as e:
         print("URLError -- ", row[0], e.reason)
         cur.nextset()
@@ -81,8 +72,8 @@ for row in cur:
 
     curinsert.execute(stmt)
     conn.commit()
-# print (stmt)
-
+if i > 0:
+    print(current_time, "# images ", i)
 
 cur.close()
 conn.close()
