@@ -1,6 +1,6 @@
 def scan_large_log_file_track_last_occurrence(filepath):
     try:
-        with open(filepath, 'r') as file:
+        with (open(filepath, 'r') as file):
             previous_line = None  # To store the previous line
             ip_details = {}  # Dictionary to store IP address details: last occurrence and count
 
@@ -9,17 +9,18 @@ def scan_large_log_file_track_last_occurrence(filepath):
                 if not line:  # If no more lines, break the loop
                     break
                 line = line.strip()  # Remove any leading/trailing whitespace
-
+                line = line.lower()
                 # Check if the previous line meets the criteria
-                if previous_line is not None and previous_line.startswith(">>> Received URL:") and len(previous_line) > 200:
-                    # Extract the last word from the current line, presumed to be the IP address
-                    last_word = line.split()[-1]
-                    # Update the IP address details in the dictionary
-                    if last_word in ip_details:
-                        ip_details[last_word]['count'] += 1
-                        ip_details[last_word]['last_occurrence'] = (previous_line, line)
-                    else:
-                        ip_details[last_word] = {'count': 1, 'last_occurrence': (previous_line, line)}
+                if previous_line is not None and previous_line.startswith(">>> Received URL:"):
+                    if len(previous_line) > 200 or "and" in previous_line or "or" in previous_line or "select" in previous_line or "union" in previous_line:
+                        # Extract the last word from the current line, presumed to be the IP address
+                        last_word = line.split()[-1]
+                        # Update the IP address details in the dictionary
+                        if last_word in ip_details:
+                            ip_details[last_word]['count'] += 1
+                            ip_details[last_word]['last_occurrence'] = (previous_line, line)
+                        else:
+                            ip_details[last_word] = {'count': 1, 'last_occurrence': (previous_line, line)}
 
                 # Update the previous line to current for the next iteration
                 previous_line = line
