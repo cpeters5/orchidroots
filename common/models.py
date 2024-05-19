@@ -244,3 +244,11 @@ class CommonName(models.Model):
 
     def __str__(self):
         return self.source
+
+    def get_best_img(self):
+        if self.level == 'Accepted':
+            try:
+                species = Species.objects.get(pk=self.taxon_id)
+                return species.get_best_img()
+            except Species.DoesNotExist:
+                return None

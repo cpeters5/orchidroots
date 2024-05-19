@@ -286,8 +286,8 @@ def search_name(request):
     name_list = commonname_list.filter(level='Accepted')
     species_list = []
     for x in name_list:
-        Accepted = apps.get_model(x.application, 'Accepted')
-        acc_obj = Accepted.objects.get(pk=x.taxon_id)
+        Species = apps.get_model(x.application, 'Species')
+        acc_obj = Species.objects.get(pk=x.taxon_id)
         species_list = species_list + [acc_obj]
 
     context = {'family_list': family_list, 'genus_list': genus_list, 'species_list': species_list,

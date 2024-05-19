@@ -130,10 +130,18 @@ class Genus(models.Model):
     def get_best_img(self):
         img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
-
+        if len(img) == 0:
+            img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).order_by(
+                'quality', '-rank', '?')
         if img.count() > 0:
             img = img[0:1][0]
             return img
+        else:
+            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).order_by(
+                'quality', '-rank', '?')
+            if img.count() > 0:
+                img = img[0:1][0]
+                return img
         return None
 
 
@@ -334,20 +342,15 @@ class Species(models.Model):
     def get_best_img(self):
         img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
-
         if img.count() > 0:
             img = img[0:1][0]
             return img
-        return None
-
-    def get_best_img_by_author(self, author):
-        img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(
-                image_file__isnull=False).filter(rank__lt=7).order_by(
+        else:
+            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).order_by(
                 'quality', '-rank', '?')
-
-        if img.count() > 0:
-            img = img[0:1][0]
-            return img
+            if img.count() > 0:
+                img = img[0:1][0]
+                return img
         return None
 
     def get_num_img_by_author(self, author):
@@ -413,15 +416,15 @@ class Accepted(models.Model):
     def __str__(self):
         return self.pid.name()
 
-    def get_best_img(self):
-        spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
-        img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
-        if len(img) > 0:
-            img = img[0:1][0]
-            return img
-        return None
-
+    # def get_best_img(self):
+    #     spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
+    #     img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+    #             'quality', '-rank', '?')
+    #     if len(img) > 0:
+    #         img = img[0:1][0]
+    #         return img
+    #     return None
+    #
 
 class Hybrid(models.Model):
     pid = models.OneToOneField(
