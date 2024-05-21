@@ -1,18 +1,19 @@
-def scan_large_log_file_track_last_occurrence(filepath):
+def scan_large_log_file_for_sqlinjection(filepath):
     try:
         with (open(filepath, 'r') as file):
             previous_line = None  # To store the previous line
             ip_details = {}  # Dictionary to store IP address details: last occurrence and count
-
+            i = 0
             while True:
+                i += 1
                 line = file.readline()  # Read the current line
                 if not line:  # If no more lines, break the loop
                     break
                 line = line.strip()  # Remove any leading/trailing whitespace
                 line = line.lower()
                 # Check if the previous line meets the criteria
-                if previous_line is not None and previous_line.startswith(">>> Received URL:"):
-                    if len(previous_line) > 200 or "and" in previous_line or "or" in previous_line or "select" in previous_line or "union" in previous_line:
+                if previous_line is not None and previous_line.startswith(">>> received url:"):
+                    if len(previous_line) > 200 or any(word in previous_line for word in ["and", "or", "select", "union"]):
                         # Extract the last word from the current line, presumed to be the IP address
                         last_word = line.split()[-1]
                         # Update the IP address details in the dictionary
@@ -28,11 +29,12 @@ def scan_large_log_file_track_last_occurrence(filepath):
             # After finishing reading the file, print the details for each IP
             for ip, details in ip_details.items():
                 long_url_line, following_line = details['last_occurrence']
-                print(f"IP {ip}: {details['count']} hits")
+                if details['count'] > 8:
+                    print(f"IP {ip}: {details['count']} hits")
 
     except FileNotFoundError:
         print("File not found. Please check the file path.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
-scan_large_log_file_track_last_occurrence('/var/log/gunicorn/gunicorn-error.log')
+scan_large_log_file_for_sqlinjection('/var/log/gunicorn/gunicorn-error.log')
