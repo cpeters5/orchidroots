@@ -789,17 +789,17 @@ seedparent, pollparent {
                                     {% if p.text_data %}{{p.text_data|safe}}{% endif %}</small></h6>">
                                         <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p.img}}">
                                 </a>
-                            {% elif  p.aid.pid > 0 %}
+                            {% else %}
                                 <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                             {% endif %}
                             <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
-                                {% if p.aid.pid > 0 %}
                                    <br>
-                                    <a href="{% url 'display:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
-                                    {{p.pct}}%
+                                {% if p.aid_id == 0 %}
+                                    unknown
                                 {% else %}
-                                    <span style="font-size: 14px;">No data</span>
+                                    <a href="{% url 'display:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
                                 {% endif %}
+                                    {{p.pct|default:0}}%
                                 <br>
                             </div>
                         </div>
