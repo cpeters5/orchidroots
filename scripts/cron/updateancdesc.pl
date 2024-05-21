@@ -12,7 +12,7 @@ use DBI;
 use Dotenv;
 Dotenv->load("/webapps/bluenanta/.env");
 
-my $host = '134.209.46.210';
+# my $host = '134.209.46.210';
 my $DB = $ENV{'DBNAME'};
 # Database connection
 my $dbh = DBI->connect( "DBI:MariaDB:$DB:$ENV{'DBHOST'}","chariya",$ENV{'MYDBPSSWD'}) or die( "Could not connect to: $DBI::errstr" );
