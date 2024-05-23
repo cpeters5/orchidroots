@@ -40,7 +40,7 @@ SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default=''),
 SITE_ID = 1
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
