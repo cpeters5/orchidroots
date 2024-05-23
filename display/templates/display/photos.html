@@ -370,7 +370,8 @@ a:hover {
                     </div>
                     <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                         <div style="width:100%;word-wrap: break-word;">
-                            <a href="{% url 'display:photos' image.pid_id %}?family={{species.gen.family}}">{{image.pid.binomial_it|safe}}</a>
+                            {{image.pid.binomial_it|safe}}
+                            {% if image.name %}"{{image.name}}"{% endif %}
                             <br>
                             {% if image.source_url %}
                                 <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
