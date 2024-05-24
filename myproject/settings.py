@@ -40,16 +40,16 @@ SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default=''),
 SITE_ID = 1
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    # 'bluenanta.com',
-    # 'www.bluenanta.com',
-    # 'beta.bluenanta.com',
-    # 'www.beta.bluenanta.com',
-    'orchidroots.com',
-    'www.orchidroots.com',
+    #'bluenanta.com',
+    #'www.bluenanta.com',
+    'beta.bluenanta.com',
+    'www.beta.bluenanta.com',
+    # 'orchidroots.com',
+    # 'www.orchidroots.com',
     # '45.55.134.164',
     # '127.0.0.1',
     # 'localhost',
