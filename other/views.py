@@ -367,7 +367,13 @@ def uploadweb(request, pid, orid=None):
     # For Other application only
     family = species.gen.family
     app = family.application
-
+    author = request.GET.get('author','')
+    if not author:
+        author = request.POST.get('author','')
+    try:
+        author = Photographer.objects.get(pk=author)
+    except Photographer.DoesNotExist:
+        author = ''
     # We now allow synonym view
     # if species.status == 'synonym':
     #     synonym = Synonym.objects.get(pk=pid)
@@ -381,19 +387,15 @@ def uploadweb(request, pid, orid=None):
 
         if form.is_valid():
             spc = form.save(commit=False)
-            # if not spc.author and not spc.credit_to:
-            #     return HttpResponse("Please select an author, or enter a new name for credit allocation.")
+            if author:
+                spc.author = author
+            else:
+                spc.author = request.user.photographer
             spc.user_id = request.user
-            spc.author = request.user.photographer
             spc.pid = species
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
-
-            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
-            # if spc.author.user_id and request.user.tier.tier < 3:
-            #     if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
-            #         spc.rank = 0
             if spc.image_url == 'temp.jpg':
                 spc.image_url = None
             if spc.image_file == 'None':
@@ -419,10 +421,14 @@ def uploadweb(request, pid, orid=None):
             img.image_url = "temp.jpg"
         else:
             sender = 'web'
+        if hasattr(img, 'author'):
+            author = img.author
+        else:
+            author = None
         form = UploadSpcWebForm(instance=img)
 
     context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
-               'species': species, 'family': family,
+               'species': species, 'family': family, 'author': author,
                'role': role, 'app': app,}
     return render(request, app + '/uploadweb.html', context)
 

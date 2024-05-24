@@ -620,7 +620,6 @@ def get_author(request):
 def uploadweb(request, pid, orid=None):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
-    # print("user tier = ", request.user.tier.tier)
     if request.user.is_authenticated and request.user.tier.tier < 2:
         message = 'You dont have access to upload files. Please update your profile to gain access.'
         return HttpResponse(message)
@@ -629,6 +628,12 @@ def uploadweb(request, pid, orid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
+
+    author = request.POST.get('author','')
+    try:
+        author = Photographer.objects.get(pk=author)
+    except Photographer.DoesNotExist:
+        author = ''
 
     # The photo
     if species.status == 'synonym':
@@ -651,7 +656,10 @@ def uploadweb(request, pid, orid=None):
         if form.is_valid():
             spc = form.save(commit=False)
             spc.user_id = request.user
-            spc.author = request.user.photographer
+            if author:
+                spc.author = author
+            else:
+                spc.author = request.user.photographer
             spc.pid = accepted
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
@@ -699,10 +707,14 @@ def uploadweb(request, pid, orid=None):
             else:
                 sender = 'web'
             form = UploadHybWebForm(instance=img)
+        if hasattr(img, 'author'):
+            author = img.author
+        else:
+            author = None
 
     context = {'form': form, 'img': img, 'sender': sender,
                'species': species, 'loc': 'active',
-               'family': species.gen.family,
+               'family': species.gen.family, 'author': author,
                'role': role, 'title': 'uploadweb'}
     return render(request, 'detail/uploadweb.html', context)
 
@@ -803,8 +815,7 @@ def approvemediaphoto(request, pid):
             spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation,
                             form=upl.forma, rank=0, description=upl.description, location=upl.location,
-                            created_date=upl.created_date, source_url=upl.source_url)
-            spc.approved_by = request.user
+                            created_date=upl.created_date, source_url=upl.source_url, text_data=upl.text_data)
             # hist = SpcImgHistory(pid=Species.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
             #                      action='approve file')
             newdir = os.path.join(settings.STATIC_ROOT, "utils/images/species")
@@ -812,10 +823,7 @@ def approvemediaphoto(request, pid):
             spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
                             description=upl.description, location=upl.location, created_date=upl.created_date,
-                            source_url=upl.source_url)
-            spc.approved_by = request.user
-            # hist = HybImgHistory(pid=Hybrid.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
-            #                      action='approve file')
+                            source_url=upl.source_url, text_data=upl.text_data)
             newdir = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
 
         spc.approved_by = request.user
