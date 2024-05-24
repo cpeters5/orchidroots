@@ -382,7 +382,6 @@ def uploadweb(request, pid, orid=None):
 
     if request.method == 'POST':
         form = UploadSpcWebForm(request.POST)
-
         if form.is_valid():
             spc = form.save(commit=False)
             if author:
@@ -394,11 +393,6 @@ def uploadweb(request, pid, orid=None):
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
-
-            # If new author name is given, set rank to 0 to give it pending status. Except curator (tier = 3)
-            # if spc.author.user_id and request.user.tier.tier < 3:
-            #     if (spc.author.user_id.id != spc.user_id.id) or role == 'pri':
-            #         spc.rank = 0
             if spc.image_url == 'temp.jpg':
                 spc.image_url = None
             if spc.image_file == 'None':
