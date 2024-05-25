@@ -79,7 +79,6 @@ td {
                             </td>
                             <td style="width:10%;">
                                 <a href="{% url 'common:genera' %}?family={{family.family}}&role={{role}}">{{family.family|safe}}</a>
-                                {% if family.get_best_img.pid.status == 'synonym' %}<br> (syn. {{family.get_best_img.pid.getAccepted.binomial}}){% endif %}
                             </td>
                             <td style="width:25%;">{{family.common_name|default:''}}</td>
                             <td>{{family.get_best_img.pid.accepted.distribution|default:''}}</td>
@@ -107,11 +106,11 @@ td {
                             </td>
                             <td style="width:10%;">
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'display:photos' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&role={{role}}&syn=&area={{area}}&selectred_app={{selected_app}}">{{genus.get_best_img.pid.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:photos' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&role={{role}}&syn=&area={{area}}&selectred_app={{selected_app}}">{{genus}}</a>
                                 {% else %}
-                                    <a href="{% url 'display:information' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&syn=Y&area={{area}}&selectred_app={{selected_app}}">{{genus.get_best_img.pid.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:information' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&syn=Y&area={{area}}&selectred_app={{selected_app}}">{{genus}}</a>
                                 {% endif %}
-                                {% if genus.get_best_img.pid.status == 'synonym' %}<br> (syn. {{genus.get_best_img.pid.getAccepted.binomial}}){% endif %}
+                                {% if genus.status == 'synonym' %}<br> (syn. {{genus.getAcc}}){% endif %}
                             </td>
                             <td style="width:25%;">{{genus.common_name|default:''}}</td>
                             <td>{{genus.get_best_img.pid.accepted.distribution|default:''}}</td>
