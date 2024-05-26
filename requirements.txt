@@ -95,6 +95,7 @@ importlib-metadata==6.6.0
 importlib-resources==3.0.0
 inquirer==2.7.0
 itsdangerous==2.1.2
+jellyfish==1.0.3
 Jinja2==3.1.2
 jsonfield==3.1.0
 kombu==5.2.3
