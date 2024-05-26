@@ -14,6 +14,34 @@ from utils import config
 applications = config.applications
 alpha_list = config.alpha_list
 
+def get_full_search_string(Genus, search_string):
+    if ' ' not in search_string:
+        genus_string = search_string
+    else:
+        (genus_string, rest) = search_string.split(' ', 1)
+
+    abrev = ''
+    try:
+        # get genus obj
+        genus = Genus.objects.get(genus=genus_string)
+    except Genus.DoesNotExist:
+        genus = ''
+        # It could be an abreviation
+        genus_obj = Genus.objects.filter(abrev=genus_string)
+        print("2. ", genus_obj)
+        if genus_obj:
+            # genus = genus_obj[0]
+        # if len(genus_obj) > 0:
+            genus = genus_obj[0]
+            abrev = genus_string
+            print("3. ", genus, abrev)
+    full_search_string = search_string
+    if abrev != '':
+        print("4. ", abrev, genus)
+        full_search_string = search_string.replace(abrev, genus.genus)
+        print(genus, search_string)
+        print(genus, full_search_string)
+    return (genus, full_search_string)
 
 def search(request):
     # requested from scientific name search in navbar
@@ -22,13 +50,14 @@ def search(request):
     search_list = []
     match_spc_list = []
     selected_app = ''
+    print("selected_app = ", selected_app)
     full_path = request.path
     path = 'information'
     if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
-    if 'selected_app' in request.POST:
-        selected_app = request.POST['selected_app']
-
+    if 'app' in request.GET:
+        selected_app = request.GET.get('app', '')
+    print("selected_app = ", selected_app)
     # Get search string
     search_string = request.GET.get('search_string', '').strip()
     if 'search_string' in request.POST:
@@ -37,48 +66,47 @@ def search(request):
         message = 'Empty search term'
         return HttpResponse(message)
 
-    if ' ' not in search_string:
-        genus_string = search_string
-    else:
-        genus_string, search_list = search_string.split(' ', 1)
-        search_list = search_list.split()
-
     genus_list = []
-    # collection all matching genus in each app
+    match_spc_list = []
+    # collect all matching genera in each app
     if selected_app in applications:
         Genus = apps.get_model(selected_app, 'Genus')
-        try:
-            genus = Genus.objects.get(genus=genus_string)
-        except Genus.DoesNotExist:
-            genus = ''
-        if genus and genus != '':
+        genus, full_search_string = get_full_search_string(Genus, search_string)
+        if genus != '':
             genus_list.append(genus)
-
-    else:
-        for app in applications:
-            Genus = apps.get_model(app, 'Genus')
-            try:
-                genus = Genus.objects.get(genus=genus_string)
-            except Genus.DoesNotExist:
-                genus = ''
-            if genus and genus != '':
-                genus_list.append(genus)
-    if genus_list:
-        match_spc_list = []
-        for genus in genus_list:
-            if ' ' not in search_string:
-                continue
             family = genus.family
             Species = apps.get_model(family.application, 'Species')
-            this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+            this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
             match_spc_list = list(chain(match_spc_list, this_match_spc_list))
-        # Incase no species found where search_string is more than one word, then look at other genus
-        other_genus_spc = []
-        if genus_list and not match_spc_list and ' ' in search_string:
-            other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+    else:
+        # unknown application. Check every app in Application (aves, animalia, fungi, orchidaceae and other)
+        for app in applications:
+            Genus = apps.get_model(app, 'Genus')
+            print(app, search_string)
+            genus, full_search_string = get_full_search_string(Genus, search_string)
+            if genus and genus != '':
+                genus_list.append(genus)
+                family = genus.family
+                Species = apps.get_model(family.application, 'Species')
+                this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
+                match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+    if genus_list:
+    #     # Get species for each genus in the list
+    #     for genus in genus_list:
+    #         if ' ' not in search_string:
+    #             continue
+    #         family = genus.family
+    #         Species = apps.get_model(family.application, 'Species')
+    #         this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+    #         match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+    #     # Incase no species found where search_string is more than one word, then look at other genus
+    #     other_genus_spc = []
+    #     if genus_list and not match_spc_list and ' ' in search_string:
+    #         other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
         context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'other_genus_spc': other_genus_spc, 'role': role,
+                   # 'other_genus_spc': other_genus_spc,
+                   'role': role,
                    'path': path, 'full_path': full_path
                    }
         return render(request, "search/search_species.html", context)
