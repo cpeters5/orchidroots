@@ -648,7 +648,7 @@ seedparent, pollparent {
                             {% endif %}
                         </div>
                         <div class="parent-text" style="text-align:center;">
-                            {% if species.hybrid.pollen_id.pid %}{{species.hybrid.pollen_id}}
+                            {% if species.hybrid.pollen_id.pid %}
                                 <a href="{% url 'display:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
                                 {% if species.hybrid.pollen_id.status == 'synonym' %}
                                     (syn. <a href="{% url 'display:information' species.hybrid.pollen_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.getAccepted.name|safe}}</a>)
@@ -783,11 +783,11 @@ seedparent, pollparent {
                 {% if ancspc_list %}
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
-                            {% if p.img %}
+                            {% if p.aid.get_best_img %}
                                 <a href="/static/utils/images/species/{{p.img}}" data-lightbox="anc" data-title="
                                     <h6><small>{{p.id}}: {{p.aid.abrevname|safe}}
                                     {% if p.text_data %}{{p.text_data|safe}}{% endif %}</small></h6>">
-                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p.img}}">
+                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p..image_file}}">
                                 </a>
                             {% else %}
                                 <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>

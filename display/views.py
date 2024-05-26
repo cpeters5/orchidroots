@@ -180,11 +180,6 @@ def information(request, pid=None):
             ancspc_list = AncestorDescendant.objects.filter(did=accid).filter(anctype='species').order_by('-pct')
         else:
             ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
-        if ancspc_list:
-            for x in ancspc_list:
-                img = x.aid.get_best_img()
-                if img:
-                    x.img = img.image_file
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
