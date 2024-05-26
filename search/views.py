@@ -28,19 +28,14 @@ def get_full_search_string(Genus, search_string):
         genus = ''
         # It could be an abreviation
         genus_obj = Genus.objects.filter(abrev=genus_string)
-        print("2. ", genus_obj)
         if genus_obj:
             # genus = genus_obj[0]
         # if len(genus_obj) > 0:
             genus = genus_obj[0]
             abrev = genus_string
-            print("3. ", genus, abrev)
     full_search_string = search_string
     if abrev != '':
-        print("4. ", abrev, genus)
         full_search_string = search_string.replace(abrev, genus.genus)
-        print(genus, search_string)
-        print(genus, full_search_string)
     return (genus, full_search_string)
 
 def search(request):
@@ -50,14 +45,12 @@ def search(request):
     search_list = []
     match_spc_list = []
     selected_app = ''
-    print("selected_app = ", selected_app)
     full_path = request.path
     path = 'information'
     if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
     if 'app' in request.GET:
         selected_app = request.GET.get('app', '')
-    print("selected_app = ", selected_app)
     # Get search string
     search_string = request.GET.get('search_string', '').strip()
     if 'search_string' in request.POST:
@@ -82,7 +75,6 @@ def search(request):
         # unknown application. Check every app in Application (aves, animalia, fungi, orchidaceae and other)
         for app in applications:
             Genus = apps.get_model(app, 'Genus')
-            print(app, search_string)
             genus, full_search_string = get_full_search_string(Genus, search_string)
             if genus and genus != '':
                 genus_list.append(genus)
