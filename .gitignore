@@ -16,4 +16,5 @@ run/
 *_test*
 *-test*
 staticfiles/
-
+media
+static
