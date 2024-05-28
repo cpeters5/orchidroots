@@ -564,7 +564,7 @@ seedparent, pollparent {
                         {% for image in display_items %}
                             <div class="imageitem justify-content-center" style="margin:2px;">
                                 <div class="box">
-                                    <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
+                                    <a target="_blank" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
                                         <img  class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% if image.image_file %}{% static image.image_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                         <div class="text text-br" ><span style="color:white">{{image.id}}</span></div>
                                     </a>
@@ -607,7 +607,7 @@ seedparent, pollparent {
                         <div class="d-flex flex-wrap justify-content-center" >
                             {% if seedimg_list %}
                                 {% for seed in seedimg_list %}
-                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
+                                    <a target="_blank" href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
                                         {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
                                             <img  class="thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% if seed.image_file %}{% static seed.image_dir %}{{seed.image_file}}{% else %}{{seed.image_url}}{% endif %}">
                                     </a>
@@ -638,7 +638,7 @@ seedparent, pollparent {
                         <div class="d-flex flex-wrap justify-content-center">
                             {% if pollimg_list %}
                                 {% for pol in pollimg_list %}
-                                    <a href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
+                                    <a target="_blank" href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
                                                 {% if pol.text_data %}{{pol.text_data|safe}}{% endif %}</small></h6>">
                                         <img  class="thumbnails thumbnails2" alt="{{pol.pid.pid.textname}}" src="{% if pol.image_file %}{% static pol.image_dir %}{{pol.image_file}}{% else %}{{pol.image_url}}{% endif %}">
                                     </a>
@@ -654,7 +654,7 @@ seedparent, pollparent {
                                     (syn. <a href="{% url 'display:information' species.hybrid.pollen_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% elif species.status == 'synonym' and species.getAccepted.hybrid.pollen_id.pid %}
-                                <a href="{% url 'display:information' species.getAccepted.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_pollen_name_long|safe}} (syn. </a>
+                                <a href="{% url 'display:information' species.getAccepted.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_pollen_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.pollen_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -673,7 +673,7 @@ seedparent, pollparent {
                                  <div class="d-flex flex-wrap justify-content-center">
                                    {% if ss_list %}
                                         {% for seedseed in ss_list %}
-                                                <a href="{% static seedseed.image_dir %}{{seedseed.image_file}}" data-lightbox="seedseed" data-title="
+                                                <a target="_blank" href="{% static seedseed.image_dir %}{{seedseed.image_file}}" data-lightbox="seedseed" data-title="
                                                     <h6><small>{{seedseed.id}}: {{seedseed.imgname}}
                                                     {% if seedseed.text_data %}{{seedseed.text_data|safe}}{% endif %}</small></h6>">
                                                     <img  class="thumbnails thumbnails2" alt="{{seedseed.pid.pid.textname}}" src="{% static seedseed.image_dir %}{{seedseed.image_file}}">
@@ -695,7 +695,7 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if sp_list %}
                                         {% for seedpol in sp_list %}
-                                            <a href="{% static seedpol.image_dir %}{{seedpol.image_file}}" data-lightbox="seedpol" data-title="
+                                            <a target="_blank" href="{% static seedpol.image_dir %}{{seedpol.image_file}}" data-lightbox="seedpol" data-title="
                                                 <h6><small>{{seedpol.id}}: {{seedpol.imgname}}
                                                 {% if seedpol.text_data %}{{seedpol.text_data|safe}}{% endif %}</small</h6>">
                                                 <img  class="thumbnails thumbnails2" alt="{{seedpol.pid.pid.textname}}" src="{% static seedpol.image_dir %}{{seedpol.image_file}}">
@@ -726,7 +726,7 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if ps_list %}
                                         {% for polseed in ps_list %}
-                                        <a href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed" data-title="
+                                        <a target="_blank" href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed" data-title="
                                         <h6><small>{{polseed.id}}: {{polseed.imgname}}
                                             {% if polseed.text_data %}{{polseed.text_data|safe}}{% endif %}
                                             </small></h6>">
@@ -749,7 +749,7 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if pp_list %}
                                         {% for polpol in pp_list %}
-                                            <a href="{% static polpol.image_dir %}{{polpol.image_file}}" data-lightbox="polpol" data-title="
+                                            <a target="_blank" href="{% static polpol.image_dir %}{{polpol.image_file}}" data-lightbox="polpol" data-title="
                                                 <h6><small>{{polpol.id}}: {{polpol.imgname}}
                                                 {% if polpol.text_data %}{{polpol.text_data|safe}}{% endif %}
                                                 </small></h6>">
@@ -784,10 +784,10 @@ seedparent, pollparent {
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
                             {% if p.aid.get_best_img %}
-                                <a href="/static/utils/images/species/{{p.img}}" data-lightbox="anc" data-title="
+                                <a target="_blank" href="/static/utils/images/species/{{p.aid.get_best_img.image_file}}" data-lightbox="anc" data-title="
                                     <h6><small>{{p.id}}: {{p.aid.abrevname|safe}}
                                     {% if p.text_data %}{{p.text_data|safe}}{% endif %}</small></h6>">
-                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p..image_file}}">
+                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/images/species/{{p.aid.get_best_img.image_file}}">
                                 </a>
                             {% else %}
                                 <img class="thumbnails thumbnails3" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
