@@ -21,10 +21,11 @@ def get_full_search_string(Genus, search_string):
         (genus_string, rest) = search_string.split(' ', 1)
 
     abrev = ''
-    try:
-        # get genus obj
-        genus = Genus.objects.get(genus=genus_string)
-    except Genus.DoesNotExist:
+    # get genus obj
+    genera = Genus.objects.filter(genus=genus_string)
+    if len(genera) > 0:
+        genus = genera[0]
+    else:
         genus = ''
         # It could be an abreviation
         genus_obj = Genus.objects.filter(abrev=genus_string)
@@ -43,6 +44,7 @@ def search(request):
     # Handles search genus. Then call search_species if there is another word(s) in the search straing
     role = getRole(request)
     search_list = []
+    genus_list = []
     match_spc_list = []
     selected_app = ''
     full_path = request.path
@@ -51,6 +53,8 @@ def search(request):
         path = 'photos'
     if 'app' in request.GET:
         selected_app = request.GET.get('app', '')
+
+
     # Get search string
     search_string = request.GET.get('search_string', '').strip()
     if 'search_string' in request.POST:
@@ -58,14 +62,18 @@ def search(request):
     if not search_string or search_string == '':
         message = 'Empty search term'
         return HttpResponse(message)
-
-    genus_list = []
-    match_spc_list = []
-    # collect all matching genera in each app
-    if selected_app in applications:
+    if selected_app == 'orchidaceae':
+        url = "%s?search_string=%s" % (reverse('search:search_orchidaceae'), search_string)
+        return HttpResponseRedirect(url)
+    elif selected_app in applications:
+    # For other non-orchid: collect all matching genera in each app
         Genus = apps.get_model(selected_app, 'Genus')
         genus, full_search_string = get_full_search_string(Genus, search_string)
         if genus != '':
+            if genus.family.family == 'Orchidaceae':
+                url = "%s?search_string=%s&genus=%s&family=%s" % (
+                reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
+                return HttpResponseRedirect(url)
             genus_list.append(genus)
             family = genus.family
             Species = apps.get_model(family.application, 'Species')
@@ -76,6 +84,11 @@ def search(request):
         for app in applications:
             Genus = apps.get_model(app, 'Genus')
             genus, full_search_string = get_full_search_string(Genus, search_string)
+            if genus.family.family == 'Orchidaceae':
+                genusname = genus.genus
+                familyname = genus.family.family
+                url = "%s?search_string=%s&genus=%s&family=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
+                return HttpResponseRedirect(url)
             if genus and genus != '':
                 genus_list.append(genus)
                 family = genus.family
@@ -316,7 +329,7 @@ def search_name(request):
     return render(request, "search/search_name.html", context)
 
 
-def search_orchid(request):
+def search_orchidaceae(request):
     app = 'orchidaceae'
     genus_string = ''
     single_word = ''
@@ -341,7 +354,6 @@ def search_orchid(request):
             genus_string = search_string
         elif search_string.split()[0]:
             genus_string = search_string.split()[0]
-
     role = getRole(request)
     if 'family' in request.GET:
         family = request.GET['family']
@@ -355,16 +367,15 @@ def search_orchid(request):
         min_score = 80
         # Try to match genus
         Genus = apps.get_model(app, 'Genus')
-        genus_list = Genus.objects.all(). \
-                        values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year')
+        genus_list = Genus.objects.all()
+                      # .values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year'))
         search_list = []
         for x in genus_list:
-            if x['genus']:
-                score = fuzz.ratio(x['genus'].lower(), genus_string.lower())
-                if score >= min_score:
-                    search_list.append([x, score])
+            score = fuzz.ratio(x.genus.lower(), genus_string.lower())
+            if score >= min_score:
+                search_list.append([x, score])
 
-        search_list.sort(key=lambda k: (-k[1], k[0]['genus']))
+        search_list.sort(key=lambda k: (-k[1], k[0].genus))
         del search_list[5:]
         genus_list = search_list
     if not genus_list or not single_word:
@@ -384,7 +395,7 @@ def search_orchid(request):
                'alpha_list': alpha_list,
                'single_word': single_word,
                'role': role, 'path': path, 'full_path': full_path}
-    return render(request, "search/search_species.html", context)
+    return render(request, "search/search_orchidaceae.html", context)
 
 
 def get_species_list(application, family=None, subfamily=None, tribe=None, subtribe=None):
@@ -401,113 +412,6 @@ def get_species_list(application, family=None, subfamily=None, tribe=None, subtr
 
     return species_list
     # return species_list.values('pid', 'binomial', 'author', 'source', 'status', 'type', 'family')
-
-
-def search_fuzzy(request):
-    min_score = 60
-    search_string = ''
-    result_list = []
-    result_score = []
-    Family = apps.get_model('common', 'Family')
-    Genus = apps.get_model('orchidaceae', 'Genus')
-    Alliance = apps.get_model('orchidaceae', 'Alliance')
-    Species = apps.get_model('orchidaceae', 'Species')
-
-    family = 'Orchidaceae'
-    if 'family' in request.GET:
-        family = request.GET['family']
-
-    role = 'pub'
-    if 'role' in request.GET:
-        role = request.GET['role']
-
-    if request.GET.get('search_string'):
-        search_string = request.GET['search_string'].strip()
-    send_url = '/search/search_orchid/?search_string=' + search_string + "&role=" + role
-
-    if family != 'Orchidaceae':
-        url = "%s?role=%s&family=%s&search_string=%s" % (
-        reverse('search:search_species'), role, family, search_string)
-        return HttpResponseRedirect(url)
-
-    grexlist = Species.objects.exclude(status='pending')
-    # Filter for partner specific list.
-
-    perfect_list = grexlist
-    keyword = search_string.lower()
-    rest = keyword.split(' ', 1)
-
-    if len(rest) > 1:
-        # First get genus by name (could be abbrev.)
-        genus = rest[0]
-        abrev = genus
-        if not genus.endswith('.'):
-            abrev = genus + '.'
-        # Then find genus in Genus class, start with accepted if exists.
-        matched_gen = Genus.objects.filter(Q(genus=rest[0]) | Q(abrev=abrev)).order_by('status')
-
-        if not matched_gen:
-            return HttpResponseRedirect(send_url)
-
-        # Genus found, get genus object
-        genus_obj = matched_gen[0]
-        keyword = rest[1]
-        # If genus is a synonym, get accepted name
-        if genus_obj.status == 'synonym':
-            matched_gen = Genus.objects.filter(Q(genus=genus_obj.gensyn.acc_id) | Q(abrev=genus_obj.gensyn.acc.abrev))
-            if matched_gen:
-                genus_obj = matched_gen[0]
-            else:
-                # For synonym genus, use conventional search
-                return HttpResponseRedirect(send_url)
-
-        # Get alliance associated to the genus_obj
-        alliance_obj = Alliance.objects.filter(gen=genus_obj.pid)
-        if alliance_obj:
-            # Then create genus_list of all genus associated to the alliance.
-            genus_list = list(Alliance.objects.filter(alid=alliance_obj[0].alid.pid).values_list('gen'))
-
-            # Then create the search space of species/hybrids in all genera associated to each alliances.
-            grexlist = grexlist.filter(gen__in=genus_list)
-        else:
-            # If alliance does not exist, just search on the genus alone
-            grexlist = grexlist.filter(gen=genus_obj.pid)
-    else:
-        return HttpResponseRedirect(send_url)
-
-    # Compute fuzzy score for all species in grexlist
-    for x in grexlist:
-        # If the first word is genus hint, compare species and the tail
-        score = fuzz.ratio(x.grex().lower(), keyword)
-        if score >= min_score:
-            result_list.append(x)
-            result_score.append([x, score])
-
-    # Add the perfect match and set score 100%.
-    # At this point, the first word is related to a genus
-    perfect_list = perfect_list.filter(species__iexact=rest[1])
-    perfect_pid = perfect_list.values_list('pid', flat=True)
-
-    for x in perfect_list:
-        if x in result_list:
-            result_list.remove(x)
-
-    for i in range(len(result_score)):
-        if genus_obj != '':
-            if result_score[i][0].gen.pid == genus_obj.pid:
-                if result_score[i][1] == 100:
-                    result_score[i][1] = 200
-    family = Family.objects.get(pk='Orchidaceae')
-
-    result_score.sort(key=lambda k: (-k[1], k[0].name()))
-    context = {'result_list': result_list,'result_score': result_score, 'len': len(result_list), 'search_string':  search_string, 'genus': genus,
-               'alliance_obj': alliance_obj, 'genus_obj': genus_obj,
-               'min_score': min_score, 'keyword': keyword,
-               'family': family,
-               'alpha_list': alpha_list, 'role': role, 'namespace': 'search',
-
-               }
-    return render(request, "search/search_orchid.html", context)
 
 
 def compare_strings(str1, str2, ignore_chars):

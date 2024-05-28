@@ -1,0 +1,206 @@
+{% load static %}
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+{% load testtags %}
+
+<style>
+table {
+  padding: 100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+td {
+    /*border: 1px solid lightgrey;*/
+    padding: 10px;
+}
+tr {
+    /*border: 1px solid lightgrey;*/
+}
+.thumbnails {
+   object-fit: cover;
+   overflow: hidden;
+   height: 100px;
+   width : auto;
+   margin:5px auto;
+}
+@media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+        font-size:10px;
+    }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
+    }
+    td {
+        border: 1px solid lightgrey;
+        padding-left: 10px;
+    }
+
+}
+</style>
+
+<div style="min-height:200px;background-color:white;width: 100%;">
+    <div class="row">
+        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
+                <div style="text-align: center;">
+                    <h5>Search results (by {{area}} in {{selected_app|default:'all domain'}}) "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
+                </div>
+                    <table>
+                        <tr><td>
+                            <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                            </td>
+                            <td>
+                                <form action="/search/search/?search_string={{ search_string }}&role={{role}}" method="post">
+                                        {% csrf_token %}
+                                  <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
+                                    <option value="">search all</option>
+                                    <option value="aves">Aves</option>
+                                    <option value="animalia">Animalia</option>
+                                    <option value="fungi">Fungi</option>
+                                    <option value="orchidaceae">Orchids</option>
+                                    <option value="other">Other Plant Families</option>
+                                  </select>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Sample image</th>
+                            <th>Genus</th>
+                            <th># species/hybrids</th>
+                        </tr>
+                {% if genus_list %}
+                    {% for genus in genus_list %}
+                        <tr style="border: 1px solid lightgrey;">
+                            <td style="min-width:100px; text-align: center">
+                                {% if genus.0.get_best_img %}
+                                 <img class="thumbnails" alt="{{genus.0.genus}}" src="{% static genus.0.get_best_img.image_dir %}{{genus.0.get_best_img.image_file}}">
+                                {{genus.0.get_best_img.pid.name|safe}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}
+                                    <a href="/common/species/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}}{% if genus.status == 'synonym' %}(syn.){% endif %}
+                                {% else %}
+                                    {% if genus.0.family.family == 'Orchidaceae' %}
+                                        <a href="/orchidaceae/hybrid/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% else %}
+                                        <a href="/common/hybrid/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% if user.tier.tier > 3 %}
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{genus.0.num_species|default:''}}
+                            </td>
+                            {% endif %}
+<!--                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{genus.0.num_spcimage}}</td>-->
+                                <td>{{genus.0.common_name|default:''}}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                {% if match_spc_list %}
+                    {% for species in match_spc_list %}
+                        <tr style="border: 1px solid lightgrey;">
+                            <td style="min-width:100px; text-align: center">
+                                {% if species.get_best_img %}
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                    <i>{{species.binomial|safe}}</i>
+                                </a>
+                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                                    (<i>{{species.family|default:''}}</i>
+                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
+                            </td>
+                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td>{{species.distribution|default:''}}</td>
+                            {% if user.tier.tier > 3 %}
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{species.pid}}
+                            </td>
+                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{species.num_image|default:''}}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% elif other_genus_spc %}
+                    {% for species in other_genus_spc %}
+                        <tr style="border: 1px solid lightgrey;">
+                            <td style="min-width:100px; text-align: center">
+                                {% if species.get_best_img %}
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                    <i>{{species.binomial|safe}}</i>
+                                </a>
+                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                                    (<i>{{species.family|default:''}}</i>
+                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
+                            </td>
+                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
+                            <td>{{species.distribution|default:''}}</td>
+                            {% if user.tier.tier > 3 %}
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{species.num_image|default:''}}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                {% endif %}
+
+<!--                    <div style="padding: 0; margin-top: 20px;">-->
+<!--                        Didn't see what you are looking for?<br>-->
+<!--                        <a class="btn btn-custom" style="width: 150px;" href="/other/search_species/?family={{family|default:'Orchidaceae'}}&search_string={{search_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
+<!--                    </div>-->
+                        <tr><td>
+                            <div class="btn btn-custom" onclick="history.back()">Go back</div>
+                        </td></tr>    </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+$(document).ready(function(){
+    $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        localStorage.setItem('activeTab', $(e.target).attr('href'));
+    });
+    var activeTab = localStorage.getItem('activeTab');
+    if(activeTab){
+        $('#myTab a[href="' + activeTab + '"]').tab('show');
+    }
+});
+
+$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+    function handleSelect(select) {
+      var selectedOption = select.value;
+      console.log("Selected option:", selectedOption);
+      // Perform further actions based on the selected option
+      // e.g., submit the form programmatically, redirect, etc.
+      select.form.submit();
+    }
+
+
+</script>
+
+
+
+{% endblock %}

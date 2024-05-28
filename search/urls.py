@@ -9,8 +9,7 @@ urlpatterns = [
     path('search_species/', views.search_species, name='search_species'),
     path('search_name/', views.search_name, name='search_name'),
     path('search_binomial/', views.search_binomial, name='search_binomial'),
-    # path('search_distribution/', views.search_distribution, name='search_distribution'),
-    path('search_fuzzy/', views.search_fuzzy, name='search_fuzzy'),
+    path('search_orchidaceae/', views.search_orchidaceae, name='search_orchidaceae'),
 
     # If neither family nor application, nor genus is given, then search across all tables for matching species
 
