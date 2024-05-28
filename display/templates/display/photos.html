@@ -315,7 +315,7 @@ a:hover {
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %} p-1 justify-content-center align-items-center">
                      {% if image.image_file_path %}
                          <div class="box" style="background-color: #f19292">
-                             <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                             <a target="_blank" href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
                                   {{image.id}}: {{image.imgname}}
                                   <br>{{image.get_displayname}}
                                   <br>{{image.text_data|default:''|safe}}">
@@ -360,7 +360,7 @@ a:hover {
             {% for image in public_list %}
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                     <div class="box">
-                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                        <a target="_blank" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                 {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                 {{image.get_displayname}}
                                 <br>{{image.text_data|default:''|safe}}">
@@ -391,7 +391,7 @@ a:hover {
                     <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         {% if image.image_file %}
                             <div class="box" style="background-color: #f19292">
-                                <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                <a target="_blank" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
                                     <h6><small>
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
