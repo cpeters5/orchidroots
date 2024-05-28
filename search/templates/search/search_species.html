@@ -115,6 +115,9 @@ tr {
                             <td>{{species.distribution|default:''}}</td>
                             {% if user.tier.tier > 3 %}
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                                {{species.pid}}
+                            </td>
+                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.num_image|default:''}}
                             </td>
                             {% endif %}
