@@ -116,8 +116,6 @@ tr {
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-                                    (<i>{{species.family|default:''}}</i>
-                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
                             <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
                             <td>{{species.distribution|default:''}}</td>
@@ -132,6 +130,7 @@ tr {
                         </tr>
                     {% endfor %}
                 {% elif other_genus_spc %}
+                        <tr><td></td></tr>
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
@@ -144,8 +143,6 @@ tr {
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-                                    (<i>{{species.family|default:''}}</i>
-                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
                             <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
                             <td>{{species.distribution|default:''}}</td>
