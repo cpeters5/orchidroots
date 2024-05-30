@@ -69,27 +69,26 @@ def search(request):
     # For other non-orchid: collect all matching genera in each app
         Genus = apps.get_model(selected_app, 'Genus')
         genus, full_search_string = get_full_search_string(Genus, search_string)
-        if genus != '':
-            if genus.family.family == 'Orchidaceae':
-                url = "%s?search_string=%s&genus=%s&family=%s" % (
-                reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
-                return HttpResponseRedirect(url)
-            genus_list.append(genus)
-            family = genus.family
-            Species = apps.get_model(family.application, 'Species')
-            this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
-            match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+        if isinstance(genus, Genus) and genus.family.family == 'Orchidaceae':
+            url = "%s?search_string=%s&genus=%s&family=%s" % (
+            reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
+            return HttpResponseRedirect(url)
+        genus_list.append(genus)
+        family = genus.family
+        Species = apps.get_model(family.application, 'Species')
+        this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
+        match_spc_list = list(chain(match_spc_list, this_match_spc_list))
     else:
         # unknown application. Check every app in Application (aves, animalia, fungi, orchidaceae and other)
         for app in applications:
             Genus = apps.get_model(app, 'Genus')
             genus, full_search_string = get_full_search_string(Genus, search_string)
-            if genus.family.family == 'Orchidaceae':
+            if genus and genus.family.family == 'Orchidaceae':
                 genusname = genus.genus
                 familyname = genus.family.family
                 url = "%s?search_string=%s&genus=%s&family=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
                 return HttpResponseRedirect(url)
-            if genus and genus != '':
+            if isinstance(genus, Genus) and genus != '':
                 genus_list.append(genus)
                 family = genus.family
                 Species = apps.get_model(family.application, 'Species')
@@ -380,10 +379,8 @@ def search_orchidaceae(request):
         genus_list = search_list
     if not genus_list or not single_word:
         match_spc_list = get_species_list(app, family).filter(binomial__icontains=search_string)
-        if family:
-            match_spc_list = match_spc_list.filter(gen__family=family.family)
-        match_spc_list = match_spc_list.values('pid', 'species', 'infraspr', 'infraspe', 'family', 'genus', 'author', 'status', 'year', 'binomial')
-
+    if match_spc_list:
+        match_spc_list = match_spc_list.order_by('binomial')
     path = 'information'
     if role == 'cur':
         path = 'photos'
