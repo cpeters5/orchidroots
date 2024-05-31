@@ -833,48 +833,10 @@ def ancestrytree(request, pid=None):
 
 
 @login_required
-def progeny_old(request, pid):
-    alpha = ''
-    direct = ''
-    role = getRole(request)
-
-    if 'direct' in request.GET:
-        direct = request.GET['direct']
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    write_output(request, species.binomial)
-    genus = species.genus
-    des_list = AncestorDescendant.objects.filter(aid=pid)
-    if len(des_list) > 5000:
-        des_list = des_list.filter(pct__gt=20)
-    if direct:
-        des_list = des_list.filter(Q(did__seed_id=pid) | Q(did__pollen_id=pid))
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL' or alpha == 'all':
-            alpha = ''
-        des_list = des_list.filter(did__pid__species__istartswith=alpha)
-
-    total = des_list.count()
-
-    context = {'des_list': des_list, 'species': species, 'total': total, 'alpha': alpha, 'alpha_list': alpha_list,
-                'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
-               'title': 'progeny', 'section': 'Public Area', 'role': role,
-               }
-    return render(request, 'orchidaceae/progeny_old.html', context)
-
-
 def progeny(request, pid):
-    direct = ''
     role = getRole(request)
     family = Family.objects.get(pk='Orchidaceae')
-
-    if 'direct' in request.GET:
-        direct = request.GET['direct']
+    direct = request.GET.get('direct', '')
 
     try:
         species = Species.objects.get(pk=pid)
@@ -882,19 +844,14 @@ def progeny(request, pid):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
-
     genus = species.genus
 
     #All descendants
     des_list = AncestorDescendant.objects.filter(aid=pid)
-
     # primary
-    prim_list = Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True)
+    prim_list = set(Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True))
     # Secondary
-    sec_list = Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True)
-    prim_list = set(prim_list)
-    sec_list = set(sec_list)
-
+    sec_list = set(Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True))
 
     if len(des_list) > 5000:
         des_list = des_list.filter(pct__gt=30)
@@ -906,7 +863,7 @@ def progeny(request, pid):
         elif x.did.pid.pid in sec_list:
             result_list.append([x,'secondary'])
         else:
-            result_list.append([x,''])
+            result_list.append([x,'remote'])
 
     # total = des_list.count()
 
