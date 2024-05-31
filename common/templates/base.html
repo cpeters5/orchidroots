@@ -19,13 +19,6 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
     <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
     <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
-    <!--    <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico?v=2' %}"/>-->
-<!--    <script>-->
-<!--        window.dataLayer = window.dataLayer || [];-->
-<!--        function gtag(){dataLayer.push(arguments);}-->
-<!--        gtag('js', new Date());-->
-<!--        gtag('config', 'UA-128957305-1');-->
-<!--    </script>-->
     {% if species %}
         <title>{{species.binomial}}</title>
     {% elif genus %}
@@ -56,85 +49,18 @@
 	<link rel="{% static '/utils/css/style.css' %}">
 	<link rel="{% static '/utils/css/index.css' %}">
 
-    <!--adsense-->
-<!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037211149077083" crossorigin="anonymous"></script>-->
+<!--    For dataTable column reorder-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.5/css/colReorder.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/1.5.5/js/dataTables.colReorder.min.js"></script>
 
-    <!--    Get rid of apple-touch error caused by requests from cellphone. Doesn't work anyway oh what to do??? -->
-<!--    <link rel="apple-touch-icon" href="apple-touch-icon.png">-->
-<!--    <link rel="icon" sizes="196x196" href="apple-touch-icon.png">-->
-<!--    <link rel="icon" sizes="120x120" href="apple-touch-icon.png">-->
-<!--    <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">-->
-<!--    <link rel="apple-touch-icon-precomposed apple-touch-icon" href="apple-touch-icon-precomposed.png">-->
-<!--    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>-->
-<!--	<script src="{% static 'utils/js/jstree.min.js' %}"></script>-->
-<!--    Select2-->
-<!--    <link href="select2.css" rel="stylesheet"/>-->
-<!--    <script src="select2.js"></script>-->
-<!--    <script>-->
-<!--        $(document).ready(function() { $("#genselect").select2(-->
-<!--            {-->
-<!--                placeholder: "Select a Genus",-->
-<!--                allowClear: true,-->
-<!--                closeOnSelect: false-->
-<!--            }-->
-<!--        ); });-->
-<!--        $(document).ready(function() { $("#spcselect").select2();});-->
-<!--        $(document).ready(function() { $("#hybselect").select2();});-->
-<!--    </script>-->
 
-    <style>
-
-    .mytable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-    .mytable>tbody>tr>th { font-size: 16px; }
-    .mytable>tbody>tr>td { font-size: 12px !important; }
-	a {text-decoration: none}
-
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    .navbar-nav > li > a {padding-top:0 !important; padding-bottom:0 !important;}
-
-    /* adsense component*/
-    .infeed {
-        border: 1px solid lightgrey;
-    }
-  @media (min-width: 350px) {
-      .infeed {
-          height: 40px;
-      }
-  }
- @media (min-width: 500px) {
-    .infeed {
-      height: 20px;
-    }
-  }
- @media (min-width: 800px) {
-    .infeed {
-        height: 50px;
-    }
-  }
-
-</style>
-<!-- Google tag (gtag.js) -->
-
-<!--&lt;!&ndash; Google tag (gtag.js) &ndash;&gt;-->
-<!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-NQ3QZB4545"></script>-->
-<!--<script>-->
-<!--  window.dataLayer = window.dataLayer || [];-->
-<!--  function gtag(){dataLayer.push(arguments);}-->
-<!--  gtag('js', new Date());-->
-
-<!--  gtag('config', 'G-NQ3QZB4545');-->
-<!--</script>-->
 </head>
 
+
 <style>
-
-
 img {
 max-width: 100%;
 display: block;
@@ -146,34 +72,12 @@ display: block;
      text-align: center;
 }
 
-.thumbnails {
-   object-fit: cover;
-   overflow: hidden;
-   height: 12vw;
-   width : 12vw;
-    padding:2px;
-}
-
-.imgcaption {
-    font-size: 11px;
-    text-align: center;
-    height:40px;
-    overflow: hidden;
-}
-
 .table-text {
     font-size:13px;
     text-align: left;
     line-height: 20px;
 }
 
-.searchbox {
-    margin:0;
-    font-size: 13px;
-    width: 100px;
-    /*padding: 0;*/
-    /*height: 10px !important;*/
-    }
 .nav-style {
     font-size:18px;
     width:100px;
@@ -191,10 +95,6 @@ display: block;
 }
 
 @media only screen and (max-width: 600px){
-    .searchbox {
-        font-size: 12px;
-        width: 80px;
-    }
     .modal-content {
         width: 100%;
     }
@@ -421,15 +321,6 @@ ul, #myUL1 {
     min-width: 200px;
 }
 
-/*.indent {*/
-/*  text-indent: 18px;*/
-/*}*/
-
-/*.nested {*/
-/*  display: none;*/
-/*    margin-left: 8px;*/
-/*}*/
-
 .active {
   display: block;
 }
@@ -621,20 +512,23 @@ nav .search-container button:hover {
 <!-- Links -->
 
         <div class="collapse navbar-collapse" id="nav-content">
+<!--            Search binomial -->
 <!--            <form class="form-inline" id="binomial" action="/search/search_binomial/" style="margin-top: 5px;">-->
 <!--                <input type="hidden" form="binomial" name="app" value="orchidaceae" >-->
 <!--                <input type="hidden" form="binomial" name="role" value="{{ role }}" >-->
 <!--                <input class="searchbox" form="binomial" value="{{search_orchid}}" type="text" name="query"  pattern=".{3,}" placeholder="orchid search" style="border:1px solid #ccc; border-right: 0">-->
 <!--            </form>-->
+<!--            search taxonomy-->
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
-                <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="scientific/registered name" style="border:1px solid #ccc; border-right: 0">
             </form>
+<!--            search common name-->
             <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">
-<!--                <input  form="name" type="hidden" name="selected_app" value="{{ selected_app }}">-->
                 <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">
             </form>
+
+<!--            User info-->
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -683,9 +577,9 @@ nav .search-container button:hover {
                 {% endif %}
             </ul>
         </div>
-<!-- Search -->
   </div>
 </nav>
+
     <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark" >-->
 {% if messages %}
   <div class="row">
@@ -700,8 +594,7 @@ nav .search-container button:hover {
   </div>
 {% endif %}
 
-
-
+<!--Second navbar-->
 <div class="p-2" style="background-color:black; color: white !important; font-size: 11px;">
      &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked&role={{role}}">Orchids</a>
      &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked&role={{role}}">Fungi</a>
@@ -711,11 +604,6 @@ nav .search-container button:hover {
      &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?">Gallery</a>
 <!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
     </div>
-
-
-
-
-
 </div>
 
 
@@ -757,19 +645,6 @@ nav .search-container button:hover {
 
 </body>
 </html>
-
-
-<!--<ins class="adsbygoogle infeed"-->
-<!--     style="display:block;"-->
-<!--     data-ad-format="fluid"-->
-<!--     data-ad-layout="image-top"-->
-<!--     data-ad-layout-key="xxxxxxxx"-->
-<!--     data-ad-client="ca-pub-12345"-->
-<!--     data-ad-slot="123456"></ins>-->
-<!--<script>-->
-<!--     (adsbygoogle = window.adsbygoogle || []).push({});-->
-<!--</script>-->
-
 
 
 

@@ -77,52 +77,6 @@ def get_random_sponsor():
     return sponsor
 
 
-def get_searchdata(request):
-    selected_app = ''
-    area = ''
-    if 'selected_app' in request.POST:
-        selected_app = request.POST['selected_app']
-    elif 'selected_app' in request.GET:
-        selected_app = request.GET['selected_app']
-    # else:
-    #     area = ''
-
-    if 'area' in request.POST:
-        area = request.POST['area'].strip()
-    elif 'area' in request.GET:
-        area = request.GET['area'].strip()
-    # else:
-    #     area = ''
-
-    return selected_app, area
-
-
-def xget_searchdata(request):
-    searchdata = 0
-
-    if 'searchdata' in request.POST:
-        searchdata = request.POST['searchdata']
-    elif 'searchdata' in request.GET:
-        searchdata = request.GET['searchdata']
-
-    option_mapping = {
-        1: ('', 'name'),
-        2: ('', 'taxon'),
-        3: ('aves', 'name'),
-        4: ('aves', 'taxon'),
-        5: ('animalia', 'name'),
-        6: ('animalia', 'taxon'),
-        7: ('fungi', 'name'),
-        8: ('fungi', 'taxon'),
-        9: ('other', 'name'),
-        10: ('other', 'taxon'),
-        11: ('orchidaceae', 'name'),
-        12: ('orchidaceae', 'taxon')
-    }
-    selected_app, area = option_mapping.get(searchdata, (None,None))
-    return selected_app, area
-
-
 def get_application(request):
     family = request.GET.get('family', None)
     try:

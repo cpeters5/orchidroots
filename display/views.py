@@ -10,7 +10,7 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, get_searchdata, handle_bad_request
+from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, handle_bad_request
 from common.views import rank_update, quality_update
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
@@ -23,9 +23,6 @@ Accepted = []
 Synonym = []
 f, sf, t, st = '', '', '', ''
 redirect_message = 'species does not exist'
-# num_show = 5
-# page_length = 500
-
 
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
@@ -33,7 +30,6 @@ def information(request, pid=None):
     if not pid or not str(pid).isnumeric():
         handle_bad_request(request)
 
-    selected_app, area = get_searchdata(request)
     from_path = pathinfo(request)
     app, family = get_application(request)
     if not family:
@@ -192,7 +188,6 @@ def information(request, pid=None):
                'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'selected_app': selected_app, 'area': area,
                'app': app, 'ancspc_list': ancspc_list,
                'from_path': from_path, 'tab': 'rel', 'view': 'information',
                }
@@ -201,7 +196,6 @@ def information(request, pid=None):
 
 def photos(request, pid=None):
     author = get_reqauthor(request)
-    selected_app, area = get_searchdata(request)
     related = ''
     related_species = ''
     related_pids = []
@@ -239,7 +233,7 @@ def photos(request, pid=None):
                    'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app,
                    'public_list': public_list, 'private_list': private_list,
                    'upload_list': upload_list,
-                   'related': related, 'syn': syn, 'role': role, 'selected_app': selected_app, 'area': area,
+                   'related': related, 'syn': syn, 'role': role,
                    }
         return render(request, 'display/photos.html', context)
 
@@ -250,9 +244,6 @@ def photos(request, pid=None):
     else:
         related_list = Species.objects.filter(binomial=this_species_name).exclude(type='species', status='synonym')
     related = request.GET.get('related', '')
-
-    # if species.genus + ' ' + species.species != species.binomial and not related.isnumeric():
-    #     related = str(species.pid)
 
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
@@ -334,15 +325,13 @@ def photos(request, pid=None):
                'variety': variety, 'pho': 'active', 'tab': 'pho', 'app':app, 'related_list': related_list,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'syn_list': syn_list, 'related': related, 'syn': syn,
-               'selected_app': selected_app, 'area': area, 'owner': owner,
-               # 'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list,
+               'owner': owner,
                }
     return render(request, 'display/photos.html', context)
 
 
 def videos(request, pid):
     author = get_reqauthor(request)
-    selected_app, area = get_searchdata(request)
     accpid = 0
     syn = request.GET.get('syn', None)
     if not author or author == 'anonymous':
@@ -387,7 +376,6 @@ def videos(request, pid):
                'vid': 'active', 'tab': 'vid', 'app':app,
                'video_list': video_list,
                'related_list': related_list, 'syn_list': syn_list,
-               'selected_app': selected_app, 'area': area,
                'view': 'videos',
                }
     return render(request, 'display/videos.html', context)
