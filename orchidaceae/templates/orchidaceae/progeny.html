@@ -123,16 +123,31 @@
 <script>
 
 $(document).ready(function() {
+    $.fn.dataTable.ext.type.order['priority-pre'] = function(data) {
+        switch (data) {
+            case 'primary': return 1;
+            case 'secondary': return 2;
+            case 'remote': return 3;
+            default: return 4;  // Handles unexpected or empty values
+        }
+    };
+
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
         "bPaginate": true,
-        "columnDefs": [{ "orderable": false, "targets": 2 }],
+        "colReorder": true,  // Enable column reordering
+        "columnDefs": [
+            // { "orderable": false, "targets": 2 }
+            { "type": "priority", "targets": 1 }
+        ],
+        "order": [[ 1, "asc" ], [0,'asc']],
         // "pagingType": "simple", # only show previous/next
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
         },
+
         // "dom": '<"top"i>rt<"bottom"flp><"clear">',
         // "dom": '<"top"flp>rt<"bottom"i><"clear">',
         // "dom": '<"wrapper"flipt>',
