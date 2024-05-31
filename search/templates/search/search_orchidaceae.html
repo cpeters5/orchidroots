@@ -26,7 +26,7 @@ tr {
 }
 @media only screen and (max-width: 600px) {
     table {
-        width: 100%;
+        /*width: 100%;*/
         font-size:10px;
     }
     .thumbnails {
@@ -34,7 +34,7 @@ tr {
        margin:5px auto;
     }
     td {
-        border: 1px solid lightgrey;
+        /*border: 1px solid lightgrey;*/
         padding-left: 10px;
     }
 
@@ -64,25 +64,17 @@ tr {
                                     <option value="other">Other Plant Families</option>
                                   </select>
                                 </form>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Sample image</th>
-                            <th>Genus</th>
-                            <th># species/hybrids</th>
-                        </tr>
+                            </td></tr>
                 {% if genus_list %}
+                        <tr>
+                            <th>Genus</th>
+                        </tr>
                     {% for genus in genus_list %}
                         <tr style="border: 1px solid lightgrey;">
-                            <td style="min-width:100px; text-align: center">
-                                {% if genus.0.get_best_img %}
-                                 <img class="thumbnails" alt="{{genus.0.genus}}" src="{% static genus.0.get_best_img.image_dir %}{{genus.0.get_best_img.image_file}}">
-                                {{genus.0.get_best_img.pid.name|safe}}
-                                {% endif %}
-                            </td>
                             <td>
                                 {% if not genus.0.num_hybrid or genus.0.num_species > 0 %}
-                                    <a href="/common/species/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}}{% if genus.status == 'synonym' %}(syn.){% endif %}
+                                    <a href="/common/species/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0}}</i></a> {{genus.0.author|default:''}} {{genus.0.year|default:''}}
+                                    {% if genus.status == 'synonym' %}<br>(syn.){% endif %}
                                 {% else %}
                                     {% if genus.0.family.family == 'Orchidaceae' %}
                                         <a href="/orchidaceae/hybrid/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
@@ -90,20 +82,36 @@ tr {
                                         <a href="/common/hybrid/?family={{genus.0.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus}}</i></a>  {{genus.0.author|default:''}} {% if genus.0.status == 'synonym' %}(syn.){% endif %}
                                     {% endif %}
                                 {% endif %}
-                            </td>
                             {% if user.tier.tier > 3 %}
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{genus.0.num_species|default:''}}
-                            </td>
+                            <br>{{genus.pid|default:''}}
                             {% endif %}
-<!--                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{genus.0.num_spcimage}}</td>-->
-                                <td>{{genus.0.common_name|default:''}}</td>
+                            </td>
+                            <td style="min-width:100px; text-align: center">
+                                {% if genus.0.get_best_img %}
+                                 <img class="thumbnails" alt="{{genus.0.genus}}" src="{% static genus.0.get_best_img.image_dir %}{{genus.0.get_best_img.image_file}}">
+<!--                                {{genus.0.get_best_img.pid.name|safe}}-->
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}
                 {% if match_spc_list %}
+                        <tr><td></td></tr>
+                        <tr>
+                            <th>species</th>
+                        </tr>
                     {% for species in match_spc_list %}
                         <tr style="border: 1px solid lightgrey;">
+                            <td>
+                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
+                                    <i>{{species.binomial|safe}}</i>
+                                </a>
+                                {{species.author|default:''}} {{species.year|default:''}}
+                                {% if species.status == 'synonym' %}<br>(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                                {% if user.tier.tier > 3 %}
+                                    <br>{{species.pid}}-{{species.getAccepted.pid}}
+                                {% endif %}
+                            </td>
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
                                 <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
@@ -111,26 +119,9 @@ tr {
                                 </a>
                                 {% endif %}
                             </td>
-                            <td>
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
-                                    <i>{{species.binomial|safe}}</i>
-                                </a>
-                                {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-                            </td>
-                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
-                            <td>{{species.distribution|default:''}}</td>
-                            {% if user.tier.tier > 3 %}
-                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{species.pid}}
-                            </td>
-                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
-                                {{species.num_image|default:''}}
-                            </td>
-                            {% endif %}
                         </tr>
                     {% endfor %}
                 {% elif other_genus_spc %}
-                        <tr><td></td></tr>
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
@@ -143,6 +134,8 @@ tr {
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                                    (<i>{{species.family|default:''}}</i>
+                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
                             </td>
                             <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
                             <td>{{species.distribution|default:''}}</td>
