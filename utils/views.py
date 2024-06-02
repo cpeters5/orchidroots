@@ -13,13 +13,14 @@ from django.apps import apps
 
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
-from accounts.models import Photographer
+from accounts.models import Photographer, User
 
 logger = logging.getLogger(__name__)
 import utils.config
 applications = utils.config.applications
 
 
+# Add IP to log when encountered malicious requests
 def handle_bad_request(request):
     pid = request.GET.get('pid', '')
     full_url = request.build_absolute_uri()
@@ -42,6 +43,7 @@ def handle_bad_request(request):
         return HttpResponse("URL and IP address has been logged.")
 
 
+# Generate unique file name. Used in ApproveMediaPhoto method
 def regenerate_file(source_path, destination_folder):
     filename = os.path.basename(source_path)
     while True:
@@ -60,12 +62,12 @@ def regenerate_file(source_path, destination_folder):
 
     return unique_filename
 
-
+# Not used
 def pathinfo(request):
     path  = request.path.split('/')[2:][0]
     return path
 
-
+# Not used
 def get_random_sponsor():
     from accounts.models import Sponsor
     from django.utils.timezone import datetime
@@ -76,25 +78,24 @@ def get_random_sponsor():
         sponsor = sponsors[0]
     return sponsor
 
-
+# Get family and app from request
+# If not exist, force return Orchidaceae
 def get_application(request):
     family = request.GET.get('family', None)
-    try:
-        family = Family.objects.get(family=family)
-        if family != '' and family.family != 'Orchidaceae':
-            crit = 1
-        app = family.application
-    except Family.DoesNotExist:
-        family = None
-        app = None
-
-    if not family:
+    if family:
+        try:
+            family = Family.objects.get(family=family)
+        except Family.DoesNotExist:
+            family = Family.objects.get(family='Orchidaceae')
+        return family.application, family
+    else:
         app = request.GET.get('app', None)
         if app not in applications:
             app = None
     return app, family
 
 
+# Obsolete. Used in taxonomy view to generate taxonomy tree
 def get_taxonomy(request):
     alpha = request.GET.get('alpha', '')
     app = request.GET.get('app', None)
@@ -121,10 +122,7 @@ def get_taxonomy(request):
     return family_list, alpha
 
 
-def getApp(request):
-    return request.resolver_match.app_name
-
-
+# Logging message for tracing users requests
 def write_output(request, detail=None):
     if str(request.user) != 'chariya' and request.user.is_authenticated:
         message = "ACCESS: " + request.path + " - " + str(request.user)
@@ -133,7 +131,7 @@ def write_output(request, detail=None):
         logger.warn(message)
     return
 
-
+# Used in my photos views. Probably can do without
 def get_author(request):
     if not request.user.is_authenticated or request.user.tier.tier < 2:
         return None, None
@@ -154,25 +152,18 @@ def get_author(request):
 
     return author, author_list
 
+# Used in detail.uploadFile (orchidaceae) and common.upload_file (all other)
 def get_reqauthor(request):
     author = None
     if request.user.is_authenticated:
-        if request.user.tier.tier > 2:
-            author = request.GET.get('author', None)
-            if author == "---" or author == '':
-                author = None
-            if author:
-                try:
-                    author = Photographer.objects.get(pk=author)
-                except Photographer.DoesNotExist:
-                    author = None
-        elif request.user.tier.tier > 1:
-            try:
-                author = Photographer.objects.get(user_id=request.user)
-            except Photographer.DoesNotExist:
-                author = None
+        author = request.GET.get('author', None)
+    if author:
+        author = User.objects.filter(username=author)
+    if isinstance(author, User):
+        author = Photographer.objects.filter(user_id=author[0].id)
+        if len(author) > 0:
+            author = author[0]
     return author
-
 
 
 def imgdir():
@@ -189,57 +180,6 @@ def get_random_img(spcobj):
     else:
         spcobj.img = 'noimage_light.jpg'
     return spcobj.img
-
-
-def is_int(s):
-    try:
-        int(s)
-    except ValueError:
-        return False
-    return True
-
-
-def paginator(request, full_list, page_length, num_show):
-    page_list = []
-    first_item = 0
-    last_item = 0
-    next_page = 0
-    prev_page = 0
-    last_page = 0
-    page = 0
-    page_range = 0
-    total = len(full_list)
-    if page_length > 0:
-        paginator = Paginator(full_list, page_length)
-        page = int(request.GET.get('page', '1'))
-
-        try:
-            page_list = paginator.page(page)
-            last_page = paginator.num_pages
-        except EmptyPage:
-            page_list = paginator.page(1)
-            last_page = 1
-        next_page = page + 1
-        if next_page > last_page:
-            next_page = last_page
-        prev_page = page - 1
-        if prev_page < 1:
-            prev_page = 1
-
-        first_item = (page - 1) * page_length + 1
-        last_item = first_item + page_length - 1
-        if last_item > total:
-            last_item = total
-        # Get the index of the current page
-        index = page_list.number - 1  # edited to something easier without index
-        # This value is maximum index of your pages, so the last page - 1
-        max_index = len(paginator.page_range)
-        # You want a range of 7, so lets calculate where to slice the list
-        start_index = index - num_show if index >= num_show else 0
-        end_index = index + num_show if index <= max_index - num_show else max_index
-        # My new page range
-        page_range = paginator.page_range[start_index: end_index]
-    return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
 def getRole(request):
@@ -260,201 +200,6 @@ def getRole(request):
         return role
     return 'pub'
 
-# def getOtherModels(request, family=None):
-#     app, subfamily, tribe, subtribe = '', '', '', ''
-#     if not family:
-#         family = request.GET.get('family', None)
-#         if not family and 'family' in request.POST:
-#             family = request.POST['family']
-#
-#     if family != 'other':
-#         try:
-#             family = Family.objects.get(pk=family)
-#             app = family.application
-#         except Family.DoesNotExist:
-#             family = ''
-#             app = 'other'
-#     else:
-#         family = ''
-#         app = 'other'
-#
-#     if 'subfamily' in request.GET:
-#         subfamily = request.GET['subfamily']
-#         if subfamily:
-#             try:
-#                 subfamily = Subfamily.objects.get(pk=subfamily)
-#             except Subfamily.DoesNotExist:
-#                 subfamily = ''
-#             if subfamily.family:
-#                 family = subfamily.family
-#     if 'tribe' in request.GET:
-#         tribe = request.GET['tribe']
-#         if tribe:
-#             try:
-#                 tribe = Tribe.objects.get(pk=tribe)
-#             except Tribe.DoesNotExist:
-#                 tribe = ''
-#             if tribe.subfamily:
-#                 subfamily = tribe.subfamily
-#             if subfamily.family:
-#                 family = tribe.subfamily.family
-#     if 'subtribe' in request.GET:
-#         subtribe = request.GET['subtribe']
-#         if subtribe:
-#             try:
-#                 subtribe = Subtribe.objects.get(pk=subtribe)
-#             except Subtribe.DoesNotExist:
-#                 subtribe = ''
-#             if subtribe.tribe:
-#                 tribe = subtribe.tribe
-#             if tribe.subfamily:
-#                 subfamily = tribe.subfamily
-#             if subfamily.family:
-#                 family = subfamily.family
-#     Genus = ''
-#     Species = ''
-#     Accepted = ''
-#     Hybrid = ''
-#     Synonym = ''
-#     Distribution = ''
-#     SpcImages = ''
-#     HybImages = ''
-#     UploadFile = ''
-#     Intragen = ''
-#     if app:
-#         if app == 'orchidaceae':
-#             from detail.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
-#             # only exist for orchidaceae
-#             GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
-#             HybImages = apps.get_model(app.lower(), 'HybImages')
-#             Intragen = apps.get_model(app.lower(), 'Intragen')
-#         else:
-#             HybImages = apps.get_model(app.lower(), 'SpcImages')
-#         Genus = apps.get_model(app.lower(), 'Genus')
-#         Hybrid = apps.get_model(app.lower(), 'Hybrid')
-#         Species = apps.get_model(app.lower(), 'Species')
-#         Accepted = apps.get_model(app.lower(), 'Accepted')
-#         Ancestordescendant = apps.get_model(app.lower(), 'AncestorDescendant')
-#         Synonym = apps.get_model(app.lower(), 'Synonym')
-#         Distribution = apps.get_model(app.lower(), 'Distribution')
-#         SpcImages = apps.get_model(app.lower(), 'SpcImages')
-#         UploadFile = apps.get_model('common', 'UploadFile')
-#     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
-
-
-# def getModels(request, family=None):
-#     app = request.GET.get('app', None)
-#     family = request.GET.get('family', None)
-#     if 'family' in request.POST:
-#         family = request.POST['family']
-#     try:
-#         family = Family.objects.get(pk=family)
-#         if not app:
-#             app = family.application
-#     except Family.DoesNotExist:
-#         family = ''
-#         if not app:
-#             app = 'other'
-#
-#     subfamily = request.GET.get('subfamily', None)
-#     if subfamily:
-#         try:
-#             subfamily = Subfamily.objects.get(pk=subfamily)
-#         except Subfamily.DoesNotExist:
-#             subfamily = ''
-#         if subfamily.family:
-#             family = subfamily.family
-#     tribe = request.GET.get('tribe', None)
-#     if tribe:
-#         try:
-#             tribe = Tribe.objects.get(pk=tribe)
-#         except Tribe.DoesNotExist:
-#             tribe = ''
-#         if tribe.subfamily:
-#             subfamily = tribe.subfamily
-#         if subfamily.family:
-#             family = tribe.subfamily.family
-#
-#     subtribe = request.GET.get('subtribe', None)
-#     if subtribe:
-#         try:
-#             subtribe = Subtribe.objects.get(pk=subtribe)
-#         except Subtribe.DoesNotExist:
-#             subtribe = ''
-#         if subtribe.tribe:
-#             tribe = subtribe.tribe
-#         if tribe.subfamily:
-#             subfamily = tribe.subfamily
-#         if subfamily.family:
-#             family = subfamily.family
-#     Genus = ''
-#     Species = ''
-#     Accepted = ''
-#     Hybrid = ''
-#     Synonym = ''
-#     Distribution = ''
-#     SpcImages = ''
-#     HybImages = ''
-#     UploadFile = ''
-#     Intragen = ''
-#     if app:
-#         if app == 'orchidaceae':
-#             from detail.forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, SpeciesForm, RenameSpeciesForm
-#             # only exist for orchidaceae
-#             GenusRelation = apps.get_model(app.lower(), 'GenusRelation')
-#             HybImages = apps.get_model(app.lower(), 'HybImages')
-#             Intragen = apps.get_model(app.lower(), 'Intragen')
-#         else:
-#             HybImages = apps.get_model(app.lower(), 'SpcImages')
-#         Genus = apps.get_model(app.lower(), 'Genus')
-#         Hybrid = apps.get_model(app.lower(), 'Hybrid')
-#         Species = apps.get_model(app.lower(), 'Species')
-#         Accepted = apps.get_model(app.lower(), 'Accepted')
-#         Ancestordescendant = apps.get_model(app.lower(), 'AncestorDescendant')
-#         Synonym = apps.get_model(app.lower(), 'Synonym')
-#         Distribution = apps.get_model(app.lower(), 'Distribution')
-#         SpcImages = apps.get_model(app.lower(), 'SpcImages')
-#         UploadFile = apps.get_model('common', 'UploadFile')
-#     return Genus, Species, Accepted, Hybrid, Synonym, Distribution, SpcImages, HybImages, app, family, subfamily, tribe, subtribe, UploadFile, Intragen
-
-
-def xgetSuperGeneric(request):
-    family, subfamily, tribe, subtribe = '', '', '', ''
-
-    subtribe = request.GET.get('subtribe', None)
-    if subtribe:
-        try:
-            subtribe = Subtribe.objects.get(pk=subtribe)
-        except Subtribe.DoesNotExist:
-            subtribe = ''
-        if subtribe and subtribe.tribe:
-            tribe = subtribe.tribe
-        if tribe and tribe.subfamily:
-            subfamily = tribe.subfamily
-        if subfamily and subfamily.family:
-            family = subfamily.family
-
-    tribe = request.GET.get('tribe', None)
-    if tribe:
-        try:
-            tribe = Tribe.objects.get(pk=tribe)
-        except Tribe.DoesNotExist:
-            tribe = ''
-        if tribe and tribe.subfamily:
-            subfamily = tribe.subfamily
-        if subfamily and subfamily.family:
-            family = tribe.subfamily.family
-
-    subfamily = request.GET.get('subfamily', None)
-    if subfamily:
-        try:
-            subfamily = Subfamily.objects.get(pk=subfamily)
-        except Subfamily.DoesNotExist:
-            subfamily = ''
-        if subfamily and subfamily.family:
-            family = subfamily.family
-
-    return family, subfamily, tribe, subtribe
 
 # Only for Orchidaceae
 def getSuperGeneric(request):
