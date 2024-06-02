@@ -9,7 +9,6 @@ from . import views
 
 app_name = 'aves'
 urlpatterns = [
-    path('compare/<int:pid>/', views.compare, name='compare'),
     path('curateinfospc/<int:pid>/', views.curateinfospc, name='curateinfospc'),
     path('curateinfospc/', views.curateinfospc, name='curateinfospc'),
     path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
