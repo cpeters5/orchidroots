@@ -17,7 +17,7 @@ from allauth.account.views import _ajax_response, PasswordChangeView, PasswordRe
 from allauth.account.forms import UserTokenForm, SetPasswordForm
 from django.conf import settings
 from datetime import datetime
-from utils.views import write_output, getRole
+from utils.views import write_output
 
 from .forms import LoginForm, RegisterForm, GuestForm, ProfileForm, AddEmailForm 
 from .models import User, Profile, Photographer
