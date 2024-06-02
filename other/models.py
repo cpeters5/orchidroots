@@ -80,9 +80,6 @@ class Genus(models.Model):
     def get_status(self):
         return self.status
 
-    def get_application(self):
-        return self.family.application
-
     def get_description(self):
         return self.description
 
