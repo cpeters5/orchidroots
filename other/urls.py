@@ -14,8 +14,6 @@ app_name = 'other'
 #     'photos':SpeciesSitemap
 # }
 urlpatterns = [
-    path('compare/<int:pid>/', views.compare, name='compare'),
-    # path('createhybrid/', views.createhybrid, name='createhybrid'),
     path('curateinfospc/<int:pid>/', views.curateinfospc, name='curateinfospc'),
     path('curateinfospc/', views.curateinfospc, name='curateinfospc'),
     path('curateinfohyb/<int:pid>/', views.curateinfohyb, name='curateinfohyb'),
