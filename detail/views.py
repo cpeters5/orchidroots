@@ -30,7 +30,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, is_int, getRole, get_reqauthor, handle_bad_request
+from utils.views import write_output, getRole, get_reqauthor, handle_bad_request
 
 from .forms import UploadFileForm, UploadSpcWebForm, UploadHybWebForm, AcceptedInfoForm, HybridInfoForm, \
     SpeciesForm, RenameSpeciesForm
