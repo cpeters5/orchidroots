@@ -66,7 +66,7 @@ def search(request):
         url = "%s?search_string=%s" % (reverse('search:search_orchidaceae'), search_string)
         return HttpResponseRedirect(url)
     elif selected_app in applications:
-    # For other non-orchid: collect all matching genera in each app
+        # For other non-orchid: collect all matching genera in each app
         Genus = apps.get_model(selected_app, 'Genus')
         genus, full_search_string = get_full_search_string(Genus, search_string)
         if isinstance(genus, Genus) and genus.family.family == 'Orchidaceae':
@@ -343,7 +343,7 @@ def search_orchidaceae(request):
 
     if 'search_string' in request.GET:
         search_string = request.GET['search_string'].strip()
-        search_string = search_string.replace('.', '')
+        # search_string = search_string.replace('.', '')
         search_string = search_string.replace(' mem ', ' Memoria ')
         search_string = search_string.replace(' Mem ', ' Memoria ')
         search_string = search_string.replace(' mem. ', ' Memoria ')
