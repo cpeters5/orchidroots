@@ -360,7 +360,7 @@ a:hover {
             {% for image in public_list %}
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                     <div class="box">
-                        <a target="_blank" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                 {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                 {{image.get_displayname}}
                                 <br>{{image.text_data|default:''|safe}}">
@@ -391,7 +391,7 @@ a:hover {
                     <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         {% if image.image_file %}
                             <div class="box" style="background-color: #f19292">
-                                <a target="_blank" href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
                                     <h6><small>
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
@@ -448,15 +448,11 @@ $(document).ready(function(){
         $('#myTab a[href="' + activeTab + '"]').tab('show');
     }
 });
-
-$(document).on('click', '[data-toggle="lightbox"]', function(event) {
-                event.preventDefault();
-                $(this).ekkoLightbox();
-            });
-//
-// $(this).ekkoLightbox({
-//     alwaysShowClose: true
-// });
+    lightbox.option({
+      'resizeDuration': 200,
+      'wrapAround': true,
+      'disableScrolling': true
+    })
 
 // This function supposed to change position of lightbox close icon.
 // Lightbox.prototype.build = function() {
