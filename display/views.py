@@ -195,7 +195,7 @@ def information(request, pid=None):
 
 
 def photos(request, pid=None):
-    author = get_reqauthor(request)
+    author = get_reqauthor(request)  #  Photographer object
     related = ''
     related_species = ''
     related_pids = []
@@ -276,8 +276,8 @@ def photos(request, pid=None):
             upload_list = upload_list.filter(author=request.user.photographer.author_id)
     private_list = public_list.filter(rank=0)  # rejected photos
     if role == 'pri':
-        upload_list = upload_list.filter(author=author) # Private photos
-        private_list = private_list.filter(author=author) # Private photos
+        upload_list = upload_list.filter(author=request.user.photographer.author_id) # Private photos
+        private_list = private_list.filter(author=request.user.photographer.author_id) # Private photos
 
     public_list = public_list.filter(rank__gt=0)  # public photos
 
