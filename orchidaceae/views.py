@@ -19,7 +19,7 @@ import re
 # import django.shortcuts
 from utils.views import write_output
 from utils.views import getRole
-from utils.views import get_random_img, imgdir
+from utils.views import get_random_img, thumbdir
 
 from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, Synonym, \
     Subgenus, Section, Subsection, Series, \
@@ -35,7 +35,7 @@ Subtribe = apps.get_model('common', 'Subtribe')
 Region = apps.get_model('common', 'Region')
 Subregion = apps.get_model('common', 'Subregion')
 Localregion = apps.get_model('common', 'Localregion')
-imgdir, hybdir, spcdir = imgdir()
+imgdir, hybdir, spcdir = thumbdir()
 
 alpha_list = config.alpha_list
 
@@ -880,14 +880,8 @@ def progenyimg(request, pid=None):
     page_length = 30
     min_pct = 30
     role = getRole(request)
-
     if not pid:
-        if 'pid' in request.GET:
-            pid = request.GET['pid']
-            pid = int(pid)
-        else:
-            pid = 0
-
+        pid = request.GET.get('pid', 0)
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -901,19 +895,23 @@ def progenyimg(request, pid=None):
 
     img_list = []
     for x in des_list:
-        offspring = Hybrid.objects.get(pk=x.did.pid_id)
-        y = x.did.pid.get_best_img()
-        if y:
-            y.name = offspring.pid.namecasual()
-            y.pct = x.pct
-            y.image_dir = y.image_dir()
-            if offspring.pollen_id:
-                y.pollen = offspring.pollen_id.pid
-                y.pollen_name = offspring.pollen_id.namecasual()
-            if offspring.seed_id:
-                y.seed = offspring.seed_id.pid
-                y.seed_name = offspring.seed_id.namecasual()
-            img_list.append(y)
+        if isinstance(x.did, Hybrid):
+            try:
+                offspring = Hybrid.objects.get(pk=x.did.pid_id)
+            except Hybrid.DoesNotExist:
+                offspring = ''
+            y = x.did.pid.get_best_img()
+            if y:
+                y.name = offspring.pid.namecasual()
+                y.pct = x.pct
+                y.image_dir = y.image_dir()
+                if offspring.pollen_id:
+                    y.pollen = offspring.pollen_id.pid
+                    y.pollen_name = offspring.pollen_id.namecasual()
+                if offspring.seed_id:
+                    y.seed = offspring.seed_id.pid
+                    y.seed_name = offspring.seed_id.namecasual()
+                img_list.append(y)
 
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
             request, img_list, page_length, num_show)
