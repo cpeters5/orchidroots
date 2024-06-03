@@ -206,25 +206,29 @@ def photos(request, pid=None):
     owner = request.GET.get('owner', None)
     if not author or author == 'anonymous':
         author = None
-    # author_list = Photographer.objects.all().order_by('displayname')
+
+    # Get application and family
     app, family = get_application(request)
+    # If family is not valid, then use Orchidaceae
     if not family:
         family = 'Orchidaceae'
         app = 'orchidaceae'
-    if not app or app == '':
-        return HttpResponseRedirect('/')
+
+    # Define Species, Synonym and Image classes based on the application
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+    # For Orchid, image class could be species or hybrid depending on species.type
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
         SpcImages = apps.get_model(app, 'SpcImages')
     UploadFile = apps.get_model(app, 'UploadFile')
 
+    # For synonym species, just render all images of the species
     if species.status == 'synonym':
         public_list = SpcImages.objects.filter(pid=pid)  # public photos
         private_list = public_list.filter(rank=0)  # rejected photos
@@ -237,14 +241,16 @@ def photos(request, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
-    this_species_name = species.genus + ' ' + species.species
-    # related_list = Species.objects.filter(genus=species.genus).filter(species=species.species)
-    if species.type != 'hybrid':
+    # For accepted species, generate synonym list, related list for dropdown menu
+    this_species_name = species.genus + ' ' + species.species  #ignore infraspecific names
+    if species.type != 'hybrid' or species.infraspe:
+        #  This inclusion of infraspe is to add natural hybrid with infraspecific name
         related_list = Species.objects.filter(binomial__istartswith=this_species_name).exclude(type='hybrid').exclude(status='synonym')
     else:
         related_list = Species.objects.filter(binomial=this_species_name).exclude(type='species', status='synonym')
-    related = request.GET.get('related', '')
 
+    # Now if related parameter is requested
+    related = request.GET.get('related', '')
     if related == 'ALL' or not related.isnumeric():
         #  Include all infraspecifics
         related_pids = related_list.values_list('pid', flat=True)
@@ -257,6 +263,7 @@ def photos(request, pid=None):
         except Species.DoesNotExist:
             related_species = None
 
+    # Now generate synonym list
     syn_list = Synonym.objects.filter(acc_id=pid)
     syn_pid = list(syn_list.values_list('spid', flat=True))
     if related_species:
@@ -269,15 +276,18 @@ def photos(request, pid=None):
         public_pid_list = public_list.values_list('pid', flat=True)
         public_list = SpcImages.objects.filter(Q(pid__in=public_pid_list) | Q(pid__in=syn_pid))
 
-    upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
-    if owner == 'Y' and request.user.is_authenticated:
-        if request.user.photographer.author_id:
-            public_list = public_list.filter(author=request.user.photographer.author_id)
-            upload_list = upload_list.filter(author=request.user.photographer.author_id)
-    private_list = public_list.filter(rank=0)  # rejected photos
-    if role == 'pri':
-        upload_list = upload_list.filter(author=request.user.photographer.author_id) # Private photos
-        private_list = private_list.filter(author=request.user.photographer.author_id) # Private photos
+    # Generate upload list, public list and private list
+    upload_list = []
+    if request.user.is_authenticated:
+        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_pid))  # All upload photos
+        if owner == 'Y':
+            if request.user.photographer.author_id:
+                public_list = public_list.filter(author=request.user.photographer.author_id)
+                upload_list = upload_list.filter(author=request.user.photographer.author_id)
+        private_list = public_list.filter(rank=0)  # rejected photos
+        if role == 'pri':
+            upload_list = upload_list.filter(author=request.user.photographer.author_id) # Private photos
+            private_list = private_list.filter(author=request.user.photographer.author_id) # Private photos
 
     public_list = public_list.filter(rank__gt=0)  # public photos
 
@@ -289,13 +299,12 @@ def photos(request, pid=None):
         quality_update(request, SpcImages)
 
     # Create lists
-
     # Handle Variety filter
     variety = request.GET.get('variety', None)
     if variety == 'semi alba':
         variety = 'semialba'
 
-    # Extract first term, possibly an infraspecific
+    # Extract first word, possibly an infraspecific
     parts = ()
     if variety:
         parts = variety.split(' ', 1)
@@ -317,8 +326,7 @@ def photos(request, pid=None):
         public_list = public_list.order_by('-rank', 'quality', '?')
         if private_list:
             private_list = private_list.order_by('created_date')
-    if private_list and author:
-        private_list = private_list.filter(author=author)
+
     write_output(request, str(family))
     context = {'species': species, 'author': author,
                'family': family,
