@@ -93,6 +93,7 @@ $(document).ready(function() {
         "lengthChange": false,
         "pagingType": "full",
         "bPaginate": true,
+        "order": [[ 1, "dsc" ], [0,'asc']],
         // "pagingType": "simple", # only show previous/next
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Search table'});//tips
