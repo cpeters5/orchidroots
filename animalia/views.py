@@ -116,55 +116,6 @@ def curate_pending(request):
 
 
 @login_required
-def curate_newapproved(request):
-    write_output(request)
-    # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
-    species = ''
-    image = ''
-    ortype = 'species'
-    if request.user.is_authenticated and request.user.tier.tier < 2:
-        return HttpResponseRedirect('/')
-    if 'type' in request.GET:
-        ortype = request.GET['type']
-        # Request to change rank/quality
-        if 'id' in request.GET:
-            orid = int(request.GET['id'])
-            try:
-                image = SpcImages.objects.get(pk=orid)
-            except SpcImages.DoesNotExist:
-                species = ''
-        if image:
-            species = Species.objects.get(pk=image.pid_id)
-
-    days = 3
-    if 'days' in request.GET:
-        days = int(request.GET['days'])
-    file_list = SpcImages.objects.filter(rank__gt=0).exclude(approved_by=request.user)
-
-    if days:
-        file_list = file_list.filter(created_date__gte=timezone.now() - timedelta(days=days))
-    file_list = file_list.order_by('-created_date')
-    if species:
-        rank_update(request, SpcImages)
-        quality_update(request, SpcImages)
-
-    num_show = 5
-    page_length = 20
-    page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
-        request, file_list, page_length, num_show)
-    family = ''
-    role = getRole(request)
-    context = {'file_list': page_list, 'type': ortype,
-               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days, 'family': family,
-               'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
-               'page': page,
-               'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
-               'app': app,
-               }
-    return render(request, 'common/curate_newapproved.html', context)
-
-
-@login_required
 def reidentify(request, orid, pid):
     source_file_name = ''
     role = getRole(request)

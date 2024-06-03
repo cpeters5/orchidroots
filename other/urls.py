@@ -20,7 +20,6 @@ urlpatterns = [
     path('curateinfohyb/', views.curateinfohyb, name='curateinfohyb'),
     path('curate_newupload/', views.curate_newupload, name='curate_newupload'),
     path('curate_pending/', views.curate_pending, name='curate_pending'),
-    path('curate_newapproved/', views.curate_newapproved, name='curate_newapproved'),
     path('reidentify/<int:orid>/<int:pid>/', views.reidentify, name='reidentify'),
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
