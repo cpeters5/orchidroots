@@ -154,6 +154,7 @@ def get_author(request):
 
 # Used in detail.uploadFile (orchidaceae) and common.upload_file (all other)
 def get_reqauthor(request):
+    # Return photogrtapher object
     author = None
     if request.user.is_authenticated:
         author = request.GET.get('author', None)
@@ -166,8 +167,8 @@ def get_reqauthor(request):
     return author
 
 
-def imgdir():
-    imgdir = 'utils/images/'
+def thumbdir():
+    imgdir = 'utils/thumbs/'
     hybdir = imgdir + 'hybrid/'
     spcdir = imgdir + 'species/'
     return imgdir, hybdir, spcdir
