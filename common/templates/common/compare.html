@@ -172,8 +172,6 @@ input[type=text] {
 </div>
 <br>
 
-genus2 = {{genus2}}
-
 {% include "common/detail-nav.html" %}
         <!--Main sections-->
     <div class="d-flex p-2 justify-content-center" style="margin:0 auto;width:95%;">
@@ -217,18 +215,15 @@ genus2 = {{genus2}}
 
                 <div class="d-flex justify-content-between" >
                     <div class="p-2" style="width:48%;">
-                        <div class="subtitle">
+                        <div style="padding:10px;">
+                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             {% if message1 %}
                                 <span class="text-danger">{{message1|safe}}</span>
-                            {% elif species.species or species.species %}
-                                {{species.binomial_it|safe}} {{species.author|default:''}} {{species.year|default:''}}
-                                {% if accepted %} <br>(syn. {{accepted.binomial_it|safe}}) {% endif %}
+                            {% elif species %}
+                            <h6>{{species.binomial_it|safe}}</h6>
                             {% else %}
                                 Enter the correct name of the first orchid
                             {% endif %}
-                        </div>
-                        <div style="padding:10px;">
-                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea">{{genus}}</button>
                             <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.species}}</button>
                             <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.infraspr|default_if_none:' '}}</button>
@@ -284,19 +279,16 @@ genus2 = {{genus2}}
                     </div>
 <!--                            <div class="col-1" style="padding:0; border:3px solid black"></div>-->
                     <div class="p-2" style="width:48%;">
-                        <div class="subtitle">
-                            {% if message2 %}
-                                <span class="text-danger">{{message2|safe}}</span>
-                            {% elif species2.species %}
-                                <a href="{% url 'display:information' species2.pid %}?family={{species.gen.family}}&role={{role}}">{{species2.binomial_it|safe}}</a> {{species2.author|default:''}} {{species2.year|default:''}}
-                                {% if accepted2 %} <br>(syn. {{accepted2.binomial_it|safe}}) {% endif %}
-                            {% else %}
-                                Enter the correct name of second orchid.
-                            {% endif %}
-                        </div>
                         <div style="padding:10px;">
                             <form action="?" id="compare">
                             <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
+                            {% if message2 %}
+                                <span class="text-danger">{{message2|safe}}</span>
+                            {% elif species2 %}
+                            <a href="{% url 'display:information' pid2 %}?family={{family}}&role={{role}}"><h6>{{binomial2}}</h6></a>
+                            {% else %}
+                                Enter the correct name of second orchid.
+                            {% endif %}
                             <input type="hidden" name="role" value="{{role}}">
                             <input type="hidden" name="pid" value="{{species.pid}}">
                             <input type="hidden" name="family" value="{{species.gen.family}}">

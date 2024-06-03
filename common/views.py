@@ -1351,12 +1351,17 @@ def compare(request, pid):
     # get Species, Genus, classes
     Species = apps.get_model(app, 'Species')
     Hybrid = apps.get_model(app, 'Hybrid')
-    SpcImages = apps.get_model(app, 'SpcImages')
+
 
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+    if species.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+
 
     spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     family = species.gen.family
@@ -1364,6 +1369,7 @@ def compare(request, pid):
 
     # Handle comparison request. Should use SpcForm instead.
     spcimg2_list = []
+
     spc2 = request.GET.get('species2', '').strip()
     gen2 = request.GET.get('genus2', '').strip()
     infraspe2 = request.GET.get('infraspe2', '').strip()
@@ -1418,9 +1424,16 @@ def compare(request, pid):
     cross = ''
     message1 = message2 = accepted2 = ''
 
+    # Convert synonym to accepted
     if species2 and species2.status == 'synonym':
         pid2 = species2.getAcc()
         accepted2 = species2.getAccepted()
+
+    # Choose correct image class based on type.
+    if species2.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
 
     # A second species is found
     if pid2:
@@ -1442,7 +1455,7 @@ def compare(request, pid):
                'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
                'spcimg1_list': spcimg1_list,
                'genus2': gen2, 'species2': spc2, 'spcimg2_list': spcimg2_list,
-               'cross': cross, 'family': family,
+               'cross': cross, 'family': family, 'binomial2': binomial2,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role}
     return render(request, 'common/compare.html', context)
