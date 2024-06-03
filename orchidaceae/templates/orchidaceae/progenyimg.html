@@ -108,7 +108,7 @@ img{
                 <div class="imageitem p-1 justify-content-center  border" style="margin:2px;">
                     <div class="box" style="margin:0 auto;">
                     <a href="{% url 'detail:information' x.pid_id %}?role={{role}}">
-                            <img class="thumbnails" alt="" src="/static/{{x.image_dir}}{{ x.image_file }}">
+                            <img class="thumbnails" alt="" src="{% static x.thumb_dir %}{{x.image_file}}">
                     </a>
                     </div>
                     <div class="imgcaption">
