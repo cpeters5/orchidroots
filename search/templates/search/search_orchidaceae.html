@@ -49,7 +49,31 @@ tr {
                     <h5>Search results (by {{area}} in {{selected_app|default:'all domain'}}) "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
                 </div>
                 <table>
-                {% if genus_list %}
+                {% if matched_genus %}
+                    <tr>
+                        <th>Genus</th>
+                    </tr>
+                        <tr style="border: 1px solid lightgrey;">
+                            <td>
+                                {% if not matched_genus.num_hybrid or matched_genus.num_species > 0 %}
+                                    <a href="/common/species/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{matched_genus.genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                                    {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
+                                {% else %}
+                                     <a href="/orchidaceae/hybrid/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                                {% endif %}
+                            {% if user.tier.tier > 3 %}
+                            <br>{{matched_genus.pid|default:''}}
+                            {% endif %}
+                            </td>
+                            <td style="min-width:100px; text-align: center">
+                                {% if matched_genus.get_best_img %}
+                                 <img class="thumbnails" alt="{{matched_genus.genus}}" src="{% static matched_genus.get_best_img.image_dir %}{{matched_genus.get_best_img.image_file}}">
+<!--                                {{genus.0.get_best_img.pid.name|safe}}-->
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                {% elif genus_list %}
                     <tr>
                         <th>Genus</th>
                     </tr>

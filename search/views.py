@@ -375,17 +375,22 @@ def search_orchidaceae(request):
         min_score = 80
         # Try to match genus
         Genus = apps.get_model(app, 'Genus')
-        genus_list = Genus.objects.all()
+        try:
+            matched_genus = Genus.objects.get(genus=genus)
+            genus_list = []
+        except Genus.DoesNotExist:
+            matched_genus = None
+            genus_list = Genus.objects.all()
                       # .values('pid', 'genus', 'family', 'author', 'description', 'num_species', 'num_hybrid', 'status', 'year'))
-        search_list = []
-        for x in genus_list:
-            score = fuzz.ratio(x.genus.lower(), genus_string.lower())
-            if score >= min_score:
-                search_list.append([x, score])
+            search_list = []
+            for x in genus_list:
+                score = fuzz.ratio(x.genus.lower(), genus_string.lower())
+                if score >= min_score:
+                    search_list.append([x, score])
 
-        search_list.sort(key=lambda k: (-k[1], k[0].genus))
-        del search_list[5:]
-        genus_list = search_list
+            search_list.sort(key=lambda k: (-k[1], k[0].genus))
+            del search_list[5:]
+            genus_list = search_list
     if not genus_list or not single_word:
         match_spc_list = get_species_list(app, family).filter(binomial__icontains=search_string)
     if match_spc_list:
@@ -395,7 +400,7 @@ def search_orchidaceae(request):
         path = 'photos'
 
     write_output(request, search_string)
-    context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+    context = {'search_string': search_string, 'matched_genus': matched_genus, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                'genus_total': len(genus_list),
                'family': family,
                'alpha_list': alpha_list,
