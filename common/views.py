@@ -719,8 +719,10 @@ def deletephoto(request, orid, pid=None):
         app = request.GET.get('app', None)
         if app not in applications:
             app = None
+
+    # Something wrong here. All delete request mush have app
     if not app:
-        return render(request, "display/photos.html", {})
+        return HttpResponseRedirect('/')
 
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
