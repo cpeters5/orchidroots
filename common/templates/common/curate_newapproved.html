@@ -169,7 +169,7 @@ div.text-br {
                             <div class="imageitem p-1 justify-content-center">
                                 <div class="box">
                                     <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}">
-                                        <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="" src="{% static image.thumb_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                     </a>
                                 </div>
