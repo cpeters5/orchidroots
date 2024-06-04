@@ -2,7 +2,7 @@ import string
 import re
 import logging
 import random
-
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -387,3 +387,26 @@ def videos(request, pid):
                'view': 'videos',
                }
     return render(request, 'display/videos.html', context)
+
+
+import openai
+
+# Set your OpenAI API key here
+openai.api_key = settings.OPENAI_API_KEY
+
+def generate_image(request):
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt')
+        try:
+            response = openai.Image.create(
+                model="image-dalle-2",
+                prompt=prompt,
+                n=1,
+                size="1024x1024"
+            )
+            image_url = response['data'][0]['url']
+            return render(request, 'your_template.html', {'image_url': image_url})
+        except Exception as e:
+            return HttpResponse(f"An error occurred: {str(e)}")
+
+    return render(request, 'your_form_template.html')
