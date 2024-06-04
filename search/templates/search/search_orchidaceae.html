@@ -109,9 +109,13 @@ tr {
                 {% if match_spc_list %}
                     <tr><td></td></tr>
                     <tr>
+                        {% if fuzzy %}
+                        <th>Similar species</th>
+                        {% else %}
                         <th>Species not in this list?  Try
                             <a class="btn btn-primary" href="{% url 'search:search_orchidaceae' %}?family=Orchidaceae&search_string={{search_string}}&fuzzy=1">Find similar</a> (slow)
                         </th>
+                        {% endif %}
                     </tr>
                     {% for species in match_spc_list %}
                         <tr style="border: 1px solid lightgrey;">
