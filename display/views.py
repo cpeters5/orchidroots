@@ -199,6 +199,7 @@ def photos(request, pid=None):
     related = ''
     related_species = ''
     related_pids = []
+    private_list = []
     variety = ''
     tail = ''
     role = request.GET.get('role', None)
