@@ -47,7 +47,9 @@ tr {
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="text-align: center;">
                     <h5>Search results (by {{area}} in {{selected_app|default:'all domain'}}) "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
+                    <a class="btn btn-primary" href="{% url 'search:search_orchidaceae' %}?family=Orchidaceae&search_string={{search_string}}&fuzzy=1">Find similar</a> (slow)
                 </div>
+                <br>
                 <table>
                 {% if matched_genus %}
                     <tr>
@@ -59,7 +61,7 @@ tr {
                                     <a href="/common/species/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{matched_genus.genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                                     {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                                 {% else %}
-                                     <a href="/orchidaceae/hybrid/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{genus.0.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                                     <a href="/orchidaceae/hybrid/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                                 {% endif %}
                             {% if user.tier.tier > 3 %}
                             <br>{{matched_genus.pid|default:''}}
