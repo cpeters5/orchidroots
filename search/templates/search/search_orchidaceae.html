@@ -21,7 +21,7 @@ tr {
    object-fit: cover;
    overflow: hidden;
    height: 100px;
-   width : auto;
+   width : 100px;
    margin:5px auto;
 }
 @media only screen and (max-width: 600px) {
@@ -47,13 +47,12 @@ tr {
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="text-align: center;">
                     <h5>Search results (by {{area}} in {{selected_app|default:'all domain'}}) "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
-                    <a class="btn btn-primary" href="{% url 'search:search_orchidaceae' %}?family=Orchidaceae&search_string={{search_string}}&fuzzy=1">Find similar</a> (slow)
                 </div>
                 <br>
                 <table>
                 {% if matched_genus %}
                     <tr>
-                        <th>Genus</th>
+                        <th>Matched Genus</th>
                     </tr>
                         <tr style="border: 1px solid lightgrey;">
                             <td>
@@ -69,7 +68,9 @@ tr {
                             </td>
                             <td style="min-width:100px; text-align: center">
                                 {% if matched_genus.get_best_img %}
-                                 <img class="thumbnails" alt="{{matched_genus.genus}}" src="{% static matched_genus.get_best_img.image_dir %}{{matched_genus.get_best_img.image_file}}">
+                                <a href="{% url 'display:information' matched_img.pid_id %}?family=Orchidaceae&role={{role}}">
+                                 <img class="thumbnails" alt="{{matched_genus.genus}}" src="{% static matched_img.thumb_dir %}{{matched_img.image_file}}">
+                                </a>
 <!--                                {{genus.0.get_best_img.pid.name|safe}}-->
                                 {% endif %}
                             </td>
@@ -77,7 +78,7 @@ tr {
 
                 {% elif genus_list %}
                     <tr>
-                        <th>Genus</th>
+                        <th>Genus not found. Did you misspell the name?</th>
                     </tr>
                     {% for genus in genus_list %}
                         <tr style="border: 1px solid lightgrey;">
@@ -98,7 +99,7 @@ tr {
                             </td>
                             <td style="min-width:100px; text-align: center">
                                 {% if genus.0.get_best_img %}
-                                 <img class="thumbnails" alt="{{genus.0.genus}}" src="{% static genus.0.get_best_img.image_dir %}{{genus.0.get_best_img.image_file}}">
+                                 <img class="thumbnails" alt="{{genus.0.genus}}" src="{% static genus.0.get_best_img.thumb_dir %}{{genus.0.get_best_img.image_file}}">
 <!--                                {{genus.0.get_best_img.pid.name|safe}}-->
                                 {% endif %}
                             </td>
@@ -108,7 +109,9 @@ tr {
                 {% if match_spc_list %}
                     <tr><td></td></tr>
                     <tr>
-                        <th>species</th>
+                        <th>Species not in this list?  Try
+                            <a class="btn btn-primary" href="{% url 'search:search_orchidaceae' %}?family=Orchidaceae&search_string={{search_string}}&fuzzy=1">Find similar</a> (slow)
+                        </th>
                     </tr>
                     {% for species in match_spc_list %}
                         <tr style="border: 1px solid lightgrey;">
@@ -124,19 +127,25 @@ tr {
                             </td>
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
-                                <a href="/display/{{path}}/{{species.pid}}/?family={{species.family|default:'Orchidaceae'}}&role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
-                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
-                                </a>
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                                 {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
-                {% elif other_genus_spc %}
+                {% else %}
+                    <tr><td></td></tr>
+                    <tr>
+                        <th>no species matching {{search_string}}. Did you misspelled?  Try
+                            <a class="btn btn-primary" href="{% url 'search:search_orchidaceae' %}?family=Orchidaceae&search_string={{search_string}}&fuzzy=1">Find similar</a> (slow)
+                        </th>
+                    </tr>
+                {% endif %}
+                {% if other_genus_spc %}
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
                                 {% if species.get_best_img %}
-                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                 <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                                 {% endif %}
                             </td>
                             <td>
