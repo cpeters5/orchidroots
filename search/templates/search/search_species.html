@@ -46,25 +46,9 @@ tr {
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="text-align: center;">
-                    <h5>Search results (by {{area}} in {{selected_app|default:'all domain'}}) "<i>{{search_string}}</i>" {% if  selected_app %} in {{selected_app|title}}{% if selected_app == 'other' %} Plant Families {% endif %}{% endif %}</h5>
+                    <h5>Search results for "{{search_string}}" in {{selected_app|default:'all domain'}}</h5>
                 </div>
-                <br>
                     <table>
-                        <tr>
-<!--                            <td><div class="btn btn-custom" onclick="history.back()">Go back</div></td>-->
-<!--                            <td>-->
-<!--                                <form action="/search/search/?search_string={{ search_string }}&role={{role}}" method="post">-->
-<!--                                        {% csrf_token %}-->
-<!--                                  <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">-->
-<!--                                    <option value="">search all</option>-->
-<!--                                    <option value="aves">Aves</option>-->
-<!--                                    <option value="animalia">Animalia</option>-->
-<!--                                    <option value="fungi">Fungi</option>-->
-<!--                                    <option value="orchidaceae">Orchids</option>-->
-<!--                                    <option value="other">Other Plant Families</option>-->
-<!--                                  </select>-->
-<!--                                </form>-->
-<!--                            </td></tr>-->
                 {% if genus_list %}
                     {% for genus in genus_list %}
                         <tr style="border: 1px solid lightgrey;">
@@ -117,7 +101,7 @@ tr {
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.pid}}
                             </td>
-                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
+                            <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.num_image|default:''}}
                             </td>
                             {% endif %}
@@ -146,16 +130,8 @@ tr {
                             {% endif %}
                         </tr>
                     {% endfor %}
-
                 {% endif %}
-
-<!--                    <div style="padding: 0; margin-top: 20px;">-->
-<!--                        Didn't see what you are looking for?<br>-->
-<!--                        <a class="btn btn-custom" style="width: 150px;" href="/other/search_species/?family={{family|default:'Orchidaceae'}}&search_string={{search_string}}&role={{role}}&app={{app}}&fuzzy=1">Aproximate search</a>-->
-<!--                    </div>-->
-<!--                        <tr><td>-->
-<!--                            <div class="btn btn-custom" onclick="history.back()">Go back</div>-->
-<!--                        </td></tr>    </table>-->
+                    </table>
 
             </div>
         </div>

@@ -190,17 +190,18 @@ def search_binomial(request):
 def search_species(request):
     genus_list = []
     search_list = []
+    species_list = []
     full_path = request.path
     role = getRole(request)
 
     search_string = request.GET.get('search_string', None)
-    if search_string.split()[0]:
-        search_list = search_list.split()
+    if search_string and search_string.split()[0]:
+        search_list = search_string.split()
 
     for app in applications:
         Species = apps.get_model(app, 'Species')
         this_species_list = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-        if i == 0:
+        if not species_list:
             species_list = (this_species_list)
         else:
             species_list = (species_list).union(this_species_list)
