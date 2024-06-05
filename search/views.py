@@ -374,7 +374,7 @@ def search_orchidaceae(request):
                 this_list = grexlist.filter(genus__in=genus_id)
                 if len(this_list) > 0:
                     gen_list = this_list
-
+            print("gen_list", gen_list)
             # Compute fuzzy score
             for x in gen_list:
                 # compare species with spc_string
@@ -385,20 +385,21 @@ def search_orchidaceae(request):
 
             if match_spc_list and match_spc_list[0][1] < min_score + 10:
                 for x in grexlist:
-                    # compare species with spc_string
-                    score = fuzz.ratio(x.species.lower(), spc_string)
-                    if score >= min_score:
-                        match_spc_list.append([x, score])
+                    if x not in [key for key, _ in match_spc_list]:
+                        # compare species with spc_string
+                        score = fuzz.ratio(x.species.lower(), spc_string)
+                        if score >= min_score:
+                            match_spc_list.append([x, score])
 
             match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
 
             # if no matched_genus or matching species have low score, try other genera
             if not match_spc_list or match_spc_list[0][1] < min_score + 10:
                 for x in grexlist:
-                    # compare species with spc_string
-                    score = fuzz.ratio(x.species.lower(), spc_string)
-                    if score >= min_score:
-                        match_spc_list.append([x, score])
+                    if x not in [key for key, _ in match_spc_list]:
+                        score = fuzz.ratio(x.species.lower(), spc_string)
+                        if score >= min_score and x not in [key for key, _ in match_spc_list]:
+                            match_spc_list.append([x, score])
             match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
             match_spc_list = [item[0] for item in match_spc_list]
 
