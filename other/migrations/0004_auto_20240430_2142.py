@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('other', '0003_delete_testspecies'),
+        ('other', '0001_initial'),
     ]
 
     operations = [

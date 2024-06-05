@@ -243,12 +243,36 @@ class CommonName(models.Model):
     taxon_id = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return self.source
+        return self.common_name
 
     def get_best_img(self):
         if self.level == 'Accepted':
+            app = self.application
+            Species = apps.get_model(app, 'Species')
             try:
                 species = Species.objects.get(pk=self.taxon_id)
                 return species.get_best_img()
             except Species.DoesNotExist:
                 return None
+        return None
+
+class Binomial(models.Model):
+    binomial = models.CharField(max_length=200, null=True, blank=True)
+    binomial_search = models.CharField(max_length=200, null=True, blank=True)
+    application = models.CharField(max_length=20, choices=APPLICATION_CHOICES, default='')
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='')
+    taxon_id = models.CharField(max_length=20, null=True, blank=True)
+
+    def __str__(self):
+        return self.binomial
+
+    def get_best_img(self):
+        if self.level == 'Accepted':
+            app = self.application
+            Species = apps.get_model(app, 'Species')
+            try:
+                species = Species.objects.get(pk=self.taxon_id)
+                return species.get_best_img()
+            except Species.DoesNotExist:
+                return None
+        return None
