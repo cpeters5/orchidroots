@@ -264,7 +264,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 STATIC_ROOT = env.str('DJANGO_STATIC_ROOT')
 MEDIA_ROOT  = env.str('DJANGO_MEDIA_ROOT')
 FILE_UPLOAD_PERMISSIONS = 0o644
