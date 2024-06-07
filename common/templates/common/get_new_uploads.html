@@ -108,7 +108,7 @@
     <br>
    <div>
         {% if fungi_upl %}
-            {% for x in fungi_upl %}
+            {% for image in fungi_upl %}
                              <div style="display:inline-block">
                                 <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
@@ -137,7 +137,7 @@
     <br>
    <div>
         {% if other_upl %}
-            {% for x in other_upl %}
+            {% for image in other_upl %}
                             <div style="display:inline-block">
                                 <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="uploadfile">
                                         <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
