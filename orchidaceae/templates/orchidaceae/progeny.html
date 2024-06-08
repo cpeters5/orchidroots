@@ -57,9 +57,9 @@
                 <tr style="text-align: left">
                     <td class="border-lb">
                         {% if role == 'cur' %}
-                            <a href="{% url 'display:photos' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.pid.binomial_it|safe}}</a>
+                            <a target="_blank" href="{% url 'display:photos' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.pid.binomial_it|safe}}</a>
                         {% else %}
-                            <a href="{% url 'display:information' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
+                            <a target="_blank" href="{% url 'display:information' hybrid.0.did.pid.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
                         {% endif %}
                     </td>
                     <td class="border-lb">
@@ -68,7 +68,7 @@
                     <td style="border-right:0;">
                         {% if hybrid.0.did.seed_id.pid %}
                             {% if role == 'cur' %}
-                                <a href="{% url 'display:photos' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
+                                <a target="_blank" href="{% url 'display:photos' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
                             {% else %}
                                 <a href="{% url 'display:information' hybrid.0.did.seed_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
                             {% endif %}
@@ -81,9 +81,9 @@
 <!--                        Some hybrrid's parent(s) are missing-->
                         {% if hybrid.0.did.pollen_id.pid %}
                             {% if role == 'cur' %}
-                                <a href="{% url 'display:photos' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
+                                <a target="_blank" href="{% url 'display:photos' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
                             {% else %}
-                                    <a href="{% url 'display:information' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
+                                    <a target="_blank" href="{% url 'display:information' hybrid.0.did.pollen_id.pid %}?family={{hybrid.0.did.pid.gen.family}}&role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
                             {% endif %}
                         {% else %}
                             na
