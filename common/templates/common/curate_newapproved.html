@@ -112,7 +112,7 @@ div.text-br {
                     {% if user.tier.tier > 1 %}
                         {% if role == 'cur' %}
                             {% if role == 'cur' %}
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}?family={{family}}&app={{app}}">Recently approved</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?family={{family}}&app={{app}}">New Uploads</a>
                                 <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&gen=&type={{species.type}}">All private photos</a>
                             {% endif %}
                         {% endif %}
