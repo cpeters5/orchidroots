@@ -10,13 +10,13 @@
 <!--        {% if image.rank == 6 %}<span style="color:#7e1b86">6</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="selected" href='?rank=6&role={{role}}&id={{image.id}}&gen={{species.gen.pid}}'>6</a>{% endif %} |-->
         {% if image.rank == 7 %}<span style="color:red">7</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="closeup" href='?rank=7&role={{role}}&id={{image.id}}&family={{image.gen.family}}&related=ALL&syn=Y'>7</a>{% endif %} |
         {% if image.rank == 8 %}<span style="color:red">8</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="info" href='?rank=8&role={{role}}&id={{image.id}}&family={{image.gen.family}}&related=ALL&syn=Y'>8</a>{% endif %}
-        <br>
+    <br>
     quality:
         {% if image.quality == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Top quality" href='?quality=1&role={{role}}&id={{image.id}}&family={{image.gen.family}}&related=ALL&syn=Y'>1</a>{% endif %} |
         {% if image.quality == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="High quality" href='?quality=2&role={{role}}&id={{image.id}}&family={{image.gen.family}}&related=ALL&syn=Y'>2</a>{% endif %} |
         {% if image.quality == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Average quality" href='?quality=3&role={{role}}&id={{image.id}}&family={{image.gen.family}}&related=ALL&syn=Y'>3</a>{% endif %} |
         {% if image.quality == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Low quality" href='?quality=4&role={{role}}&id={{image.id}}&gen=&family={{image.gen.family}}&related=ALL&syn=Y'>4</a>{% endif %} |
-        <br>
+
     {% endif %}
     {% if user.get_author == image.author or user.tier.tier > 2 %}
         <a href='/{{app}}/uploadweb/{{species.pid}}/{{image.id}}/?role={{role}}&tab={{tab}}&family={{image.gen.family}}'>Update</a> |
