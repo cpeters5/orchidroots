@@ -87,11 +87,17 @@ def get_application(request):
             family = Family.objects.get(family=family)
         except Family.DoesNotExist:
             family = Family.objects.get(family='Orchidaceae')
-        return family.application, family
+        app = family.application
     else:
         app = request.GET.get('app', None)
-        if app not in applications:
-            app = None
+        if app == 'orchidaceae':
+            family = Family.objects.get(family='Orchidaceae')
+        elif app not in applications or app == '':
+            # If neither family nor app give, assume orchid is requested
+            family = Family.objects.get(family='Orchidaceae')
+            app = family.application
+        else:  #for other apps, return family = None. family will be identified from the pid
+            family = None
     return app, family
 
 
