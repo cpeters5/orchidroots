@@ -60,10 +60,14 @@ label {
 .imgcaption {
     font-size: 13px;
     color: #0b51af;
-    height: 40px;
+    height: 45px;
     margin:2px;
     text-align:center;
-    overflow-wrap: break-word;
+    /*overflow-wrap: break-word;*/
+    overflow: hidden; /* Hide overflow content */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+
 }
 
 .thumbnails {
