@@ -36,13 +36,7 @@ from . import views
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
-    # path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
-    # path("robots.txt", robots_txt),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
-    # path('dispatch', dispatch, name='dispatch'),
-    # path('index/', index, name='index'),
-    # path('ads/', include('ads.urls')),
-    # path("ads.txt", RedirectView.as_view(url=staticfiles_storage.url("ads.txt")),),
 
     # User accounts
     path('login/', login_page, name='login'),
@@ -64,13 +58,13 @@ urlpatterns = [
     # Landing
     path('', home, name='home'),
     path('documents/', include('documents.urls')),
-    # path('', ode, name='ode'),
 
+    # Common to all apps
     path('search/', include('search.urls')),
-
-    # Family specific
     path('common/', include('common.urls')),
     path('display/', include('display.urls')),
+
+    # Family specific
     path('animalia/', include('animalia.urls')),
     path('aves/', include('aves.urls')),
     path('fungi/', include('fungi.urls')),
@@ -81,14 +75,36 @@ urlpatterns = [
     # New dev
     path('gallery/', include('gallery.urls')),
 
-  # apple pay
-  # https://bluenanta.com/.well-known/apple-developer-merchantid-domain-association
+    # REDIRECTIONS: Remove this in a year or so. @2024
+    # redirections (in the process of merging detail with orchidaceae)
+    path('detail/ancestor/<int:pid>/', RedirectView.as_view(url='/orchidaceae/ancestor/%(pid)s/', permanent=True)),
+    path('detail/ancestor/', RedirectView.as_view(url='/orchidaceae/ancestor/', permanent=True)),
+    path('detail/ancestrytree/<int:pid>/', RedirectView.as_view(url='/orchidaceae/ancestrytree/%(pid)s/', permanent=True)),
+    path('detail/ancestrytree/', RedirectView.as_view(url='/orchidaceae/ancestrytree/', permanent=True)),
+    path('detail/progeny/<int:pid>/', RedirectView.as_view(url='/orchidaceae/progeny/%(pid)s/', permanent=True)),
+    path('detail/progenyimg/<int:pid>/', RedirectView.as_view(url='/orchidaceae/progenyimg/%(pid)s/', permanent=True)),
+    path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/photos/<int:pid>/', RedirectView.as_view(url='/display/photos/%(pid)s/', permanent=True)),
+    path('detail/species/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/hybrid/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/<int:pid>/hybrid/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/<int:pid>/species/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/species_detail/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/hybrid_detail/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/<int:pid>/species_detail/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('detail/<int:pid>/hybrid_detail/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('orchidaceae/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
+    path('orchidaceae/photos/<int:pid>/', RedirectView.as_view(url='/display/photos/%(pid)s/', permanent=True)),
 
-  # legacy applications
-    # path('natural/', include('detail.urls')),
-    # path('orchid/', include('orchidaceae.urls')),
-    # path('orchidlite/', include('detail.urls')),
-    # path('orchidlist/', include('orchidlist.urls')),
+    # Decommissioned applications
+    re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
+    path('natural/', include('detail.urls')),
+    re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
+    path('orchidlite/', include('detail.urls')),
+    re_path(r'^orchid/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
+    path('orchid/', include('orchidaceae.urls')),
+    re_path(r'^orchidlist/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
+    path('orchidlist/', include('orchidaceae.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from display.views import photos as display_photos, information as display_information
+from display.views import photos, information
 from orchidaceae.views import ancestor as orchidaceae_ancestor, ancestrytree as orchidaceae_ancestrytree, \
     progeny as orchidaceae_progeny, progenyimg as orchidaceae_progenyimg
 
@@ -27,26 +27,4 @@ urlpatterns = [
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
-
-    # Redirect to orchidaceae
-    path('ancestor/<int:pid>/', orchidaceae_ancestor, name='ancestor'),
-    path('ancestor/', orchidaceae_ancestor, name='ancestor'),
-    path('ancestrytree/<int:pid>/', orchidaceae_ancestrytree, name='ancestrytree'),
-    path('ancestrytree/', orchidaceae_ancestrytree, name='ancestrytree'),
-    path('progeny/<int:pid>/', orchidaceae_progeny, name='progeny'),
-    path('progenyimg/<int:pid>/', orchidaceae_progenyimg, name='progenyimg'),
-
-    # Redirect to display
-    path('information/', display_information, name='information'),
-    path('information/<int:pid>/', display_information, name='information'),
-    path('photos/', display_photos, name='photos'),
-    path('photos/<int:pid>/', display_photos, name='photos'),
-    path('species/<int:pid>/', display_information, name='information'),
-    path('hybrid/<int:pid>/', display_information, name='information'),
-    path('<int:pid>/hybrid/', display_information, name='information'),
-    path('<int:pid>/species/', display_information, name='information'),
-    path('species_detail/<int:pid>/', display_information, name='information'),
-    path('hybrid_detail/<int:pid>/', display_information, name='information'),
-    path('<int:pid>/species_detail/', display_information, name='information'),
-    path('<int:pid>/hybrid_detail/', display_information, name='information'),
 ]
