@@ -740,7 +740,6 @@ class Video(models.Model):
 
 class UploadFile(models.Model):
     pid        = models.ForeignKey(Species, null=True, blank=True, db_column='pid', related_name='othpid',on_delete=models.DO_NOTHING)
-    family = models.ForeignKey(Family, null=True, blank=True, db_column='family', related_name='uplothfamily', on_delete=models.DO_NOTHING)
     author     = models.ForeignKey(Photographer, db_column='author', related_name='othauthor', null=True, blank=True,on_delete=models.DO_NOTHING)
     user_id    = models.ForeignKey(User, db_column='user_id', related_name='othuser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     credit_to  = models.CharField(max_length=100, null=True, blank=True)    #should match author_id inPhotography
@@ -748,7 +747,6 @@ class UploadFile(models.Model):
     source_file_name = models.CharField(max_length=100, null=True, blank=True)
     binomial = models.CharField(max_length=500, null=True, blank=True)
     name        = models.CharField(max_length=100, null=True, blank=True)
-    awards      = models.CharField(max_length=200, null=True, blank=True)
     variation   = models.CharField(max_length=50, null=True, blank=True)
     forma       = models.CharField(max_length=50, null=True, blank=True)
     originator  = models.CharField(max_length=50, null=True, blank=True)
