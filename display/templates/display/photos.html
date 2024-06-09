@@ -52,14 +52,14 @@
     margin:5px auto;
 }
 
-.thumbnail-tiny {
-   object-fit: cover;
-   overflow: hidden;
-   height: 11vw;
-   width : 11vw;
-   padding:2px;
-    margin:5px auto;
-}
+/*.thumbnail-tiny {*/
+/*   object-fit: cover;*/
+/*   overflow: hidden;*/
+/*   height: 11vw;*/
+/*   width : 11vw;*/
+/*   padding:2px;*/
+/*    margin:5px auto;*/
+/*}*/
 
 .imgcaption {
     font-size: 10px;
@@ -73,7 +73,9 @@
     text-align: center;
     /*height:80px;*/
     margin-top: -7px;
-    /*overflow: hidden;*/
+    overflow: hidden;
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
 }
 
 div.text {
@@ -158,13 +160,13 @@ div.text-bl a {
         font-size: 9px;
         margin-left:-3px;
     }
-    .thumbnail-tiny {
-        height: 15vw;
-        width : 15vw;
-        padding:2px;
-        margin:3px auto;
+    /*.thumbnail-tiny {*/
+    /*    height: 15vw;*/
+    /*    width : 15vw;*/
+    /*    padding:2px;*/
+    /*    margin:3px auto;*/
 
-    }
+    /*}*/
     .imgcaption {
        width : 34vw;
         font-size: 9px;
@@ -306,6 +308,10 @@ a:hover {
 <!--                    {% endif %}-->
 <!--                </form>-->
         </div>
+
+<input type="text" id="autocomplete" placeholder="Start typing...">
+<div id="suggestions" style="border:1px solid #ccc;"></div>
+
 
 <!--            Main section-->
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">

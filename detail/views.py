@@ -94,7 +94,6 @@ def createhybrid(request):
         return HttpResponse(redirect_message)
     if species1.status == 'synonym':
         species1 = species1.getAccepted()
-    print("1. species1 = ", species1.binomial)
 
     pid2 = request.GET.get('pid2', none)
     if not pid2:
@@ -104,10 +103,8 @@ def createhybrid(request):
             species2 = Species.objects.get(pk=pid2)
         except Species.DoesNotExist:
             return HttpResponse(redirect_message)
-    print("2. species2 = ", species2.binomial)
     if species2.status == 'synonym':
         species2 = species2.getAccepted()
-    print("3. species2 = ", species2.binomial)
 
     spc1 = species1.species
     if species1.infraspe:

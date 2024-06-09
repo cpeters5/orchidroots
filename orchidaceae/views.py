@@ -506,14 +506,7 @@ def browsedist(request):
 
 
 @login_required
-def ancestor(request, pid=None):
-    if not pid:
-        if 'pid' in request.GET:
-            pid = request.GET['pid']
-            pid = int(pid)
-        else:
-            pid = 0
-
+def ancestor(request, pid):
     role = getRole(request)
     sort = ''
     prev_sort = ''
@@ -574,15 +567,8 @@ def ancestor(request, pid=None):
 
 
 @login_required
-def ancestrytree(request, pid=None):
-    if not pid:
-        if 'pid' in request.GET:
-            pid = request.GET['pid']
-            pid = int(pid)
-        else:
-            pid = 0
+def ancestrytree(request, pid):
     role = getRole(request)
-
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -875,13 +861,11 @@ def progeny(request, pid):
 
 
 @login_required
-def progenyimg(request, pid=None):
+def progenyimg(request, pid):
     num_show = 5
     page_length = 30
     min_pct = 30
     role = getRole(request)
-    if not pid:
-        pid = request.GET.get('pid', 0)
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:

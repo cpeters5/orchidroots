@@ -268,15 +268,12 @@ def uploadvid(request, pid, orid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
-    print("1. species = ", species)
     # For Other application only
     family = species.gen.family
     role = getRole(request)
     if request.method == 'POST':
         form = UploadVidForm(request.POST)
-        print("1. Imh3r3")
         if form.is_valid():
-            print("2. Form is valid")
             spc = form.save(commit=False)
             spc.author = request.user.photographer
             spc.user_id = request.user

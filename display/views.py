@@ -32,11 +32,7 @@ def information(request, pid=None):
 
     from_path = pathinfo(request)
     app, family = get_application(request)
-    if not family:
-        family = 'Orchidaceae'
-        app = 'orchidaceae'
-    if app == '' or not app:
-        return HttpResponseRedirect('/')
+
     Species = apps.get_model(app, 'Species')
     try:
         species = Species.objects.get(pk=pid)
@@ -210,10 +206,6 @@ def photos(request, pid=None):
 
     # Get application and family
     app, family = get_application(request)
-    # If family is not valid, then use Orchidaceae
-    if not family:
-        family = 'Orchidaceae'
-        app = 'orchidaceae'
 
     # Define Species, Synonym and Image classes based on the application
     Species = apps.get_model(app, 'Species')
@@ -222,6 +214,11 @@ def photos(request, pid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+    # for non-orchids request, family can be anything, depending on pid.
+    if not family:
+        family = species.gen.family
+
+
     # For Orchid, image class could be species or hybrid depending on species.type
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
@@ -347,18 +344,12 @@ def videos(request, pid):
         author = None
     # author_list = Photographer.objects.all().order_by('displayname')
     app, family = get_application(request)
-    if not family:
-        family = 'Orchidaceae'
-        app = 'orchidaceae'
-    if app == '':
-        return HttpResponseRedirect('/')
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
     Video = apps.get_model(app, 'Video')
 
     try:
         species = Species.objects.get(pk=pid)
-
 
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
