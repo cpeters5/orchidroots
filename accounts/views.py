@@ -101,8 +101,8 @@ def register_page(request):
                 request, user,
                 settings.ACCOUNT_EMAIL_VERIFICATION,
                 reverse_lazy('login'))
-        else:
-            print(user_form.errors, profile_form.errors)
+        # else:
+        #     print(user_form.errors, profile_form.errors)
 
     else:
         user_form = RegisterForm()

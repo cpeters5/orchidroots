@@ -880,9 +880,6 @@ def myphoto(request, pid):
         return HttpResponseRedirect('/login/')
     role = getRole(request)
     app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
-
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
     UploadFile = apps.get_model(app, 'UploadFile')
@@ -957,7 +954,7 @@ def myphoto(request, pid):
 
 def myphoto_list(request):
     author, author_list = get_author(request)
-    role = getRole(request)
+    role = 'pri'
 
     # If change family
     app_list = applications
@@ -980,7 +977,6 @@ def myphoto_list(request):
         app_list = [family]
 
     for family in app_list:
-        app, family = get_application(request)
         Species = apps.get_model(app, 'Species')
         UploadFile = apps.get_model(app, 'UploadFile')
         SpcImages = apps.get_model(app, 'SpcImages')
@@ -1015,12 +1011,11 @@ def myphoto_browse_spc(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
     # author, author_list = get_author(request)
-    role = getRole(request)
+    role = 'pri'
     owner = request.GET.get('owner', 'Y')
 
     app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
+
     SpcImages = apps.get_model(app, 'SpcImages')
     try:
         author = request.user.photographer.author_id
@@ -1056,13 +1051,10 @@ def myphoto_browse_hyb(request):
     family = 'Orchidaceae'
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
-    # author, author_list = get_author(request)
+    # author, author_list = get_author(request). species and hybrid are together in all other apps
     role = getRole(request)
     owner = request.GET.get('owner', 'Y')
 
-    # app, family = get_application(request)
-    # if app != 'orchidaceae':
-    #     return HttpResponseRedirect('/')
     HybImages = apps.get_model(app, 'HybImages')
     try:
         author = request.user.photographer.author_id
@@ -1095,8 +1087,6 @@ def myphoto_browse_hyb(request):
 @login_required
 def curate_newupload(request):
     app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
 
     UploadFile = apps.get_model(app, 'UploadFile')
     filepath = os.path.join(settings.MEDIA_ROOT)
@@ -1122,8 +1112,6 @@ def curate_newupload(request):
 def curate_pending(request):
     # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
     app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
 
     SpcImages = apps.get_model(app, 'SpcImages')
     if app == 'orchidaceae':
@@ -1160,7 +1148,6 @@ def curate_pending(request):
 
     file_list = file_list.order_by('-modified_date')
 
-
     num_show = 5
     page_length = 100
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
@@ -1183,15 +1170,15 @@ def curate_newapproved(request):
     # This page is for curators to perform mass delete. It contains all rank 0 photos sorted by date reverse.
     species = ''
     image = ''
-    ortype = 'species'
     app, family = get_application(request)
-    if app == '':
-        return HttpResponseRedirect('/')
-
-    SpcImages = apps.get_model(app, 'SpcImages')
-    Species = apps.get_model(app, 'Species')
 
     ortype = request.GET.get('type', None)
+    if ortype == 'hybrid' and family.family == 'Orchidaceae':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+    Species = apps.get_model(app, 'Species')
+
     # Request to change rank/quality
     orid = int(request.GET.get('id', 0))
     try:
@@ -1215,8 +1202,6 @@ def curate_newapproved(request):
     if species:
         rank = int(request.GET.get('rank', 0))
         orid = int(request.GET.get('id', None))
-        image = ''
-
         try:
             image = SpcImages.objects.get(pk=orid)
             image.rank = rank
@@ -1345,8 +1330,6 @@ def compare(request, pid):
     role = getRole(request)
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
     app, family = get_application(request)
-    if not app:
-        return HttpResponseRedirect('/')
 
     # get Species, Genus, classes
     Species = apps.get_model(app, 'Species')

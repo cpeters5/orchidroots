@@ -48,7 +48,7 @@ td {
                    {% csrf_token %}
                    <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
                         <option>Select a domain</option>
-                        <option value="aves" {% if selected_app == "aves" %}selected{% endif %}>Aves</option>
+                        <option value="aves" {% if selected_app == 'aves' %}selected{% endif %}>Aves</option>
                         <option value="animalia"  {% if selected_app == "animalia" %}selected{% endif %}>Animalia</option>
                         <option value="fungi" {% if selected_app == "fungi" %}selected{% endif %}>Fungi</option>
                         <option value="orchidaceae" {% if selected_app == "orchidaceae" %}selected{% endif %}>Orchids</option>
@@ -59,8 +59,9 @@ td {
                 </form>
                 <br><br>
                 {% if not family_list and not genus_list and not species_list %}
-                <div style="text-align: center;"><h5>No record found in our system matching commonname "{{commonname}}"
-                    {% if selected_app %}in domain <b>{{selected_app|default:'all'|title }}</b>{% endif %}</h5>
+                <div style="text-align: center;"><h6>No record found in our system matching commonname "{{commonname}}"
+                    {% if selected_app %}in domain <b>{{selected_app|default:'all'|title }}</b>{% endif %}
+                    <br>Could {{commonname}} be the name of an orchid hybrid?  if so, please use the `scientific & registered name` search box</h6>
                 </div>
 
                 {% else %}
@@ -73,9 +74,11 @@ td {
                     {% for family in family_list %}
                         <tr>
                             <td style="width:20%;">
+                                {% if family.get_best_img %}
                                 <a href="{% url 'display:photos' family.get_best_img.pid.pid %}?family={{family.family}}&role={{role}}">
                                  <img class="thumbnails" alt="{{family.get_best_img.pid}}" src="{% static family.get_best_img.image_dir %}{{family.get_best_img.image_file}}">
                                 </a>
+                                {% endif %}
                             </td>
                             <td style="width:10%;">
                                 <a href="{% url 'common:genera' %}?family={{family.family}}&role={{role}}">{{family.family|safe}}</a>
@@ -97,25 +100,23 @@ td {
                 <table class="table-bordered">
                     <tr><td></td><td style="width:20%"><b>Genus</b></td><td><b>common name</b></td><td><b>distribution</b></td></tr>
                     {% for genus in genus_list %}
-                        {% if genus.get_best_img %}
                         <tr>
                             <td style="width:20%;">
+                            {% if genus.get_best_img %}
                                 <a href="{% url 'display:photos' genus.get_best_img.pid.pid %}?family={{genus.family.family}}&role={{role}}">
                                  <img class="thumbnails" alt="{{genus.get_best_img.pid}}" src="{% static genus.get_best_img.image_dir %}{{genus.get_best_img.image_file}}">
                                 </a>
+                            {% endif %}
                             </td>
                             <td style="width:10%;">
-                                {% if role == 'cur' %}
+                                {% if genus.get_best_img %}
                                     <a href="{% url 'display:photos' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&role={{role}}&syn=&area={{area}}&selectred_app={{selected_app}}">{{genus}}</a>
-                                {% else %}
-                                    <a href="{% url 'display:information' genus.get_best_img.pid_id %}?family={{genus.get_best_img.pid.family}}&syn=Y&area={{area}}&selectred_app={{selected_app}}">{{genus}}</a>
                                 {% endif %}
                                 {% if genus.status == 'synonym' %}<br> (syn. {{genus.getAcc}}){% endif %}
                             </td>
                             <td style="width:25%;">{{genus.common_name|default:''}}</td>
                             <td>{{genus.get_best_img.pid.accepted.distribution|default:''}}</td>
                         </tr>
-                        {% endif %}
                     {% endfor %}
                 </table>
                 {% endif %}
@@ -124,7 +125,7 @@ td {
                 {% if species_list %}
                 <div style="text-align: center;">
                     <h5>
-                        <b>{{selected_app|default:'all'|title }}</b> Species with matching common name "{{commonname}}"
+                        <b>{{selected_app|default:'all'|title }}</b> Species with common name contains "{{commonname}}"
                     </h5>
                 </div>
                 <table class="table-bordered">
@@ -145,7 +146,7 @@ td {
                                 {% else %}
                                     <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
                                 {% endif %}
-                                ({{species.gen.family}})
+                                ({{species.gen.family.family}})
                                 {% if species.pid.status == 'synonym' %}<br> (syn. {{species.pid.getAccepted.binomial}}){% endif %}
                             </td>
                             <td style="width:25%;">{{species.accepted.common_name|default:''}}</td>

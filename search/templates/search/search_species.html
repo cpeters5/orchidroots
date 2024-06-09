@@ -78,6 +78,11 @@ tr {
                     {% endfor %}
                 {% endif %}
                 {% if match_spc_list %}
+                        <tr style="border: 1px solid lightgrey;">
+                            <th>Sample Image</th>
+                            <th>Species/Grex</th>
+                            <th>Common name</th>
+                        </tr>
                     {% for species in match_spc_list %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
@@ -92,11 +97,9 @@ tr {
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-                                    (<i>{{species.family|default:''}}</i>
-                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
+                                    (<i>{{species.family|default:''}}</i>)
                             </td>
                             <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
-                            <td>{{species.distribution|default:''}}</td>
                             {% if user.tier.tier > 3 %}
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">
                                 {{species.pid}}
@@ -108,6 +111,12 @@ tr {
                         </tr>
                     {% endfor %}
                 {% elif other_genus_spc %}
+                        <tr><td></td></tr>
+                       <tr style="border: 1px solid lightgrey;">
+                            <th>Sample Image</th>
+                            <th>Species/Grex</th>
+                            <th>Common name</th>
+                        </tr>
                     {% for species in other_genus_spc %}
                         <tr style="border: 1px solid lightgrey;">
                             <td style="min-width:100px; text-align: center">
@@ -120,11 +129,11 @@ tr {
                                     <i>{{species.binomial|safe}}</i>
                                 </a>
                                 {{species.author|default:''}} {{species.year|default:''}} {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
-                                    (<i>{{species.family|default:''}}</i>
-                                    {% if species.family.application == 'other' or species.family.application == 'orchidaceae' %}Plantae{% else %}{{species.family.application}}{% endif %})
+                                    (<i>{{species.family|default:''}}</i>)
                             </td>
-                            <td style="border-left: 1px solid lightgrey;">{{species.accepted.common_name|default:''}}</td>
-                            <td>{{species.distribution|default:''}}</td>
+                            <td style="border-left: 1px solid lightgrey;">
+                                    {{species.accepted.common_name|default:''}}
+                            </td>
                             {% if user.tier.tier > 3 %}
                             <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{species.num_image|default:''}}</td>
                             {% endif %}
