@@ -6,12 +6,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from itertools import chain
 from fuzzywuzzy import fuzz, process
-from common.models import Family, Subfamily, Tribe, Subtribe, CommonName
+from common.models import Family, Subfamily, Tribe, Subtribe, CommonName, Binomial
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
-from utils.views import write_output, getRole
+from utils.views import write_output, getRole, clean_search_string
 from utils import config
 applications = config.applications
+big_genera = config.big_genera
 alpha_list = config.alpha_list
 
 
@@ -43,21 +44,24 @@ def get_full_search_string(Genus, search_string):
 # Prepare query string for search in common.Binomial
 # remove all occurrences of blanks, white spaces, single and double quotes, ., -, and expand genus abreviation if exists
 def clean_query(search_string):
+    rest = ''
     if ' ' not in search_string:
         genus_string = search_string
     else:
         (genus_string, rest) = search_string.split(' ', 1)
-
-    if genus_string:
-        genus_list = Binomial.objects.filter(abrev=genus_string)
+    cleaned_query = genus_string
+    cleaned_species = ''
+    # if genus_string:
+    #     genus_list = Binomial.objects.filter(abrev=genus_string)
 
     # test if genus_string is an abreviation
 
-
-    cleaned_species = rest.replace(" ", "").replace("-", "").replace(",", "").replace("'", "").replace("\"", "").replace(
+    if rest:
+        cleaned_species = rest.replace(" ", "").replace("-", "").replace(",", "").replace("'", "").replace("\"", "").replace(
         ".", "")
-    clean_query = genus_string + cleaned_species
-    return cleaned_query
+        cleaned_query = genus_string + cleaned_species
+
+    return genus_string, cleaned_species
 
 
 def search(request):
@@ -91,11 +95,13 @@ def search(request):
     # Determine requested application and send 'orchidaceae' request to search_orchidaceae
     selected_app = request.GET.get('app', '')
     if selected_app == 'orchidaceae':
+        print("1")
         url = "%s?search_string=%s" % (reverse('search:search_orchidaceae'), search_string)
         return HttpResponseRedirect(url)
 
     # Go through each application (!= orchidaceae) one by one.
     if selected_app in applications:
+        print("2")
         # If app is valid, collect all matching genera in each app
         Genus = apps.get_model(selected_app, 'Genus')
 
@@ -103,16 +109,24 @@ def search(request):
         genus, full_search_string = get_full_search_string(Genus, search_string)
         genus_list.append(genus)
         family = genus.family
+        if family.family == 'Orchidaceae':
+            print("3", family)
+
+
+
         Species = apps.get_model(family.application, 'Species')
         this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
         match_spc_list = list(chain(match_spc_list, this_match_spc_list))
     else:
-    # if requested application is empty or unknown, look for genus in each app in Applications
+        print("3", len(genus_list))
+        # if requested application is empty or unknown, look for genus in each app in Applications
         for app in applications:
+            print("app", app)
             Genus = apps.get_model(app, 'Genus')
             genus, full_search_string = get_full_search_string(Genus, search_string)
+            print("Redirecting to search_orchidaceae", genus)
             if genus and genus.family.family == 'Orchidaceae':
-                url = "%s?search_string=%s&genus=%s&family=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus, genus.family.family)
+                url = "%s?search_string=%s&family=%s" % (reverse('search:search_orchidaceae'), search_string, genus.family.family)
                 return HttpResponseRedirect(url)
             if isinstance(genus, Genus) and genus != '':
                 # List of genera found in each app (except orchidaceae).
@@ -122,6 +136,7 @@ def search(request):
                 Species = apps.get_model(family.application, 'Species')
                 this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
                 match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+        print("4", len(genus_list))
 
     # Now try to identify species from each word in the search string
     if search_string.split()[0]:
@@ -137,7 +152,7 @@ def search(request):
             this_match_spc_list = Species.objects.filter(genus=genus).filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
             match_spc_list = list(chain(match_spc_list, this_match_spc_list))
         # Incase no species found where search_string is more than one word, then look at other genus
-        other_genus_spc = []
+        print("5", len(match_spc_list))
         if genus_list and not match_spc_list and ' ' in search_string:
             other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
 
@@ -153,29 +168,31 @@ def search(request):
         # Forget genus and match species instead
 
 
-        other_genus_spc = []
         if selected_app in applications:
+            print("6")
             Species = apps.get_model(selected_app, 'Species')
             # Look foir matching binomial with entire search string OR matchind species with elements in search_list
             this_spc_list = Species.objects.filter(
                 Q(binomial__icontains=full_search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
             other_genus_spc = list(this_spc_list)
-        else:
-            for app in applications:
-                Species = apps.get_model(app, 'Species')
-                this_spc_list = Species.objects.filter(
-                        Q(binomial__icontains=full_search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
-                print("app = ", app, len(this_spc_list), full_search_string)
-                other_genus_spc = list(chain(other_genus_spc, this_spc_list))
-
-        if other_genus_spc:
             context = {'search_string': full_search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                        'other_genus_spc': other_genus_spc, 'role': role, 'selected_app': selected_app,
                        'path': path, 'full_path': full_path
                        }
             return render(request, "search/search_species.html", context)
+        else:
+            print("7")
+            url = "%s?search_string=%s" % (
+            reverse('search:search_orchidaceae'), search_string)
+            return HttpResponseRedirect(url)
+            # for app in applications:
+            #     Species = apps.get_model(app, 'Species')
+            #     this_spc_list = Species.objects.filter(
+            #             Q(binomial__icontains=full_search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+            #     other_genus_spc = list(chain(other_genus_spc, this_spc_list))
+
     # Empty results
-    url = "%s?search_string=%s" % (reverse('search:search_binomial'), full_search_string)
+    url = "%s?search_string=%s" % (reverse('search:search_orchidaceae'), full_search_string)
     return HttpResponseRedirect(url)
 
 
@@ -188,7 +205,7 @@ def search_binomial(request):
     search_string = request.GET.get('query', '')
     # Clean search string. Get genus if exists
     search_genus, search_string = clean_query(search_string)
-    if query != '':
+    if search_genus != '':
         # 1. Just match the requested string
         this_query = ''
         results = Binomial.objects.search(query)
@@ -215,7 +232,7 @@ def search_binomial(request):
         result_list.append(str_with_scores_dicts[i])
 
     role = getRole(request)
-    context = {'result_list': result_list, 'query': query, 'role': role }
+    context = {'result_list': result_list, 'search_string': search_string, 'role': role }
     return render(request, "search/search_binomial.html", context)
 
 
@@ -265,6 +282,7 @@ def search_species(request):
         search_list = search_string.split()
     species_list = []
     for app in applications:
+        print("app",app)
         Species = apps.get_model(app, 'Species')
         this_species_list = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
         if this_species_list:
@@ -272,6 +290,7 @@ def search_species(request):
                 species_list = (this_species_list)
             else:
                 species_list = (species_list).union(this_species_list)
+        print("species_list",len(species_list))
 
         match_spc_list = species_list
     if match_spc_list:
@@ -308,9 +327,9 @@ def search_name(request):
     search_string = commonname.replace("-", "").replace(" ", "").replace("'", "")
     # Collect entities contaiing the search string
     commonname_list = CommonName.objects.filter(common_name_search__icontains=search_string)
+
     if selected_app != 'ALL' and selected_app in applications:
         commonname_list = commonname_list.filter(application=selected_app)
-
     if len(commonname_list) == 0:
         return render(request, "search/search_name.html", { 'role': role, 'commonname': commonname})
 
@@ -330,12 +349,23 @@ def search_name(request):
         genus_list = genus_list + [gen_obj]
 
     # search species
-    name_list = commonname_list.filter(level='Accepted')
+    name_list = commonname_list.filter(Q(level='Accepted') | Q(level='Hybrid'), )
+    priority_items = [commonname]
+
+    def sort_key(x):
+        item_lower = x[1].lower()
+        if item_lower in {pv.lower() for pv in priority_items}:
+        # if x[1] in priority_items:
+            return (0, item_lower)
+        else:
+            return (1, item_lower)
+
     species_list = []
     for x in name_list:
         Species = apps.get_model(x.application, 'Species')
-        acc_obj = Species.objects.get(pk=x.taxon_id)
-        species_list = species_list + [acc_obj]
+        spc_obj = Species.objects.get(pk=x.taxon_id)
+        species_list = species_list + [[spc_obj, x.common_name, spc_obj.get_best_img()]]
+    species_list.sort(key=sort_key)
 
     context = {'family_list': family_list, 'genus_list': genus_list, 'species_list': species_list,
                'commonname': commonname, 'selected_app': selected_app, 'role': role,}
@@ -344,14 +374,12 @@ def search_name(request):
 
 
 def search_orchidaceae(request):
-    import re
     app = 'orchidaceae'
     family = Family.objects.get(pk='Orchidaceae')
-    min_score = 70
+    min_score = 80
     genus_list = []
     genus_id = []
     full_path = request.path
-    matched_img = ''
     matched_genus = ''
     role = getRole(request)
 
@@ -360,6 +388,7 @@ def search_orchidaceae(request):
     if not search_string:
         message = 'Empty search term'
         return HttpResponse(message)
+    write_output(request, search_string)
 
     # get orchidaceae models
     Genus = apps.get_model(app, 'Genus')
@@ -368,18 +397,15 @@ def search_orchidaceae(request):
     # Clean search_string
     search_string.strip()
     genus, search_string = get_full_search_string(Genus, search_string)
-    # search_string = search_string.replace('.', '')
-    search_string = search_string.replace(' mem ', ' Memoria ')
-    search_string = search_string.replace(' Mem ', ' Memoria ')
-    search_string = search_string.replace(' mem. ', ' Memoria ')
-    search_string = search_string.replace(' Mem. ', ' Memoria ')
-    search_string = re.sub(r'\s+', ' ', search_string)
+    if genus:
+        print("genus = ", genus)
+    search_string = clean_search_string(search_string)
 
     # Try to separate genus from species
     if ' ' not in search_string:
         #  This could possibly be genus
         genus_string = search_string
-        spc_string = None  # If not genus, it could be species
+        spc_string = genus_string  # If not genus, it could be species
     elif search_string.split()[0]:
         words = search_string.split()
         genus_string = words[0]
@@ -387,33 +413,38 @@ def search_orchidaceae(request):
     else:
         genus_string = ''
         spc_string = ''
+    # A hack. To avoid timed out
+    if genus_string in big_genera:
+        genus_string = ''
 
     # matching genus
     if genus_string:  # Seach genus table
         try:
             matched_genus = Genus.objects.get(genus=genus)
             genus_list = [[matched_genus, matched_genus.get_best_img()]]
-            matched_img = matched_genus.get_best_img()
+            if matched_genus:
+                matched_genus.img = matched_genus.get_best_img()
         except Genus.DoesNotExist:
             matched_genus = None
-            # matched_img = ''
-            if not spc_string:
-                # Single word search string
-                spc_string = genus_string
-
+            # if not spc_string:
+            #     # Single word search string
+            #     spc_string = genus_string
             # Get a list of similar genus with fuzzy score
             genus_list = Genus.objects.all()
             search_list = []
             for x in genus_list:
                 score = fuzz.ratio(x.genus.lower(), genus_string.lower())
                 if score >= min_score:
-                    search_list.append([x, score])
+                    x.score = score
+                    x.img = x.get_best_img()
+                    search_list.append(x)
 
-            search_list.sort(key=lambda k: (-k[1], k[0].genus))
+            search_list.sort(key=lambda k: k.score, reverse=True)
             del search_list[5:]
             # List of similarly spelled genera
-            genus_list = [[item[0], item[0].get_best_img()] for item in search_list]
-        genus_id = [item[0].genus for item in genus_list]
+            genus_list = search_list
+            # genus_list = [[item, item.get_best_img()] for item in search_list]
+            genus_id = [item.pid for item in genus_list]
 
         # TODO
         # Get a list of genera in the same infrageneric or related genus uisng genus_relation class
@@ -425,97 +456,108 @@ def search_orchidaceae(request):
     # matching species
     match_spc_list = []
     matched_genus_spc = []
-    gen_list = []
+    matched_spc = ''
     fuzzy = 0
     if spc_string:
         # Check if fuzzy search is requested
-        fuzzy = request.GET.get('fuzzy', 0)
-        if fuzzy:
-            grexlist = Species.objects.filter(species__istartswith=spc_string[:2])
-            # First get species in the matched genus
-            if matched_genus:
-                # Narrow the search to species begins with the firrst two characters of the search string
-                print("1 matched genus = ", matched_genus)
-                this_spc_list = grexlist.filter(genus=matched_genus)
-                print("2 this_spc_list = ", len(this_spc_list))
-                print("3 spc_string = ", spc_string)
-                for x in this_spc_list:
-                    score = fuzz.ratio(x.binomial.lower(), search_string)
-                    if score >= min_score:
-                        print(x.binomial)
-                        match_spc_list.append([x, score])
-                match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
+        # Assuming the species in search_string is correct up to the first two characters
+        # Narrow the search to species begins with the first two characters of the search string
+        grexlist = Species.objects.filter(species__istartswith=spc_string[:1])
+        if genus_list and not matched_genus:
+            matched_genus = genus_list[0]
 
-                # If no match, search all species
-                # if len(match_spc_list) == 0:
-                #     match_spc_list = matched_genus_spc
-                # match_spc_list = [(obj, 100) for obj in match_spc_list.iterator()]
-                print("3 match_spc_list = ", len(match_spc_list))
+        # First get species in the matched genus
+        if matched_genus:
+            # Prepare for sort priority
+            priority_items = [matched_genus.genus]
+            def sort_key(x):
+                item = x[0].genus
+                if item in {pv for pv in priority_items}:
+                    return (0, item)
+                else:
+                    return (1, item)
+
+            # Build species list
+            this_spc_list = grexlist.filter(genus=matched_genus)
+            for x in this_spc_list:
+                score = fuzz.ratio(x.binomial.lower(), search_string)
+                if score >= min_score:
+                    x.score = score
+                    match_spc_list.append(x)
+                    # match_pid = match_pid.append(x.pid)
+            # match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
 
             # If no matched, try similar genera
-            if not match_spc_list and genus_list:
-                this_list = grexlist.filter(genus__in=genus_id)
+            if genus_list:
+                this_list = grexlist.filter(genus__in=genus_id).exclude(genus=matched_genus)
                 if len(this_list) > 0:
                     matched_genus_spc = this_list
             else:
                 matched_genus_spc = []
 
-            print("4 genus_list = ", genus_list)
-            # Compute fuzzy score
-            print("5 grexlist = ", len(grexlist))
-            if len(matched_genus_spc) == 0:
+            if len(matched_genus_spc) > 0:
+                for x in matched_genus_spc:
+                    if x not in [spc for spc in match_spc_list]:
+                        score = fuzz.ratio(x.binomial.lower(), search_string)
+                        if score >= min_score:
+                            x.score = score
+                            match_spc_list.append(x)
+                            # match_pid = match_pid.append(x.pid)
+            else:
+                # If no good results, use all genera
                 for x in grexlist:
                     # compare species with spc_string
-                    score = fuzz.ratio(x.species.lower(), spc_string)
-                    if score >= min_score:
-                        match_spc_list.append([x, score])
+                    if x not in [spc for spc in match_spc_list]:
+                        score = fuzz.ratio(x.species.lower(), spc_string)
+                        if score >= min_score:
+                            x.score = score
+                            match_spc_list.append(x)
+                            # match_pid = match_pid.append(x.pid)
 
-                if match_spc_list and match_spc_list[0][1] < min_score + 10:
-                    for x in grexlist:
-                        if x not in [key for key, _ in match_spc_list]:
-                            # compare species with spc_string
-                            score = fuzz.ratio(x.species.lower(), spc_string)
-                            if score >= min_score:
-                                match_spc_list.append([x, score])
+            priority_items = [genus_string]
+            def sort_species_key(x):
+                item = x.score
+                if item in {pv for pv in priority_items}:
+                    return (0, item)
+                else:
+                    return (1, item)
 
-            match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
+            # match_spc_list.sort(key=lambda x: x.score, reverse=True)
+            # match_spc_list.sort(key=lambda k: (-k))
+            # match_spc_list.sort(key=sort_species_key)
+            sorted_spc_list = sorted(match_spc_list, key=lambda x: (-int(x.genus == genus_string), -x.score))
+            match_spc_list = sorted_spc_list
 
             # if no matched_genus or matching species have low score, try other genera
-            if not match_spc_list or match_spc_list[0][1] < min_score + 10:
+            if not match_spc_list or match_spc_list[0].score < min_score + 10:
                 for x in grexlist:
-                    if x not in [key for key, _ in match_spc_list]:
+                    if x not in [key for key in match_spc_list]:
                         score = fuzz.ratio(x.species.lower(), spc_string)
-                        if score >= min_score and x not in [key for key, _ in match_spc_list]:
-                            match_spc_list.append([x, score])
-            match_spc_list.sort(key=lambda k: (-k[1], k[0].genus))
-            match_spc_list = [item[0] for item in match_spc_list]
+                        if score >= min_score:
+                            x.score = score
+                            match_spc_list.append(x)
+
+            # match_spc_list.sort(key=lambda x: x.score, reverse=True)
+            # match_spc_list.sort(key=sort_species_key)
+            sorted_spc_list = sorted(match_spc_list, key=lambda x: (-int(x.genus == genus_string), -x.score))
+            match_spc_list = sorted_spc_list
 
         else:
-            # straight partial matches
-            if matched_genus:
-                # First search species in matched genus
-                all_spc_list = Species.objects.filter(binomial__icontains=search_string)
-                match_spc_list = all_spc_list.filter(genus=matched_genus)
-                # If no match, search all species
-                if len(match_spc_list) == 0:
-                    match_spc_list = all_spc_list
-            else:
-                # species is the entire search string, or part of it
-                match_spc_list = Species.objects.filter(Q(species__istartswith=spc_string) | Q(species__istartswith=search_string))
+            # Couldn't find or estimate matched_genus. Then search binomial for all species within Orchidaceae family
+            # species is the entire search string, or part of it (in case genus is badly misspelled)
+            match_spc_list = Species.objects.filter(Q(species__istartswith=spc_string) | Q(species__istartswith=search_string))
             match_spc_list = match_spc_list.order_by('binomial')
 
     path = 'information'
-    if role == 'cur':
+    if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
 
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_genus': matched_genus,
-               'matched_img': matched_img,
+               'genus_string': genus_string, 'spc_string': spc_string,
                'genus_list': genus_list, 'match_spc_list': match_spc_list,
-               'genus_total': len(genus_list),
                'family': family, 'fuzzy': fuzzy,
                'alpha_list': alpha_list,
                'role': role, 'path': path, 'full_path': full_path}
     return render(request, "search/search_orchidaceae.html", context)
-
 
