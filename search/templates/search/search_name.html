@@ -41,13 +41,12 @@ td {
     <div style="clear:both"></div>
     <div class="row" style="margin:0 auto;">
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
-            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
+            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
                 <br>
-                <div class="btn btn-custom" onclick="history.back()">Go back</div>
                 <form action="/search/search_name/" method="post">
                    {% csrf_token %}
                    <select  class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
-                        <option>Select a domain</option>
+                        <option>Select domain</option>
                         <option value="aves" {% if selected_app == 'aves' %}selected{% endif %}>Aves</option>
                         <option value="animalia"  {% if selected_app == "animalia" %}selected{% endif %}>Animalia</option>
                         <option value="fungi" {% if selected_app == "fungi" %}selected{% endif %}>Fungi</option>
@@ -59,9 +58,18 @@ td {
                 </form>
                 <br><br>
                 {% if not family_list and not genus_list and not species_list %}
-                <div style="text-align: center;"><h6>No record found in our system matching commonname "{{commonname}}"
-                    {% if selected_app %}in domain <b>{{selected_app|default:'all'|title }}</b>{% endif %}
-                    <br>Could {{commonname}} be the name of an orchid hybrid?  if so, please use the `scientific & registered name` search box</h6>
+                <div style="text-align: center;font-size: 16px;">
+                   {% if selected_app %}
+                       <h6>
+                        No record found in our system matching commonname "{{commonname}}"
+                            in domain {{selected_app|default:'all'|title }}
+                        </h6>
+                    {% else %}
+                        <h6>No record found in our system matching commonname "{{commonname}}"</h6>
+                   {% endif %}
+                    Ensure that the "Select Domain" button is set to "All Domains" or to a specific domain relevant to your search, if known.
+                    <br>
+                    You may also try the "Scientific/registered name search in case "{{commonname}}" is a taxon or a registered hybrid.
                 </div>
 
                 {% else %}
@@ -129,30 +137,31 @@ td {
                     </h5>
                 </div>
                 <table class="table-bordered">
-                    <tr><td></td><td style="width:20%"><b>Species</b></td><td><b>common name</b></td><td><b>distribution</b></td></tr>
+                    <tr style="text-align: center;"><th>Sample image</th><th style="width:20%">Species</th><th>common name</th><th>distribution</th></tr>
                     {% for species in species_list %}
-                        {% if species.accepted.common_name %}
-                        <tr>
+                        {% if species.1 %}
+                        <tr >
                             <td style="width:20%;">
-                                {% if species.get_best_img %}
-                                <a href="{% url 'display:photos' species.pid %}?family={{species.family}}&role={{role}}">
-                                 <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.image_dir %}{{species.get_best_img.image_file}}">
+                                {% if species.2 %}
+                                <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.family}}&role={{role}}">
+                                 <img class="thumbnails" alt="{{species.2}}" src="{% static species.2.image_dir %}{{species.2.image_file}}">
                                 </a>
                                 {% endif %}
                             </td>
                             <td style="width:10%;">
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}">{{species.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:photos' species.0.pid %}?family={{species.0.gen.family}}&role={{role}}">{{species.0.binomial_it|safe}}</a>
                                 {% else %}
-                                    <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}">{{species.binomial_it|safe}}</a>
+                                    <a href="{% url 'display:information' species.0.pid %}?family={{species.0.gen.family}}">{{species.0.binomial_it|safe}}</a>
                                 {% endif %}
-                                ({{species.gen.family.family}})
-                                {% if species.pid.status == 'synonym' %}<br> (syn. {{species.pid.getAccepted.binomial}}){% endif %}
+                                ({{species.0.gen.family.family}})
+                                {% if species.0.pid.status == 'synonym' %}<br> (syn. {{species.0.pid.getAccepted.binomial}}){% endif %}
                             </td>
-                            <td style="width:25%;">{{species.accepted.common_name|default:''}}</td>
+                            <td style="width:25%;">{{species.1|default:''}}</td>
                             <td>{{species.accepted.distribution|default:''}}</td>
                         </tr>
                         {% endif %}
+
                     {% endfor %}
                 </table>
                 {% endif %}
