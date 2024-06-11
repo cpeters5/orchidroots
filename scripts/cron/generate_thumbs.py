@@ -16,7 +16,7 @@ def generate_thumbnails(base_path):
     flag = False
     for subdir, dirs, files in os.walk(images_path):
         for file in files:
-            if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+            if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')):
                 # Create a path for the original file and the thumbnail
                 original_file_path = os.path.join(subdir, file)
                 thumb_subdir = subdir.replace(images_path, thumb_path)
@@ -31,7 +31,7 @@ def generate_thumbnails(base_path):
                         img = Image.open(original_file_path)
                         try:
                             img.thumbnail((thumb_size, thumb_size))
-                            img.save(thumb_file_path)
+                            img.save(thumb_file_path, 'JPEG')
                         except:
                             # If file corrupted, use original
                             img.save(thumb_file_path)
