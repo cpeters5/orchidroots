@@ -99,8 +99,8 @@ urlpatterns = [
     # Decommissioned applications
     re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
     path('natural/', include('detail.urls')),
-    re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
-    path('orchidlite/', include('detail.urls')),
+    re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/display/%(path)s', permanent=True)),
+    path('orchidlite/', include('display.urls')),
     re_path(r'^orchid/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
     path('orchid/', include('orchidaceae.urls')),
     re_path(r'^orchidlist/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
