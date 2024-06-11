@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import shortuuid
+import re
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET
 # from django.core.urlresolvers import resolve
@@ -18,6 +19,15 @@ from accounts.models import Photographer, User
 logger = logging.getLogger(__name__)
 import utils.config
 applications = utils.config.applications
+
+def clean_search_string(search_string):
+    # search_string = search_string.replace('.', '')
+    search_string = search_string.replace(' mem ', ' Memoria ')
+    search_string = search_string.replace(' Mem ', ' Memoria ')
+    search_string = search_string.replace(' mem. ', ' Memoria ')
+    search_string = search_string.replace(' Mem. ', ' Memoria ')
+    search_string = re.sub(r'\s+', ' ', search_string)
+    return search_string
 
 
 # Add IP to log when encountered malicious requests
