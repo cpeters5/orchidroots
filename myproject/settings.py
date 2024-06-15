@@ -92,7 +92,9 @@ INSTALLED_APPS = [
     'fungi',
     'aves',
     'animalia',
+    'utils',
     'gallery',
+
 
     # Third Party
     # 'ads',
@@ -122,6 +124,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.CleanUTF8Middleware',
+
 ]
 
 INTERNAL_IPS = [
@@ -182,6 +186,10 @@ DATABASES = {
         'HOST': env.str('DBHOST', default=''),
         'USER': env.str('DBUSER', default=''),
         'PASSWORD': env.str('DBPASSWD', default=''),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
+        }
     }
 }
 
