@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse  # For datatable processing by page
+from django.views.decorators.http import require_http_methods  # For datatable of large responses (hybrid and species view)
 from django.urls import reverse, reverse_lazy
 from django.apps import apps
 from itertools import chain
@@ -978,4 +980,55 @@ def mypaginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
+
+
+# Serverside processing for large datatable responses
+# Common query function
+def get_filtered_data_spc(start, length, search_value=None, order_column='id', order_dir='asc'):
+    query = Employee.objects.all()
+    if search_value:
+        query = query.filter(name__icontains=search_escape(search_value))  # search_escape should sanitize input
+
+    # Ordering
+    if order_dir == 'desc':
+        order_column = f'-{order_column}'
+    query = query.order_by(order_column)
+
+    total_count = query.count()
+    query = query[start:start + length]
+    return query, total_count
+
+# Ajax view
+from django.http import JsonResponse
+
+def server_processing_spc(request):
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 10))
+    search_value = request.GET.get('search[value]', '')
+    order = int(request.GET.get('order[0][column]', 0))
+    order_dir = request.GET.get('order[0][dir]', 'asc')
+
+    columns = ['name', 'position', 'office', 'age', 'start_date', 'salary']
+    order_column = columns[order]
+
+    employees, total_records = get_filtered_data_spc(start, length, search_value, order_column, order_dim)
+
+    data = list(employees.values('name', 'position', 'office', 'age', 'start_date', 'salary'))
+
+    response = {
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': total_records,
+        'recordsFiltered': total_records,
+        'data': data
+    }
+    return JsonResponse(response)
+
+# initial html view using the shared function
+from django.shortcuts import render
+
+# def species(request):
+#     # Using default parameters to fetch initial data for display
+#     employees, _ = get_filtered_data_spc(0, 10)  # Fetch the first 10 entries
+#     return render(request, 'species.html', {'employees': employees})
+
 
