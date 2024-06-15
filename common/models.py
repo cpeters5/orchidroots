@@ -232,6 +232,7 @@ class DataSource(models.Model):
     def __str__(self):
         return self.source
 
+
 LEVEL_CHOICES = [('Family', 'Family'), ('Genus', 'Genus'), ('Accepted', 'Accepted')]
 APPLICATION_CHOICES = [('animalia', 'animalia'), ('aves', 'aves'), ('fungi', 'fungi'), ('other', 'other'), ('orchidaceae', 'orchidaceae')]
 
@@ -256,13 +257,16 @@ class CommonName(models.Model):
                 return None
         return None
 
+
 class Binomial(models.Model):
+    genus = models.CharField(max_length=200, null=True, blank=True)
     binomial = models.CharField(max_length=200, null=True, blank=True)
     binomial_search = models.CharField(max_length=200, null=True, blank=True)
+    species = models.CharField(max_length=200, null=True, blank=True)
+    species_search = models.CharField(max_length=200, null=True, blank=True)
     application = models.CharField(max_length=20, choices=APPLICATION_CHOICES, default='')
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='')
     taxon_id = models.CharField(max_length=20, null=True, blank=True)
-
     def __str__(self):
         return self.binomial
 
