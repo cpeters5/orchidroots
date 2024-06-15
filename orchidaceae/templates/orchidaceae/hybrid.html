@@ -336,6 +336,24 @@ for (i = 0; i < toggler.length; i++) {
 }
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({
+        // Enable serverside processing
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "server_processing.php",  // URL to the server-side script
+            "type": "POST"
+        },
+       "columns": [
+            { "data": "grex" },
+            { "data": "registrant" },
+            { "data": "originator" },
+            { "data": "year" },
+            { "data": "percentage" },
+            { "data": "#ancestors" },
+            { "data": "#descendants" },
+            { "data": "#images" },
+        ],
+
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
