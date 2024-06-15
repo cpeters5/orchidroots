@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.db.models import Q
+from django.db import connection
 from django.apps import apps
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-
+from django.utils.deprecation import MiddlewareMixin
 from itertools import chain
 from fuzzywuzzy import fuzz, process
 from common.models import Family, Subfamily, Tribe, Subtribe, CommonName, Binomial
@@ -12,11 +13,41 @@ from accounts.models import User, Photographer
 from utils.views import write_output, getRole, clean_search_string
 from utils import config
 applications = config.applications
+app_descriptions =config.app_descriptions
 big_genera = config.big_genera
 alpha_list = config.alpha_list
 
 
+def get_binomial_search_string(search_string):
+    if ' ' not in search_string:
+        genus_string = search_string
+    else:
+        (genus_string, rest) = search_string.split(' ', 1)
+
+    abrev = genus_string if genus_string.endswith('.') else genus_string + '.'
+
+    # get genus obj
+    genera = Binomial.objects.filter(Q(genus=genus_string) | Q(abrev=abrev))
+    if len(genera) > 0:
+        genus = genera[0]
+    else:
+        genus = ''
+        # It could be an abreviation
+        genus_obj = Genus.objects.filter(abrev=genus_string)
+        if genus_obj:
+            # genus = genus_obj[0]
+        # if len(genus_obj) > 0:
+            genus = genus_obj[0]
+            abrev = genus_string if genus_string.endswith('.') else genus_string + '.'
+    print("abrev", abrev)
+    full_search_string = search_string
+    if abrev != '':
+        full_search_string = search_string.replace(abrev, genus.genus)
+    return (genus, full_search_string)
+
+
 def get_full_search_string(Genus, search_string):
+    print("search_string", search_string)
     if ' ' not in search_string:
         genus_string = search_string
     else:
@@ -35,7 +66,8 @@ def get_full_search_string(Genus, search_string):
             # genus = genus_obj[0]
         # if len(genus_obj) > 0:
             genus = genus_obj[0]
-            abrev = genus_string
+            abrev = genus_string if genus.endswith('.') else genus + '.'
+    print("abrev", abrev)
     full_search_string = search_string
     if abrev != '':
         full_search_string = search_string.replace(abrev, genus.genus)
@@ -49,19 +81,47 @@ def clean_query(search_string):
         genus_string = search_string
     else:
         (genus_string, rest) = search_string.split(' ', 1)
-    cleaned_query = genus_string
-    cleaned_species = ''
-    # if genus_string:
-    #     genus_list = Binomial.objects.filter(abrev=genus_string)
+
+    if genus_string:
+        genus_list = Binomial.objects.filter(abrev=genus_string)
 
     # test if genus_string is an abreviation
 
-    if rest:
-        cleaned_species = rest.replace(" ", "").replace("-", "").replace(",", "").replace("'", "").replace("\"", "").replace(
-        ".", "")
-        cleaned_query = genus_string + cleaned_species
+    clean_species = clean_name(rest)
+    return genus_string + clean_species
 
-    return genus_string, cleaned_species
+
+def clean_name(search_string):
+
+    cleaned_name = search_string.replace(" ", "").replace("-", "").replace(",", "").replace("'", "").replace("\"", "").replace(
+        ".", "")
+    return cleaned_name
+
+def search_fulltext_with_score(search_string, search_string1, search_string2, score_limit, max_results, ):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT taxon_id, application, level, MATCH(common_name) AGAINST (%s IN BOOLEAN MODE) AS score
+            FROM common_commonname
+            WHERE MATCH(common_name) AGAINST (%s IN BOOLEAN MODE)
+              AND MATCH(common_name) AGAINST (%s IN BOOLEAN MODE) > %s
+
+            ORDER BY score DESC
+            LIMIT %s
+        """, [search_string, search_string1, search_string2, score_limit, max_results])
+        # results = [{'row': row, 'score': row[-1]} for row in cursor.fetchall()]
+        results = []
+        for row in cursor.fetchall():
+            result_dict = {
+                'pid': row[0],
+                'application': row[1],
+                'level': row[2],
+                'score': row[3]
+            }
+
+            results.append(result_dict)
+
+        # print("results = ", results)
+    return results
 
 
 def search(request):
@@ -79,11 +139,17 @@ def search(request):
     match_spc_list = []
     full_path = request.path
     path = 'information'
+    full_search_string = ''
+    other_genus_spc = ''
     if request.user.is_authenticated and request.user.tier.tier > 2:
         path = 'photos'
 
     # Get search string
-    search_string = request.GET.get('search_string', '').strip()
+    search = request.GET.get('search', '')      #handle legacy case
+    if search:
+        search_string = search
+    else:
+        search_string = request.GET.get('search_string', '').strip()
     if 'search_string' in request.POST:
         search_string = request.POST['search_string'].strip()
 
@@ -124,8 +190,9 @@ def search(request):
             print("app", app)
             Genus = apps.get_model(app, 'Genus')
             genus, full_search_string = get_full_search_string(Genus, search_string)
-            print("Redirecting to search_orchidaceae", genus)
+            print("1 genus =",genus)
             if genus and genus.family.family == 'Orchidaceae':
+                print("Redirecting to search_orchidaceae", genus)
                 url = "%s?search_string=%s&family=%s" % (reverse('search:search_orchidaceae'), search_string, genus.family.family)
                 return HttpResponseRedirect(url)
             if isinstance(genus, Genus) and genus != '':
@@ -139,6 +206,7 @@ def search(request):
         print("4", len(genus_list))
 
     # Now try to identify species from each word in the search string
+
     if search_string.split()[0]:
         search_list = search_string.split()
 
@@ -154,14 +222,23 @@ def search(request):
         # Incase no species found where search_string is more than one word, then look at other genus
         print("5", len(match_spc_list))
         if genus_list and not match_spc_list and ' ' in search_string:
-            other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+            for genus in genus_list:
+                if ' ' not in search_string:
+                    continue
+                family = genus.family
+                Species = apps.get_model(family.application, 'Species')
+                this_match_spc_list = Species.objects.filter(genus=genus).filter(
+                    Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+                match_spc_list = list(chain(match_spc_list, this_match_spc_list))
+                other_genus_spc = Species.objects.filter(Q(binomial__icontains=search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
+
 
         context = {'search_string': full_search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                    'other_genus_spc': other_genus_spc,
                    'role': role,
                    'path': path, 'full_path': full_path
                    }
-        return render(request, "search/search_species.html", context)
+        return render(request, "search/search_binomial.html", context)
 
     else:
         # Here, the requested genus from search string is unknown, probably misspelled, or search string didn't include genus.
@@ -191,13 +268,10 @@ def search(request):
             #             Q(binomial__icontains=full_search_string) | Q(species__in=search_list) | Q(infraspe__in=search_list))
             #     other_genus_spc = list(chain(other_genus_spc, this_spc_list))
 
-    # Empty results
-    url = "%s?search_string=%s" % (reverse('search:search_orchidaceae'), full_search_string)
-    return HttpResponseRedirect(url)
-
 
 # Uses commin.Binomial
 def search_binomial(request):
+    query = []
     from os.path import join
     import jellyfish
     from common.models import Binomial
@@ -236,44 +310,13 @@ def search_binomial(request):
     return render(request, "search/search_binomial.html", context)
 
 
-def xsearch_binomial(request):
-    from os.path import join
-    import jellyfish
-    from orchidaceae.models import Species
-
-    query = request.GET.get('query', '')
-    if query != '':
-        if ' ' in query:
-            (req_genus, rest) = query.split(' ', 1)
-            abrev_obj = Genus.objects.filter(abrev=req_genus)
-            if len(abrev_obj) > 0:
-                replacement = abrev_obj.first().genus
-                query = query.split()
-                abrev = query[0]
-                query = " ".join(query)
-                query = query.replace(abrev, replacement)
-        results = Species.objects.search(query)
-        jaro_winkler_similarities = {s: jellyfish.jaro_winkler_similarity(query, s.binomial) for s in results}
-        str_with_scores_dicts = [{'match': s, 'score': jaro_winkler_similarities[s]} for s in results]
-        str_with_scores_dicts.sort(key=lambda x: x['score'], reverse=True)
-    else:
-        str_with_scores_dicts = []
-    result_list = []
-    for i in range(10):
-        if i == len(str_with_scores_dicts):
-            break
-        result_list.append(str_with_scores_dicts[i])
-
-    role = getRole(request)
-    context = {'result_list': result_list, 'query': query, 'role': role }
-    return render(request, "search/search_binomial.html", context)
-
 # Called from search when genus can't be identified
 # We know that genus, application and family cannot be identified
 def search_species(request):
     genus_list = []
     search_list = []
     species_list = []
+    match_spc_list = []
     full_path = request.path
     role = getRole(request)
 
@@ -311,64 +354,75 @@ def search_species(request):
 
 def search_name(request):
     # Get search term
+    global Model
+    score_limit = 8.5
+
     role = getRole(request)
     selected_app = request.POST.get('selected_app', '')
     if not selected_app:
         selected_app = request.GET.get('selected_app', '')
-
     commonname = request.GET.get('commonname', '').strip()
     if not commonname:
         commonname = request.POST.get('commonname', '').strip()
     commonname = commonname.rstrip('s')
-
     if not commonname or commonname == '':
         context = {'role': role, }
         return render(request, "search/search_name.html", context)
-    search_string = commonname.replace("-", "").replace(" ", "").replace("'", "")
+    # search_string = clean_name(commonname)
+    search_string = commonname
     # Collect entities contaiing the search string
-    commonname_list = CommonName.objects.filter(common_name_search__icontains=search_string)
+    commonname_list = search_fulltext_with_score(search_string, search_string, search_string, score_limit, 100)
+    filtered_list = []
+    if selected_app != 'All' and selected_app in applications:
+        filtered_list = [x for x in commonname_list if x['application'] == selected_app]
 
-    if selected_app != 'ALL' and selected_app in applications:
-        commonname_list = commonname_list.filter(application=selected_app)
-    if len(commonname_list) == 0:
-        return render(request, "search/search_name.html", { 'role': role, 'commonname': commonname})
+    family_list, genus_list, species_list = [], [], []
+    for x in filtered_list:
+        if x['level'] == 'Family':
+            Model = apps.get_model('common', 'Family')
+        elif x['level'] == 'Genus':
+            Model = apps.get_model(x['application'], 'Genus')
+        elif x['level'] in ('Accepted', 'Hybrid'):
+            Model = apps.get_model(x['application'], 'Species')
+        try:
+            xobj = Model.objects.get(pk=x['pid'])
+        except Model.DoesNotExist:
+            break
+        fam, gen, spc = {}, {}, {}
+        img = xobj.get_best_img()
+        if x['level'] == 'Family':
+            fam = {'family': xobj.family, 'name': xobj.common_name, 'should': x['score'],
+                   'status': xobj.status}
+            if img:
+                fam['img_pid'] = img.pid.pid
+                fam['image_dir'] = img.thumb_dir
+                fam['image_file'] = img.image_file
+            family_list.append(fam)
+        elif x['level'] == 'Genus':
+            gen = {'pid': xobj.pid, 'genus': xobj.genus, 'name': xobj.common_name, 'score': x['score'],
+                   'status': xobj.status}
+            if img:
+                gen['img_pid'] = img.pid.pid
+                gen['image_dir'] = img.thumb_dir
+                gen['image_file'] = img.image_file
+            genus_list.append(gen)
+        elif x['level'] in ('Accepted', 'Hybrid'):
+            spc = {'pid': xobj.pid, 'binomial': xobj.binomial, 'type': xobj.type, 'score': x['score'],
+                   'family':xobj.family, 'status': xobj.status, 'level': 'Accepted'}
+            if xobj.status == 'synonym':
+                spc['acc'] = xobj.getAccepted()
+            elif xobj.type == 'species':
+                spc['name'] = xobj.accepted.common_name
+            if img:
+                spc['img_pid'] = img.pid.pid
+                spc['image_dir'] = img.thumb_dir
+                spc['image_file'] = img.image_file
+            species_list.append(spc)
 
-    # Start with highest level, Families
-    name_list = commonname_list.filter(level='Family')
-    family_list = []
-    for x in name_list:
-        fam_obj = Family.objects.get(pk=x.taxon_id)
-        family_list = family_list + [fam_obj]
-
-    # Search genus with matched common name
-    name_list = commonname_list.filter(level='Genus')
-    genus_list = []
-    for x in name_list:
-        Genus = apps.get_model(x.application, 'Genus')
-        gen_obj = Genus.objects.get(pk=x.taxon_id)
-        genus_list = genus_list + [gen_obj]
-
-    # search species
-    name_list = commonname_list.filter(Q(level='Accepted') | Q(level='Hybrid'), )
-    priority_items = [commonname]
-
-    def sort_key(x):
-        item_lower = x[1].lower()
-        if item_lower in {pv.lower() for pv in priority_items}:
-        # if x[1] in priority_items:
-            return (0, item_lower)
-        else:
-            return (1, item_lower)
-
-    species_list = []
-    for x in name_list:
-        Species = apps.get_model(x.application, 'Species')
-        spc_obj = Species.objects.get(pk=x.taxon_id)
-        species_list = species_list + [[spc_obj, x.common_name, spc_obj.get_best_img()]]
-    species_list.sort(key=sort_key)
-
+    options = [{'value': app, 'text': app_descriptions.get(app, app)} for app in applications]
+    options.append({'value': 'All', 'text': 'Entire site'})
     context = {'family_list': family_list, 'genus_list': genus_list, 'species_list': species_list,
-               'commonname': commonname, 'selected_app': selected_app, 'role': role,}
+               'options': options, 'commonname': commonname, 'selected_app': selected_app, 'role': role,}
     write_output(request, str(commonname))
     return render(request, "search/search_name.html", context)
 
@@ -398,9 +452,9 @@ def search_orchidaceae(request):
     search_string.strip()
     genus, search_string = get_full_search_string(Genus, search_string)
     if genus:
-        print("genus = ", genus)
+        print("2 genus = ", genus)
     search_string = clean_search_string(search_string)
-
+    print("where am i")
     # Try to separate genus from species
     if ' ' not in search_string:
         #  This could possibly be genus
@@ -414,8 +468,8 @@ def search_orchidaceae(request):
         genus_string = ''
         spc_string = ''
     # A hack. To avoid timed out
-    if genus_string in big_genera:
-        genus_string = ''
+    # if genus_string in big_genera:
+    #     genus_string = ''
 
     # matching genus
     if genus_string:  # Seach genus table
@@ -424,6 +478,7 @@ def search_orchidaceae(request):
             genus_list = [[matched_genus, matched_genus.get_best_img()]]
             if matched_genus:
                 matched_genus.img = matched_genus.get_best_img()
+            print("matched_genus =", matched_genus)
         except Genus.DoesNotExist:
             matched_genus = None
             # if not spc_string:
