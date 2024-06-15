@@ -95,6 +95,7 @@ urlpatterns = [
     path('detail/<int:pid>/hybrid_detail/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
     path('orchidaceae/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
     path('orchidaceae/photos/<int:pid>/', RedirectView.as_view(url='/display/photos/%(pid)s/', permanent=True)),
+    path('search/search_match/', RedirectView.as_view(url='/search/search_orchidaceae/', permanent=True)),
 
     # Decommissioned applications
     re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
