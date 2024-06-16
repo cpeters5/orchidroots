@@ -113,7 +113,6 @@ td {
                     You may also try the "Scientific/registered name search in case "{{commonname}}" is a taxon or a registered hybrid.
                 </div>
                 {% else %}
-
                 {% if species_list %}
                 <div style="text-align: center;">
                     <h5>
@@ -131,13 +130,13 @@ td {
                                 </a>
                                 {% endif %}
                             </td>
-                            <td style="width:10%;text-align: left;">
+                            <td style="text-align: left;">
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}">{{species.binomial|safe}}</a>
+                                    <a href="{% url 'display:photos' species.pid %}?family={{species.family}}&role={{role}}">{{species.binomial|safe}}</a>
                                 {% else %}
-                                    <a href="{% url 'display:information' species.pid %}?family={{species.gen.family}}">{{species.binomial|safe}}</a>
+                                    <a href="{% url 'display:information' species.pid %}?family={{species.family}}">{{species.binomial|safe}}</a>
                                 {% endif %}
-                                ({{species.family.family}})
+                                ({{species.family.family}}) {{species.score}}
                                 {% if species.status == 'synonym' %}<br> (syn. {{species.acc.binomial}}){% endif %}
                             </td>
                             <td style="text-align: left;">{{species.name|default:''}}</td>
