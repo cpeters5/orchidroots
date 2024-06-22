@@ -280,3 +280,20 @@ class Binomial(models.Model):
             except Species.DoesNotExist:
                 return None
         return None
+
+
+from django.db import models
+
+
+class SpellChecker(models.Model):
+    correct_spelling = models.CharField(max_length=255)
+    common_misspelling = models.CharField(max_length=255)
+    usage_count = models.IntegerField(default=0)
+    last_corrected = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # Ensuring that each combination of correct_spelling and common_misspelling is unique
+        unique_together = ('correct_spelling', 'common_misspelling')
+
+    def __str__(self):
+        return f"{self.correct_spelling} -> {self.common_misspelling}"
