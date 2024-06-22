@@ -365,32 +365,24 @@ def species(request):
     return render(request, "common/species.html", context)
 
 
-def rank_update(request, SpcImages):
-    rank = int(request.GET.get('rank', 0))
-    orid = int(request.GET.get('id', 0))
-    image = ''
+def rank_update(rank, orid, SpcImages):
     try:
         image = SpcImages.objects.get(pk=orid)
     except SpcImages.DoesNotExist:
         return 0
-        # acc = Accepted.objects.get(pk=pid)
     image.rank = rank
     image.save()
     return rank
 
 
-def quality_update(request, SpcImages):
-    if request.user.is_authenticated and request.user.tier.tier > 2 and 'quality' in request.GET:
-        quality = int(request.GET.get('quality', 3))
-        orid = int(request.GET.get('id', 0))
-        image = ''
-        try:
-            image = SpcImages.objects.get(pk=orid)
-        except SpcImages.DoesNotExist:
-            return 3
-        image.quality = quality
-        image.save()
-    return
+def quality_update(quality, orid, SpcImages):
+    try:
+        image = SpcImages.objects.get(pk=orid)
+    except SpcImages.DoesNotExist:
+        return 0
+    image.quality = quality
+    image.save()
+    return quality
 
 
 def newbrowse(request):
