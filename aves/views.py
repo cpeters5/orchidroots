@@ -31,7 +31,7 @@ from itertools import chain
 
 from django.utils import timezone
 from datetime import datetime, timedelta
-from utils.views import write_output, getRole, get_reqauthor
+from utils.views import write_output, getRole
 from utils import config
 applications = config.applications
 
