@@ -114,7 +114,7 @@ img{
                                     <div class="imageitem">
                                         <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
                                             <div class="box">
-                                                <img class="thumbnails" alt="" src="{% static x.image_dir %}{{ x.image_file }}" class="img-fluid fullimg">
+                                                <img class="thumbnails" alt="" src="{% static x.thumb_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                             </div>
                                             <div class="imgcaption">{{x.pid.binomial_it|safe}} {% if x.credit_to %}<br>Photographer: {{x.credit_to}} {% endif %}</div>
                                         </a>

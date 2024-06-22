@@ -526,10 +526,9 @@ nav .search-container button:hover {
                 <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
             </form>
 <!--            search common name-->
-            <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">
-                <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">
-            </form>
-
+<!--            <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">-->
+<!--                <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">-->
+<!--            </form>-->
 <!--            User info-->
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}

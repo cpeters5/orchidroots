@@ -42,8 +42,10 @@
     padding:0 10px;
     width: 100%;
     color: #0a6aa1;
+    overflow: hidden; /* Hide overflow content */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
 }
-
 .imgtitle {
     font-size: 18px;
     font-weight: bold;
@@ -155,24 +157,26 @@ img{
 
                     <br>
                     </div>
-                    <br><br>
+                    <br>
+                    <br>
+<!--                    <div class="d-flex justify-content-center">-->
+<!--                        <form action="/search/search/">-->
+<!--                            <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >-->
+<!--                            <input type="hidden" form="search" name="role" value="{{ role }}" >-->
+<!--                            <input value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" size="30" placeholder="scientific name" height="10px">-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                    <br>-->
                     <div class="d-flex justify-content-center">
                         <h5>Orchids</h5>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <form action="/search/search_orchidaceae/">
-                           <input value="{{search_string}}" type="text" name="search_string" pattern=".{3,}" size="50" placeholder="Search Orchids" height="10px">
-                           <input type="hidden" name="app" value="orchidaceae" >
-                           <input type="hidden" name="role" value="{{ role }}" >
-                        </form>
-                    </div>
+                     </div>
                     {% for image in orcimage %}
                         <div class="imageitem">
                             <div class="imgtitle">
                                 <a href="{% url 'common:newbrowse' %}?app={{image.pid.gen.family.application}}&family={{image.gen.family}}&role={{role}}&display=checked">{{image.pid.genus}}</a></div>
                                 <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
-                                    <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.image_dir %}{{image.image_file}}">
+                                    <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                 </div>
                                 </a>
                             <div class="imgcaption">
@@ -188,26 +192,13 @@ img{
                     <div class="d-flex justify-content-center">
                         <h5>Other Families <span style="color:blue;"><b>(NEW!)</b></span></h5>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <form action="/search/search_name/">
-                            <input type="hidden" name="selected_app" value="{{ selected_app }}">
-                            <input value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" size="30" placeholder="common name" height="10px">
-                        </form>
-                        &nbsp;
-                        &nbsp;
-                        <form action="/search/search/">
-                            <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >
-                            <input type="hidden" form="search" name="role" value="{{ role }}" >
-                            <input value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" size="30" placeholder="scientific name" height="10px">
-                        </form>
-                    </div>
-                    {% for othimage in all_list %}
+                     {% for othimage in all_list %}
                         {% if othimage.1 %}
                         <div class="imageitem">
                             <div class="imgtitle"><a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
                                 <a href="{% url 'common:newbrowse' %}?app={{othimage.1.pid.gen.family.application}}&role={{role}}&display=checked">
                                 <div class="box">
-                                    <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.image_dir %}{{othimage.1.image_file}}">
+                                    <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
                                 </div>
                                 </a>
                             <div class="imgcaption">
