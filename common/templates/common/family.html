@@ -12,9 +12,17 @@
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of Families in {% if app == 'other' %} Plantae (except Orchidaceae) {% else %}{{app|title}}{% endif %}
-                            {% if tribe %} tribe <i>{{tribe}}</i>  {% endif %}
-                                {% if subtribe %} subtribe <i>{{subtribe}}</i>  {% endif %}
+                            {% if app or family %}
+                                List of Families in
+                                {% if app == 'other' %} Plantae (except Orchidaceae) {% else %}{{app|title}}
+                                {% endif %}
+                                {% if tribe %} tribe <i>{{tribe}}</i>
+                                {% endif %}
+                                {% if subtribe %} subtribe <i>{{subtribe}}</i>
+                                {% endif %}
+                            {% else %}
+                                You didn't provide domain or family, please select one of the families in the following list
+                            {% endif %}
                         </div>
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
@@ -44,9 +52,8 @@
 
                         </div>
                         <!--   Main table-->
-                        Family list = {{family_list|length}}
+                        {% include "common/alpha_list_family.html" %}
                         {% if family_list %}
-                            {% include "common/alpha_list_core.html" %}
                             <div style="clear: both"></div>
                             <div>
                                 <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover">
@@ -82,25 +89,27 @@
 </div>
 <br>
 <br>
+{% endblock %}
+
+{% block extra-scripts %}
+
 <script>
 $(document).ready(function() {
-    var dataTable = $('#sortTable').dataTable({
+  $('[data-toggle="tooltip"]').tooltip();
+    var initialFilterValue = "{{ family | default:'' | escapejs }}";
+
+    var table = $('#sortTable').dataTable({
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
+        "pagingType": "simple",
+        "colReorder": true,  // Enable column reordering
         "bPaginate": true,
         // "pagingType": "simple", # only show previous/next
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
         },
-        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
-        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
-        // "dom": '<"wrapper"flipt>',
-        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
-        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
         "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
-        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
         language: {
             search: "_INPUT_",
             "sProcessing": "Processing...",
@@ -109,6 +118,9 @@ $(document).ready(function() {
             // searchPlaceholder: "Search this page"
         }
     });
+    $('.dataTables_filter input').val(initialFilterValue);
+    table.search(initialFilterValue).draw();
+
 });
 
 </script>
