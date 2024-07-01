@@ -120,6 +120,11 @@
 
                         </li>
                     {% endif %}
+                    {% if user.tier.tier > 2 %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploads</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </ul>
