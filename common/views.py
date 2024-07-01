@@ -336,7 +336,10 @@ def species(request):
     if not genus_list and not species_list and not req_genus:
         #     No filter requested, return family list
         family_list = Family.objects.all()
-        req_app = request.GET.get('app', None)
+        if talpha:
+            family_list = family_list.filter(family__istartswith=talpha)
+
+        req_app = request.GET.get('app', '')
         if req_app in applications:
             family_list = family_list.filter(application=req_app)
         context = {
