@@ -3,14 +3,6 @@
 {% load humanize %}
 <html lang="en">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-YM7ZEG2RY1');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
@@ -40,7 +32,13 @@
     <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" crossorigin="anonymous">-->
+    <link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous">
+
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Fondamento" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -52,11 +50,13 @@
 	<link rel="{% static '/utils/css/index.css' %}">
 
 <!--    For dataTable column reorder-->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.5/css/colReorder.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/colreorder/1.5.5/js/dataTables.colReorder.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.18/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.dataTables.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!--    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
+<!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>-->
+<!--    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>-->
+<!--    <script src="https://cdn.datatables.net/colreorder/1.5.5/js/dataTables.colReorder.min.js"></script>-->
 
 
 </head>
@@ -479,18 +479,6 @@ nav .search-container button:hover {
     font-family: "Lucida Calligraphy", "Comic Sans MS", "Adobe Song Std L", century, vivaldi ;
     font-size: 17px;
   }
-
-  /*.search-btn {*/
-  /*   width: 100px !important;*/
-  /*   height:30px !important;*/
-  /*    font-size: 11px;*/
-
-  /*}*/
-  /*  .search-btn1 {*/
-  /*      width: 30px !important;*/
-  /*      height:30px !important;*/
-  /*      font-size: 11px;*/
-  /*  }*/
     .fambtn {
         font-size: 10px;
         padding: 4px !important;
@@ -500,8 +488,91 @@ nav .search-container button:hover {
 .active1 {
     background-color: #394ad5 !important;
 }
-</style>
 
+/* DataTable style*/
+/* Pagination container */
+.dataTables_paginate {
+    padding-top: 10px;
+}
+
+/*.dataTables_wrapper {*/
+/*    width: 95%;*/
+/*    margin: 0 auto;*/
+/*}*/
+/* Pagination buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.5em 1em;
+    margin-left: 2px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background-color: #f9f9f9;
+    color: #333;
+    width: 20px;  /* Set your desired width */
+    height: 20px;  /* Set your desired height */
+    /*padding: 0;  !* Remove default padding *!*/
+    line-height: 30px;  /* Center text vertically */
+    text-align: center;  /* Center text horizontally */
+    font-size: 14px;
+    /*border: none;*/
+    /*margin: 2px 2px;  !* Small gap between buttons *!*/
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    width: 60px;  /* Wider for 'Previous' and 'Next' */
+}
+
+/* Current/active page */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Hover state */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Disabled state */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Styles for smaller screens (700px and below) */
+@media screen and (max-width: 700px) {
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.3em 0.6em;
+        margin-left: 1px;
+        width: 15px;
+        height: 15px;
+        line-height: 20px;
+        font-size: 12px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+        width: 40px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:not(.previous):not(.next) {
+        display: none;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .ellipsis {
+        display: inline-block;
+    }
+}
+</style>
+<body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="container-fluid">
         <div class="navbar-header" style="width: 100%;">
@@ -514,22 +585,14 @@ nav .search-container button:hover {
 <!-- Links -->
 
         <div class="collapse navbar-collapse" id="nav-content">
-<!--            Search binomial -->
-<!--            <form class="form-inline" id="binomial" action="/search/search_binomial/" style="margin-top: 5px;">-->
-<!--                <input type="hidden" form="binomial" name="app" value="orchidaceae" >-->
-<!--                <input type="hidden" form="binomial" name="role" value="{{ role }}" >-->
-<!--                <input class="searchbox" form="binomial" value="{{search_orchid}}" type="text" name="query"  pattern=".{3,}" placeholder="orchid search" style="border:1px solid #ccc; border-right: 0">-->
-<!--            </form>-->
-<!--            search taxonomy-->
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
             </form>
-<!--            search common name-->
-<!--            <form class="form-inline" id="name" action="/search/search_name/" style="margin-top: 5px;">-->
-<!--                <input class="searchbox" form="name" value="{{commonname}}" type="text" name="commonname"  pattern=".{3,}" placeholder="common name" style="border:1px solid #ccc; border-right: 0">-->
-<!--            </form>-->
-<!--            User info-->
+            <form class="form-inline" id="searchtest" action="/search/search_test/" style="margin-top: 5px;">
+                <input type="hidden" form="searchtest" name="role" value="{{ role }}" >
+                <input class="searchbox" form="searchtest" value="{{search_test_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="search anything" style="border:1px solid #ccc; border-right: 0">
+            </form>
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -606,17 +669,21 @@ nav .search-container button:hover {
 <!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
     </div>
 </div>
+{% include "main_message.html" %}
 
-
-{% block content %}
     {%  block body %}
 
 
     {% endblock %}
-{% endblock %}
 
 
 
+
+{% block extra-scripts %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
 <script>
 
     (function($) {
@@ -639,10 +706,16 @@ nav .search-container button:hover {
 
 </script>
 
-{% block extra-scripts %}
-
 {% endblock %}
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-YM7ZEG2RY1');
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
 
 </body>
 </html>

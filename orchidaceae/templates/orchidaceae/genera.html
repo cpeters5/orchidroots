@@ -30,7 +30,7 @@
 
 
 a {
-        text-decoration: none;
+    text-decoration: none;
     color: blue;
 }
 
@@ -44,9 +44,9 @@ a:hover {
   opacity: 1; /* Firefox */
 }
 
-.table-condensed{
-  font-size: 14px;
-}
+/*.table-condensed{*/
+/*  font-size: 14px;*/
+/*}*/
 
 .scrollable-menu {
     height: auto;
@@ -192,7 +192,6 @@ a:hover {
                     <br><br>
                     {% if my_list %}
                     <!--main table-->
-                    <div style="clear: all"></div>
                     <div class="flex">
                         <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
                             <thead>
@@ -289,44 +288,92 @@ a:hover {
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra-scripts %}
 
 <script>
 var toggler = document.getElementsByClassName("caret");
-var i;
 
-for (i = 0; i < toggler.length; i++) {
+for (var i = 0; i < toggler.length; i++) {
   toggler[i].addEventListener("click", function() {
     this.parentElement.querySelector(".nested").classList.toggle("active");
     this.classList.toggle("caret-down");
   });
 }
-$(document).ready(function() {
-    var dataTable = $('#sortTable').dataTable({
-        "pageLength": 100,
-        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    var initialFilterValue = "{{ spc | default:'' | escapejs }}";
+
+    var table = $('#sortTable').DataTable({
+        "info": true,
+        "paging": true,  // Enable paging
         "lengthChange": false,
-        "pagingType": "full",
-        "bPaginate": true,
-        // "pagingType": "simple", # only show previous/next
- 	    "fnPreDrawCallback": function( oSettings ) {
-            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
-        },
-        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
-        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
-        // "dom": '<"wrapper"flipt>',
-        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
-        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
-        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
-        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        "pageLength": 50,
+        "lengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "colReorder": true,
+        "columnDefs": [
+            { "type": "priority", "targets": 1 },
+            // { targets: [5, 6, 7], className: 'none' }
+        ],
+        "order": [[0, "asc" ],],
+        // "columns": [
+        //     { "data": "grex" },
+        //     { "data": "parentage" },
+        //     { "data": "registrant" },
+        //     { "data": "originator" },
+        //     { "data": "year" },
+        //     { "data": "#ancestors" },
+        //     { "data": "#descendants" },
+        //     { "data": "#images" },
+        // ],
+        responsive: true,
+        "dom": "<'row'<'col-sm-6'f><'col-sm-6'p>>" +  // Top pagination
+               "<'row'<'col-sm-12'tr>>" +
+               "<'row'<'col-sm-5'i><'col-sm-7'p>>",  // Bottom pagination
+
         language: {
             search: "_INPUT_",
             "sProcessing": "Processing...",
             "sZeroRecords": "No match results",
-            // "sSearch": "Searching:",
-            // searchPlaceholder: "Search this page"
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Show/hide info and pagination
+            $('.dataTables_info, .dataTables_paginate').toggle(pageInfo.pages > 1);
+
+            // Adjust the filter and top pagination position
+            if (pageInfo.pages <= 1) {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '10px'
+                });
+                $('.dataTables_paginate:eq(0)').hide();  // Hide top pagination if only one page
+            } else {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '0'
+                });
+                $('.dataTables_paginate:eq(0)').show().css('float', 'right');  // Show top pagination
+            }
+
+            // Log info for debugging
+            console.log("Total pages:", pageInfo.pages);
+            console.log("Current page:", pageInfo.page);
+            console.log("Total records:", pageInfo.recordsTotal);
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_filter input').attr('placeholder', 'Filter results');
         }
     });
+
+    // Set initial filter value and draw table
+    $('.dataTables_filter input').val(initialFilterValue);
+    table.search(initialFilterValue).draw();
 });
 
 
