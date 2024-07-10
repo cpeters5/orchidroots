@@ -84,42 +84,58 @@ td {
     font-size: 14px; /* Adjust the size as needed */
 }
 
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .flashing-button {
+      animation: flash 1s linear infinite;
+    }
+
 </style>
 <div style="min-height:200px;background-color:#f4f6f3;width: 100%;text-align: left;">
     <div style="text-align: center;">
         <br>
-        <h5 class="card-title" style="margin-bottom: 0">Search results for  "<i>{{search_string}}</i>"</h5>
+        <h5 class="card-title" style="margin-bottom: 0">Search_orchidaceae.html results for  "<i>{{search_string}}</i>"
+            {% if matched_genus %}in {{matched_genus}} genus{% endif %}</h5>
         <div id="accordion">
             <div class="card mt-1 no-border-bg">
                 <div class="card-header no-border-bg">
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#Help">
-                        <h6 class="card-title" style="margin-bottom: 0"><b>HELP</b></h6>
+                    <button class="btn btn-danger  flashing-button" type="button" data-toggle="collapse" data-target="#Help">
+                        <h6 class="card-title" style="margin-bottom: 0; width: 120px;"><b>HELP</b></h6>
                     </button>
                 </div>
-                <div id="Help" class="collapse" data-parent="#accordion">
-                    <div class="card-body">
-                        If your search did not return the orchid you were looking for, consider exploring one of the following alternatives to improve your results:
-                        <ul style="font-size: 16px; list-style-type: disc; text-align: left; width: 70%; margin-left: 50px; margin-top: 20px;">
-                            <li>Make sure to include the genus name in your search term. This will help refine your search and yield more precise results. </li>
-                            <li>Check the genus and/or species spelling in your search term and recommit the search.</li>
-                            <li>Consider including an approximate species name in your search term to help find similar matches.</li>
-                            <li>Click on the matched genus in the "Genus" section to view the complete list of species within that genus.</li>
-                            <li> The search term may contain common name of the plant.
-                                Use the 'common_name search' option on the navbar to search for the species part of your search term, (do not include genus).
-                        </ul>
-                    </div>
-                </div>
+                {% include "search/search_guide.html" %}
+
+                <h6>Dont see what you are looking for?  Try searching for common name
+                <a class="btn btn-primary" href="{% url 'search:search_name' %}?role={{role}}&commonname={{search_string}}">common name</a>
+                </h6>
+
+<!--                <form action="{% url 'search:search_name' %}" method="post">-->
+<!--                   {% csrf_token %}-->
+<!--                    <select class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">-->
+<!--                        <option value="">See other domain</option>-->
+<!--                        {% for option in options %}-->
+<!--                            <option value="{{ option.value }}" {% if selected_app  == option.value %}selected{% endif %}>-->
+<!--                                {{ option.text }}-->
+<!--                            </option>-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                    <input type="hidden" name="commonname" value="{{ commonname }}">-->
+<!--                </form>-->
+
+
             </div>
         </div>
     <table class="table table-condensed  table-hover" style="padding-bottom: 0px; width: 85%;">
     {% if matched_genus %}
         <tr>
             <td>
-                {% if not matched_genus.num_hybrid or matched_genus.num_species > 0 %}
-                    <a href="{% url 'orchidaceae:species' %}?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{matched_genus.genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                {% if not matched_genus.type == 'species' %}
+                    <a href="{% url 'orchidaceae:species' %}?role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                     {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                 {% else %}
-                     <a href="/orchidaceae/hybrid/?family={{matched_genus.family|default:'Orchidaceae'}}&genus={{genus.0.genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                     <a href="{% url 'orchidaceae:hybrid' %}?role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                 {% endif %}
                 {% if user.tier.tier > 3 %}
                 {{matched_genus.pid|default:''}}
@@ -136,13 +152,13 @@ td {
             <tr style="background-color: white;">
                 <td>
                     {% if not genus.num_hybrid or genus.num_species > 0 %}
-                        <a href="/common/species/?family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
+                        <a href="/common/species/?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
                         {% if genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
                         {% if genus.family.family == 'Orchidaceae' %}
-                            <a href="/orchidaceae/hybrid/?family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
+                            <a href="/orchidaceae/hybrid/?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                         {% else %}
-                            <a href="/common/hybrid/?family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
+                            <a href="/common/hybrid/?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                         {% endif %}
                     {% endif %}
                 {% if user.tier.tier > 3 %}
@@ -150,9 +166,8 @@ td {
                 {% endif %}
                 </td>
                 <td style="min-width:100px; text-align: center">
-                    {% if genus.get_best_img %}
-                     <img class="thumbnails" alt="{{genus.genus}}" src="{% static genus.img.thumb_dir %}{{genus.img.image_file}}">
-<!--                                {{genus.0.get_best_img.pid.name|safe}}-->
+                    {% if genus.img_file %}
+                     <img class="thumbnails" alt="{{genus.genus}}" src="{% static genus.img_dir %}{{genus.img_file}}">
                     {% endif %}
                 </td>
             </tr>
@@ -174,9 +189,10 @@ td {
                         <i>{{species.binomial|safe}}</i>
                     </a>
                     {{species.author|default:''}} {{species.year|default:''}}
-                    {% if species.status == 'synonym' %}<br>(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
+                    {{species.accepted.common_name|default:''}}
+                    {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
                     {% if user.tier.tier > 3 %}
-                        <br>{{species.pid}}-{{species.getAccepted.pid}} score = {{species.score}}
+                        <br>{{species.pid}}-{{species.getAccepted.pid}}
                     {% endif %}
                 </td>
                 <td style="text-align: center; border-bottom:0">
