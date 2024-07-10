@@ -27,17 +27,20 @@ td {
 @media only screen and (max-width: 600px) {
     table {
         width: 100%;
-        font-size:12px;
+        font-size: 12px;
     }
+
     .thumbnails {
-       height: 80px;
-       margin:5px auto;
+        height: 80px;
+        margin: 5px auto;
     }
+
     td {
         border: 0;
         padding-left: 10px;
         min-height: 50px;
     }
+}
 .dataTables_wrapper .row {
     width: 90%;
     margin: 0 auto; /* Center the row if necessary */
@@ -76,8 +79,15 @@ td {
 .dataTables_filter label {
     font-size: 14px; /* Adjust the size as needed */
 }
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .flashing-button {
+      animation: flash 1s linear infinite;
+    }
 
-}
+
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
     <div style="clear:both"></div>
@@ -85,6 +95,17 @@ td {
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
                 <br>
+        <h5 class="card-title" style="margin-bottom: 0">Search results for  "<i>{{commonname}}</i>"</h5>
+        <div id="accordion">
+            <div class="card mt-1 no-border-bg">
+                <div class="card-header no-border-bg">
+                    <button class="btn btn-danger  flashing-button" type="button" data-toggle="collapse" data-target="#Help">
+                        <h6 class="card-title" style="margin-bottom: 0; width: 120px;"><b>HELP</b></h6>
+                    </button>
+                </div>
+                {% include "search/search_guide.html" %}
+            </div>
+        </div>
                 <form action="{% url 'search:search_name' %}" method="post">
                    {% csrf_token %}
                     <select class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
@@ -123,23 +144,23 @@ td {
                     <thead style="text-align: center;"><th>Sample image</th><th>Species</th><th>common name</th><th>distribution</th></thead>
                     {% for species in species_list %}
                         <tr >
-                            <td style="width:20%;">{{species.img.image_file}}
-                                {% if species.img_pid %}
-                                <a href="{% url 'display:photos' species.pid %}?family={{species.family}}&role={{role}}">
-                                 <img class="thumbnails" alt="{{species.img}}" src="{% static species.image_dir %}{{species.image_file}}">
+                            <td style="width:20%;">
+                                {% if species.get_best_img.image_file %}
+                                <a href="{% url 'display:information' species.pid %}?family={{species.family}}&role={{role}}">
+                                 <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                                 {% endif %}
                             </td>
                             <td style="text-align: left;">
-                                {% if role == 'cur' %}
+                                {% if user.tier.tier > 3 %}
                                     <a href="{% url 'display:photos' species.pid %}?family={{species.family}}&role={{role}}">{{species.binomial|safe}}</a>
                                 {% else %}
-                                    <a href="{% url 'display:information' species.pid %}?family={{species.family}}">{{species.binomial|safe}}</a>
+                                    <a href="{% url 'display:information' species.pid %}?role={{role}}&family={{species.family}}">{{species.binomial|safe}}</a>
                                 {% endif %}
-                                ({{species.family.family}}) {{species.score}}
-                                {% if species.status == 'synonym' %}<br> (syn. {{species.acc.binomial}}){% endif %}
+                                ({{species.family.family}})
+                                {% if species.status == 'synonym' %} (syn. {{species.acc.binomial}}){% endif %}
                             </td>
-                            <td style="text-align: left;">{{species.name|default:''}}</td>
+                            <td style="text-align: left;">{{species.accepted.common_name|default:''}}</td>
                             <td style="text-align: left;">{{species.accepted.distribution|default:''}}</td>
                         </tr>
 
@@ -213,13 +234,13 @@ $(document).ready(function(){
     });
 
 
-    function handleSelect(select) {
-      var selectedOption = select.value;
-      console.log("Selected option:", selectedOption);
-      // Perform further actions based on the selected option
-      // e.g., submit the form programmatically, redirect, etc.
-      select.form.submit();
-    }
+    // function handleSelect(select) {
+    //   var selectedOption = select.value;
+    //   console.log("Selected option:", selectedOption);
+    //   // Perform further actions based on the selected option
+    //   // e.g., submit the form programmatically, redirect, etc.
+    //   select.form.submit();
+    // }
 
 
 </script>
