@@ -722,12 +722,12 @@ def uploadweb(request, pid, orid=None):
 @login_required
 def uploadfile(request, pid):
     role = getRole(request)
+    species = Species.objects.get(pk=pid)
     if request.user.tier.tier < 2 or not request.user.photographer.author_id:
         message = 'You dont have access to upload files. Please update your profile to gain access. ' \
                   'Or contact admin@bluenanta.com'
         return HttpResponse(message)
-    species = Species.objects.get(pk=pid)
-    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
+    if request.user.tier.tier < 3 and species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
         message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
                 'Please delete one or more of your photos before uploading a new one.'
         return HttpResponse(message)
