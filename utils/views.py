@@ -7,10 +7,13 @@ import re
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET
 # from django.core.urlresolvers import resolve
-from django.db.models import Q
+from django.db.models import Func, Q, Value, CharField
 from django.http import HttpResponse
 from django.urls import resolve, get_resolver, URLResolver, URLPattern
 from django.apps import apps
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from urllib.parse import urlparse, urlencode
 
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
@@ -20,6 +23,49 @@ logger = logging.getLogger(__name__)
 import utils.config
 applications = utils.config.applications
 
+# Use in django query to match ignore spece character
+class RemoveSpaces(Func):
+    function = 'REPLACE'
+    template = "%(function)s(%(expressions)s, ' ', '')"
+
+
+
+
+def redirect_to_referrer(request, default_url='/', excluded_params=None):
+    """
+    Redirects to the referring page with all original GET parameters.
+
+    Args:
+    request: The HttpRequest object.
+    default_url: The name of the URL to redirect to if no referrer is found.
+    excluded_params: A list of GET parameters to exclude from the redirect.
+
+    Returns:
+    HttpResponseRedirect to the referrer or default URL.
+    """
+    referer = request.META.get('HTTP_REFERER')
+
+    if referer:
+        parsed_uri = urlparse(referer)
+        path = parsed_uri.path
+
+        # Get the original GET parameters, excluding any specified
+        params = request.GET.copy()
+        if excluded_params:
+            for param in excluded_params:
+                params.pop(param, None)
+
+        query_string = urlencode(params)
+
+        # Combine the path and parameters
+        redirect_url = f"{path}?{query_string}" if query_string else path
+
+        return HttpResponseRedirect(redirect_url)
+    else:
+        # If there's no referer, redirect to the default URL
+        return redirect(default_url)
+
+
 def clean_search_string(search_string):
     # search_string = search_string.replace('.', '')
     search_string = search_string.replace(' mem ', ' Memoria ')
@@ -27,7 +73,31 @@ def clean_search_string(search_string):
     search_string = search_string.replace(' mem. ', ' Memoria ')
     search_string = search_string.replace(' Mem. ', ' Memoria ')
     search_string = re.sub(r'\s+', ' ', search_string)
+    search_string =  search_string.replace("’", "'")
     return search_string
+
+
+def clean_query(search_string):
+    rest = ''
+    if ' ' not in search_string:
+        genus_string = search_string
+    else:
+        (genus_string, rest) = search_string.split(' ', 1)
+
+    if genus_string:
+        genus_list = Binomial.objects.filter(abrev=genus_string)
+
+    # test if genus_string is an abreviation
+
+    clean_species = clean_name(rest)
+    return genus_string + clean_species
+
+
+def clean_name(search_string):
+
+    cleaned_name = search_string.replace(" ", "").replace("-", "").replace(",", "").replace("'", "").replace("\"", "").replace(
+        ".", "")
+    return cleaned_name
 
 
 # Add IP to log when encountered malicious requests
@@ -35,7 +105,6 @@ def handle_bad_request(request):
     pid = request.GET.get('pid', '')
     full_url = request.build_absolute_uri()
     if not pid or not pid.isnumeric():
-        print(">>> Received URL:", full_url)
         logger.info(f">>> Received URL: {full_url}")
         # Try to get the real IP from the X-Real-IP header
         client_ip = request.META.get('HTTP_X_REAL_IP')
@@ -49,7 +118,6 @@ def handle_bad_request(request):
         if not client_ip:
             client_ip = request.META.get('REMOTE_ADDR', '')
 
-        print(">>> Client IP:", client_ip)
         return HttpResponse("URL and IP address has been logged.")
 
 
@@ -65,10 +133,9 @@ def regenerate_file(source_path, destination_folder):
         if not os.path.exists(destination_path):
             # If it doesn't exist, copy the file
             shutil.copy(source_path, destination_path)
-            print(f"File regenerated successfully: {destination_path}")
             break
         else:
-            print(f"Filename already exists: {unique_filename}. Regenerating...")
+            continue
 
     return unique_filename
 
@@ -140,7 +207,7 @@ def get_taxonomy(request):
 
 # Logging message for tracing users requests
 def write_output(request, detail=None):
-    if str(request.user) != 'chariya' and request.user.is_authenticated:
+    if request.user.is_authenticated:
         message = "ACCESS: " + request.path + " - " + str(request.user)
         if detail:
             message += " - " + detail
@@ -173,9 +240,15 @@ def get_reqauthor(request):
     # Return photogrtapher object
     author = None
     if request.user.is_authenticated:
-        author = request.GET.get('author', None)
-    if author:
-        author = User.objects.filter(username=author)
+        author = request.GET.get('author', request.user.photographer)
+
+        if not isinstance(author, Photographer):
+            try:
+                author = Photographer.objects.get(pk=author)
+            except Photographer.DoesNotExist:
+                author = Photographer.objects.get(author_id='anonymous')
+        if not author:
+            author = request.user.photographer
     if isinstance(author, User):
         author = Photographer.objects.filter(user_id=author[0].id)
         if len(author) > 0:
@@ -263,7 +336,6 @@ def getmyphotos(author, app):
     return myspecies_list, myhybrid_list
 
 
-
 def getphotos(author, app, species=None):
     # Get list for display
     if species:
@@ -288,4 +360,30 @@ def getphotos(author, app, species=None):
         private_list = public_list = upload_list = []
 
     return private_list, public_list, upload_list
+
+
+#  Enhance SQL queries
+class Replace(Func):
+    function = 'REPLACE'
+    template = "%(function)s(%(expressions)s, %(pattern)s, %(replacement)s)"
+
+    def __init__(self, expression, pattern, replacement='', **extra):
+        super().__init__(
+            expression,
+            pattern=Value(pattern),
+            replacement=Value(replacement),
+            **extra
+        )
+
+
+# Applying multiple REPLACE
+class MultiReplace(Func):
+    def __init__(self, expression, **extra):
+        replacements = [
+            (' ', ''),  # Remove spaces
+            ("'", '')  # Remove single quotes
+        ]
+        for old, new in replacements:
+            expression = Replace(expression, old, new)
+        super().__init__(expression, **extra)
 
