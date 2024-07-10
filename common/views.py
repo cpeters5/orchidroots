@@ -1228,6 +1228,7 @@ def curate_newapproved(request):
 def uploadfile(request, pid):
     app, family = get_application(request)
     Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
     role = getRole(request)
     if request.user.tier.tier < 2 or not request.user.photographer.author_id:
         message = 'You dont have access to upload files. Please update your profile to gain access. ' \
