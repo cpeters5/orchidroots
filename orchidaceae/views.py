@@ -8,6 +8,7 @@ from django.http import JsonResponse  # For datatable processing by page
 from django.views.decorators.http import require_http_methods  # For datatable of large responses (hybrid and species view)
 from django.urls import reverse, reverse_lazy
 from django.apps import apps
+from urllib.parse import urlparse, urlencode
 from itertools import chain
 from fuzzywuzzy import fuzz, process
 from utils import conf_orchidaceae
@@ -18,10 +19,7 @@ import random
 import string
 import re
 
-# import django.shortcuts
-from utils.views import write_output
-from utils.views import getRole
-from utils.views import get_random_img, thumbdir
+from utils.views import write_output, redirect_to_referrer, getRole, get_random_img, thumbdir
 
 from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, Synonym, \
     Subgenus, Section, Subsection, Series, \
@@ -45,8 +43,6 @@ alpha_list = config.alpha_list
 def genera(request):
     write_output(request)
     family = 'Orchidaceae'
-    min_lengenus_req = 2
-    year = ''
     genustype = ''
     formula1 = ''
     formula2 = ''
@@ -58,26 +54,22 @@ def genera(request):
     t_obj = ''
     st_obj = ''
     role = getRole(request)
-    alpha = ''
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-
-    if 'sf' in request.GET:
-        sf = request.GET['sf']
-        if sf:
-            sf_obj = Subfamily.objects.get(pk=sf)
-    if 't' in request.GET:
-        t = request.GET['t']
-        if t:
-            try:
-                t_obj = Tribe.objects.get(pk=t)
-            except Tribe.DoesNotExist:
-                pass
-            if not sf_obj:
-                try:
-                    sf_obj = Subfamily.objects.get(pk=t_obj.subfamily)       # back fill subfamily
-                except Subfamily.DoesNotExist:
-                    pass
+    alpha = request.GET.get('alpha', '')
+    sf = request.GET.get('sf', '')
+    try:
+        sf_obj = Subfamily.objects.get(pk=sf)
+    except Subfamily.DoesNotExist:
+        sf_obj = None
+    t = request.GET.get('t', '')
+    try:
+        t_obj = Tribe.objects.get(pk=t)
+    except Tribe.DoesNotExist:
+        t_obj = None
+    if not sf_obj:
+        try:
+            sf_obj = Subfamily.objects.get(pk=t_obj.subfamily)       # back fill subfamily
+        except Subfamily.DoesNotExist:
+            pass
     if 'st' in request.GET:
         st = request.GET['st']
         if st:
@@ -104,38 +96,35 @@ def genera(request):
     if not genustype:
         genustype = 'all'
 
-    if 'formula1' in request.GET:
-        formula1 = request.GET['formula1']
-    if 'formula2' in request.GET:
-        formula2 = request.GET['formula2']
-
-    if 'status' in request.GET:
-        status = request.GET['status']
+    formula1 = request.GET.get('formula1', '')
+    formula2 = request.GET.get('formula2', '')
+    status = request.GET.get('status', '')
 
     genus_list = Genus.objects.all()
 
     if status == 'synonym':
         genus_list = genus_list.filter(status='synonym')
-
+        print("genera: alpha", len(genus_list))
     elif genustype == 'hybrid':
         genus_list = genus_list.filter(type='hybrid').exclude(status='synonym')
         if formula1 != '' or formula2 != '':
-            genus_list = genus_list.filter(description__icontains=formula1).filter(description__icontains=formula2)
+            genus_list = genus_list.filter(Q(description__icontains=formula1) | Q(description__icontains=formula2))
+        print("genera: alpha", len(genus_list))
     elif genustype == 'species':
         # If an intrageneric is chosen, start from beginning.
         genus_list = genus_list.filter(type='species').exclude(status='synonym')
+        print("genera: alpha", len(genus_list))
         if sf_obj or t_obj or st_obj:
             if sf_obj and t_obj and st_obj:
-                genus_list = genus_list.filter(subfamily=sf_obj.subfamily).filter(
-                    tribe=t_obj.tribe).filter(subtribe=st_obj.subtribe)
+                genus_list = genus_list.filter(subfamily=sf_obj.subfamily, tribe=t_obj.tribe, subtribe=st_obj.subtribe)
             elif sf_obj and t_obj and not st_obj:
-                genus_list = genus_list.filter(subfamily=sf_obj.subfamily).filter(tribe=t_obj.tribe)
+                genus_list = genus_list.filter(subfamily=sf_obj.subfamily, tribe=t_obj.tribe)
             elif sf_obj and st_obj and not t_obj:
-                genus_list = genus_list.filter(subfamily=sf_obj.subfamily).filter(subtribe=st_obj.subtribe)
+                genus_list = genus_list.filter(subfamily=sf_obj.subfamily, subtribe=st_obj.subtribe)
             elif sf_obj and not st_obj and not t_obj:
                 genus_list = genus_list.filter(subfamily=sf_obj.subfamily)
             elif t_obj and st_obj and not sf_obj:
-                genus_list = genus_list.filter(tribe=t_obj.tribe).filter(st=st_obj.subtribe)
+                genus_list = genus_list.filter(tribe=t_obj.tribe, stubtribe=st_obj.subtribe)
             elif t_obj and not st_obj and not sf_obj:
                 genus_list = genus_list.filter(tribe=t_obj.tribe)
             elif st_obj and not t_obj and not sf_obj:
@@ -143,8 +132,7 @@ def genera(request):
 
     if alpha and len(alpha) == 1:
         genus_list = genus_list.filter(genus__istartswith=alpha)
-
-    total = genus_list.count()
+    print("genera: alpha", len(genus_list))
 
     # Get Alliances
     sf_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0)
@@ -200,7 +188,7 @@ def series(request):
     context = {'series_list': series_list, 'title': 'series', }
     return render(request, 'orchidaceae/series.html', context)
 
-
+# Get the list of matching genus along with related generaa
 def getPartialPid(reqgenus, type, status):
     pid_list = []
     # logger.error(">>00. reqgenus = " + str(reqgenus))
@@ -249,14 +237,10 @@ def getPartialPid(reqgenus, type, status):
 
 
 def getPrev(request,arg, prev):
-    if arg in request.GET:
-        arg = request.GET[arg]
-    else:
-        arg = ''
-    if prev in request.GET:
-        prev = request.GET[prev]
-    else:
-        prev = ''
+    arg = request.GET.get('arc', '')
+    arg = arg.strip()
+    prev = request.GET.get('prev', '')
+    prev = prev.strip()
     return arg, prev
 
 
@@ -264,17 +248,17 @@ def getPrev(request,arg, prev):
 def species(request):
     myspecies = ''
     author = ''
-    max_rec = 3000
     role = getRole(request)
-    family = ''
-    if 'family' in request.GET:
-        family = request.GET['family']
+    spc = request.GET.get('spc', '')
+    family = request.GET.get('family', '')
+    print("0. family = ", family)
     if family != 'Orchidaceae':
         send_url = '/common/species/?family=' + str(family) + '&role=' + role
         return HttpResponseRedirect(send_url)
+    spc = request.GET.get('spc', '')
+    print("1. spc = ", spc)
 
     family = Family.objects.get(pk='Orchidaceae')
-    spc = reqgenus = ''
     msg = ''
     type = 'species'
     alpha = ''
@@ -288,19 +272,15 @@ def species(request):
 
     # Initialize
     reqgenus = request.GET.get('genus', '')
-    if reqgenus == '':
-        # Sent from base.html in case no genus info, in which case randomize genus
-        while 1:
-            reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, num_spc_with_image__lt=300).exclude(status='synonym').order_by('?')
-            if reqgenus:
-                reqgenus = reqgenus[0].genus
-                break
 
     if 'alpha' in request.GET:
         alpha = request.GET['alpha']
         if alpha == 'ALL':
             alpha = ''
     syn = request.GET.get('syn', '')
+
+    if alpha == '' and reqgenus in config.big_genera:
+        alpha = 'A'
 
     subfamily = request.GET.get('subfamily', '')
     tribe = request.GET.get('tribe', '')
@@ -315,28 +295,45 @@ def species(request):
 
     # Get list of affected  genus
     genus_list = Genus.objects.all()
+    if subfamily:
+        genus_list = genus_list.filter(subfamily=subfamily)
+    if tribe:
+        genus_list = genus_list.filter(tribe=tribe)
+    if subtribe:
+        genus_list = genus_list.filter(subtribe=subtribe)
+    genus_list = genus_list.values_list('genus', flat=True)
+    # If requested genus is not in the requested subfamilies, reset it
+    if reqgenus not in genus_list:
+        reqgenus = ''
+    # If reqgenus is not known, pick one
+    if reqgenus == '':
+        # Sent from base.html in case no genus info, in which case randomize genus
+        reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, genus__in=genus_list).exclude(status='synonym')
+        if reqgenus.exists():
+            reqgenus = reqgenus.order_by('?')[0].genus
+        else:
+            reqgenus = Genus.objects.filter(genus__in=genus_list).exclude(status='synonym')
+            if reqgenus.exists():
+                reqgenus = reqgenus.order_by('?')[0].genus
 
     # Start building th elist
-    if reqgenus or alpha or subfamily or tribe or subtribe:
+    if reqgenus or alpha or spc or subfamily or tribe or subtribe:
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, type, '')
         write_output(request, str(genus))
         # if not subfamily and not reqgenus:
         #     subfamily = 'Epidendroideae'
-        if subfamily:
-            genus_list = genus_list.filter(subfamily=subfamily)
-        if tribe:
-            genus_list = genus_list.filter(tribe=tribe)
-        if subtribe:
-            genus_list = genus_list.filter(subtribe=subtribe)
-        genus_list = genus_list.values_list('pid',flat=True)
 
-        if syn == 'N':
-            this_species_list = this_species_list.exclude(status='synonym')
-        else:
-            syn = 'Y'
         if this_species_list:
-            this_species_list = this_species_list.filter(gen__in=genus_list)
-            if alpha:
+            if syn == 'N':
+                this_species_list = this_species_list.exclude(status='synonym')
+            else:
+                syn = 'Y'
+            this_species_list = this_species_list.filter(genus__in=genus_list)
+            if spc:
+                print("3. spc = ", spc, len(this_species_list))
+                this_species_list = this_species_list.filter(species__istartswith=spc)
+                print("3. spc = ", spc, len(this_species_list))
+            elif alpha:
                 if len(alpha) == 1:
                     this_species_list = this_species_list.filter(species__istartswith=alpha)
             if myspecies and author:
@@ -365,137 +362,140 @@ def species(request):
 
 @login_required
 def hybrid(request):
-    year = ''
-    year_valid = 0
-    status = ''
-    author = originator = ''
-    seed_genus = ''
-    pollen_genus = ''
-    seed = pollen = ''
-    spc = ''
-    msg = ''
-
     # Initialization
+    author = ''
+    role = getRole(request)
+    year_valid = 0
+    msg = ''
+    crit = 0
+    spc = request.GET.get('spc', '')
+    if not spc:
+        spc = request.POST.get('spc', '')
+
+    originator = request.GET.get('originator', '')
+    if originator: crit = 1
+    alpha = request.GET.get('alpha', '')
+
+    if alpha: crit = 1
+    year = request.GET.get('year', '')
+    if valid_year(year):
+        year_valid = 1
+        crit = 1
+    status = request.GET.get('status', '')
+
+    # Not sure we still need crit index
+    if spc:
+        crit = 1
+    # if len(spc) == 1:
+    #     alpha = ''
+    # crit = 1;
+
     reqgenus = request.GET.get('genus', None)
     prev_genus = request.GET.get('reqgenus', None)
-    if reqgenus == None or reqgenus == '':
-        # Sent from base.html in case no genus info, in which case randomize genus
-        while 1:
-            reqgenus = Genus.objects.filter(num_hyb_with_image__gt=100, num_hyb_with_image__lt=300).exclude(status='synonym').order_by('?')
-            if reqgenus:
-                reqgenus = reqgenus[0].genus
-                break
-        prev_genus = reqgenus
-    if 'seed' in request.GET:
-        seed = request.GET['seed']
-    if 'pollen' in request.GET:
-        pollen = request.GET['pollen']
-    if 'status' in request.GET:
-        status = request.GET['status']
-    if 'spc' in request.GET:
-        spc = request.GET['spc']
-        if spc:
-            crit = 1
-        if len(spc) == 1:
-            alpha = ''
 
-    if 'author' in request.GET:
-        author = request.GET['author']
-        if author: crit = 1
-    if 'originator' in request.GET:
-        originator = request.GET['originator']
-        if originator: crit = 1
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha: crit = 1
-    else:
-        alpha = ''
-    if 'year' in request.GET:
-        year = request.GET['year']
-        if valid_year(year):
-            year_valid = 1
-            crit = 1
-    if alpha != 'ALL':
-        alpha = alpha[0:1]
-    crit = 1
-    if crit :
+    # If genus change, check if it is a big genus and alpha is not set, then set alpha = A
+    if not prev_genus:
+        prev_genus = reqgenus
+    if reqgenus != prev_genus and reqgenus in config.big_genera and (not alpha or alpha == 'ALL'):
+        alpha = 'A'
+        crit = 1
+
+    if not crit:
+        # return render(request, 'orchidaceae/hybrid.html', {})
+        return redirect_to_referrer(request)
+
+    if reqgenus == None or reqgenus == '':
+        reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, genus__in=genus_list).exclude(status='synonym')
+        if reqgenus.exists():
+            reqgenus = reqgenus.order_by('?')[0].genus
+        else:
+            reqgenus = Genus.objects.filter(genus__in=genus_list).exclude(status='synonym')
+            if reqgenus.exists():
+                reqgenus = reqgenus.order_by('?')[0].genus
         reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-    else:
+        print("1 hybrid: this_species_list", len(this_species_list))
+        print("2 hybrid: reqgenus", reqgenus)
+
+    # user requests seed or pollen parents
+    # First get seed_id object, then filter the hybrid list matching seed / pollen parent
+    seed_binomial = request.GET.get('seed_binomial', '').strip()
+    pollen_binomial = request.GET.get('pollen_binomial', '').strip()
+
+    # Start building the list
+    # First matching genus, with wild card
+    crit = 1 #???
+    if not crit :
         return render(request, 'orchidaceae/hybrid.html', {})
+
+    reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+    print("3 this_species_list", len(this_species_list))
+
     write_output(request, str(reqgenus))
 
+    # Genus unchanged, see if seed/pollen are requested
     if (reqgenus and (reqgenus == prev_genus)):
-        seed_genus, prev_seed_genus = getPrev(request,'seed_genus', 'prev_seed_genus')
-        pollen_genus, prev_pollen_genus = getPrev(request,'pollen_genus', 'prev_pollen_genus')
+        seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
+        pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
+        print("4 pollen_binomial>" + pollen_binomial + "<")
+    print("4 seed_binomial", seed_binomial)
 
-    if seed and seed_genus:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_genus__istartswith=seed_genus, hybrid__seed_species__istartswith=seed)
-            |
-            Q(hybrid__pollen_genus__istartswith=seed_genus, hybrid__pollen_species__istartswith=seed)
-        )
-    elif seed:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_species__istartswith=seed)
-            |
-            Q(hybrid__pollen_species__istartswith=seed)
-        )
-    elif seed_genus:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_genus__istartswith=seed_genus)
-            |
-            Q(hybrid__pollen_genus__istartswith=seed_genus)
-        )
+    if isinstance(reqgenus, Genus) and len(spc) > 0:
+        this_binom = ' '.join([reqgenus.genus, spc]).strip()
+        print("12 hybrid: this_binom", this_binom)
+        this_binom = Species.objects.filter(Q(binomial=this_binom) |  Q(species=this_binom))
+        print("12 hybrid: this_binom", this_binom)
+        # Check if same type. ifnot redirect to the correct type
+        if this_binom.exists() and this_binom[0].type == 'species':
+            send_url = '/orchidaceae/species/?family=Orchidaceae&role=' + role + "&genus=" + reqgenus.genus + "&spc=" + spc
+            return HttpResponseRedirect(send_url)
 
-    if pollen and pollen_genus:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_genus__istartswith=pollen_genus, hybrid__seed_species__istartswith=pollen)
-            |
-            Q(hybrid__pollen_genus__istartswith=pollen_genus, hybrid__pollen_species__istartswith=pollen)
-        )
-    elif pollen:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_species__istartswith=pollen)
-            |
-            Q(hybrid__pollen_species__istartswith=pollen)
-        )
-    elif pollen_genus:
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_genus__istartswith=pollen_genus)
-            |
-            Q(hybrid__pollen_genus__istartswith=pollen_genus)
-        )
+    if len(seed_binomial) > 0:
+        seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
+        print("5 seed_pids", seed_pids)
+        this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
+        print("6 this_species_list", len(this_species_list))
 
+    print("7 pollen_binomial", pollen_binomial)
+    if len(pollen_binomial) > 0:
+        poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
+        print("8 poll_pids", poll_pids)
+        this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
+        print("9 this_species_list", len(this_species_list))
+
+
+    print("10 hybrid, crit, this species list", crit, len(this_species_list))
     # Building pid ;list
-    if crit and this_species_list:
-        if spc:
-            if len(spc) >= 2:
-                this_species_list = this_species_list.filter(species__icontains=spc)
-            else:
-                this_species_list = this_species_list.filter(species__istartswith=spc)
 
-        elif alpha:
-            if len(alpha) == 1:
-                this_species_list = this_species_list.filter(species__istartswith=alpha)
-        if author or originator:
-            this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
-        if author and originator:
-            this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
-        # if originator and not author:
-        #     this_species_list = this_species_list.filter(originator__icontains=originator)
-        if year_valid:
-            year = int(year)
-            this_species_list = this_species_list.filter(year=year)
-    else:
+
+    if spc:
+        # Get species obj from genus + spc
+        print("11 hybrid: reqgenus", reqgenus, spc)
+
+        # Check if the species is the same type as page requested.
+        if len(spc) >= 3:
+            this_species_list = this_species_list.filter(species__icontains=spc)
+        else:
+            this_species_list = this_species_list.filter(species__istartswith=spc)
+
+    if alpha:
+        if len(alpha) == 1:
+            this_species_list = this_species_list.filter(species__istartswith=alpha)
+    if author or originator:
+        this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
+    if author and originator:
+        this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
+    # if originator and not author:
+    #     this_species_list = this_species_list.filter(originator__icontains=originator)
+    if year_valid:
+        year = int(year)
+        this_species_list = this_species_list.filter(year=year)
+    elif not this_species_list.exists() :
         this_species_list = []
         msg = "Please select a search criteria"
-
-    role = getRole(request)
     context = {'my_list': this_species_list,
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
-               'author': author, 'originator': originator, 'seed': seed, 'pollen': pollen,
-               'seed_genus': seed_genus, 'pollen_genus': pollen_genus,
+               'author': author, 'originator': originator, 'seed_binomial': seed_binomial, 'pollen_binomial': pollen_binomial,
                'role': role, 'level': 'list', 'title': 'hybrid_list',
                }
     return render(request, 'orchidaceae/hybrid.html', context)
