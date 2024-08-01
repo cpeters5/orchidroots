@@ -5,7 +5,7 @@ import logging
 import random
 import shutil
 
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
@@ -443,6 +443,7 @@ def newbrowse(request):
             # Go to browse genus.species
             Genus = apps.get_model(app.lower(), 'Genus')
             Species = apps.get_model(app.lower(), 'Species')
+            Accepted = apps.get_model(app.lower(), 'Accepted')
             try:
                 genus = Genus.objects.get(genus=genus)
             except Genus.DoesNotExist:
@@ -453,6 +454,11 @@ def newbrowse(request):
                     talpha = 'A'
                 if talpha:
                     species = species.filter(species__istartswith=talpha)
+                section = request.GET.get('section', '')
+                if section:
+                    sections = Accepted.objects.filter(gen=genus.pid).filter(section=section).values_list('pid', flat=True)
+                    species = species.filter(pid__in=sections)
+
                 species = species.order_by('species')
                 if len(species) > 500:
                     species = species[0: 500]
