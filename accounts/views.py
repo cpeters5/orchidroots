@@ -7,13 +7,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, FormView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.utils.http import is_safe_url, url_has_allowed_host_and_scheme
+from django.utils.http import url_has_allowed_host_and_scheme
+# from django.utils.http import is_safe_url, url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
-from allauth.account.views import _ajax_response, PasswordChangeView, PasswordResetFromKeyView, app_settings, signals
+# from allauth.account.views import _ajax_response, PasswordChangeView, PasswordResetFromKeyView, app_settings, signals
+from allauth.account.views import PasswordChangeView, PasswordResetFromKeyView
+from allauth.account import app_settings
+from allauth.account import signals
+
 from allauth.account.forms import UserTokenForm, SetPasswordForm
 from django.conf import settings
 from datetime import datetime
@@ -67,7 +72,7 @@ def login_page(request):
                     request.session['email_user'] = user.id
                     return redirect('set_email')
 
-            if is_safe_url(redirect_path, request.get_host()):
+            if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
             # if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
             #     return redirect("/detail/myphoto_browse_spc/?role=" + role + "&display=checked")
                 return redirect(redirect_path + "?role=pri")
@@ -132,7 +137,7 @@ def change_password(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/change_password.html', {
+    return render(request, 'account/password_change.html', {
         'form': form,
     })
 
@@ -283,6 +288,37 @@ class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
         self.reset_user = None
         response = self.render_to_response(self.get_context_data(token_fail=True))
         return _ajax_response(self.request, response, form=token_form)
+
+
+from django.http import JsonResponse
+# from django.template.loader import render_to_string
+from utils.json_encoder import LazyEncoder
+
+
+class xCustomPasswordResetFromKeyView(PasswordResetFromKeyView):
+    template_name = "account/password_reset_from_key.html"
+    success_url = reverse_lazy("account_reset_password_from_key_done")
+
+    def dispatch(self, request, uidb36, key, **kwargs):
+        # ... [rest of your method remains the same] ...
+
+        self.reset_user = None
+        context = self.get_context_data(token_fail=True)
+
+        if request.is_ajax():
+            html = render_to_string(self.template_name, context, request=request)
+            return JsonResponse(
+                {
+                'html': html,
+                'form_errors': token_form.errors if token_form.errors else None,
+                },
+                encoder=LazyEncoder
+            )
+        else:
+            return self.render_to_response(context)
+
+
+
 
 
 def user_reset_password(request):
