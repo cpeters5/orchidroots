@@ -27,11 +27,6 @@ def robots_txt(request):
         "Disallow: /admin/",
         "Disallow: /accounts/",
         "Disallow: /account/",
-        "Disallow: /animalia/",
-        "Disallow: /aves/",
-        "Disallow: /common/",
-        "Disallow: /detail/",
-        "Disallow: /display/information/",
         "Disallow: /documents/",
         "Disallow: /donations/",
         "Disallow: /fungi/",
@@ -40,12 +35,12 @@ def robots_txt(request):
         "Disallow: /other/",
         "Disallow: /search/",
         "Disallow: /utils/",
-        # non-existed pages
-        "Disallow: /tags/",
-        "Disallow: /orchidlite/",
-        "Disallow: /natural/",
-        "Disallow: /orchid/",
-        "Disallow: /data/",
+
+        "Allow: /detail/",
+        "Allow: /display/",
+        "User - Agent: PetalBot",
+        "Disallow: /",
+
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 

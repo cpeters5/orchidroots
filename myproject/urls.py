@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps.views import sitemap, index
+# from django.contrib.sitemaps.views import index as sitemap_index
 from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, RedirectView
 from django.urls import path, include, re_path
@@ -26,19 +27,20 @@ from django.conf.urls.static import static
 from accounts.views import  user_reset_password, login_page, register_page, UpdateProfileView, SetEmailView,\
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
 from common.views import home
-# from other.sitemaps import SpeciesSitemap# from myproject.views import robots_txt
 from . import views
-
-# sitemaps = {
-#     'photos':SpeciesSitemap
-# }
+from myproject.views import robots_txt
+from sitemap.views import sitemap_index, sitemap_section
 
 urlpatterns = [
     # Home page
     path('admin/', admin.site.urls),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
+    # path('sitemap.xml', index, {'sitemaps': sitemaps_dict}, name='django.contrib.sitemaps.views.index'),
+    # path('sitemap-<section>.xml', sitemap, {'sitemaps': sitemaps_dict}, name='django.contrib.sitemaps.views.sitemap'),
+    path('sitemap.xml', sitemap_index, name='sitemap_index'),
+    path('sitemap-<int:section>.xml', sitemap_section, name='sitemap_section'),
 
-    # User accounts
+                  # User accounts
     path('login/', login_page, name='login'),
     path('register/', register_page, name='register'),
     path('set_email/', SetEmailView.as_view(), name='set_email'),

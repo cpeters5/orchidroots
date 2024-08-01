@@ -1,4 +1,12 @@
 User-agent: *
+Allow: /common/newbrowse/
+Allow: /display/information/
+Allow: /orchidaceae/progeny/
+Allow: /orchidaceae/ancestor/
+Allow: /orchidaceae/species/
+Allow: /orchidaceae/hybrid/
+Allow: /orchidaceae/genera/
+Allow: /home/
 Disallow: /admin/
 Disallow: /accounts/
 Disallow: /animalia/
@@ -6,23 +14,20 @@ Disallow: /aves/
 Disallow: /common/
 Disallow: /data/
 Disallow: /detail/
-Disallow: /display/information/
 Disallow: /documents/
+Disallow: /donations/
 Disallow: /fungi/
 Disallow: /gallery/
-Disallow: /donations/
 Disallow: /orchidaceae/
 Disallow: /other/
 Disallow: /search/
-Disallow: /utils/
 Disallow: /tags/
+Disallow: /utils/
+Disallow: /orchidlist/
 Disallow: /orchidlite/
 Disallow: /natural/
 Disallow: /orchid/
-Disallow: /data/
-
-User-Agent: PetalBot
 Disallow: /
 
-User-agent: *
-Crawl-delay: 10
+Sitemap: https://www.beta.bluenanta.com/sitemap.xml
+
