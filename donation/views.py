@@ -17,6 +17,7 @@ from django.core.files import File
 from django.urls import reverse, reverse_lazy
 from django.template import RequestContext
 from itertools import chain
+from utils.json_encoder import LazyEncoder
 
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -106,9 +107,9 @@ class PaypalTransactionDoneView(View):
             }
 
             Donation.objects.create(**payload)
-            return JsonResponse({'status': 'success'})
+            return JsonResponse({'status': 'success'}, encoder=LazyEncoder)
         except Exception as e:
-            return JsonResponse({'status':'error', 'msg': str(e)})
+            return JsonResponse({'status':'error', 'msg': str(e)}, encoder=LazyEncoder)
 
 
 class ThankYouView(TemplateView):

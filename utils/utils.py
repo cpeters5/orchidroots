@@ -1,7 +1,16 @@
 from django.shortcuts import render
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.encoding import force_str
 
 # Create your views here.
 from PIL import Image, ExifTags
+
+class LazyEncoder(DjangoJSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, '__proxy__'):
+            return force_str(obj)
+        return super().default(obj)
+
 
 def rotate_image(filepath):
   try:
