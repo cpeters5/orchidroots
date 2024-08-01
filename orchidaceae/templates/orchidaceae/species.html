@@ -126,7 +126,7 @@ option {
     <div class="card m-2">
         <div class="card-header">
             <h4>
-                {{subfamily|default:''}} {{tribe|default:''}} {{subtribe|default:''}} {{genus|title}} {{type}}
+                {{genus|title}}
                 {% if genus.num_hybrid > 0 %}
                     <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
                 {% endif %}
@@ -134,11 +134,11 @@ option {
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                     <input form="display" type="hidden" name="genus" value="{{genus}}" >
                     <input form="display" type="hidden" name="family" value="{{family|default:'Orchidaceae'}}" >
-                    <input form="display" type="hidden" name="subfamily" value="{{subfamily}}" >
-                    <input form="display" type="hidden" name="tribe" value="{{tribe}}" >
-                    <input form="display" type="hidden" name="subtribe" value="{{subtribe}}" >
                     <input form="display" type="hidden" name="alpha" value="{{alpha}}" >
                     <input form="display" type="hidden" name="myspecies" value="{{myspecies}}" >
+                    <input form="display" type="hidden" name="subgenus" value="{{subgenus}}" >
+                    <input form="display" type="hidden" name="section" value="{{section}}" >
+                    <input form="display" type="hidden" name="subsection" value="{{subsection}}" >
                     {% if syn == 'N' %}
                         <input form="display" type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
                         <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
@@ -150,9 +150,9 @@ option {
                 <form action="?" id="myspecies" style="display:inline-block">
                     <input form="myspecies" type="hidden" name="genus" value="{{genus}}" >
                     <input form="myspecies" type="hidden" name="family" value="{{family|default:'Orchidaceae'}}" >
-                    <input form="myspecies" type="hidden" name="subfamily" value="{{subfamily}}" >
-                    <input form="myspecies" type="hidden" name="tribe" value="{{tribe}}" >
-                    <input form="myspecies" type="hidden" name="subtribe" value="{{subtribe}}" >
+                    <input form="myspecies" type="hidden" name="subgenus" value="{{subgenus}}" >
+                    <input form="myspecies" type="hidden" name="section" value="{{section}}" >
+                    <input form="myspecies" type="hidden" name="subsection" value="{{subsection}}" >
                     <input form="myspecies" type="hidden" name="alpha" value="{{alpha}}" >
                     <input form="myspecies" type="hidden" name="role" value="{{role}}" >
                     <input form="myspecies" type="hidden" name="syn" value="{{syn}}" >
@@ -174,63 +174,81 @@ option {
                 <input form="filter" type="hidden" name="family" value="{{family.|default:'Orchidaceae'}}" >
                 <input form="filter" type="hidden" name="alpha" value="{{alpha}}" >
                 <input form="filter" type="hidden" name="syn" value="N" >
-                <input form="filter" class="btn btn-custom p-1" form="filter" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="genus" data-toggle="tooltip"  data-placement="top" title="Genus" style="margin-right: 3px !important;">
-                <input form="filter" class="btn btn-custom p-1" form="filter" name="spc" onfocus="this.select()" value="{{spc}}" placeholder="species" data-toggle="tooltip"  data-placement="top" title="Species" style="margin-right: 3px !important;">
+                <input form="filter" class="btn btn-custom p-1" form="filter" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="genus" data-bs-toggle="tooltip"  data-placement="top" title="Genus" style="margin-right: 3px !important;">
+                <input form="filter" class="btn btn-custom p-1" form="filter" name="spc" onfocus="this.select()" value="{{spc}}" placeholder="species" data-bs-toggle="tooltip"  data-placement="top" title="Species" style="margin-right: 3px !important;">
                 <button form="filter" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
             </form>
+            {% if subgenus_list %}
             <div>
-                <button class="btn btn-custom p-1 m-1" type="button" id="subfamButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{subfamily|default:"Select new Subfamily"}}
+                <button class="btn btn-custom p-1 m-1" type="button" id="subfamButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{subgenus|default:"Select new subgenus"}}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="subfamButton">
-                    <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&alpha={{alpha}}&syn=N">----</a>
-                    {% for g in subfamily_list %}
-                        <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&subfamily={{g.subfamily}}&alpha={{alpha}}&syn=N">{{g.subfamily}}</a>
+                    <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
+                    {% for g in subgenus_list %}
+                        <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&subgenus={{g.subgenus}}&alpha=All&syn=N">{{g}}</a>
                     {% endfor %}
                 </div>
             </div>
-            {% if subfamily %}
-                {% if tribe_list %}
+            {% endif %}
+
+            {% if section_list %}
                     <div>
-                        <button class="btn btn-custom p-1 m-1" type="button" id="tribeButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{tribe|default:"Select new Tribe"}}
+                        <button class="btn btn-custom p-1 m-1" type="button" id="SectionButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{section|default:"Select new section"}}
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="tribeButton">
-                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&subfamily={{g.subfamily}}&alpha={{alpha}}&syn=N">----</a>
-                            {% for g in tribe_list %}
-                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&alpha={{alpha}}&syn=N">{{g.tribe}}</a>
+                        <div class="dropdown-menu" aria-labelledby="SectionButton">
+                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&syn=N">----</a>
+                            {% for g in section_list %}
+                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&section={{g.section}}&alpha=All&syn=N">{{g}}</a>
                             {% endfor %}
                         </div>
                     </div>
-                {% endif %}
-                {% if subtribe_list %}
+            {% endif %}
+
+            {% if subsection_list %}
                     <div>
 
-                        <button class="btn btn-custom p-1 m-1" type="button" id="SubtribeButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{subtribe|default:"Select new Subtribe"}}
+                        <button class="btn btn-custom p-1 m-1" type="button" id="SubsectionButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{subsection|default:"Select new subsection"}}
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="SubtribeButton">
-                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&alpha={{alpha}}&syn=N">----</a>
-                            {% for g in subtribe_list %}
-                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&subfamily={{g.subfamily}}&tribe={{g.tribe}}&subtribe={{g.subtribe}}&alpha={{alpha}}&syn=N">{{g.subtribe.subtribe}}</a>
+                        <div class="dropdown-menu" aria-labelledby="SubSectionButton">
+                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
+                            {% for g in subsection_list %}
+                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&subsection={{g.subsection}}&alpha=All&syn=N">{{g}}</a>
                             {% endfor %}
                         </div>
                     </div>
-                {% endif %}
             {% endif %}
-            {% if total == 0 %}
-                <div style="margin: 10px 0 0 10px;">
-                    {% if genus %}
-                        No <i>{{genus|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
-                    {% elif subftribe %}
-                        No  <i>{{subftribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
-                    {% elif tribe %}
-                        No <i>{{tribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}
-                    {% elif subfamily %}
-                        No <i>{{subfamily|title}}</i> species {% if alpha and alpha != 'ALL' %}}starts with {{alpha}}.{% endif %}
-                    {% endif %}
-                </div>
+            {% if series_list %}
+                    <div>
+
+                        <button class="btn btn-custom p-1 m-1" type="button" id="seriesButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{subseries|default:"Select new series"}}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="seriesButton">
+                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&series={{g.series}}&alpha={{alpha}}&syn=N">----</a>
+                            {% for g in series_list %}
+                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&series={{g.series}}&alpha=All&syn=N">{{g}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
             {% endif %}
+
+
+<!--            {% if total == 0 %}-->
+<!--                <div style="margin: 10px 0 0 10px;">-->
+<!--                    {% if genus %}-->
+<!--                        No <i>{{genus|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
+<!--                    {% elif subftribe %}-->
+<!--                        No  <i>{{subftribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
+<!--                    {% elif section %}-->
+<!--                        No <i>{{section|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
+<!--                    {% elif subgenus %}-->
+<!--                        No <i>{{subgenus|title}}</i> species {% if alpha and alpha != 'ALL' %}}starts with {{alpha}}.{% endif %}-->
+<!--                    {% endif %}-->
+<!--                </div>-->
+<!--            {% endif %}-->
 
 
 
@@ -244,7 +262,7 @@ option {
     <div class="card m-2">
 
     <!--Pagination        -->
-    {% include "orchidaceae/alpha_list.html" %}
+    {% include "orchidaceae/alpha_list_species.html" %}
     {% if page_list %}
         <div class="flex">
         <!--main table-->
@@ -269,7 +287,7 @@ option {
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
                                     (syn. {% if species.getAcc %} {{species.getAccepted.pid}}
-                                            <a href="{ url 'display:photos' species.getAccepted.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
+                                            <a href="{ url 'display:information' species.getAccepted.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
                                         {% else %}
                                             {{species.getAccepted.binomial|safe}}
                                         {% endif %}
@@ -286,16 +304,11 @@ option {
                             </td>
                         <td class="align-center">{{species.author|default:''}}</td>
                         <td class="align-center">{{species.year|default:''}}</td>
-<!--                        <td class="align-center">-->
-<!--                            {% if species.gen.subfamily %}<a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&subfamily={{species.gen.subfamily}}&type=species&display=checked">{{species.gen.subfamily}}</a>{% endif %}-->
-<!--                            {% if species.gen.section %} > <a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&tribe={{species.gen.tribe}}&type=species&display=checked">{{species.gen.tribe}}</a>{% endif %}-->
-<!--                            {% if species.gen.subsection %} > <a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&subtribe={{species.gen.subtribe}}&type=species&display=checked">{{species.gen.subtribe}}</a>{% endif %}-->
-<!--                        </td>-->
                         <td class="align-center">
-                            {% if species.accepted.subgenus %}<a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&subgenus={{species.accepted.subgenus}}&type=species&display=checked">{{species.accepted.subgenus}}</a>{% endif %}
-                            {% if species.accepted.section %}<a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&section={{species.accepted.section}}&type=species&display=checked">{{species.accepted.section}}</a>{% endif %}
-                            {% if species.accepted.subsection %}<a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&subsection={{species.accepted.subsection}}&type=species&display=checked">{{species.accepted.subsection}}</a>{% endif %}
-                            {% if species.accepted.series %}<a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&series={{species.accepted.series}}&type=species&display=checked">{{species.accepted.series}}</a>{% endif %}
+                            {% if species.accepted.subgenus %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&subgenus={{species.accepted.subgenus}}&type=species&genus={{genus}}">{{species.accepted.subgenus}}</a>{% endif %}
+                            {% if species.accepted.section %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&section={{species.accepted.section}}&type=species&genus={{genus}}">{{species.accepted.section}}</a>{% endif %}
+                            {% if species.accepted.subsection %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&subsection={{species.accepted.subsection}}&type=species&genus={{genus}}">{{species.accepted.subsection}}</a>{% endif %}
+                            {% if species.accepted.series %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&series={{species.accepted.series}}&type=species&genus={{genus}}">{{species.accepted.series}}</a>{% endif %}
                         </td>
                         <td class="align-center">
                             {% if species.status == 'synonym' %}
@@ -341,6 +354,18 @@ for (var i = 0; i < toggler.length; i++) {
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
     var initialFilterValue = "{{ spc | default:'' | escapejs }}";
+
+    // $('[data-toggle="dropdown1"]').tooltip();
+    // var initialFilterValue = "{{ subgenus | default:'' | escapejs }}";
+    //
+    // $('[data-toggle="dropdown2"]').tooltip();
+    // var initialFilterValue = "{{ section | default:'' | escapejs }}";
+    //
+    // $('[data-toggle="dropdown3"]').tooltip();
+    // var initialFilterValue = "{{ subsection | default:'' | escapejs }}";
+    //
+    // $('[data-toggle="dropdown4"]').tooltip();
+    // var initialFilterValue = "{{ series | default:'' | escapejs }}";
 
     var table = $('#sortTable').DataTable({
         "info": true,
