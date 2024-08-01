@@ -13,6 +13,8 @@ import environ
 import os
 import logging.config
 from django.utils.translation import gettext
+from utils.json_encoder import LazyJSONSerializer, LazyEncoder
+
 
 # root = environ.Path(__file__) - 2  # get root of the project
 ROOT_DIR = environ.Path(__file__) - 2  # get root of the project
@@ -37,7 +39,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default=''),
 
-SITE_ID = 1
+SITE_ID = 3
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -94,6 +96,7 @@ INSTALLED_APPS = [
     'animalia',
     'utils',
     'gallery',
+    'sitemap',
 
 
     # Third Party
@@ -125,7 +128,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'utils.middleware.CleanUTF8Middleware',
-
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 INTERNAL_IPS = [
@@ -133,6 +136,24 @@ INTERNAL_IPS = [
     '45.55.134.164',
     # ...
 ]
+
+# Session settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+# For signed cookies and other signing operations
+SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
+SERIALIZATION_MODULES = {
+    'json': 'path.to.your.json_encoder.LazyJSONSerializer'
+}
+
+# For signed cookies
+# from django.core import signing
+# signing.JSONSerializer = lazy_serializer
+
+
+from utils.utils import LazyEncoder
+# SESSION_COOKIE_SIGNER_ENCODER = LazyEncoder
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -148,7 +169,10 @@ AUTHENTICATION_BACKENDS = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'accounts/templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'accounts/templates'),
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         # 'APP_DIRS': True,
         'OPTIONS': {
             "loaders": [
@@ -293,9 +317,11 @@ CELERYBEAT_SCHEDULE = {
     'session_cleanup': weekly_schedule
 }
 
+
 CRONJOBS = [
-    ('*/2 * * * *', 'myproject.cron.my_cron_job')
+    ('0 3 4 * *', 'django.core.management.call_command', ['update_sitemaps'])
 ]
+
 
 LOGGING_CONFIG = None
 try:
