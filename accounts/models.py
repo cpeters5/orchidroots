@@ -1,7 +1,7 @@
 from allauth.account.utils import perform_login
 from allauth.account.signals import user_signed_up, user_logged_in, email_confirmed
 from allauth.account.models import EmailAddress
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.signals import pre_social_login
 
 from django.db import models

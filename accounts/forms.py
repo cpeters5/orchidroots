@@ -11,7 +11,7 @@ from allauth.socialaccount.forms import SignupForm, BaseSignupForm
 from allauth.account.forms import SetPasswordField, PasswordField
 from allauth.account import app_settings
 from allauth.account.utils import user_field, user_email, user_username
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import User, Profile, Photographer, Country
 
