@@ -262,10 +262,7 @@ def species(request):
     msg = ''
     type = 'species'
     alpha = ''
-    tribe_list = []
-    subtribe_list = []
-    subfamily_obj = ''
-    tribe_obj = ''
+    subgenus_list, section_list, subsection_list, series_list = [], [], [], []
     genus = ''
     this_species_list = []
     # max_page_length = 1000
@@ -273,19 +270,20 @@ def species(request):
     # Initialize
     reqgenus = request.GET.get('genus', '')
 
-    if 'alpha' in request.GET:
-        alpha = request.GET['alpha']
-        if alpha == 'ALL':
-            alpha = ''
+    alpha = request.GET.get('alpha', '')
+    # if alpha == 'ALL':
+    #     alpha = ''
     syn = request.GET.get('syn', '')
 
     if alpha == '' and reqgenus in config.big_genera:
         alpha = 'A'
+    print(request)
 
-    subfamily = request.GET.get('subfamily', '')
-    tribe = request.GET.get('tribe', '')
-    subtribe = request.GET.get('subtribe', '')
-
+    subgenus = request.GET.get('subgenus', '')
+    print("subgenus", subgenus)
+    section = request.GET.get('section', '')
+    subsection = request.GET.get('subsection', '')
+    series = request.GET.get('series', '')
     myspecies = request.GET.get('myspecies', '')
     if myspecies:
         try:
@@ -293,42 +291,27 @@ def species(request):
         except Photographer.DoesNotExist:
             author = ''
 
-    # Get list of affected  genus
-    genus_list = Genus.objects.all()
-    if subfamily:
-        genus_list = genus_list.filter(subfamily=subfamily)
-    if tribe:
-        genus_list = genus_list.filter(tribe=tribe)
-    if subtribe:
-        genus_list = genus_list.filter(subtribe=subtribe)
-    genus_list = genus_list.values_list('genus', flat=True)
-    # If requested genus is not in the requested subfamilies, reset it
-    if reqgenus not in genus_list:
-        reqgenus = ''
-    # If reqgenus is not known, pick one
-    if reqgenus == '':
-        # Sent from base.html in case no genus info, in which case randomize genus
-        reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, genus__in=genus_list).exclude(status='synonym')
-        if reqgenus.exists():
-            reqgenus = reqgenus.order_by('?')[0].genus
-        else:
-            reqgenus = Genus.objects.filter(genus__in=genus_list).exclude(status='synonym')
-            if reqgenus.exists():
-                reqgenus = reqgenus.order_by('?')[0].genus
-
     # Start building th elist
-    if reqgenus or alpha or spc or subfamily or tribe or subtribe:
+    if reqgenus or alpha or spc or subgenus or section or subsection:
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, type, '')
         write_output(request, str(genus))
-        # if not subfamily and not reqgenus:
-        #     subfamily = 'Epidendroideae'
+        print("this_species_list", len(this_species_list))
+        if subgenus:
+            this_species_list = this_species_list.filter(accepted__subgenus=subgenus)
+        elif section:
+            this_species_list = this_species_list.filter(accepted__section=section)
+        elif subsection:
+            this_species_list = this_species_list.filter(accepted__subsection=subsection)
+        elif series:
+            this_species_list = this_species_list.filter(accepted__series=series)
+        print("this_species_list", len(this_species_list))
+
 
         if this_species_list:
             if syn == 'N':
                 this_species_list = this_species_list.exclude(status='synonym')
             else:
                 syn = 'Y'
-            this_species_list = this_species_list.filter(genus__in=genus_list)
             if spc:
                 print("3. spc = ", spc, len(this_species_list))
                 this_species_list = this_species_list.filter(species__istartswith=spc)
@@ -340,19 +323,17 @@ def species(request):
                 pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
                 this_species_list = this_species_list.filter(pid__in=pid_list)
 
-    subfamily_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0).order_by('subfamily')
-    if subfamily:
-        tribe_list = Tribe.objects.filter(subfamily=subfamily).order_by('tribe')
-    if tribe:
-        subtribe_list = Subtribe.objects.filter(tribe=tribe).order_by ('subtribe')
-    elif subfamily:
-        subtribe_list = Subtribe.objects.filter(subfamily=subfamily).order_by ('subtribe')
-
+    subgenus_list = Subgenus.objects.filter(genus=genus).order_by('subgenus')
+    section_list = Section.objects.filter(genus=genus).order_by('section')
+    subsection_list = Subsection.objects.filter(genus=genus).order_by ('subsection')
+    series_list = Series.objects.filter(genus=genus).order_by ('subsection')
+    print("section", genus, len(section_list))
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'family': family, 'genus': genus,
-               'subfamily': subfamily, 'subfamily_list': subfamily_list,
-               'tribe': tribe, 'tribe_list': tribe_list,
-               'subtribe': subtribe, 'subtribe_list': subtribe_list,
+               'subgenus': subgenus, 'subgenus_list': subgenus_list,
+               'section': section, 'section_list': section_list,
+               'subsection': subsection, 'subsection_list': subsection_list,
+               'series': series, 'series_list': series_list,
                'msg': msg,
                'syn': syn, 'myspecies': myspecies,
                'title': 'taxonomy', 'type': 'species'
@@ -833,6 +814,45 @@ def progeny(request, pid):
         return HttpResponse(message)
     write_output(request, species.binomial)
     genus = species.genus
+    prim = request.GET.get('prim', '')
+    prim_list, sec_list, result_list = [], [], []
+    if prim:
+        prim_list = Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid))
+    else:
+        #All descendants
+        des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt=30)
+        # primary
+        prim_list = set(Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True))
+        # Secondary
+        sec_list = set(Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True))
+
+        for x in des_list:
+            if x.did.pid.pid in prim_list:
+                result_list.append([x,'primary'])
+            elif x.did.pid.pid in sec_list:
+                result_list.append([x,'secondary'])
+            else:
+                result_list.append([x,'remote'])
+
+    context = {'result_list': result_list, 'prim_list': prim_list,
+               'species': species, 'family': family,
+                'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
+               'title': 'progeny', 'section': 'Public Area', 'role': role,
+               }
+    return render(request, 'orchidaceae/progeny.html', context)
+
+def xprogeny(request, pid):
+    role = getRole(request)
+    family = Family.objects.get(pk='Orchidaceae')
+    direct = request.GET.get('direct', '')
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    write_output(request, species.binomial)
+    genus = species.genus
 
     #All descendants
     des_list = AncestorDescendant.objects.filter(aid=pid)
@@ -1000,6 +1020,7 @@ def get_filtered_data_spc(start, length, search_value=None, order_column='id', o
 
 # Ajax view
 from django.http import JsonResponse
+from utils.json_encoder import LazyEncoder
 
 def server_processing_spc(request):
     start = int(request.GET.get('start', 0))
@@ -1021,7 +1042,7 @@ def server_processing_spc(request):
         'recordsFiltered': total_records,
         'data': data
     }
-    return JsonResponse(response)
+    return JsonResponse(response, encoder=LazyEncoder)
 
 # initial html view using the shared function
 from django.shortcuts import render

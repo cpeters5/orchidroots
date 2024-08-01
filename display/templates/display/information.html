@@ -2,10 +2,6 @@
 {% include "base.html" %}
 {% include 'detail-title.html' %}
 {% block body %}
-<head>
-    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
-    <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
-</head>
 
 <style>
 
@@ -74,7 +70,7 @@ div.text-bl a {
     margin:0 !important;
 }
 .parent-text {
-    font-size:10px;
+    font-size:12px;
 }
 
 .box {
@@ -99,7 +95,7 @@ img{
 }
 
 .imgcaption {
-    font-size: 10px;
+    font-size: 12px;
     height: auto;
     overflow: hidden;
     padding:0 6px;
@@ -143,7 +139,7 @@ img{
         width: 30vw;
     }
     .imgcaption {
-        font-size: 10px;
+        font-size: 12px;
     }
    .box {
         /*width: 35vw;*/
@@ -204,7 +200,7 @@ img{
        width : 14vw !important;
     }
     .parent-text {
-        font-size:9px;
+        font-size:10px;
     }
     .list-group{
         /*max-height: 200px;*/
@@ -291,252 +287,42 @@ seedparent, pollparent {
     <!-- Main -->
     {% include 'common/detail-nav.html' %}
     <!-- body -->
-    <div style="background:white; margin:0 auto;background:white;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
-        <div class="d-flex p-2 justify-content-center">
-            <!--Left panel-->
-            <div class="d-none d-sm-block col-sm-3 col-lg-3 p-2 list-group  bg-light" style="border:1px solid lightgrey">
-                <div style="padding-left:10px;">
-                    {% if species.gen.subfamily %}
-                        <br><b>Subfamily:</b>
-                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&subfamily={{species.gen.subfamily.subfamily}}&type=species&role={{role}}">{{species.gen.subfamily}}</a>
-                    {% endif %}
-
-                    {% if species.gen.tribe %}
-                        <br><b>Tribe:</b>
-                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&tribe={{species.gen.tribe.tribe}}&type=species&role={{role}}">{{species.gen.tribe}}</a>
-                    {% endif %}
-
-                    {% if species.gen.subtribe %}
-                        <br><b>Subtribe:</b>
-                        <br>&nbsp;&nbsp;<a href="{% url 'common:genera' %}?family={{species.gen.family}}&genustype=species&subtribe={{species.gen.subtribe.subtribe}}&type=species&role={{role}}">{{species.gen.subtribe}}</a>
-                    {% endif %}
-
-                        <br><b>Genus:</b>
-                        {{species.gen}}:
-                        <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&type=species&genus={{species.genus}}&role={{role}}">list</a>&nbsp;&nbsp;|
-                        &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-
-                    {% if accepted.subgenus %}
-                        <br><b>Subgenus:</b>
-                        {{accepted.subgenus}}:
-                            <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                            &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                    {% endif %}
-
-                    {% if accepted.section %}
-                        <br><b>Section:</b>
-                            {{accepted.section}}:
-                                {% if accepted.subgenus %}
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                                {% else %}
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                                {% endif %}
-                    {% endif %}
-
-                    {% if accepted.subsection %}
-                        <br><b>Subsection:</b>
-                                {{accepted.subsection}}:
-                                {% if accepted.subgenus %}
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&subgenus={{accepted.subgenus}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                                {% else %}
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&subsection={{accepted.subsection}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                                {% endif %}
-                    {% endif %}
-
-                    {% if accepted.series %}
-                        <br><b>Series:</b>
-                                {{accepted.series}}
-                                {% if accepted.section %}
-
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&section={{accepted.section}}&series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}&display=checked">images</a>
-                                {% else %}
-                                    <br>&nbsp;&nbsp;<a href="{% url 'common:species' %}?series={{accepted.series}}&genus={{species.genus}}&type=species&role={{role}}">list</a>&nbsp;&nbsp;|
-                                    &nbsp;&nbsp;<a href="{% url 'common:newbrowse' %}?app={{app}}&family={{species.gen.family}}&role={{role}}&series={{accepted.series}}&genus={{species.genus}}&type=species&display=checked">images</a>
-                                {% endif %}
-                    {% endif %}
-<!--                <hr>-->
-                </div>
-            </div>
-            <!--Right panel-->
-            <div class="col-sm-9 col-lg-9 p-2 list-group  bg-light flex-fill" style="border:1px solid lightgrey">
-                <div id="accordion">
-                    <!-- Update button for curators-->
-                    {% if user.tier.tier > 2 and role == 'cur' %}
-                    <div class="card">
-                       {% if species.type == 'species' %}
-                           <a type="button" class="btn btn-primary btn-sm info-collapse" href="/{{app}}/curateinfospc/{{species.pid}}/?&role={{role}}">Update Information</a>
-                       {% elif species.type == 'hybrid' %}
-                           <a type="button" class="btn btn-primary btn-sm info-collapse" href="/{{app}}/curateinfohyb/{{species.pid}}/?&role={{role}}">Update Information</a>
-                       {% endif %}
-                    </div>
-                    {% endif %}
-
-                    {% if distribution_list %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Distribution">Distribution</button>
-                        <div id="Distribution" class="collapse" data-parent="#accordion">
-                            <div class="card-body">
-                            <ul style="list-style-type:none;padding: 0 2px; margin-bottom: 10px;">
-                            {% for dist in distribution_list %}
-                                {% if forloop.first %}
-                                    <li>
-                                        {% if dist.localregion_id and dist.localregion_id > 0 %}{{dist.localregion_id}},{% endif %}
-                                        {% if dist.subregion_code %}{{dist.subregion_code}}, {% endif %}
-                                        {% if dist.region_id %}{{dist.region_id}}, {% endif %}
-                                        {% if dist.continent_id %}{{dist.continent_id}}{% endif %}
-                                    </li>
-                                {% else %}
-                                    <li>{{dist.name}}</li>
-                                {% endif %}
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if accepted.description %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Description">Description</button>
-                        <div id="Description" class="collapse" data-parent="#accordion">
-                            <div class="card-body" style="padding:10px;">
-                            {{accepted.description|safe}}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if accepted.comment %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Comments">Comments</button>
-                        <div id="Comments" class="collapse" data-parent="#accordion">
-                            <div class="card-body" style="padding:10px;">
-                            {{accepted.comment|safe}}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if species..culture %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Culture">Culture</button>
-                        <div id="Culture" class="collapse" data-parent="#accordion">
-                            <div class="card-body" style="padding:10px;">
-                            {{accepted.culture|safe}}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.etymology %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Information">Misc. Information</button>
-                        <div id="Information" class="collapse" data-parent="#accordion">
-                            <div class="card-body">
-                                {% if accepted.common_name or accepted.local_name or accepted.altitude or accepted.bloom_month or accepted.etymology %}
-                                    {% if accepted.common_name or accepted.local_name %}
-                                        <br>
-                                        <b>Common Name:</b>
-                                        {% if accepted.common_name %}{{accepted.common_name}},{% endif %}
-                                        {% if accepted.local_name %}{{accepted.local_name}}{% endif %}
-                                    {% endif %}
-                                    {% if accepted.altitude %}
-                                        <br>
-                                        <b>Altitude:</b>
-                                        {{accepted.altitude|safe}}
-                                    {% endif %}
-                                    {% if accepted.bloom_month %}
-                                        <br>
-                                        <b>bloom_month (local):</b>
-                                        {{accepted.bloom_month|safe}}
-                                    {% endif %}
-                                    {% if accepted.etymology %}
-                                        <br>
-                                        <b>Etymology</b>
-                                        {{accepted.etymology|safe}}
-                                    {% endif %}
-                                {% else %}
-                                        <br>
-                                    None
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if synonym_list.count > 0 %}
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" data-target="#Synonym">Synonym</button>
-                        <div id="Synonym" class="collapse" data-parent="#accordion">
-                            <div class="card-body">
-                                {% if synonym_list.count > 0 %}
-                                    <ul style="list-style-type:none; padding: 0 2px; margin-bottom: 10px;">
-                                    {% for synonym in synonym_list %}
-                                        <li><a href="/display/information/{{synonym.spid.pid}}/?family={{species.gen.family}}">{{ synonym.spid.name|safe }}</a><i> {{ synonym.spid.author }}</i> {{synonym.spid.year|default:''}}
-                                    {% endfor %}
-                                    </ul>
-                                {% else %}
-                                    None
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="card">
-                        <button type="button" class="btn btn-light btn-xs info-collapse" data-toggle="collapse" href="#offspring">Immediate Offspring</button>
-                        <div id="offspring" class="collapse" data-parent="#accordion">
-                            <div class="card-body">
-                                {% if offspring_count > 0 %}
-                                    <table class="table table-sm table-hover table-condensed table-border offsp" style="margin: 0 auto;width:100%; padding:0;border:1px solid #ccc;">
-<!--                                        <tr bgcolor="#e3e3e3">-->
-<!--                                            <th class="border-rb">Grex</th><th class="border-rb">Parents</th></tr>-->
-                                        {% for off in offspring_list %}
-                                         <tr >
-                                             <td class="border-lb" style="text-align: left">
-                                                 {% if off.pid %}<a href="{% url 'display:information' off.pid.pid %}?family={{species.gen.family}}&role={{role}}">
-                                                 <span style="font-zize:11px">
-                                                     {{off.pid.name |safe}}
-                                                     {% if off.pid.num_image > 0 %} ({{off.pid.num_image}}){% endif %}
-                                                 </span>
-                                                 {% else %}{{off.pid.pid}}
-                                                 {% endif %}
-                                                 </a> </td>
-                                             <td class="border-rb" style="text-align: left;">
-                                                 {% if off.seed_id %}
-                                                    <a href="{% url 'display:information' off.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_seed_name|safe }}</a>
-                                                 {% else %}
-                                                   na
-                                                 {% endif %}
-                                                    ×
-                                                 {% if off.pollen_id %}
-                                                    <a href="{% url 'display:information' off.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{off.registered_pollen_name|safe}}</a>
-                                                 {% else %}
-                                                    na
-                                                 {% endif %}
-                                             </td>
-                                         </tr>
-                                         {% endfor %}
-                                     </table>
-                                {% else %}
-                                    None
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>
+    <div style="background:white; margin:0 auto;">
+        <div style="height:100px; width:80%;margin:0 auto;">
+            <br>
+            {% if species.type == 'species' %}
+                {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} of
+                &nbsp;<a href="{% url 'common:newbrowse' %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;family,
+                &nbsp;<a href="{% url 'common:newbrowse' %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
+                {% if species.accepted.subgenus %}
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>&nbsp;subgenus
+                {% endif %}
+                {% if species.accepted.section %}
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;section
+                {% endif %}
+                {% if species.accepted.subsection %}
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;subsection
+                {% endif %}
+                {% if species.accepted.series %}
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;series
+                {% endif %}
+                {% if species.status == 'synonym' %}
+                    This name is a synonym of <a href="{% url 'display:information'  species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted }}</a>
+                {% endif %}
+                {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}
+            {% else %}
+                The orchid {{species.binomial}} is a hybrid
+                {% if species.source == 'RHS' %}registered with the Royal Horticultural Society
+                    {% if species.author == 'na' or species.author == '' %} registrant is unknown{% else %} by {{species.author}} in {{species.year}}.{% endif %}
+                    {% if species.originator == 'na' or species.originator == '' %} Its originator is unknown.{% elif species.originator != species.author %} It is originated by {{species.originator}}{% endif %}
+                {% elif  species.source == 'INT' %}.
+                    This orchid hybrid lacks official registration. The name is an internal designation created within the orchidroots system.
+                {% endif %}
+            {% endif %}
+            <br>
         </div>
-
         <div class="d-flex p-1 justify-content-center" style="width:100%; margin:0 auto;">
-            <div class="p-1 flex-fill list-group border" style="border:0 solid lightgrey">
+            <div class="p-1 flex-fill list-group border" style="border:0 solid lightgrey; min-height: 100px;">
                 {% if display_items %}
                     <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
                         {% for image in display_items %}
@@ -556,22 +342,23 @@ seedparent, pollparent {
                                         {{image.imgname|safe}}<br>{{image.get_displayname }}
                                     {% endif %}
                                     <br>
-                                    {% if image.source_file_name %}
-                                        {{image.source_file_name}} (syn)
-                                    {% else %}
-                                        {{image.imginfo}}
-                                    {% endif %}
+                                    {{image.imginfo|default:''}}
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}"><b>more ... </b></a></span>
                 {% else %}
-                    <div style="width: 100%; font-size:12px;border:0 solid lightgrey; margin:0 auto; text-align: center; padding:10px">
+                    <div style="width: 80%; font-size:16px;border:0 solid lightgrey; margin:50px auto; text-align: center; padding:10px">
                         No image available. if you have one please consider uploading it
-                        <a href="/{{app}}/uploadfile/{{species.pid}}/?tab=sum">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
+                        {% if species.status == 'synonym' %}
+                        Please try the accepted species <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted}}</a>
+                        {% else %}
+                            if you have one please consider uploading it
+                            <a href="/{{app}}/uploadfile/{{species.pid}}/?tab=sum">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
                             <a href="https://www.facebook.com/groups/BlueNanta/?ref=br_rs">Blue Nanta, OrchidRoots User's Group</a>.
-                        Copyright credit and a link to your website will be displayed with every photo.
+                            Copyright credit and a link to your website will be displayed with every photo.
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
@@ -772,7 +559,7 @@ seedparent, pollparent {
                             {% endif %}
                             <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
                                    <br>
-                                {% if p.aid_id == 0 %}
+                                {% if p.aid_id == 0 or not p.aid_id %}
                                     unknown
                                 {% else %}
                                     <a href="{% url 'display:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
