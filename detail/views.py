@@ -10,7 +10,6 @@ import django.shortcuts
 import random
 import os
 import shutil
-import json
 
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash, get_user_model
@@ -23,7 +22,7 @@ from PIL import Image
 from PIL import ExifTags
 from io import BytesIO
 from django.core.files import File
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
