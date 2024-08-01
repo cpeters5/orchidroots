@@ -101,7 +101,8 @@
                         {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
                     </a>
                     <div class="nav3 dropdown-menu">
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny list</span></a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro&prim=1"><span style="color:#575757;;">Immediate offspring</span></a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro"><span style="color:#575757;;">Progeny</span></a>
                             <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg"><span style="color:#575757;">Progeny images</span></a>
                     </div>
                 </li>
@@ -117,7 +118,6 @@
                                 <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=tree"><span style="color:#575757;">Ancestry tree</span></a>
                             {% endif %}
                            </div>
-
                         </li>
                     {% endif %}
                     {% if user.tier.tier > 2 %}

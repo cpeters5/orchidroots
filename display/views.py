@@ -54,18 +54,15 @@ def information(request, pid=None):
         HybImages = apps.get_model(app, 'SpcImages')
 
     ps_list = pp_list = ss_list = sp_list = ()
-    max_items = 3000
     ancspc_list = []
     seedimg_list = []
     pollimg_list = []
-    distribution_list = []
 
     # If pid is a synonym, convert to accept
     req_pid = pid
     req_species = species
     genus = species.gen
     display_items = []
-    synonym_list = Synonym.objects.filter(acc=pid)
     pid = species.pid
     syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
 
@@ -87,6 +84,7 @@ def information(request, pid=None):
             images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
         if species.status == 'synonym':
             accid = species.getAcc()
+            print("accid", accid)
             try:
                 myspecies = Species.objects.get(pk=accid)
             except Species.DoesNotExist:
@@ -129,10 +127,6 @@ def information(request, pid=None):
     # Remove duplicates. i.e. if both parents are synonym.
     temp_list = pollen_list
     pollen_list = pollen_list.order_by('seed_genus', 'seed_species')
-    offspring_list = chain(list(seed_list), list(pollen_list))
-    offspring_count = len(seed_list) + len(pollen_list)
-    if offspring_count > max_items:
-        offspring_list = offspring_list[0:max_items]
 
     if species.type == 'hybrid':
         if accepted.seed_id and accepted.seed_id.type == 'species':
@@ -189,17 +183,15 @@ def information(request, pid=None):
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
-    # if len(display_items) > 0:
     role = request.GET.get('role', None)
     write_output(request, str(family))
-    context = {'pid': species.pid, 'species': species, 'synonym_list': synonym_list, 'accepted': accepted,
+    context = {'pid': species.pid, 'species': species,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
-               'display_items': display_items, 'distribution_list': distribution_list, 'family': family,
-               'offspring_list': offspring_list, 'offspring_count': offspring_count, 'max_items': max_items,
+               'display_items': display_items, 'family': family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list,
-               'from_path': from_path, 'tab': 'rel', 'view': 'information',
+               'tab': 'rel', 'view': 'information',
                }
     return render(request, "display/information.html", context)
 
