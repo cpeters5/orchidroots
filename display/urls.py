@@ -3,6 +3,7 @@ from . import views
 
 app_name = 'display'
 urlpatterns = [
+    path('<int:pid>/', views.information, name='information'),
     path('information/<int:pid>/', views.information, name='information'),
     path('information/', views.information, name='information'),
     path('photos/<int:pid>/', views.photos, name='photos'),
