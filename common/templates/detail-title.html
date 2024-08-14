@@ -58,7 +58,7 @@
                     {% endif %}
                 </h4>
                 {% if species.status == 'synonym' %}
-                    syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.name|safe}}</a>
+                    syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>
                     {{species.getAccepted.accepted.common_name|default:''}}
                     {{species.getAccepted.accepted.local_name|default:''}}
                 <br>
