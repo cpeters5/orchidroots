@@ -2,10 +2,6 @@
 {% include "base.html" %}
 {% include "detail-title.html" %}
 {% block body %}
-<!--<head>-->
-<!--    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.bootstrap4.min.css">-->
-<!--    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>-->
-<!--</head>-->
 <style>
 
 .border-lb {
@@ -19,7 +15,7 @@
 
 
 .table {
-    width: 70%;
+    width: 100%;
     margin:0 auto;
 }
 
@@ -51,33 +47,33 @@
 </style>
 
 
-<div style="margin:0 auto;padding:0;width:70%;">
+<div style="margin:0 auto;width:90%;">
         <!--main section-->
     <br>
     {% include 'common/detail-nav.html' %}
-    <div class="tab-content clearfix" style="overflow-x:auto;padding:0;background-color:white; margin:0 auto;;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+    <div class="tab-content clearfix" style="background:white; margin:0;">
         {% if species.type == 'hybrid' %}
             <br>
             {% if anc_list %}
-               <table id="myTable" class="table table-condensed table-sm  table-bordered table-hover" style="margin-left:auto;margin-right:auto;font-size:13px;">
-                <thead  class="thead-light">
-                    <tr  style="background-color: #f2f2f2">
-                        <th class="border-lb text-left">Ancestors<span> (total {{anc_list.count}})</span></th>
-                        <th class="border-rb text-center">%</th>
-                        <th class="border-lb text-center">Img</th>
-                    </tr>
+               <table id="myTable"  class="table table-condensed table-sm table-hover">
+                 <thead>
+                        <th class="text-left">Ancestors</th>
+                        <th class="text-center">type</th>
+                        <th class="text-center">%</th>
+                        <th class="d-none d-md-table-cell text-center">Img</th>
                    </thead>
                     {% for anc in anc_list %}
-                    <tr class="center">
-                        <td class="border-rb" style="text-align: left">
-                            {% if anc.aid.pid > 0 %}
-                            <a href="{% url 'display:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a>
-                            {% else %}
-                                unknown
-                            {% endif %}
+                    <tr>
+                        <td class="text-left">
+                        {% if anc.aid.pid > 0 %}
+                        <a href="{% url 'display:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a>
+                        {% else %}
+                            unknown
+                        {% endif %}
                         </td>
-                        <td class="border-rb" style="text-align: right">{{anc.prettypct}}%</td>
-                        <td class="border-rb " style="text-align: center">{% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}</td>
+                        <td class="text-center">{{anc.anctype}}</td>
+                        <td class="text-center">{{anc.prettypct}}%</td>
+                        <td class="text-center d-none d-md-table-cell">{% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}</td>
                     </tr>
                     {% endfor %}
                 </table>
