@@ -132,9 +132,9 @@ class Genus(models.Model):
 
     def get_best_img(self):
         if self.type == 'species':
-            img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality', '-rank', '?')
+            img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank', 'quality', '?')
         else:
-            img = HybImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality', '-rank', '?')
+            img = HybImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank', 'quality', '?')
 
         if img.count() > 0:
             img = img[0:1][0]
@@ -510,9 +510,9 @@ class Species(models.Model):
 
     def get_best_img(self):
         if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality','-rank','?')
+            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank','quality','?')
         else:
-            img = HybImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('quality','-rank', '?')
+            img = HybImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank','quality', '?')
         if len(img) > 0:
             img = img[0:1][0]
             return img
@@ -521,16 +521,16 @@ class Species(models.Model):
     def get_best_img_by_author(self, author):
         if self.type == 'species':
             img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+                '-rank', 'quality', '?')
             if not img:
                 img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
-                    'quality', '-rank', '?')
+                    '-rank', 'quality', '?')
         else:
             img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+                '-rank', 'quality', '?')
             if not img:
                 img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
-                    'quality', '-rank', '?')
+                    '-rank', 'quality', '?')
 
         if img.count() > 0:
             img = img[0:1][0]
@@ -540,16 +540,16 @@ class Species(models.Model):
     def get_best_img_by_author_only(self, author):
         if self.type == 'species':
             img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+                '-rank', 'quality', '?')
             if not img:
                 img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
-                    'quality', '-rank', '?')
+                    '-rank', 'quality', '?')
         else:
             img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+                '-rank', 'quality', '?')
             if not img:
                 img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
-                    'quality', '-rank', '?')
+                    '-rank', 'quality', '?')
 
         if img.count() > 0:
             img = img[0:1][0]
@@ -621,7 +621,7 @@ class Accepted(models.Model):
         related_name='accepted',
         on_delete=models.CASCADE,
         primary_key=True)
-    gen = models.ForeignKey(Genus, db_column='gen', null=True, blank=True,on_delete=models.CASCADE)
+    gen = models.ForeignKey(Genus, db_column='gen', related_name='or6gen', default=0,on_delete=models.CASCADE)
     genus = models.CharField(max_length=50)
     species = models.CharField(max_length=50)
     infraspr = models.CharField(max_length=20, null=True)
@@ -668,8 +668,8 @@ class Accepted(models.Model):
 
     def get_best_img(self):
         spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
-        img = SpcImages.objects.filter(Q(pid=self.pid) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                'quality', '-rank', '?')
+        img = SpcImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+                '-rank', 'quality', '?')
         if len(img) > 0:
             img = img[0:1][0]
             return img
@@ -822,6 +822,15 @@ class Hybrid(models.Model):
         else:
             return 'artificial'
 
+    def get_best_img(self):
+        spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
+        img = HybImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
+                '-rank', 'quality', '?')
+        if len(img) > 0:
+            img = img[0:1][0]
+            return img
+        return None
+
 
 class Grexrelation(models.Model):
     class Meta:
@@ -884,11 +893,15 @@ class Grexrelation(models.Model):
 class AncestorDescendant(models.Model):
     class Meta:
         unique_together = (("did", "aid"),)
-
     did = models.ForeignKey(Hybrid, null=False, db_column='did', related_name='ordid',on_delete=models.CASCADE)
     aid = models.ForeignKey(Species, null=False, db_column='aid', related_name='oraid',on_delete=models.CASCADE)
     anctype = models.CharField(max_length=10, default='hybrid')
     pct = models.FloatField(blank=True, null=True)
+
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=['aid', 'pct']),
+    #     ]
     # file = models.CharField(max_length=10, blank=True)
 
     def __str__(self):
