@@ -1,0 +1,119 @@
+{% load static %}
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
+<style>
+
+.progen {
+    margin:10px;
+    width:90%;
+    font-size: 14px;
+}
+
+
+@media only screen and (max-width: 700px){
+    .progen {
+        width:95%;
+        font-size: 10px;
+    }
+}
+
+
+</style>
+
+
+    <div class="progen">
+        <!--main section-->
+    {% include "common/detail-nav.html" %}
+    <div class="tab-content clearfix" style="background:white; margin:0;">
+        <br>
+        <table id="sortTable" class="table table-condensed table-sm table-hover">
+            <thead>
+                <th>Descendants</th>
+                <th>Seed Parent</th>
+                <th>Pollen Parent</th>
+                <th class="text-left d-sm-table-cell"># images</th>
+            </thead>
+            <div style="display:block; margin: 0; width: 100%; font-size:13px">
+                {% for hybrid in prim_list %}
+                <tr style="text-align: left">
+                    <td>
+                        <a href="{% url 'display:information' hybrid.pid.pid %}?family={{hybrid.pid.gen.family}}&role={{role}}"><i>{{hybrid.pid.binomial_it|safe}}</i></a>
+                    </td>
+                    <td >
+                        {% if hybrid.seed_id.pid %}
+                            <a href="{% url 'display:information' hybrid.seed_id.pid %}?family={{hybrid.pid.gen.family}}&role={{role}}">{{hybrid.registered_seed_name|safe}}</a>
+                        {% else %}
+                            na
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if hybrid.pollen_id.pid %}
+                            <a href="{% url 'display:information' hybrid.pollen_id.pid %}?family={{hybrid.pid.gen.family}}&role={{role}}">{{hybrid.registered_pollen_name|safe}}</a>
+                        {% else %}
+                            na
+                        {% endif %}
+                    </td>
+                    <td class="text-left d-sm-table-cell">
+                        {% if hybrid.pid.num_image %}{{hybrid.pid.num_image}} {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </div>
+     </table>
+    </div>
+
+
+</div>
+
+<script>
+
+$(document).ready(function() {
+    // $.fn.dataTable.ext.type.order['priority-pre'] = function(data) {
+    //     switch (data) {
+    //         case 'primary': return 1;
+    //         case 'secondary': return 2;
+    //         case 'remote': return 3;
+    //         default: return 4;  // Handles unexpected or empty values
+    //     }
+    // };
+
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        "colReorder": true,  // Enable column reordering
+        "columnDefs": [
+            // { "orderable": false, "targets": 2 }
+            { "type": "priority", "targets": 1 }
+        ],
+        "order": [[ 1, "asc" ], [0,'asc']],
+        // "pagingType": "simple", # only show previous/next
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+
+        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
+        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
+        // "dom": '<"wrapper"flipt>',
+        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
+        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
+        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "None",
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+
+    });
+});
+
+
+</script>
+
+{% endblock %}
