@@ -2,7 +2,6 @@ from django.urls import reverse
 from django.utils import timezone
 from .models import SitemapEntry
 
-
 def generate_sitemap_index(request):
     sitemap_count = (SitemapEntry.objects.count() // 50000) + 1
 
@@ -19,7 +18,6 @@ def generate_sitemap_index(request):
 
     return xml_content
 
-
 def generate_sitemap_section(section):
     start = (int(section) - 1) * 50000
     end = start + 50000
@@ -29,8 +27,9 @@ def generate_sitemap_section(section):
     xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
     for entry in entries:
+        canonical_url = get_canonical_url(entry.url)
         xml_content += f'  <url>\n'
-        xml_content += f'    <loc>{entry.url}</loc>\n'
+        xml_content += f'    <loc>{canonical_url}</loc>\n'
         if entry.last_modified:
             xml_content += f'    <lastmod>{entry.last_modified.isoformat()}</lastmod>\n'
         xml_content += f'    <changefreq>weekly</changefreq>\n'
@@ -40,3 +39,10 @@ def generate_sitemap_section(section):
     xml_content += '</urlset>'
 
     return xml_content
+
+def get_canonical_url(url):
+    # Convert query parameter URLs to path-based URLs
+    if '?pid=' in url:
+        pid = url.split('?pid=')[1].split('&')[0]
+        return f"/information/{pid}/"
+    return url

@@ -183,8 +183,6 @@ def createhybrid(request):
     return HttpResponseRedirect("/display/photos/" + str(spcobj.pid) + "/?role=" + role + "&genus2=" + species2.genus + "&family=" + str(species2.gen.family))
 
 
-# All access - at least role = pub
-@login_required
 def compare(request, pid=None):
     # TODO:  Use Species form instead
     if not pid or not str(pid).isnumeric():

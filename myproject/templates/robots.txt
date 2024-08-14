@@ -1,6 +1,6 @@
 User-agent: *
-Allow: /common/newbrowse/
 Allow: /display/information/
+Allow: /detail/information/
 Allow: /orchidaceae/progeny/
 Allow: /orchidaceae/ancestor/
 Allow: /orchidaceae/species/
@@ -13,7 +13,6 @@ Disallow: /animalia/
 Disallow: /aves/
 Disallow: /common/
 Disallow: /data/
-Disallow: /detail/
 Disallow: /documents/
 Disallow: /donations/
 Disallow: /fungi/
@@ -31,3 +30,5 @@ Disallow: /
 
 Sitemap: https://www.beta.bluenanta.com/sitemap.xml
 
+User-agent: Bytespider
+Disallow: /

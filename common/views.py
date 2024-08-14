@@ -170,7 +170,6 @@ def require_get(view_func):
     return wrap
 
 
-@login_required
 def taxonomy(request):
     family_list, alpha = get_taxonomy(request)
     context = {'family_list': family_list,
@@ -178,7 +177,6 @@ def taxonomy(request):
     return render(request, "common/taxonomy.html", context)
 
 
-@login_required
 def genera(request):
     path = resolve(request.path).url_name
     talpha = request.GET.get('talpha','')
@@ -250,12 +248,11 @@ def genera(request):
         return render(request, "common/family.html", context)
 
 
-@login_required
 def species(request):
     # path = resolve(request.path).url_name
     path_link = 'information'
     talpha = request.GET.get('talpha','')
-    if request.user.tier.tier > 3:
+    if request.user.is_authenticated  and request.user.tier.tier > 3:
         path_link = 'photos'
     req_type = request.GET.get('type', 'species')
     req_family = request.GET.get('family', None)
@@ -355,7 +352,7 @@ def species(request):
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
         total = max_items
     role = ''
-    if request.user.tier.tier > 2:
+    if request.user.is_authenticated  and request.user.tier.tier > 2:
         role = 'cur'
     write_output(request, str(req_family))
     context = {
@@ -631,6 +628,7 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
+@login_required
 def delete_image_files(app, spc_obj, orid):
     # look in uploaded files first
     try:
@@ -686,6 +684,7 @@ def delete_image_files(app, spc_obj, orid):
             pass
 
 
+@login_required
 def delete_bad_image_files(orid, app):
     # Delete file
     try:
@@ -893,7 +892,7 @@ def myphoto(request, pid):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
-    if not role or request.user.tier.tier < 2:
+    if not request.user.is_authenticated  or request.user.tier.tier < 2:
         url = "%s?role=%s&family=%s" % (reverse('display:information', args=(pid,)), role, species.gen.family)
         return HttpResponseRedirect(url)
     else:
@@ -953,6 +952,7 @@ def myphoto(request, pid):
     return render(request, 'common/myphoto.html', context)
 
 
+@login_required
 def myphoto_list(request):
     author, author_list = get_author(request)
     role = 'pri'
@@ -1008,6 +1008,7 @@ def myphoto_list(request):
     return render(request, 'common/myphoto_list.html', context)
 
 
+@login_required
 def myphoto_browse_spc(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login/')
@@ -1046,6 +1047,7 @@ def myphoto_browse_spc(request):
     return render(request, 'common/myphoto_browse_spc.html', context)
 
 
+@login_required
 def myphoto_browse_hyb(request):
     # Browse hybrid only works for orchids
     app = 'orchidaceae'
@@ -1236,7 +1238,7 @@ def uploadfile(request, pid):
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
     role = getRole(request)
-    if request.user.tier.tier < 2 or not request.user.photographer.author_id:
+    if not request.user.is_authenticated  or not request.user.photographer.author_id:
         message = 'You dont have access to upload files. Please update your profile to gain access. ' \
                   'Or contact admin@bluenanta.com'
         return HttpResponse(message)
@@ -1342,7 +1344,7 @@ def compare(request, pid):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
-    if species.type == 'hybrid':
+    if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
         SpcImages = apps.get_model(app, 'SpcImages')
