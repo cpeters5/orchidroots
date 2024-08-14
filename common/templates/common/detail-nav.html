@@ -34,6 +34,7 @@
                 <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:{{related}}&syn={{syn}}">Videos<br></a></li>
                 <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?family={{species.gen.family}}&role={{role}}">Compare<br></a></li>
 
+                {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{loc}} {{web}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                         {% if loc == 'active' %}Upload URL{% elif web == 'active' %}Upload FIle{% else %}Upload{% endif %}
@@ -70,6 +71,7 @@
                     {% endif %}
                     </div>
                 </li>
+                {% endif %}
                 {% if related_list and species.type != 'hybrid' %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Infraspecific</a>
@@ -98,7 +100,7 @@
                 {% if species.gen.family.family == 'Orchidaceae' %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        {% if tab == 'pro' %}Progeny list{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
+                        {% if tab == 'pro' %}Progeny{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
                     </a>
                     <div class="nav3 dropdown-menu">
                             <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro&prim=1"><span style="color:#575757;;">Immediate offspring</span></a>
@@ -110,7 +112,7 @@
                     {% if species.type == 'hybrid' %}
                         <li class="nav-item dropdown">
                             <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
+                                {% if tab == 'anc' %}Ancestry{% elif tab == 'tree' %}Tree{% else %}Ancestry{% endif %}
                             </a>
                             <div class="nav2 dropdown-menu">
                             {% if species.gen.family.family == 'Orchidaceae' %}
