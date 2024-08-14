@@ -21,13 +21,14 @@ ROOT_DIR = environ.Path(__file__) - 2  # get root of the project
 
 env = environ.Env()
 
-# environ.Env.read_env()  # reading .env file
 DOT_ENV_FILE = env.str("DOT_ENV_FILE", default=".env")
 if DOT_ENV_FILE:
     env.read_env(str(ROOT_DIR.path(DOT_ENV_FILE)))
 
 # SITE_ROOT = root()
 SITE_ROOT = ROOT_DIR
+SITE_URL = env.str("SITE_URL", "https://beta.bluenanta.com")
+SITE_URL = SITE_URL.rstrip('/')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +38,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default=''),
+SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default='')
 
 SITE_ID = 3
 

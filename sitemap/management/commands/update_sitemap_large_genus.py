@@ -122,22 +122,27 @@ class Command(BaseCommand):
             # if genus in priority_genera:
                 # print(f"{'Added' if created else 'Updated'} species and hybrid page: {genus_url}")
 
-        print("Get info pages for species/hybrids")
+        print("Get info pages for species")
+        for genus in priority_genera:
+            genus = Genus.objects.filter(genus=genus).annotate(
+                species_count=Count('or5gen')
+            ).first()
 
-        for species in Species.objects.all():
-            if species.genus in priority_genera:
-                priority = 0.5
+            if genus and genus.species_count > 0:
+                for species in Species.objects.filter(gen=genus):
+                    species_url = f"{settings.SITE_URL}/display/information/{species.pid}/?family={species.family}"
+                    entry, created = SitemapEntry.objects.update_or_create(
+                        url=species_url,
+                        section="information",
+                        defaults={
+                            'change_frequency': 'monthly',
+                            'priority': 0.5
+                        }
+                    )
+                    # if created:
+                    #     print(f"Added species page: {species_url}")
             else:
-                priority = 0.2
-            species_url = f"{settings.SITE_URL}/display/information/{species.pid}/?family={species.family}"
-            entry, created = SitemapEntry.objects.update_or_create(
-                url=species_url,
-                section="information",
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': priority
-                }
-            )
+                print(f"Skipping empty genus: {genus_name}")
 
         print("Finished processing orchidaceae")
 

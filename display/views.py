@@ -3,7 +3,7 @@ import re
 import logging
 import random
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -27,14 +27,20 @@ redirect_message = 'species does not exist'
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
-    if not pid:
-        pid = request.GET.get('pid', '')
-
+    author = ''
+    if pid is None:
+        pid = request.GET.get('pid')
     if not pid or not str(pid).isnumeric():
         handle_bad_request(request)
         return HttpResponseRedirect('/')
 
-    from_path = pathinfo(request)
+    # Construct the canonical URL
+    canonical_url = request.build_absolute_uri(f'/information/{pid}/')
+
+    # If accessed via query parameter, redirect to the canonical URL
+    if 'pid' in request.GET:
+        return HttpResponsePermanentRedirect(canonical_url)
+
     app, family = get_application(request)
 
     Species = apps.get_model(app, 'Species')
@@ -136,7 +142,10 @@ def information(request, pid=None):
                 seed_obj = ''
             seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
-            seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
+            try:
+                seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
+            except Hybrid.DoesNotExist:
+                seed_obj = ''
             if seed_obj:
                 seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
                 assert isinstance(seed_obj, object)
@@ -160,7 +169,10 @@ def information(request, pid=None):
                 pollen_obj = ''
             pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif accepted.pollen_id and accepted.pollen_id.type == 'hybrid':
-            pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
+            try:
+                pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
+            except Hybrid.DoesNotExist:
+                pollen_obj = ''
             pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
             if pollen_obj.seed_id:
                 ps_type = pollen_obj.seed_id.type
@@ -191,15 +203,21 @@ def information(request, pid=None):
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list,
+               'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
-    return render(request, "display/information.html", context)
+    response = render(request, 'display/information.html', context)
+
+    # Add Link header
+    # response['Link'] = f'<{canonical_url}>; rel="canonical"'
+
+    return response
 
 
 def photos(request, pid=None):
     author = ''
-    if not pid:
-        pid = request.GET.get('pid', '')
+    if pid is None:
+        pid = request.GET.get('pid')
     if not pid or not str(pid).isnumeric():
         handle_bad_request(request)
         return HttpResponseRedirect('/')
