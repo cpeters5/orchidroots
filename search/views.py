@@ -368,7 +368,7 @@ def search(request):
         message = 'Empty search term'
         return HttpResponse(message)
 
-    if not selected_app or select_app == 'orchidaceae':
+    if not selected_app or selected_app == 'orchidaceae':
         Genus = apps.get_model('orchidaceae', 'Genus')
         if ' ' not in search_string:
             try:
