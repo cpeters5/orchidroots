@@ -582,7 +582,7 @@ nav .search-container button:hover {
         <div class="collapse navbar-collapse" id="nav-content">
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string" id="search_string" pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
             </form>
             <form class="form-inline" id="searchtest" action="/search/search_test/" style="margin-top: 5px;">
                 <input type="hidden" form="searchtest" name="role" value="{{ role }}" >
@@ -665,12 +665,12 @@ nav .search-container button:hover {
     </div>
 
 {% include "main_message.html" %}
-begin body
+
     {%  block body %}
 
 
     {% endblock %}
-end body
+
 
 
 
@@ -698,6 +698,14 @@ end body
   });
 
 })(jQuery);
+
+document.getElementById('search').addEventListener('submit', function(event) {
+    var input = document.getElementById('search_string').value;
+    if (!/^[\u0000-\u007F]*$/.test(input)) {
+        event.preventDefault();
+        alert('Please use only supported characters.');
+    }
+});
 
 </script>
 
