@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import connection
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -11,15 +12,13 @@ from django.apps import apps
 from urllib.parse import urlparse, urlencode
 from itertools import chain
 from fuzzywuzzy import fuzz, process
-from utils import conf_orchidaceae
-from utils import config
+from utils import conf_orchidaceae, config
+from utils.views import handle_bad_request, write_output, getRole, get_random_img, thumbdir, redirect_to_referrer
 # from myproject import config
 import logging
 import random
 import string
 import re
-
-from utils.views import write_output, redirect_to_referrer, getRole, get_random_img, thumbdir
 
 from .models import Genus, GenusRelation, Intragen, Species, Hybrid, Accepted, Synonym, \
     Subgenus, Section, Subsection, Series, \
@@ -39,7 +38,6 @@ imgdir, hybdir, spcdir = thumbdir()
 
 alpha_list = config.alpha_list
 
-@login_required
 def genera(request):
     write_output(request)
     family = 'Orchidaceae'
@@ -151,7 +149,7 @@ def genera(request):
     t_list = t_list.order_by('tribe')
     st_list = st_list.order_by('subtribe')
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
-    context = {'my_list': genus_list, 'total': total, 'genus_lookup': genus_lookup, 'family':family,
+    context = {'my_list': genus_list, 'genus_lookup': genus_lookup, 'family':family,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,
                'st_obj': st_obj, 'st_list': st_list,
                'title': 'taxonomy', 'genustype': genustype, 'status': status,
@@ -244,7 +242,6 @@ def getPrev(request,arg, prev):
     return arg, prev
 
 
-@login_required
 def species(request):
     myspecies = ''
     author = ''
@@ -341,61 +338,44 @@ def species(request):
     return render(request, 'orchidaceae/species.html', context)
 
 
-@login_required
 def hybrid(request):
     # Initialization
-    author = ''
-    role = getRole(request)
+    author = request.GET.get('author', '')
     year_valid = 0
     msg = ''
     crit = 0
-    spc = request.GET.get('spc', '')
-    if not spc:
-        spc = request.POST.get('spc', '')
-
+    if author: crit = 1
     originator = request.GET.get('originator', '')
     if originator: crit = 1
     alpha = request.GET.get('alpha', '')
-
     if alpha: crit = 1
     year = request.GET.get('year', '')
     if valid_year(year):
         year_valid = 1
         crit = 1
+    if alpha != 'ALL':
+        alpha = alpha[0:1]
     status = request.GET.get('status', '')
-
-    # Not sure we still need crit index
+    spc = request.GET.get('spc', '')
     if spc:
         crit = 1
-    # if len(spc) == 1:
-    #     alpha = ''
-    # crit = 1;
-
+    if len(spc) == 1:
+        alpha = spc
+        spc = ''
     reqgenus = request.GET.get('genus', None)
     prev_genus = request.GET.get('reqgenus', None)
-
-    # If genus change, check if it is a big genus and alpha is not set, then set alpha = A
-    if not prev_genus:
-        prev_genus = reqgenus
-    if reqgenus != prev_genus and reqgenus in config.big_genera and (not alpha or alpha == 'ALL'):
-        alpha = 'A'
-        crit = 1
-
-    if not crit:
-        # return render(request, 'orchidaceae/hybrid.html', {})
-        return redirect_to_referrer(request)
-
     if reqgenus == None or reqgenus == '':
-        reqgenus = Genus.objects.filter(num_spc_with_image__gt=100, genus__in=genus_list).exclude(status='synonym')
-        if reqgenus.exists():
-            reqgenus = reqgenus.order_by('?')[0].genus
-        else:
-            reqgenus = Genus.objects.filter(genus__in=genus_list).exclude(status='synonym')
-            if reqgenus.exists():
-                reqgenus = reqgenus.order_by('?')[0].genus
-        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-        print("1 hybrid: this_species_list", len(this_species_list))
-        print("2 hybrid: reqgenus", reqgenus)
+        # Sent from base.html in case no genus info, in which case randomize genus
+        while 1:
+            # Just get a random one with some images to show
+            reqgenus = Genus.objects.filter(num_hyb_with_image__gt=100, num_hyb_with_image__lt=300).exclude(status='synonym').order_by('?')
+            if reqgenus:
+                reqgenus = reqgenus[0].genus
+                break
+        prev_genus = reqgenus
+    # If there is no params requested, and for large tables, set alpha = A
+    if not crit and reqgenus in config.big_genera:
+        alpha = 'A'
 
     # user requests seed or pollen parents
     # First get seed_id object, then filter the hybrid list matching seed / pollen parent
@@ -405,74 +385,48 @@ def hybrid(request):
     # Start building the list
     # First matching genus, with wild card
     crit = 1 #???
-    if not crit :
+    if crit :
+        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+    else:
+        # If crit = 0 (no filter criteria), ignore request
         return render(request, 'orchidaceae/hybrid.html', {})
-
-    reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-    print("3 this_species_list", len(this_species_list))
-
     write_output(request, str(reqgenus))
 
     # Genus unchanged, see if seed/pollen are requested
     if (reqgenus and (reqgenus == prev_genus)):
         seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
         pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
-        print("4 pollen_binomial>" + pollen_binomial + "<")
-    print("4 seed_binomial", seed_binomial)
-
-    if isinstance(reqgenus, Genus) and len(spc) > 0:
-        this_binom = ' '.join([reqgenus.genus, spc]).strip()
-        print("12 hybrid: this_binom", this_binom)
-        this_binom = Species.objects.filter(Q(binomial=this_binom) |  Q(species=this_binom))
-        print("12 hybrid: this_binom", this_binom)
-        # Check if same type. ifnot redirect to the correct type
-        if this_binom.exists() and this_binom[0].type == 'species':
-            send_url = '/orchidaceae/species/?family=Orchidaceae&role=' + role + "&genus=" + reqgenus.genus + "&spc=" + spc
-            return HttpResponseRedirect(send_url)
-
     if len(seed_binomial) > 0:
         seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
-        print("5 seed_pids", seed_pids)
         this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
-        print("6 this_species_list", len(this_species_list))
 
-    print("7 pollen_binomial", pollen_binomial)
     if len(pollen_binomial) > 0:
         poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
-        print("8 poll_pids", poll_pids)
         this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
-        print("9 this_species_list", len(this_species_list))
 
+    if crit and this_species_list:
+        if spc:
+            if len(spc) >= 2:
+                this_species_list = this_species_list.filter(species__icontains=spc)
+            else:
+                this_species_list = this_species_list.filter(species__istartswith=spc)
 
-    print("10 hybrid, crit, this species list", crit, len(this_species_list))
-    # Building pid ;list
-
-
-    if spc:
-        # Get species obj from genus + spc
-        print("11 hybrid: reqgenus", reqgenus, spc)
-
-        # Check if the species is the same type as page requested.
-        if len(spc) >= 3:
-            this_species_list = this_species_list.filter(species__icontains=spc)
-        else:
-            this_species_list = this_species_list.filter(species__istartswith=spc)
-
-    if alpha:
-        if len(alpha) == 1:
-            this_species_list = this_species_list.filter(species__istartswith=alpha)
-    if author or originator:
-        this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
-    if author and originator:
-        this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
-    # if originator and not author:
-    #     this_species_list = this_species_list.filter(originator__icontains=originator)
-    if year_valid:
-        year = int(year)
-        this_species_list = this_species_list.filter(year=year)
-    elif not this_species_list.exists() :
+        elif alpha:
+            if len(alpha) == 1:
+                this_species_list = this_species_list.filter(species__istartswith=alpha)
+        if author or originator:
+            this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
+        if author and originator:
+            this_species_list = this_species_list.filter(Q(author__icontains=author) | Q(originator__icontains=originator))
+        # if originator and not author:
+        #     this_species_list = this_species_list.filter(originator__icontains=originator)
+        if year_valid:
+            year = int(year)
+            this_species_list = this_species_list.filter(year=year)
+    else:
         this_species_list = []
         msg = "Please select a search criteria"
+    role = getRole(request)
     context = {'my_list': this_species_list,
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
@@ -482,22 +436,79 @@ def hybrid(request):
     return render(request, 'orchidaceae/hybrid.html', context)
 
 
+def datatable_hybrid(request):
+    # Get start and length parameters
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 10))
+
+    # Get search value
+    search_value = request.GET.get('search[value]', '')
+
+    # Get order column and direction
+    order_column = request.GET.get('order[0][column]', 0)
+    order_dir = request.GET.get('order[0][dir]', 'asc')
+
+    # Define column list
+    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]  # Replace with your actual column names
+
+    # Construct queryset
+    queryset = YourModel.objects.all()
+
+    # Apply search
+    if search_value:
+        queryset = queryset.filter(
+            Q(name__icontains=search_value) |
+            Q(email__icontains=search_value)
+        )
+
+    # Get total record count
+    total_records = queryset.count()
+
+    # Apply ordering
+    if order_dir == 'asc':
+        queryset = queryset.order_by(columns[int(order_column)])
+    else:
+        queryset = queryset.order_by(f'-{columns[int(order_column)]}')
+
+    # Apply pagination
+    queryset = queryset[start:start + length]
+
+    # Prepare data for response
+    data = []
+    for item in queryset:
+        data.append([
+            item.id,
+            item.name,
+            item.email,
+            # Add more fields as needed
+        ])
+
+    # Prepare response
+    response = {
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': total_records,
+        'recordsFiltered': total_records,
+        'data': data,
+    }
+
+    return JsonResponse(response)
+
+
 def browsedist(request):
     dist_list = get_distlist()
     context = {'dist_list': dist_list, }
     return render(request, 'orchidaceae/browsedist.html', context)
 
 
-@login_required
 def ancestor(request, pid):
-    role = getRole(request)
-    sort = ''
-    prev_sort = ''
-    state = ''
-    if request.GET.get('state'):
-        state = request.GET['state']
-        sort.lower()
+    if not pid:
+        pid = request.GET.get('pid', '')
 
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        return HttpResponseRedirect('/')
+
+    role = getRole(request)
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -506,51 +517,105 @@ def ancestor(request, pid):
     write_output(request, species.binomial)
     genus = species.gen
 
-    if request.GET.get('sort'):
-        sort = request.GET['sort']
-        sort.lower()
-    if sort:
-        if request.GET.get('prev_sort'):
-            prev_sort = request.GET['prev_sort']
-        if prev_sort == sort:
-            if sort.find('-', 0) >= 0:
-                sort = sort.replace('-', '')
-            else:
-                sort = '-' + sort
-        else:
-            # sort = '-' + sort
-            prev_sort = sort
     # List of ancestors in the left panel
     anc_list = AncestorDescendant.objects.filter(did=pid)
-
-    # if sort:
-    #     if sort == 'pct':
-    #         anc_list = anc_list.order_by('-pct')
-    #     elif sort == '-pct':
-    #         anc_list = anc_list.order_by('pct')
-    #     elif sort == 'img':
-    #         anc_list = anc_list.order_by('-aid__num_image')
-    #     elif sort == '-img':
-    #         anc_list = anc_list.order_by('aid__num_image')
-    #     elif sort == 'name':
-    #         anc_list = anc_list.order_by('aid__genus', 'aid__species')
-    #     elif sort == '-name':
-    #         anc_list = anc_list.order_by('-aid__genus', '-aid__species')
-
-    for x in anc_list:
-        x.anctype = "orchidaceae:" + str(x.anctype)
 
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
                'anc': 'active', 'tab': 'anc',
-               'sort': sort, 'prev_sort': prev_sort,
-               'title': 'ancestor', 'role': role, 'state': state,
+               'title': 'ancestor', 'role': role,
                }
     return render(request, 'orchidaceae/ancestor.html', context)
 
 
-@login_required
-def ancestrytree(request, pid):
+def get_seed_parent(child):
+    # child must be a Hybrid instance
+    if not isinstance(child, Hybrid):
+        return ''
+    if child and child.seed_id and child.seed_id.type == 'species':
+        # SS
+        if child.seed_id.status == 'synonym':
+            try:
+                parent = Accepted.objects.get(pk=child.seed_id.getAcc())
+            except Accepted.DoesNotExist:
+                return ''
+        else:
+            try:
+                parent = Accepted.objects.get(pk=child.seed_id)
+            except Accepted.DoesNotExist:
+                return ''
+        parent.type = parent.pid.type
+        parent.parent = 'seed'
+        parent.year = parent.pid.year
+        parent.img = spcdir + get_random_img(parent)
+    elif child.seed_id and child.seed_id.type == 'hybrid':
+        if child.seed_id.status == 'synonym':
+            try:
+                parent = Hybrid.objects.get(pk=child.seed_id.getAcc())
+            except Accepted.DoesNotExist:
+                parent = ''
+        else:
+            try:
+                parent = Hybrid.objects.get(pk=child.seed_id)
+            except Hybrid.DoesNotExist:
+                parent = ''
+        parent = Hybrid.objects.get(pk=child.seed_id)
+        parent.type = parent.pid.type
+        parent.parent = 'seed'
+        parent.year = parent.pid.year
+        parent.img = hybdir + get_random_img(parent)
+    else:
+        parent = ''
+    return parent
+
+
+def get_pollen_parent(child):
+    # child must be a Hybrid instance
+    if not isinstance(child, Hybrid):
+        return ''
+    if child and child.pollen_id and child.pollen_id.type == 'species':
+        if child.pollen_id.status == 'synonym':
+            try:
+                parent = Accepted.objects.get(pk=child.pollen_id.getAcc())
+            except Accepted.DoesNotExist:
+                return ''
+        else:
+            try:
+                parent = Accepted.objects.get(pk=child.pollen_id)
+            except Accepted.DoesNotExist:
+                return ''
+        parent.type = parent.pid.type
+        parent.parent = 'pollen'
+        parent.year = parent.pid.year
+        parent.img = spcdir + get_random_img(parent)
+    elif child.pollen_id and child.pollen_id.type == 'hybrid':
+        if child.pollen_id.status == 'synonym':
+            try:
+                parent = Hybrid.objects.get(pk=child.pollen_id.getAcc())
+            except Hybrid.DoesNotExist:
+                return ''
+        else:
+            try:
+                parent = Hybrid.objects.get(pk=child.pollen_id)
+            except Hybrid.DoesNotExist:
+                return ''
+        parent.type = parent.pid.type
+        parent.parent = 'pollen'
+        parent.year = parent.pid.year
+        parent.img = hybdir + get_random_img(parent)
+    else:
+        parent = ''
+    return parent
+
+
+def ancestrytree(request, pid=None):
+    if not pid:
+        pid = request.GET.get('pid', '')
+
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        return HttpResponseRedirect('/')
+
     role = getRole(request)
     try:
         species = Species.objects.get(pk=pid)
@@ -561,247 +626,80 @@ def ancestrytree(request, pid):
     if species.status == 'synonym':
         species = species.getAccepted()
 
-    hybrid = species
-    s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = ssss = sssp = ssps = sspp = spss =\
-        spsp = spps = sppp = psss = pssp = psps = pspp = ppss = ppsp = ppps = pppp = None
+    s = p = ss = sp = ps = pp = sss = ssp = sps = spp = pss = psp = pps = ppp = None
     spc = ''
-
     if species.type == 'hybrid':
-        hybrid.img = hybdir + get_random_img(hybrid)
-
-        if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
-            if species.hybrid.seed_id.status == 'synonym':
-                s = Accepted.objects.get(pk=species.hybrid.seed_id.getAcc())
-            else:
-                s = Accepted.objects.get(pk=species.hybrid.seed_id)
-            s.type = 'species'
-            s.parent = 'seed'
-            s.year = s.pid.year
-            s.img = spcdir + get_random_img(s.pid)
-
-            # tree_list = tree_list + (s,)
-        elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
-            if species.hybrid.seed_id.status == 'synonym':
-                s = Hybrid.objects.get(pk=species.hybrid.seed_id.getAcc())
-            else:
-                s = Hybrid.objects.get(pk=species.hybrid.seed_id)
-            s.type = 'hybrid'
-            s.parent = 'seed'
-            s.year = s.pid.year
-            img = s.pid.get_best_img()
-            if img:
-                s.img = hybdir + img.image_file
-            else:
-                s.img = imgdir + 'noimage_light.jpg'
-            # tree_list = tree_list + (s,)
-            # SS
-            if s and s.seed_id and s.seed_id.type == 'species':
-                ss = Accepted.objects.get(pk=s.seed_id)
-                ss.type = 'species'
-                ss.parent = 'seed'
-                ss.year = ss.pid.year
-                ss.img = spcdir + get_random_img(ss.pid)
-                # tree_list = tree_list + (ss,)
-            elif s.seed_id and s.seed_id.type == 'hybrid':
-                ss = Hybrid.objects.get(pk=s.seed_id)
-                ss.type = 'hybrid'
-                ss.parent = 'seed'
-                ss.year = s.pid.year
-                ss.img = hybdir + get_random_img(ss.pid)
-                # tree_list = tree_list + (ss,)
-                # SSS
-                if ss.seed_id and ss.seed_id.type == 'species':
-                    sss = Accepted.objects.get(pk=ss.seed_id)
-                    sss.type = 'species'
-                    sss.parent = 'seed'
-                    sss.year = sss.pid.year
-                    sss.img = spcdir + get_random_img(sss.pid)
-                    # tree_list = tree_list + (sss,)
-                elif ss.seed_id and ss.seed_id.type == 'hybrid':
-                    sss = Hybrid.objects.get(pk=ss.seed_id)
-                    sss.type = 'hybrid'
-                    sss.parent = 'seed'
-                    sss.year = sss.pid.year
-                    sss.img = hybdir + get_random_img(sss.pid)
-                else:
-                    s = None
-                # SSP
-                if ss.pollen_id and ss.pollen_id.type == 'species':
-                    ssp = Accepted.objects.get(pk=ss.pollen_id)
-                    ssp.type = 'species'
-                    ssp.parent = 'pollen'
-                    ssp.year = ssp.pid.year
-                    ssp.img = spcdir + get_random_img(ssp.pid)
-                    # tree_list = tree_list + (ssp,)
-                elif ss.pollen_id and ss.pollen_id.type == 'hybrid':
-                    ssp = Hybrid.objects.get(pk=ss.pollen_id)
-                    ssp.type = 'hybrid'
-                    ssp.parent = 'pollen'
-                    ssp.year = ssp.pid.year
-                    ssp.img = hybdir + get_random_img(ssp.pid)
-                    # tree_list = tree_list + (ssp,)
-                    # SSPS
-
-            if s and s.pollen_id and s.pollen_id.type == 'species':
-                sp = Accepted.objects.get(pk=s.pollen_id)
-                sp.type = 'species'
-                sp.parent = 'pollen'
-                sp.year = sp.pid.year
-                sp.img = spcdir + get_random_img(sp.pid)
-                # tree_list = tree_list + (sp,)
-            elif s and s.pollen_id and s.pollen_id.type == 'hybrid':
-                sp = Hybrid.objects.get(pk=s.pollen_id)
-                sp.type = 'hybrid'
-                sp.parent = 'seed'
-                sp.year = sp.pid.year
-                sp.year = sp.pid.year
-                sp.img = hybdir + get_random_img(sp.pid)
-                # tree_list = tree_list + (sp,)
-                if sp.seed_id and sp.seed_id.type == 'species':
-                    sps = Accepted.objects.get(pk=sp.seed_id)
-                    sps.type = 'species'
-                    sps.year = sps.pid.year
-                    sps.img = spcdir + get_random_img(sps.pid)
-                    # tree_list = tree_list + (sps,)
-                elif sp.seed_id and sp.seed_id.type == 'hybrid':
-                    sps = Hybrid.objects.get(pk=sp.seed_id)
-                    sps.type = 'hybrid'
-                    sps.year = sps.pid.year
-                    sps.img = hybdir + get_random_img(sps.pid)
-                    # tree_list = tree_list + (sps,)
-
-                if sp.pollen_id and sp.pollen_id.type == 'species':
-                    spp = Accepted.objects.get(pk=sp.pollen_id)
-                    spp.type = 'species'
-                    spp.year = spp.pid.year
-                    spp.img = spcdir + get_random_img(spp.pid)
-                    # tree_list = tree_list + (spp,)
-                elif sp.pollen_id and sp.pollen_id.type == 'hybrid':
-                    spp = Hybrid.objects.get(pk=sp.pollen_id)
-                    spp.type = 'hybrid'
-                    spp.year = spp.pid.year
-                    spp.img = hybdir + get_random_img(spp.pid)
-                    # tree_list = tree_list + (spp,)
-            # else:
-            #     s = ''
-        # P - pollenparent
-        if species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'species':
-            p = Accepted.objects.get(pk=species.hybrid.pollen_id)
-            p.type = p.pid.type
-            p.parent = 'pollen'
-            p.year = p.pid.year
-            p.img = spcdir + get_random_img(p.pid)
-            # tree_list = tree_list + (s,)
-        elif species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'hybrid':
-            p = Hybrid.objects.get(pk=species.hybrid.pollen_id)
-            p.type = 'hybrid'
-            p.parent = 'pollen'
-            p.year = p.pid.year
-            p.img = hybdir + get_random_img(p.pid)
-            # tree_list = tree_list + (s,)
-            # SS
-            if p.seed_id and p.seed_id.type == 'species':
-                ps = Accepted.objects.get(pk=p.seed_id)
-                ps.type = 'species'
-                ps.parent = 'seed'
-                ps.year = ps.pid.year
-                ps.img = spcdir + get_random_img(ps.pid)
-                # tree_list = tree_list + (ss,)
-            elif p.seed_id and p.seed_id.type == 'hybrid':
-                ps = Hybrid.objects.get(pk=p.seed_id)
-                ps.type = 'hybrid'
-                ps.parent = 'seed'
-                ps.year = ps.pid.year
-                ps.img = hybdir + get_random_img(ps.pid)
-                # tree_list = tree_list + (ss,)
-                # SSS
-                if ps.seed_id and ps.seed_id.type == 'species':
-                    pss = Accepted.objects.get(pk=ps.seed_id)
-                    pss.type = 'species'
-                    pss.parent = 'seed'
-                    pss.year = pss.pid.year
-                    pss.img = spcdir + get_random_img(pss.pid)
-                    # tree_list = tree_list + (sss,)
-                elif ps.seed_id and ps.seed_id.type == 'hybrid':
-                    pss = Hybrid.objects.get(pk=ps.seed_id)
-                    pss.type = 'hybrid'
-                    pss.parent = 'seed'
-                    pss.year = pss.pid.year
-                    pss.img = hybdir + get_random_img(pss.pid)
-                    # tree_list = tree_list + (sss,)
-                    # SSSS
-                # SSP
-                if ps.pollen_id and ps.pollen_id.type == 'species':
-                    psp = Accepted.objects.get(pk=ps.pollen_id)
-                    psp.type = 'species'
-                    psp.parent = 'pollen'
-                    psp.year = psp.pid.year
-                    psp.img = spcdir + get_random_img(psp.pid)
-                    # tree_list = tree_list + (ssp,)
-                elif ps.pollen_id and ps.pollen_id.type == 'hybrid':
-                    psp = Hybrid.objects.get(pk=ps.pollen_id)
-                    psp.type = 'hybrid'
-                    psp.parent = 'pollen'
-                    psp.year = psp.pid.year
-                    psp.img = hybdir + get_random_img(psp.pid)
-            # -- SP
-            if p.pollen_id and p.pollen_id.type == 'species':
-                pp = Accepted.objects.get(pk=p.pollen_id)
-                pp.type = 'species'
-                pp.parent = 'pollen'
-                pp.year = pp.pid.year
-                pp.img = spcdir + get_random_img(pp.pid)
-                # tree_list = tree_list + (sp,)
-            elif p.pollen_id and p.pollen_id.type == 'hybrid':
-                pp = Hybrid.objects.get(pk=p.pollen_id)
-                pp.type = 'hybrid'
-                pp.parent = 'pollen'
-                pp.year = pp.pid.year
-                pp.img = hybdir + get_random_img(pp.pid)
-                # tree_list = tree_list + (sp,)
-                if pp.seed_id and pp.seed_id.type == 'species':
-                    pps = Accepted.objects.get(pk=pp.seed_id)
-                    pps.type = 'species'
-                    pps.img = spcdir + get_random_img(pps.pid)
-                    pps.parent = 'seed'
-                    pps.year = pps.pid.year
-                    # tree_list = tree_list + (sps,)
-                elif pp.seed_id and pp.seed_id.type == 'hybrid':
-                    pps = Hybrid.objects.get(pk=pp.seed_id)
-                    pps.type = 'hybrid'
-                    pps.img = hybdir + get_random_img(pps.pid)
-                    pps.parent = 'seed'
-                    pps.year = pps.pid.year
-                    # tree_list = tree_list + (sps,)
-                if pp.pollen_id and pp.pollen_id.type == 'species':
-                    ppp = Accepted.objects.get(pk=pp.pollen_id)
-                    ppp.type = 'species'
-                    ppp.img = spcdir + get_random_img(ppp.pid)
-                    ppp.parent = 'pollen'
-                    ppp.year = ppp.pid.year
-                    # tree_list = tree_list + (spp,)
-                elif pp.pollen_id and pp.pollen_id.type == 'hybrid':
-                    ppp = Hybrid.objects.get(pk=pp.pollen_id)
-                    ppp.type = 'hybrid'
-                    ppp.img = hybdir + get_random_img(ppp.pid)
-                    ppp.parent = 'pollen'
-                    ppp.year = ppp.pid.year
-                    # tree_list = tree_list + (spp,)
-
+        hybrid = species.hybrid
+        s = get_seed_parent(hybrid)
+        p = get_pollen_parent(hybrid)
+        ss = get_seed_parent(s)
+        sp = get_pollen_parent(s)
+        sss = get_seed_parent(ss)
+        ssp = get_pollen_parent(ss)
+        sps = get_seed_parent(sp)
+        spp = get_pollen_parent(sp)
+        ps = get_seed_parent(p)
+        pp = get_pollen_parent(p)
+        pss = get_seed_parent(ps)
+        psp = get_pollen_parent(ps)
+        pps = get_seed_parent(pp)
+        ppp = get_pollen_parent(pp)
+        species.img = hybdir + get_random_img(species)
     context = {'species': species,
                'spc': spc, 'tree': 'active', 'tab': 'tree',
                's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
-               'ssss': ssss, 'sssp': sssp, 'ssps': ssps, 'sspp': sspp, 'spss': spss, 'spsp': spsp, 'spps': spps,
-               'sppp': sppp,
                'p': p, 'ps': ps, 'pp': pp, 'pss': pss, 'psp': psp, 'pps': pps, 'ppp': ppp,
-               'psss': psss, 'pssp': pssp, 'psps': psps, 'pspp': pspp, 'ppss': ppss, 'ppsp': ppsp, 'ppps': ppps,
-               'pppp': pppp,
                'title': 'ancestrytree', 'role': role,
                }
     return render(request, 'orchidaceae/ancestrytree.html', context)
 
+from django.db import connection
+from django.db.models import Subquery, OuterRef, Value, IntegerField, Q
+from django.db.models.functions import Greatest
 
-@login_required
+def get_des_list_large(pid, syn_list):
+    # Create a temporary table with syn_list
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            CREATE TEMPORARY TABLE temp_syn_list (aid INT PRIMARY KEY)
+        """)
+        cursor.executemany(
+            "INSERT INTO temp_syn_list (aid) VALUES (%s)",
+            [(aid,) for aid in syn_list]
+        )
+
+    # Use the temporary table in the query
+    dest_list = list(AncestorDescendant.objects.filter(pct__gt=30)
+                .annotate(
+                    is_in_syn_list=Greatest(
+                        Value(0),
+                        Subquery(
+                            AncestorDescendant.objects.filter(aid=OuterRef('aid'))
+                            .extra(where=['aid IN (SELECT aid FROM temp_syn_list)'])
+                            .values('aid')
+                            .annotate(v=Value(1, output_field=IntegerField()))
+                            .values('v')[:1]
+                        )
+                    )
+                )
+                .filter(Q(aid=pid) | Q(is_in_syn_list=1)))
+
+    # Drop the temporary table
+    with connection.cursor() as cursor:
+        cursor.execute("DROP TEMPORARY TABLE IF EXISTS temp_syn_list")
+
+    return dest_list
+
+
+def get_des_list(pid, syn_list):
+    base_query = AncestorDescendant.objects.filter(pct__gt=30)
+
+    if not syn_list:
+        return list(base_query.filter(aid=pid))
+
+    return list(base_query.filter(Q(aid=pid) | Q(aid__in=syn_list)))
+
+
 def progeny(request, pid):
     role = getRole(request)
     family = Family.objects.get(pk='Orchidaceae')
@@ -816,55 +714,35 @@ def progeny(request, pid):
     genus = species.genus
     prim = request.GET.get('prim', '')
     prim_list, sec_list, result_list = [], [], []
+    syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True)
+
+    prim_list = Hybrid.objects.filter(
+        Q(seed_id=pid) |
+        Q(pollen_id=pid) |
+        Q(seed_id__in=syn_list) |
+        Q(pollen_id__in=syn_list)
+    )
     if prim:
-        prim_list = Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid))
-    else:
-        #All descendants
-        des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt=30)
-        # primary
-        prim_list = set(Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True))
-        # Secondary
-        sec_list = set(Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True))
-
-        for x in des_list:
-            if x.did.pid.pid in prim_list:
-                result_list.append([x,'primary'])
-            elif x.did.pid.pid in sec_list:
-                result_list.append([x,'secondary'])
-            else:
-                result_list.append([x,'remote'])
-
-    context = {'result_list': result_list, 'prim_list': prim_list,
-               'species': species, 'family': family,
-                'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
-               'title': 'progeny', 'section': 'Public Area', 'role': role,
-               }
-    return render(request, 'orchidaceae/progeny.html', context)
-
-def xprogeny(request, pid):
-    role = getRole(request)
-    family = Family.objects.get(pk='Orchidaceae')
-    direct = request.GET.get('direct', '')
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    write_output(request, species.binomial)
-    genus = species.genus
+        context = {'prim_list': prim_list,
+                   'species': species, 'family': family,
+                   'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
+                   'title': 'progeny', 'section': 'Public Area', 'role': role,
+                   }
+        return render(request, 'orchidaceae/progeny_immediate.html', context)
 
     #All descendants
-    des_list = AncestorDescendant.objects.filter(aid=pid)
+    if len(syn_list) > 100:
+        # des_list = get_des_list_large(pid, syn_list)
+        des_list = get_des_list(pid, syn_list)
+    else:
+        des_list = get_des_list(pid, syn_list)
     # primary
-    prim_list = set(Hybrid.objects.filter(Q(seed_id=pid) | Q(pollen_id=pid)).values_list('pid', flat=True))
+    prim_list = set(prim_list.values_list('pid', flat=True))
     # Secondary
-    sec_list = set(Hybrid.objects.filter(Q(seed_id__in=prim_list) | Q(pollen_id__in=prim_list)).values_list('pid', flat=True))
-
-    if len(des_list) > 5000:
-        des_list = des_list.filter(pct__gt=30)
-
-    result_list = []
+    sec_list = set(Hybrid.objects.filter(
+        Q(seed_id__in=prim_list) |
+        Q(pollen_id__in=prim_list)
+    ).values_list('pid', flat=True))
     for x in des_list:
         if x.did.pid.pid in prim_list:
             result_list.append([x,'primary'])
@@ -872,17 +750,15 @@ def xprogeny(request, pid):
             result_list.append([x,'secondary'])
         else:
             result_list.append([x,'remote'])
-
-    # total = des_list.count()
-
-    context = {'result_list': result_list, 'species': species, 'family': family,
+    context = {'result_list': result_list,
+               'species': species, 'family': family,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role,
                }
+
     return render(request, 'orchidaceae/progeny.html', context)
 
 
-@login_required
 def progenyimg(request, pid):
     num_show = 5
     page_length = 30
@@ -1045,7 +921,7 @@ def server_processing_spc(request):
     return JsonResponse(response, encoder=LazyEncoder)
 
 # initial html view using the shared function
-from django.shortcuts import render
+# from django.shortcuts import render
 
 # def species(request):
 #     # Using default parameters to fetch initial data for display
