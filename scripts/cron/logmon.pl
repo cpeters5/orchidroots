@@ -23,7 +23,7 @@ my ($sth, $sth1);
 
 #require "common.pl";
 #our ($sth);
-my %ip = ();
+my %ip;
 my $debug = 1;
 my $file = "/var/log/gunicorn/gunicorn-access.log";
 my $grouping = 'day';
@@ -41,7 +41,7 @@ my %mon2str = qw(
     7 Jul 8  Aug 9  Sep 10  Oct 11 Nov 12 Dec
 );
 my %maxhit = qw(
-    orchidlist 300 detail 2000 search 20
+    species 10 display 100 browse 10 search 10
 );
 
 my $tab = "logstat_byday";
@@ -54,8 +54,11 @@ my $today = sprintf("%04d-%02d-%02d", $year, $mon, $mday);
 open LOG, $file or die "Can't open file $file\n$!\n";
 my %sum = ();
 my $i = 0;
+print "getExistedDate\n";
 getExistedDate();
+print "extractLog\n";
 extractLog();
+print "outputResult\n";
 outputResult();
 
 sub extractLog {
@@ -67,6 +70,7 @@ sub extractLog {
         my $app = $1;
         my %seen;
         foreach my $elm (sort keys %maxhit) {
+            # print "$app $elm\n"; sleep 1;
             if ($app eq $elm) {
                 $seen{$app}++;
                 last;
@@ -90,11 +94,15 @@ sub extractLog {
         $day = sprintf("%02d", $day);
         my $date = $year . '-' . $mon . '-' . $day;
         next if exists $dt{$date.$app};
-        next if $date eq $today;
+        # print "{$today $date.$app}\n"; sleep 2;
+        # next if $date eq $today;
         my $key = $ip . "|" . $app . "|" . $date;
         $ip{$key}++;
         $sum{$date}++;
+        # print "$key: $ip{$key} $sum{$date}\n"; sleep 2;
     }
+    # print scalar keys %ip;
+    # print "\n";
     close LOG;
 }
 
@@ -109,15 +117,12 @@ sub getExistedDate {
 }
 
 sub outputResult {
+    # print keys %ip;
     foreach (sort keys %ip){
-        if ($_ =~ /^([\d\.]+)\|([a-z]+)\|(.*)$/) {
-            my $ip = $1;
-            my $app = $2;
-            my $dt = $3;
-            next if $ip{$_} < $maxhit{$app};
-            print "$ip\t$dt\t$app\t$ip{$_} \n" if $ip{$_} > 10000;
-            &getASPM("insert ignore into $tab (ip, app, dt, count) values ('$ip', '$app', '$dt', $ip{$_})");
-        }
+        my ($ip, $app, $dt) = split /\|/, $_;
+        next if $ip{$_} < $maxhit{$app};
+        print ">$ip\t$dt\t$app\t$ip{$_} \n";
+        # &getASPM("insert ignore into $tab (ip, app, dt, count) values ('$ip', '$app', '$dt', $ip{$_})");
     }
 }
 
