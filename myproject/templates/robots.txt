@@ -1,6 +1,6 @@
 User-agent: *
+Allow: /
 Allow: /display/information/
-Allow: /detail/information/
 Allow: /orchidaceae/progeny/
 Allow: /orchidaceae/ancestor/
 Allow: /orchidaceae/species/
@@ -9,11 +9,14 @@ Allow: /orchidaceae/genera/
 Allow: /home/
 Disallow: /admin/
 Disallow: /accounts/
+Disallow: /login/
+Disallow: /register/
 Disallow: /animalia/
 Disallow: /aves/
 Disallow: /common/
 Disallow: /data/
 Disallow: /documents/
+Disallow: /display/
 Disallow: /donations/
 Disallow: /fungi/
 Disallow: /gallery/
@@ -26,9 +29,8 @@ Disallow: /orchidlist/
 Disallow: /orchidlite/
 Disallow: /natural/
 Disallow: /orchid/
-Disallow: /
 
-Sitemap: https://www.beta.bluenanta.com/sitemap.xml
+Sitemap: https://www.orchidroots.com/sitemap.xml
 
 User-agent: Bytespider
 Disallow: /
