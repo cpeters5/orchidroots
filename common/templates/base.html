@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="Information about orchids and other selected plant and animal families.">
+    <meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
@@ -574,7 +576,7 @@ nav .search-container button:hover {
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand mb-0 bannerfont" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; float: left"><b>Orchid<br>R<span style="font-size:14px;">oots</span></b></a>
+            <a class="navbar-brand mb-0 bannerfont" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; float: left" data-nosnippet><b>Orchid<br>R<span style="font-size:14px;">oots</span></b></a>
             <!-- Brand -->
         </div>
 <!-- Links -->
@@ -592,35 +594,35 @@ nav .search-container button:hover {
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <div class="nav-item dropdown" style="">
-                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
+                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white" data-nosnippet>{{user}}&nbsp;</span></a>
                         <ul class="dropdown-menu">
                             {% if user.tier.tier > 2 %}
                                 {% if user.tier.tier == 5 %}
-                                    <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae">Orchidroots</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}">Maintenance</a></li>
-                                    <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae" data-nosnippet>Orchidroots</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}" data-nosnippet>Admin</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" data-nosnippet>Maintenance</a></li>
+                                    <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/" data-nosnippet>Google Analytics</a></li>
                                     {% if species %}
-                                        <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub">Public</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" data-nosnippet>Public</a></li>
                                     {% else %}
-                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked">Browse</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked" data-nosnippet>Browse</a></li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'gallery:index' %}">Gallery</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'gallery:index' %}" data-nosnippet>Gallery</a></li>
                                 {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur">View new uploads</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" data-nosnippet>View new uploads</a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}">Orchid Species</a></li>
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}">Orchid Hybrids</a></li>
-                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&tab=brg&role=pri">My Collection</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" data-nosnippet>Orchid Species</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" data-nosnippet>Orchid Hybrids</a></li>
+                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&tab=brg&role=pri" data-nosnippet>My Collection</a></li>
 <!--                            <hr style="margin:0;padding:0;">-->
-                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/">Update profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/">Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/" data-nosnippet>Update profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/" data-nosnippet>Logout</a></li>
                             {% if user.tier.tier > 1 %}
                             <li>Role</li>
-                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked">Public</a></li>
-                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked">Private</a></li>
+                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked" data-nosnippet>Public</a></li>
+                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked" data-nosnippet>Private</a></li>
                                 {% if user.tier.tier > 2 %}
-                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked">Curate</a></li>
+                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked" data-nosnippet>Curate</a></li>
                                 {% endif %}
                             {% endif %}
                         </ul>
@@ -628,10 +630,10 @@ nav .search-container button:hover {
                 </li>
                 {% else %}
                     <li class="nav-item" style="margin-top:8px;">
-                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login"><span style="color:white">Register</span></a>
+                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login" data-nosnippet><span style="color:white">Register</span></a>
                     </li>
                     <li class="nav-item" style="margin-top:8px;">
-                        <a class="nav-link custom-find" href="{% url 'login' %}?next=/"><span style="color:white">Login</span></a>
+                        <a class="nav-link custom-find" href="{% url 'login' %}?next=/" data-nosnippet><span style="color:white">Login</span></a>
                     </li>
                 {% endif %}
             </ul>
