@@ -1,18 +1,3 @@
-"""myproject URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -32,22 +17,23 @@ from myproject.views import robots_txt
 from sitemap.views import sitemap_index, sitemap_section
 
 urlpatterns = [
-    # Home page
+    # admin & sitemaps
     path('admin/', admin.site.urls),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type='text/plain')),
-    # path('sitemap.xml', index, {'sitemaps': sitemaps_dict}, name='django.contrib.sitemaps.views.index'),
-    # path('sitemap-<section>.xml', sitemap, {'sitemaps': sitemaps_dict}, name='django.contrib.sitemaps.views.sitemap'),
     path('sitemap.xml', sitemap_index, name='sitemap_index'),
     path('sitemap-<int:section>.xml', sitemap_section, name='sitemap_section'),
 
-                  # User accounts
+    # home
+    path('', home, name='home'),
+
+    # User accounts
     path('login/', login_page, name='login'),
     path('register/', register_page, name='register'),
     path('set_email/', SetEmailView.as_view(), name='set_email'),
     path('change_email/', ChangeEmailView.as_view(), name='change_email'),
     path('update_profile/', UpdateProfileView.as_view(), name='update_profile'),
     path('logout/', LogoutView.as_view(), {'next_page': '//'}, name='logout'),
-    path('donation/', include('donation.urls')),
+    path('accounts/', include('allauth.urls')),
     path('accounts/password/change/', PasswordChangeRedirect.as_view(), name="account_password_change"),
     path('accounts/password/user_reset_password/', user_reset_password, name="user_account_reset_password"),
     re_path(
@@ -55,27 +41,26 @@ urlpatterns = [
         CustomPasswordResetFromKeyView.as_view(),
         name="account_reset_password_from_key",
     ),
-    path('accounts/', include('allauth.urls')),
 
-    # Landing
-    path('', home, name='home'),
-    path('documents/', include('documents.urls')),
+    # my applications
+    path('donation/', include(('donation.urls', 'donation'), namespace='donation')),
+    path('documents/', include(('documents.urls', 'documents'), namespace='documents')),
 
-    # Common to all apps
-    path('search/', include('search.urls')),
-    path('common/', include('common.urls')),
-    path('display/', include('display.urls')),
+    # Common applications
+    path('search/', include(('search.urls', 'search'), namespace='search')),
+    path('common/', include(('common.urls', 'common'), namespace='common')),
+    path('display/', include(('display.urls', 'display'), namespace='display')),
 
     # Family specific
-    path('animalia/', include('animalia.urls')),
-    path('aves/', include('aves.urls')),
-    path('fungi/', include('fungi.urls')),
-    path('other/', include('other.urls')),
-    path('orchidaceae/', include('orchidaceae.urls')),
-    path('detail/', include('detail.urls')),
+    path('animalia/', include(('animalia.urls', 'animalia'), namespace='animalia')),
+    path('aves/', include(('aves.urls', 'aves'), namespace='aves')),
+    path('fungi/', include(('fungi.urls', 'fungi'), namespace='fungi')),
+    path('other/', include(('other.urls', 'other'), namespace='other')),
+    path('orchidaceae/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchidaceae')),
+    path('detail/', include(('detail.urls', 'detail'), namespace='detail')),
 
-    # New dev
-    path('gallery/', include('gallery.urls')),
+    # New
+    path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),
 
     # REDIRECTIONS: Remove this in a year or so. @2024
     # redirections (in the process of merging detail with orchidaceae)
@@ -103,14 +88,18 @@ urlpatterns = [
     path('search/search_match/', RedirectView.as_view(url='/search/search_orchidaceae/', permanent=True)),
 
     # Decommissioned applications
-    re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
-    path('natural/', include('detail.urls')),
-    re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/display/%(path)s', permanent=True)),
-    path('orchidlite/', include('display.urls')),
-    re_path(r'^orchid/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
-    path('orchid/', include('orchidaceae.urls')),
-    re_path(r'^orchidlist/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
-    path('orchidlist/', include('orchidaceae.urls')),
+    path('natural/', include(('detail.urls', 'detail'), namespace='natural')),
+    path('orchidlite/', include(('display.urls', 'display'), namespace='orchidlite')),
+    path('orchid/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchid')),
+    path('orchidlist/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchidlist')),
+    # re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
+    # path('natural/', include('detail.urls'), namespace='natural'),
+    # re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/display/%(path)s', permanent=True)),
+    # path('orchidlite/', include('display.urls'), namespace='orchidlite'),
+    # re_path(r'^orchid/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
+    # path('orchid/', include('orchidaceae.urls'), namespace='orchid'),
+    # re_path(r'^orchidlist/(?P<path>.*)$', RedirectView.as_view(url='/orchidaceae/%(path)s', permanent=True)),
+    # path('orchidlist/', include('orchidaceae.urls'), namespace='orchidlist'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
