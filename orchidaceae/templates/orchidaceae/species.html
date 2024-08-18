@@ -2,6 +2,9 @@
 {% load humanize %}
 {% include "base.html" %}
 {% block body %}
+<head>
+    <title>List of {{genus}} species</title>
+</head>
 
 <style>
 
@@ -234,27 +237,6 @@ option {
                         </div>
                     </div>
             {% endif %}
-
-
-<!--            {% if total == 0 %}-->
-<!--                <div style="margin: 10px 0 0 10px;">-->
-<!--                    {% if genus %}-->
-<!--                        No <i>{{genus|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
-<!--                    {% elif subftribe %}-->
-<!--                        No  <i>{{subftribe|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
-<!--                    {% elif section %}-->
-<!--                        No <i>{{section|title}}</i> species {% if alpha and alpha != 'ALL' %}starts with {{alpha}}.{% endif %}-->
-<!--                    {% elif subgenus %}-->
-<!--                        No <i>{{subgenus|title}}</i> species {% if alpha and alpha != 'ALL' %}}starts with {{alpha}}.{% endif %}-->
-<!--                    {% endif %}-->
-<!--                </div>-->
-<!--            {% endif %}-->
-
-
-
-
-
-
         </div>
     </div>
 

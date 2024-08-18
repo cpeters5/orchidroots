@@ -3,6 +3,7 @@
 {% include 'detail-title.html' %}
 {% block body %}
 <head>
+    <title>Detail about {{species.binomial}}</title>
     <link rel="canonical" href="{{ canonical_url }}">
 </head>
 
@@ -137,6 +138,12 @@ img{
     font-size: 14px;
     text-align:center;
 }
+
+.info {
+    font-size: 14px;
+    padding: 20px;
+
+}
 @media only screen and (max-width: 830px) {
    .imageitem {
         width: 30vw;
@@ -174,6 +181,12 @@ img{
     .grandparent-title {
         font-size: 13px;
         text-align:center;
+    }
+    .info {
+        font-size: 11px;
+        /*width:80%;*/
+        margin:0 auto;
+        padding: 15px;
     }
 }
 
@@ -213,6 +226,12 @@ img{
     .grandparent-title {
         font-size: 12px;
         text-align:center;
+    }
+    .info {
+        font-size: 11px;
+        /*width:80%;*/
+        margin:0 auto;
+        padding: 15px;
     }
 }
 
@@ -291,8 +310,7 @@ seedparent, pollparent {
     {% include 'common/detail-nav.html' %}
     <!-- body -->
     <div style="background:white; margin:0 auto;background:white;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
-        <div style="height:100px; width:80%;margin:0 auto;">
-            <br>
+        <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} of
                 &nbsp;<a href="{% url 'common:newbrowse' %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;family,
@@ -325,7 +343,7 @@ seedparent, pollparent {
             <br>
         </div>
         <div class="d-flex p-1 justify-content-center" style="width:100%; margin:0 auto;">
-            <div class="p-1 flex-fill list-group border" style="border:0 solid lightgrey; min-height: 150px;">
+            <div class="p-1 flex-fill list-group" style="min-height: 150px;">
                 {% if display_items %}
                     <div class="d-flex flex-wrap justify-content-center" style="display:inline-block; margin-top:5px;">
                         {% for image in display_items %}

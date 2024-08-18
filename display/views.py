@@ -44,7 +44,7 @@ def information(request, pid=None):
         return HttpResponseRedirect('/')
 
     # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/information/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
 
     # If accessed via query parameter, redirect to the canonical URL
     if 'pid' in request.GET:
@@ -233,7 +233,12 @@ def xinformation(request, pid=None):
         return HttpResponseRedirect('/')
 
     # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/information/{pid}/')
+    # canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
+    canonical_url = reverse('display:information', kwargs={'pid': pid})
+    full_canonical_url = request.build_absolute_uri(canonical_url)
+
+    if request.build_absolute_uri() != full_canonical_url:
+        return HttpResponsePermanentRedirect(full_canonical_url)
 
     # If accessed via query parameter, redirect to the canonical URL
     if 'pid' in request.GET:
@@ -399,7 +404,7 @@ def xinformation(request, pid=None):
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list,
-               'canonical_url': canonical_url,
+               'canonical_url': full_canonical_url,
                'tab': 'rel', 'view': 'information',
                }
     response = render(request, 'display/information.html', context)
