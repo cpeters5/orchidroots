@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db import connection
 from django.db.models import Case, When, Value, Subquery, OuterRef, Q, CharField
 from django.db.models.functions import Replace
@@ -358,6 +358,10 @@ def search(request):
         search_string = request.GET.get('search_string', '').strip()
     if 'search_string' in request.POST:
         search_string = request.POST['search_string'].strip()
+    if not search_string:
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
 
     print("1. search_string", search_string)
     search_string = clean_search_string(search_string)
@@ -1024,9 +1028,11 @@ def search_orchidaceae(request):
 
     #Get search string. if none, send it back
     search_string = request.GET.get('search_string',None)
-    # if not search_string:
-    #     message = 'Empty search term'
-    #     return HttpResponse(message)
+    if not search_string:
+        # return HttpResponse(message)
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
     req_genus = request.GET.get('genus','')
     write_output(request, search_string)
 
