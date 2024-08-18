@@ -3,6 +3,8 @@
 {% include "detail-title.html" %}
 {% block body %}
 <head>
+    <title>Video clips for {{species.binomial}}</title>
+    <link rel="canonical" href="{% url 'display:information' pid=species.pid %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
     <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
 </head>

@@ -2,6 +2,9 @@
 {% include "base.html" %}
 {% include "detail-title.html" %}
 {% block body %}
+<head>
+    <title>Family tree of {{species.binomial}}</title>
+</head>
 
 <style>
 
@@ -169,12 +172,14 @@ right connector from last child*/
 .thumbnails4 {
    height: 6vw !important;
    width : 6vw !important;
+   padding:2px;
     margin: 0 2px;
     border: 0;
 }
 .thumbnails3 {
    height: 8vw !important;
    width : 8vw !important;
+   padding:2px;
     border:0 solid lightgrey;
     padding:0 !important;
     margin:0 !important;

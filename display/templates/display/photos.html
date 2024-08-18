@@ -2,6 +2,10 @@
 {% include "base.html" %}
 {% include "detail-title.html" %}
 {% block body %}
+<head>
+    <title>Images of {{species.binomial}}</title>
+    <link rel="canonical" href="{% url 'display:information' pid=species.pid %}" />
+</head>
 <style>
     /*Styles for Top Descendants*/
 [class*="col-"] {
