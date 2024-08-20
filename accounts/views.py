@@ -2,25 +2,26 @@ from allauth.account.utils import complete_signup
 from allauth.account.adapter import get_adapter
 from allauth.account import signals
 from django.core.mail import send_mail
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, FormView
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
+from django.views.generic.edit import CreateView, FormView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.http import url_has_allowed_host_and_scheme
 # from django.utils.http import is_safe_url, url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.urls import reverse, reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.contrib.auth.forms import PasswordChangeForm
+
 # from allauth.account.views import _ajax_response, PasswordChangeView, PasswordResetFromKeyView, app_settings, signals
 from allauth.account.views import PasswordChangeView, PasswordResetFromKeyView
 from allauth.account import app_settings
 from allauth.account import signals
+from allauth.account.forms import UserTokenForm, SetPasswordForm, ChangePasswordForm
 
-from allauth.account.forms import UserTokenForm, SetPasswordForm
-from django.conf import settings
 from datetime import datetime
 from utils.views import write_output
 
@@ -142,6 +143,23 @@ def change_password(request):
     })
 
 
+class CustomChangePasswordView(LoginRequiredMixin, FormView):
+    template_name = 'account/password_change.html'
+    form_class = ChangePasswordForm
+    success_url = reverse_lazy('account_change_password')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Your password has been successfully changed.')
+        return super().form_valid(form)
+
+
+
 class SetEmailView(FormView):
     template_name = 'account/set_email.html'
     form_class = AddEmailForm
@@ -244,7 +262,7 @@ class UpdateProfileView(LoginRequiredMixin, FormView):
         return super().form_invalid(form)
 
 
-class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
+class xCustomPasswordResetFromKeyView(PasswordResetFromKeyView):
     template_name = "account/password_reset_from_key.html" 
     success_url = reverse_lazy("account_reset_password_from_key_done")
 
@@ -295,7 +313,7 @@ from django.http import JsonResponse
 from utils.json_encoder import LazyEncoder
 
 
-class xCustomPasswordResetFromKeyView(PasswordResetFromKeyView):
+class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
     template_name = "account/password_reset_from_key.html"
     success_url = reverse_lazy("account_reset_password_from_key_done")
 
