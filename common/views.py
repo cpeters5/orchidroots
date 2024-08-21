@@ -184,7 +184,7 @@ def genera(request):
     tribe = ''
     subtribe = ''
     family_list = []
-    family = request.GET.get('family','')
+    family = request.GET.get('family','Orchidaceae')
     try:
         family = Family.objects.get(family=family)
         app = family.application
@@ -1203,17 +1203,13 @@ def curate_newapproved(request):
 
     file_list = file_list.order_by('-modified_date')
     if species:
-        rank = int(request.GET.get('rank', 0))
         orid = int(request.GET.get('id', None))
-        try:
-            image = SpcImages.objects.get(pk=orid)
-            image.rank = rank
-            image.save()
-        except SpcImages.DoesNotExist:
-            pass
-
-        # rank_update(request, species)
-        quality_update(request, species)
+        rank = int(request.GET.get('rank', 0))
+        quality = int(request.GET.get('quality', 0))
+        if rank:
+            rank_update(rank, orid, SpcImages)
+        if quality:
+            quality_update(quality, orid, SpcImages)
 
     num_show = 5
     page_length = 20
