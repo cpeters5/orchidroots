@@ -134,7 +134,7 @@ div.text-br {
 
                 <div class="imageitem">
                     {% if image.image_file %}
-                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" rel="nofollow noreferrer noopener" data-title="
                                 <h6><small>
                                 {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                 {{image.get_displayname}}
@@ -166,8 +166,8 @@ div.text-br {
                                 {{image.get_displayname}}
                             {% endif %}
                             {% if role == 'pri' %}
-                            - <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{image.gen.family}}&id={{image.id}}&role={{role}}" >Delete</a>
-                            - <a href="/{{image.gen.family.application}}/uploadweb/{{image.pid_id}}/{{image.id}}/?family={{image.gen.family}}&role={{role}}" >Update</a>
+                            - <a href="{% url 'common:deletewebphoto' image.pid_id %}?family={{image.gen.family}}&id={{image.id}}&role={{role}}" rel="nofollow noreferrer noopener" >Delete</a>
+                            - <a href="/{{image.gen.family.application}}/uploadweb/{{image.pid_id}}/{{image.id}}/?family={{image.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener" >Update</a>
                             {% endif %}
                         </div>
 
@@ -185,7 +185,7 @@ div.text-br {
             {% for image in upload_list %}
                  <div class="imageitem" style="display:inline-block">
                      {% if image.image_file_path %}
-                          <a href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                          <a href="{% static 'media/' %}{{image.image_file_path}}" rel="nofollow noreferrer noopener" data-lightbox="media" data-title="
                                    {{image.id}}: {{image.imgname}}
                                    <br> {{image.get_displayname}}
                                    <br>{% if image.text_data %}{{image.text_data|safe}}{% endif %}">
@@ -210,11 +210,11 @@ div.text-br {
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
                                 {% if family == 'Orchidaceae' %}
-                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
-                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?id={{image.id}}&family=Orchidaceae&role={{role}}" >- Delete</a>
+                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid_id %}?&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?id={{image.id}}&family=Orchidaceae&role={{role}}" rel="nofollow noreferrer noopener" >- Delete</a>
                                 {% else %}
-                                    <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
-                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?id={{image.id}}&family={{image.family}}&role={{role}}" >- Delete</a>
+                                    <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?id={{image.id}}&family={{image.family}}&role={{role}}" rel="nofollow noreferrer noopener" >- Delete</a>
                                 {% endif %}
                             {% endif %}
                         {% endif %}

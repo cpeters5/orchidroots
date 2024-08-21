@@ -149,7 +149,7 @@ def genera(request):
     t_list = t_list.order_by('tribe')
     st_list = st_list.order_by('subtribe')
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
-    context = {'my_list': genus_list, 'genus_lookup': genus_lookup, 'family':family,
+    context = {'my_list': genus_list, 'genus_lookup': genus_lookup,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,
                'st_obj': st_obj, 'st_list': st_list,
                'title': 'taxonomy', 'genustype': genustype, 'status': status,
@@ -243,19 +243,9 @@ def getPrev(request,arg, prev):
 
 
 def species(request):
-    myspecies = ''
     author = ''
     role = getRole(request)
     spc = request.GET.get('spc', '')
-    family = request.GET.get('family', '')
-    print("0. family = ", family)
-    if family != 'Orchidaceae':
-        send_url = '/common/species/?family=' + str(family) + '&role=' + role
-        return HttpResponseRedirect(send_url)
-    spc = request.GET.get('spc', '')
-    print("1. spc = ", spc)
-
-    family = Family.objects.get(pk='Orchidaceae')
     msg = ''
     type = 'species'
     alpha = ''
@@ -281,12 +271,6 @@ def species(request):
     section = request.GET.get('section', '')
     subsection = request.GET.get('subsection', '')
     series = request.GET.get('series', '')
-    myspecies = request.GET.get('myspecies', '')
-    if myspecies:
-        try:
-            author = Photographer.objects.get(user_id=request.user)
-        except Photographer.DoesNotExist:
-            author = ''
 
     # Start building th elist
     if reqgenus or alpha or spc or subgenus or section or subsection:
@@ -316,9 +300,6 @@ def species(request):
             elif alpha:
                 if len(alpha) == 1:
                     this_species_list = this_species_list.filter(species__istartswith=alpha)
-            if myspecies and author:
-                pid_list = SpcImages.objects.filter(author_id=author).values_list('pid', flat=True).distinct()
-                this_species_list = this_species_list.filter(pid__in=pid_list)
 
     subgenus_list = Subgenus.objects.filter(genus=genus).order_by('subgenus')
     section_list = Section.objects.filter(genus=genus).order_by('section')
@@ -326,13 +307,13 @@ def species(request):
     series_list = Series.objects.filter(genus=genus).order_by ('subsection')
     print("section", genus, len(section_list))
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
-               'role': role, 'family': family, 'genus': genus,
+               'role': role, 'genus': genus,
                'subgenus': subgenus, 'subgenus_list': subgenus_list,
                'section': section, 'section_list': section_list,
                'subsection': subsection, 'subsection_list': subsection_list,
                'series': series, 'series_list': series_list,
                'msg': msg,
-               'syn': syn, 'myspecies': myspecies,
+               'syn': syn,
                'title': 'taxonomy', 'type': 'species'
                }
     return render(request, 'orchidaceae/species.html', context)
@@ -702,7 +683,6 @@ def get_des_list(pid, syn_list):
 
 def progeny(request, pid):
     role = getRole(request)
-    family = Family.objects.get(pk='Orchidaceae')
     direct = request.GET.get('direct', '')
 
     try:
@@ -712,7 +692,7 @@ def progeny(request, pid):
         return HttpResponse(message)
     write_output(request, species.binomial)
     genus = species.genus
-    prim = request.GET.get('prim', '')
+    prim = request.GET.get('prim', None)
     prim_list, sec_list, result_list = [], [], []
     syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True)
 
@@ -723,13 +703,13 @@ def progeny(request, pid):
         Q(pollen_id__in=syn_list)
     )
     if prim:
-        context = {'prim_list': prim_list,
-                   'species': species, 'family': family,
+        print("1. prime = ", prim)
+        context = {'prim_list': prim_list, 'species': species,
                    'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                    'title': 'progeny', 'section': 'Public Area', 'role': role,
                    }
         return render(request, 'orchidaceae/progeny_immediate.html', context)
-
+    print("2. prime = ", prim)
     #All descendants
     if len(syn_list) > 100:
         # des_list = get_des_list_large(pid, syn_list)
@@ -750,8 +730,7 @@ def progeny(request, pid):
             result_list.append([x,'secondary'])
         else:
             result_list.append([x,'remote'])
-    context = {'result_list': result_list,
-               'species': species, 'family': family,
+    context = {'result_list': result_list, 'species': species,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role,
                }

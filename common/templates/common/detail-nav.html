@@ -1,13 +1,4 @@
 <style>
-
-/*  .btn-group-xs > .btn, .btn-xs {*/
-/*    padding  : 8px 30px;*/
-/*    !*padding  : .5rem .5rem;*!*/
-/*    font-size  : .8rem;*/
-/*    line-height  : .65;*/
-/*    border-radius : .2rem;*/
-/*  }*/
-
 .nav2 {
     font-size: 13px;
 }
@@ -109,9 +100,9 @@
                         {% if tab == 'pro' %}Progeny{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
                     </a>
                     <div class="nav3 dropdown-menu">
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro&prim=1" data-nosnippet>Immediate offspring</a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=pro" data-nosnippet>Progeny</a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=proimg" data-nosnippet>images</a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Progeny</a>
+                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>images</a>
                     </div>
                 </li>
 
@@ -122,8 +113,8 @@
                             </a>
                             <div class="nav2 dropdown-menu">
                             {% if species.gen.family.family == 'Orchidaceae' %}
-                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=anc" data-nosnippet>Ancestry list</a>
-                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&tab=tree" data-nosnippet>Ancestry tree</a>
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Ancestry list</a>
+                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Ancestry tree</a>
                             {% endif %}
                            </div>
                         </li>

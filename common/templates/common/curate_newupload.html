@@ -115,11 +115,11 @@ img{
                                 <div style="font-size:12px">
                                     {% if image.pid %}
                                         {% if image.binomial == image.pid.binomial %}
-                                            <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
+                                            <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
                                         {% else %}
                                             {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                         <br>
-                                            <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                            <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
                                         {% endif %}
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}

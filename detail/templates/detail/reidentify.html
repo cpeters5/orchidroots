@@ -12,11 +12,11 @@
      <div class="tab-content clearfix" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;min-height:1000px">
         <br>
          <div class="container" style="width:90%;font-size:13px;">
-             <form method="post" action="{% url 'detail:reidentify' orid=img.id pid=img.pid_id %}?family={{family.family}}&role={{role}}&tab={{tab}}">
+             <form method="post" action="{% url 'detail:reidentify' orid=img.id pid=img.pid_id %}?family={{family.family}}&role={{role}}" rel="nofollow noreferrer noopener">
                  {% csrf_token %}
                  <span style="font-size:16px;">
                      <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                     <a href="{% url 'display:photos' species.pid %}?family={{family.family}}&role={{role}}&tab=sum&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                     <a href="{% url 'display:photos' species.pid %}?role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
                  </span>
                  <br>
                         {{form.genus|as_crispy_field}}
