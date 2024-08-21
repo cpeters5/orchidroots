@@ -281,9 +281,9 @@ a:hover {
         <div  class="p-2 justify-content-center align-items-center">
         {% if msg %}<span style="text-align:center; color: red">{{msg}}</span>{% endif %}
         {% if user.tier.tier > 2 %}
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}">Recently approved</a>
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}">All pending photos</a>
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}">New uploaded photos</a>
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newapproved' %}?family={{family}}" rel="nofollow noreferrer noopener">Recently approved</a>
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?family={{family}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">All pending photos</a>
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">New uploaded photos</a>
         {% endif %}
 <!--        {% if user.tier.tier > 1 %}-->
 <!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
@@ -292,9 +292,9 @@ a:hover {
             &nbsp;&nbsp;
         {% if user.is_authenticated %}
             {% if owner == 'Y' %}
-                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=N">Click to view all {{species.binomial_it|safe}} photos</a>
+                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
-                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=Y">Click to view only my photos</a>
+                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
             {% endif %}
         {% endif %}
 <!--                <form action="?" style="display:inline-block; margin-top: 5px;">-->
@@ -321,7 +321,7 @@ a:hover {
                              <a target="_blank" href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
                                   {{image.id}}: {{image.imgname}}
                                   <br>{{image.get_displayname}}
-                                  <br>{{image.text_data|default:''|safe}}">
+                                  <br>{{image.text_data|default:''|safe}}" rel="nofollow noreferrer noopener">
                                   <img class="thumbnails" alt="" src="{% static 'media/' %}{{image.image_file_path}}">
                                   <div class="text text-br">{{image.id}}
                                   </div>
@@ -339,7 +339,7 @@ a:hover {
                      {% endif %}
                      <br>
                      <div style="font-size:10px">
-                        <a href="{{image.source_url}}">{{image.get_displayname}}</a>
+                        <a href="{{image.source_url}}" rel="nofollow noreferrer noopener">{{image.get_displayname}}</a>
 <!--                            Private and curate role may delete photos-->
                         {% if role == "cur" or image.author.author_id == user.photographer.author_id %}
                          <br>
@@ -347,12 +347,12 @@ a:hover {
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
                                 {% if family.family == 'Orchidaceae' %}
-                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid.pid %}?id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
                                 {% else %}
-                                    <a href="{% url 'common:approvemediaphoto' image.pid.pid %}?family={{species.gen.family}}&id={{image.id}}&tab={{tab}}&gen={{species.gen.pid}}&action=file">Approve</a> |
+                                    <a href="{% url 'common:approvemediaphoto' image.pid.pid %}?family={{species.gen.family}}&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
                                 {% endif %}
                             {% endif %}
-                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?family={{species.gen.family}}&role={{role}}&next=photos" >Delete</a>
+                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?role={{role}}&next=photos" rel="nofollow noreferrer noopener" >Delete</a>
                         {% endif %}
                      </div>
 

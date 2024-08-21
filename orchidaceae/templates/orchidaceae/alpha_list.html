@@ -42,9 +42,9 @@
                         <li class="page-item active"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="#" >{{opt}}</a></li>
                     {% else %}
                         {% if type == 'species' %}
-                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?family={{family}}&alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn={{syn}}" >{{opt}}</a></li>
+                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn={{syn}}" >{{opt}}</a></li>
                         {% else %}
-                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?family={{family}}&alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}&syn={{syn}}" >{{opt}}</a></li>
+                            <li class="page-item"><a class="page-link" {% if opt == alpha %} class="active" {% endif %} href="?alpha={{opt}}&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}&syn={{syn}}" >{{opt}}</a></li>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
@@ -52,9 +52,9 @@
                         <li class="page-item active"><a class="page-link" href="#">All </a></li>
                 {% else %}
                     {% if type == 'species' %}
-                        <li class="page-item"><a class="page-link" href="?family={{family}}&alpha=ALL&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn={{syn}}">All </a></li>
+                        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&year={{year}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn={{syn}}">All </a></li>
                     {% else %}
-                        <li class="page-item"><a class="page-link" href="?family={{family}}&alpha=ALL&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}">All </a></li>
+                        <li class="page-item"><a class="page-link" href="?alpha=ALL&role={{role}}&type={{type}}&year={{year}}&sf={{sf}}&t={{t}}&st={{st}}&genus={{genus}}&genustype={{genustype}}&display={{display}}&seed_genus={{seed_genus}}&seed={{seed}}&pollen_genus={{pollen_genus}}&pollen={{pollen}}">All </a></li>
                     {% endif %}
                 {% endif %}
     </ul>

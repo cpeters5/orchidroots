@@ -88,10 +88,10 @@ a:hover {
                     </dev>
                 </button>
                 <ul class="dropdown-menu scrollable-menu" style="margin:0">
-                    <li><a href="?family=Orchidaceae&genustype=species&year={{ year }}&genus={{genus}}&author={{author}}" >&nbsp;&nbsp;<span style="font-size: 12px;">Accepted Genus&nbsp;</span></a></li>
-                    <li><a href="?family=Orchidaceae&genustype=hybrid&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Nothogenus &nbsp;&nbsp;</span></a></li>
-                    <li><a href="?family=Orchidaceae&genustype=synonym&status=synonym&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Synonym </span></a></li>
-                    <li><a href="?family=Orchidaceae&genustype=all&year={{ year }}&genus={{genus}}" >&nbsp;&nbsp;<span style="font-size: 12px;">All Genera</span></a></li>
+                    <li><a href="?genustype=species&year={{ year }}&genus={{genus}}&author={{author}}" >&nbsp;&nbsp;<span style="font-size: 12px;">Accepted Genus&nbsp;</span></a></li>
+                    <li><a href="?genustype=hybrid&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Nothogenus &nbsp;&nbsp;</span></a></li>
+                    <li><a href="?genustype=synonym&status=synonym&year={{ year }}&genus={{genus}}&author={{author}}">&nbsp;&nbsp;<span style="font-size: 12px;">Synonym </span></a></li>
+                    <li><a href="?genustype=all&year={{ year }}&genus={{genus}}" >&nbsp;&nbsp;<span style="font-size: 12px;">All Genera</span></a></li>
                 </ul>
             </div>
             {% if genustype == 'hybrid' %}
@@ -100,9 +100,9 @@ a:hover {
                         {% if formula1 %}<span style="color:black">{{formula1}}</span>{% else %} Parent Genus 1{% endif %}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{formula2}}">-----</a></li>
+                        <li><a href="?genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{formula2}}">-----</a></li>
                         {% for g in genus_lookup %}
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{g.genus}}&Cattleya&formula2={{formula2}}">&nbsp;{{g.genus}}</a></li>
+                        <li><a href="?genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{g.genus}}&Cattleya&formula2={{formula2}}">&nbsp;{{g.genus}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -111,9 +111,9 @@ a:hover {
                         {% if formula2 %}<span style="color:black">{{formula2}}</span>{% else %} Parent Genus 2{% endif %}
                     </button>
                     <ul class="dropdown-menu scrollable-menu" >
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{formula1}}">-----</a></li>
+                        <li><a href="?genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula1={{formula1}}">-----</a></li>
                         {% for g in genus_lookup %}
-                        <li><a href="?family=Orchidaceae&genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{g.genus}}&formula1={{formula1}}">&nbsp;{{g.genus}}</a></li>
+                        <li><a href="?genustype=hybrid&status=&sf=&t=&st=&genus=&year={{year}}&formula2={{g.genus}}&formula1={{formula1}}">&nbsp;{{g.genus}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -127,11 +127,11 @@ a:hover {
                         {% if sf_obj.subfamily %}<span style="color:black">&nbsp;{{sf_obj.subfamily}}</span>{% else %}Subfamily{% endif %}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li>{% if sf_obj %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf=&t=&st=&genustype={{genustype}}">-----</a>
+                        <li>{% if sf_obj %}<a href="?genus={{genus}}&year={{ year }}&sf=&t=&st=&genustype={{genustype}}">-----</a>
                             {% endif %}
                         </li>
                         {% for sf in sf_list %}
-                        <li>{% if sf.subfamily != sf_obj.subfamily %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf={{sf.subfamily}}&t=&st=&genustype={{genustype}}">{{sf.subfamily}}</a>
+                        <li>{% if sf.subfamily != sf_obj.subfamily %}<a href="?genus={{genus}}&year={{ year }}&sf={{sf.subfamily}}&t=&st=&genustype={{genustype}}">{{sf.subfamily}}</a>
                             {% else %}<a href="#">{{sf_obj.subfamily}}</a>
                             {% endif %}
                         </li>
@@ -148,11 +148,11 @@ a:hover {
                     </button>
 
                     <ul class="dropdown-menu scrollable-menu">
-                        <li>{% if t_obj %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&genustype={{genustype}}&author={{author}}">-----</a>
+                        <li>{% if t_obj %}<a href="?genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&genustype={{genustype}}&author={{author}}">-----</a>
                             {% endif %}
                         </li>
                         {% for t in t_list %}
-                        <li>{% if t.tribe != t_obj.tribe %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t.tribe}}&st=&genustype={{genustype}}&author={{author}}">{{t.tribe}}</a>
+                        <li>{% if t.tribe != t_obj.tribe %}<a href="?genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t.tribe}}&st=&genustype={{genustype}}&author={{author}}">{{t.tribe}}</a>
                             {% else %}<a href="#">{{t_obj.tribe}}</a>
                             {% endif %}
                         </li>
@@ -169,11 +169,11 @@ a:hover {
                     </button>
 
                     <ul class="dropdown-menu scrollable-menu">
-                        <li>{% if st_obj %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t_obj.tribe}}&st=&genustype={{genustype}}&author={{author}}">-----</a>
+                        <li>{% if st_obj %}<a href="?genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t_obj.tribe}}&st=&genustype={{genustype}}&author={{author}}">-----</a>
                             {% endif %}
                         </li>
                         {% for st in st_list %}
-                        <li>{% if st.subtribe != st_obj.subtribe %}<a href="?family=Orchidaceae&genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t_obj.tribe}}&st={{st.subtribe}}&genustype={{genustype}}&author={{author}}">{{st.subtribe}}</a>
+                        <li>{% if st.subtribe != st_obj.subtribe %}<a href="?genus={{genus}}&year={{ year }}&sf={{sf_obj.subfamily}}&t={{t_obj.tribe}}&st={{st.subtribe}}&genustype={{genustype}}&author={{author}}">{{st.subtribe}}</a>
                             {% else %}<a href="#">{{st_obj.subtribe}}</a>
                             {% endif %}
                         </li>
@@ -182,7 +182,7 @@ a:hover {
                 </div>
                 {% endif %}
             {% endif %}
-<!--                <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species</a>-->
+<!--                <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}">Go to Species</a>-->
 
 
 <!--Main table-->
@@ -196,7 +196,7 @@ a:hover {
                     <!--main table-->
                     <div class="flex">
                         <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
-                            <thead>
+                            <thead style="background-color: #e3e3e3">
                                     <th class="text-center">Genus</th>
 
                                     {% if status == 'synonym' %}
@@ -229,11 +229,11 @@ a:hover {
                                     {% if genus.status == 'synonym' %}
                                         <i>{{genus.genus}}</i> {% if genus.author %}{{genus.author}}{% endif %} {% if genus.year > 0 %}{{genus.year}}{% endif %}
                                     {% elif genus.type == 'species' %}
-                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
+                                        <a href="{% url 'orchidaceae:species' %}?genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
                                     {% elif genus.type == 'hybrid' %}
-                                        <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
+                                        <a href="{% url 'orchidaceae:hybrid' %}?genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {% if genus.author %}{{genus.author}}{% endif %} {{genus.year}}
                                     {% else %}
-                                        <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {{genus.year}}
+                                        <a href="{% url 'orchidaceae:species' %}?genus={{genus.genus}}&genustype={{genus.type}}"><i>{{genus.genus}}</i></a> {{genus.year}}
                                     {% endif %}
                                     </td>
 
@@ -243,9 +243,9 @@ a:hover {
                                             {% if genus.status == 'synonym' %}
                                                 Synonym of
                                                 {% if genus.type == 'species' %}
-                                                    <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
+                                                    <a href="{% url 'orchidaceae:species' %}?genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
                                                 {% else %}
-                                                    <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
+                                                    <a href="{% url 'orchidaceae:hybrid' %}?genus={{genus.getAcc}}&genustype={{genus.type}}">{{genus.getAccepted|safe}}</a> {{genus.getAcc.year}}
                                                 {% endif %}
                                             {% elif genus.type == 'species' %}{{genus.get_description}}
                                             {% elif genus.type == 'hybrid' %} hybrid ({{genus.get_description}})
@@ -259,14 +259,14 @@ a:hover {
                                         <td class="align-center">
                                             <span  style="font-size: 10px;">
                                             {% if genus.type == 'species' %}
-                                                <a href="{% url 'orchidaceae:species' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
+                                                <a href="{% url 'orchidaceae:species' %}?genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
                                             {% else %}
-                                                <a href="{% url 'orchidaceae:hybrid' %}?family={{family}}&genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
+                                                <a href="{% url 'orchidaceae:hybrid' %}?genus={{genus.getAcc}}&status=synonym"><i>{{genus.getAccepted|safe}}</i></a> {{genus.getAcc.year}}
                                             {% endif %}
                                             </span>
                                         </td>
                                     {% else %}
-                                    <td class="align-center d-none d-sm-block d-none d-sm-table-cell"><a href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&sf={{genus.subfamily}}&tribe={{genus.tribe}}&st={{genus.subtribe}}&role={{role}}&genustype={{genustype}}">{{genus.subfamily|default:''}} {{genus.tribe|default:''}} {{genus.subtribe|default:''}}</a></td>
+                                    <td class="align-center d-none d-sm-block d-none d-sm-table-cell"><a href="{% url 'orchidaceae:genera' %}?sf={{genus.subfamily}}&tribe={{genus.tribe}}&st={{genus.subtribe}}&role={{role}}&genustype={{genustype}}">{{genus.subfamily|default:''}} {{genus.tribe|default:''}} {{genus.subtribe|default:''}}</a></td>
                                     {% endif %}
 
                                     {% if genustype != 'hybrid' %}
@@ -278,7 +278,7 @@ a:hover {
                                     <td class="text-center small-font"><a href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=hybrid&genus={{genus}}&display=checked">{{genus.num_hyb_with_image|default:''}}</a></td>
                                     <td class="text-center small-font">{{genus.get_roundhybpct|default:''}}</td>
                                     <td class="text-center small-font">
-                                       <a href="{% url 'orchidaceae:species' %}?family={{family}}&status=synonym&genus={{genus}}"><span style="font-size: 10px;"> {{genus.num_synonym|default:''}}</span></a>
+                                       <a href="{% url 'orchidaceae:species' %}?status=synonym&genus={{genus}}"><span style="font-size: 10px;"> {{genus.num_synonym|default:''}}</span></a>
                                     </td>
                                 </tr>
                                 {% endfor %}

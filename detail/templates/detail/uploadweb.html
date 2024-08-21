@@ -32,7 +32,7 @@
                      {% csrf_token %}
                      <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
 <!--                     {% if user.tier.tier > 3 %}-->
-<!--                         <a href="{% url 'detail:uploadweb' species.pid %}?tab=sum&role={{role}}&next=cont">&nbsp;&nbsp;&nbsp;Save and add another</a>-->
+<!--                         <a href="{% url 'detail:uploadweb' species.pid %}?role={{role}}&next=cont">&nbsp;&nbsp;&nbsp;Save and add another</a>-->
 <!--                     {% endif %}-->
                  {% endif %}
 
@@ -40,7 +40,7 @@
                      <input type="hidden" name="author" value="{{author.author_id}}" >
                      <input type="hidden" name="role" value="{{role}}" >
                      <input type="hidden" name="image_file" value="{{img.image_file }}" >
-                     <a href="{% url 'display:photos' species.pid %}?family={{family.family}}&role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                     <a href="{% url 'display:photos' species.pid %}?family={{family.family}}&role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
 
                      <div class="form-row">
                          <div class="form-group col-md-6 mb-0">
@@ -73,7 +73,7 @@
                      {{form.text_data|as_crispy_field}}
                      <span style="font-size:16px;">
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                        <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&variety={{var}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
                      </span>
                      <input type="hidden" name="role" value="{{ role }}" >
                  </form>

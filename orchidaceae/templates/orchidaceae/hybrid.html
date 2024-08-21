@@ -8,34 +8,6 @@
 
 <style>
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 1;
-    top: 100%;
-    left: 50%;
-    margin-left: -60px;
-    margin-left: -60px;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
-
 a {
     text-decoration: none;
     color: blue;
@@ -91,7 +63,7 @@ option {
     <div class="card" style="width:100%;">
         <div class="card-header">
             <h4>{{genus|title}} Hybrid List
-                    - <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Show species List</a>
+                    - <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Show species List</a>
                 <form action="?" id="myspecies" style="display:inline-block">
                     <input type="hidden" name="family" value="{{family}}" >
                     <input type="hidden" name="genus" value="{{genus}}" >
@@ -100,46 +72,11 @@ option {
                     <input type="hidden" name="primary" value="{{primary}}" >
                     <input type="hidden" name="syn" value="{{syn}}" >
                     <input type="hidden" name="req_type" value="hybrid" >
-                    {% if myspecies %}
-                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">Show My hybrids</span>
-                    {% else %}
-                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">Show My hybrids</span>
-                    {% endif %}
                 </form>
             </h4>
                 {% if total > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
                     <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
                 {% endif %}
-<!--                <form action="?" id="display" style="display:inline-block; margin-top: 5px;">-->
-<!--                    <input type="hidden" name="genus" value="{{genus}}" >-->
-<!--                    <input type="hidden" name="family" value="{{family.family}}" >-->
-<!--                    <input type="hidden" name="alpha" value="{{alpha}}" >-->
-<!--                    {% if syn == 'N' %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">-->
-<!--                    <span style="margin:0 30px;font-size:13px;">hide synonyms</span>-->
-<!--                    {% else %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin:10px 0 0 0;">-->
-<!--                    <span style="margin:0 30px;font-size:13px;">hide synonyms</span>-->
-<!--                    {% endif %}-->
-<!--                </form>-->
-<!--                <form action="?" id="primary" style="display:inline-block; margin-top: 5px;">-->
-<!--                    <input type="hidden" name="family" value="{{family}}" >-->
-<!--                    <input type="hidden" name="role" value="{{role}}" >-->
-<!--                    <input type="hidden" name="subfamily" value="{{subfamily}}" >-->
-<!--                    <input type="hidden" name="tribe" value="{{tribe}}" >-->
-<!--                    <input type="hidden" name="subtribe" value="{{subtribe}}" >-->
-<!--                    <input type="hidden" name="genus" value="{{genus}}" >-->
-<!--                    <input type="hidden" name="syn" value="{{syn}}" >-->
-<!--                    <input type="hidden" name="myspecies" value="{{myspecies}}" >-->
-<!--                    {% if primary == 'Y' %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="primary" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">primary hybrid</span>-->
-<!--                    {% else %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="primary" value="Y" onchange="this.form.submit()" style="margin:10px 0 0 0;"> <span style="margin:0 30px;font-size:13px;">primary hybrid</span>-->
-<!--                    {% endif %}-->
-<!--                </form>-->
-                &nbsp;
-
-            </h4>
         </div>
 
         <!--Filter-->
@@ -184,7 +121,7 @@ option {
             <div style="width:100%; margin: 0 auto;background-color: white;">
                 <table class="table table-sm table-condensed table-bordered table-hover" id="sortTable" style="">
                     <thead>
-                        <tr class="center">
+                        <tr class="center" style="background-color: #e3e3e3">
                             <th class="text-center">Grex</th>
                             <th class="text-center">Parentage</th>
                             <th class="text-center">Registrant</th>
@@ -198,31 +135,31 @@ option {
                     </thead>
                         {% for spc in my_list %}
                             <tr>
-                                <td align="left"><a href="{% url 'display:information' spc.pid %}?family={{spc.gen.family}}&role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
+                                <td class="align-left"><a href="{% url 'display:information' spc.pid %}?role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
                                 <td class="align-center">
                                     {% if spc.status == 'synonym' %}
                                     Synonym of
                                         {% if spc.getAccepted %}
-                                            <a href="{% url 'display:information' spc.getAccepted.pid %}?family={{spc.gen.family}}&role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.getAccepted.pid %}?role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
                                         {% else %}}
                                             {{spc.getAccepted.name|safe}}
                                         {% endif %}
                                     {% else %}
                                         {% if spc.hybrid.seed_id.type == 'species' %}
                                             {% if spc.hybrid.seed_id_id %}
-                                                <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                                <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                             {% else %}
                                                 <a href="#">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                             {% endif %}
                                         {% elif spc.hybrid.seed_id.type == 'hybrid' %}
-                                            <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                             ×
                                         {% if spc.hybrid.pollen_id.type == 'species' %}
-                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% elif spc.hybrid.pollen_id.type == 'hybrid' %}
-                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?family={{spc.gen.family}}&role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                     {% endif %}
@@ -230,8 +167,8 @@ option {
                                 <td>{{spc.author|default:''}}</td>
                                 <td>{{spc.originator|default:''}}</td>
                                 <td>{{spc.year|default:''}}</td>
-                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:ancestor' spc.pid %}?family={{spc.gen.family}}&role={{role}}">{{spc.num_ancestor|default:''}}</a></td>
-                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:progeny' spc.pid %}?family={{spc.gen.family}}&role={{role}}">{{spc.num_descendant|default:''}}</a></td>
+                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:ancestor' spc.pid %}?role={{role}}">{{spc.num_ancestor|default:''}}</a></td>
+                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:progeny' spc.pid %}?role={{role}}">{{spc.num_descendant|default:''}}</a></td>
                                 <td class="d-none d-sm-table-cell text-center">{{spc.num_image|default:''}}</td>
                             </tr>
                         {% endfor %}

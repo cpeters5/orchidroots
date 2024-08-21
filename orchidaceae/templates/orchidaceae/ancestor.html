@@ -8,14 +8,6 @@
 
 <style>
 
-.border-lb {
-    border: 1px solid #ccc;
-    border-width: 0 0 1px 1px;
-}
-.border-rb {
-    border: 1px solid #ccc;
-    border-width: 0 1px 1px 1px;
-}
 
 
 .table {
@@ -23,28 +15,13 @@
     margin:0 auto;
 }
 
-.table-anc {
-    width:600px;
-    font-size: 13px;
-    clear:left ;
-    margin:10px;
-}
-
 @media only screen and (max-width: 800px) {
     .table {
         width:100%;
     }
-    .table-anc {
-        width: 500px;
-        font-size: 11px;
-    }
 }
 
 @media only screen and (max-width: 600px){
-    .table-anc {
-        font-size:10px;
-        width: 350px;
-    }
 }
 
 
@@ -60,7 +37,7 @@
             <br>
             {% if anc_list %}
                <table id="myTable"  class="table table-condensed table-sm table-hover">
-                 <thead>
+                 <thead style="background-color: #e3e3e3">
                         <th class="text-left">Ancestors</th>
                         <th class="text-center">type</th>
                         <th class="text-center">%</th>
@@ -70,7 +47,7 @@
                     <tr>
                         <td class="text-left">
                         {% if anc.aid.pid > 0 %}
-                        <a href="{% url 'display:information' anc.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{anc.aid.name|safe}}</a>
+                        <a href="{% url 'display:information' anc.aid.pid %}?role={{role}}">{{anc.aid.name|safe}}</a>
                         {% else %}
                             unknown
                         {% endif %}

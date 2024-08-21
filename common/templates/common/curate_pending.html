@@ -136,9 +136,9 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="speciesDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&tab=upl&type= all&days={{days}}">all private photos</a>
-                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&tab=upl&type=species&days={{days}}">private species</a>
-                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&tab=upl&type=hybrid&days={{days}}">private hybrid</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&type= all&days={{days}}">all private photos</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&type=species&days={{days}}">private species</a>
+                                <a class="dropdown-item" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&type=hybrid&days={{days}}">private hybrid</a>
                             </div>
                         </div>
                         &nbsp;
@@ -151,11 +151,11 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="hybridDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days="></a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=3">past 3 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=7">past 7 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=20">past 20 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&tab=upl&type={{type}}&days=30">past 30 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days="></a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=3">past 3 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=7">past 7 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=20">past 20 days</a>
+                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=30">past 30 days</a>
                             </div>
                         </div>
                     </div>
@@ -169,13 +169,13 @@ div.text-br {
                         {% for image in file_list %}
                             <div class="imageitem p-1 justify-content-center">
                                 <div class="box">
-                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">
+                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">
                                         <img class="thumbnails" alt="" src="{% static image.image_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&tab=sum&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
+                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
                                     <br>Approved by {{image.approved_by}}, {{image.modified_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>

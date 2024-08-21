@@ -3,7 +3,7 @@
 {% load humanize %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="description" content="Information about orchids and other selected plant and animal families.">
@@ -24,6 +24,7 @@
 <!--    {% else %}-->
 <!--        <title>Orchidroots</title>-->
 <!--    {% endif %}-->
+
     <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -55,6 +56,45 @@
 <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
 <link rel="stylesheet" href="{% static '/utils/css/style.css' %}">
 <link rel="stylesheet" href="{% static '/utils/css/index.css' %}">
+
+
+
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>-->
+<!--    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
+
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">-->
+<!--    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>-->
+<!--    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>-->
+
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">-->
+<!--&lt;!&ndash;    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" crossorigin="anonymous">&ndash;&gt;-->
+<!--    <link rel="stylesheet"-->
+<!--      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"-->
+<!--      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"-->
+<!--      crossorigin="anonymous">-->
+
+
+<!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>-->
+<!--    <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Fondamento" rel="stylesheet">-->
+<!--    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+<!--    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">-->
+<!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+<!--	<link rel="{% static '/utils/css/style.css' %}">-->
+<!--	<link rel="{% static '/utils/css/index.css' %}">-->
+
+<!--&lt;!&ndash;    For dataTable column reorder&ndash;&gt;-->
+<!--    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.18/css/jquery.dataTables.min.css">-->
+<!--    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.dataTables.min.css">-->
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+<!--    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>-->
+<!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>-->
+<!--    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>-->
+<!--    <script src="https://cdn.datatables.net/colreorder/1.5.5/js/dataTables.colReorder.min.js"></script>-->
+
 
 </head>
 
@@ -539,6 +579,43 @@ nav .search-container button:hover {
     cursor: not-allowed;
 }
 
+/* Default styles (for larger screens) */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.5em 1em;
+    margin-left: 2px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background-color: #f9f9f9;
+    color: #333;
+    width: 20px;
+    height: 20px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    width: 60px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Styles for smaller screens (700px and below) */
 @media screen and (max-width: 700px) {
     .dataTables_wrapper .dataTables_paginate .paginate_button {
@@ -576,7 +653,7 @@ nav .search-container button:hover {
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand mb-0 bannerfont" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; float: left" data-nosnippet><b>Orchid<br>R<span style="font-size:14px;">oots</span></b></a>
+            <a class="navbar-brand mb-0 bannerfont" href="/?role={{role}}" style="color: #ffff07;line-height: 11px; float: left"><b>Orchid<br>R<span style="font-size:14px;">oots</span></b></a>
             <!-- Brand -->
         </div>
 <!-- Links -->
@@ -584,45 +661,41 @@ nav .search-container button:hover {
         <div class="collapse navbar-collapse" id="nav-content">
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string" id="search_string" pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
-            </form>
-            <form class="form-inline" id="searchtest" action="/search/search_test/" style="margin-top: 5px;">
-                <input type="hidden" form="searchtest" name="role" value="{{ role }}" >
-                <input class="searchbox" form="searchtest" value="{{search_test_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="search anything" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
             </form>
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <div class="nav-item dropdown" style="">
-                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white" data-nosnippet>{{user}}&nbsp;</span></a>
+                        <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
                         <ul class="dropdown-menu">
                             {% if user.tier.tier > 2 %}
                                 {% if user.tier.tier == 5 %}
-                                    <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae" data-nosnippet>Orchidroots</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}" data-nosnippet>Admin</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" data-nosnippet>Maintenance</a></li>
-                                    <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/" data-nosnippet>Google Analytics</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae" rel="nofollow noreferrer noopener" data-nosnippet>Orchidroots</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Admin</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
+                                    <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
                                     {% if species %}
-                                        <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" data-nosnippet>Public</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
                                     {% else %}
-                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked" data-nosnippet>Browse</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'gallery:index' %}" data-nosnippet>Gallery</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'gallery:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Gallery</a></li>
                                 {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" data-nosnippet>View new uploads</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" rel="nofollow noreferrer noopener" data-nosnippet>View new uploads</a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" data-nosnippet>Orchid Species</a></li>
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" data-nosnippet>Orchid Hybrids</a></li>
-                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&tab=brg&role=pri" data-nosnippet>My Collection</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" rel="nofollow noreferrer noopener" data-nosnippet>Orchid Species</a></li>
+                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" rel="nofollow noreferrer noopener" data-nosnippet>Orchid Hybrids</a></li>
+                            <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&role=pri" rel="nofollow noreferrer noopener" data-nosnippet>My Collection</a></li>
 <!--                            <hr style="margin:0;padding:0;">-->
-                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/" data-nosnippet>Update profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/" data-nosnippet>Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/" rel="nofollow noreferrer noopener" data-nosnippet>Update profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}?next=/" rel="nofollow noreferrer noopener" data-nosnippet>Logout</a></li>
                             {% if user.tier.tier > 1 %}
                             <li>Role</li>
-                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked" data-nosnippet>Public</a></li>
-                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked" data-nosnippet>Private</a></li>
+                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
+                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Private</a></li>
                                 {% if user.tier.tier > 2 %}
-                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked" data-nosnippet>Curate</a></li>
+                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Curate</a></li>
                                 {% endif %}
                             {% endif %}
                         </ul>
@@ -657,16 +730,15 @@ nav .search-container button:hover {
 
 <!--Second navbar-->
 <div class="p-2" style="background-color:black; color: white !important; font-size: 11px;">
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked&role={{role}}">Orchids</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked&role={{role}}">Fungi</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked&role={{role}}">Plants</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked&role={{role}}">Birds</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked&role={{role}}">Animals</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?">Gallery</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked&role={{role}}" data-nosnippet>Orchids</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked&role={{role}}" data-nosnippet>Fungi</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked&role={{role}}" data-nosnippet>Plants</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked&role={{role}}" data-nosnippet>Birds</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked&role={{role}}" data-nosnippet>Animals</a>
+     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?" data-nosnippet>Gallery</a>
 <!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
     </div>
-
-{% include "main_message.html" %}
+</div>
 
     {%  block body %}
 
@@ -701,8 +773,9 @@ nav .search-container button:hover {
 
 })(jQuery);
 
+
 document.getElementById('search').addEventListener('submit', function(event) {
-    var input = document.getElementById('search_string').value;
+    var input = document.getElementById('your-input-id').value;
     if (!/^[\u0000-\u007F]*$/.test(input)) {
         event.preventDefault();
         alert('Please use only supported characters.');
@@ -711,8 +784,7 @@ document.getElementById('search').addEventListener('submit', function(event) {
 
 </script>
 
-
-
+{% endblock %}
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -722,7 +794,6 @@ document.getElementById('search').addEventListener('submit', function(event) {
 </script>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
-{% endblock %}
 
 </body>
 </html>

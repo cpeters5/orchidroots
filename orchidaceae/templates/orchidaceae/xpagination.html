@@ -1,0 +1,78 @@
+<style>
+.pagination {
+    font-size:11px;
+    padding:2px 6px;
+    /*margin-top: 5px;*/
+    margin-block-end: 5px;
+}
+.pagination a{
+    font-size:11px;
+    padding:4px 8px;
+    margin: 2px;
+}
+.pagination a.hover {
+    background-color: #f5f9f9;
+}
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.pagination ul {
+   margin: 0; padding: 0;
+    list-style-type: none;
+    list-style-image: none;
+
+}
+
+.pagination li
+{
+    float: left;
+    display:inline-block;
+    /*margin: 20px 0;*/
+}
+
+
+</style>
+            <!--Page-->
+    <ul class="pagination pagination-xs">
+    {% if last_page > 1 %}
+        {% if last_page > num_show %}
+            {% if my_list.number > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&gn={{gn}}&pp={{pollen}}&a={{accepted}}">
+                <span class="fa fa-angle-double-left" style="font-size:15px;"></span>
+            </a>
+        </li>
+            {% else %}
+        <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left" style="font-size:15px;"></span></a></li>
+            {% endif %}
+        {% endif %}
+        {% if my_list.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{my_list.previous_page_number}}&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gn={{gn}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&pp={{pollen}}&a={{accepted}}"><span class="fa fa-angle-left" style="font-size:15px"></span></a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left" style="font-size:15px"></span></a></li>
+        {% endif %}
+        {% for pg in page_range %}
+            {% if my_list.number == pg %}
+        <li class="page-item"><a class="page-link" class="active" href="?page={{pg}}&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gn={{gn}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&pp={{pollen}}&a={{accepted}}" style="background-color:#4CAF50;">{{pg}}</a></li>
+            {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{pg}}&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gn={{gn}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&pp={{pollen}}&a={{accepted}}">{{pg}}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if my_list.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{my_list.next_page_number}}&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gn={{gn}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&gn={{gn}}&pp={{pollen}}&a={{accepted}}"><span class="fa fa-angle-right" style="font-size:15px;"></span></a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right" style="font-size:15px"></span></a></li>
+        {% endif %}
+        {% if last_page > num_show %}
+            {% if my_list.number < last_page %}
+        <li class="page-item"><a class="page-link" href="?page={{last_page}}&alpha={{alpha}}&year={{year}}&type={{type}}&status={{status}}&sort={{sort}}&genus={{genus}}&genustype={{genustype}}&spc={{species}}&g={{g}}&sf={{sf_obj.sf}}&t={{t_obj.t}}&st={{st_obj.st}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&dist={{dist}}&author={{author}}&originator={{originator}}&parent={{parent}}&ancestor={{ancestor}}&gn={{gn}}&gen={{genus.pid}}&d={{d}}&sp={{seed}}&pp={{pollen}}&a={{accepted}}">
+            <span class="fa fa-angle-double-right" style="font-size:15px;"></span></a></li>
+            {% else %}
+        <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right" style="font-size:15px;"></span></a></li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    </ul>

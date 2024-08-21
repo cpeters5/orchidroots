@@ -227,12 +227,6 @@ img{
         font-size: 12px;
         text-align:center;
     }
-    .info {
-        font-size: 11px;
-        /*width:80%;*/
-        margin:0 auto;
-        padding: 15px;
-    }
 }
 
 #main {
@@ -365,7 +359,7 @@ seedparent, pollparent {
                             </div>
                         {% endfor %}
                     </div>
-                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}"><b>more ... </b></a></span>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
                 {% else %}
                     <div style="width: 80%; font-size:16px;border:0 solid lightgrey; margin:50px auto; text-align: center; padding:10px">
                         No image available.
@@ -373,7 +367,7 @@ seedparent, pollparent {
                         Please try the accepted species <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted}}</a>
                         {% else %}
                             if you have one please consider uploading it
-                            <a href="/{{app}}/uploadfile/{{species.pid}}/?tab=sum">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
+                            <a href="/{{app}}/uploadfile/{{species.pid}}/" rel="nofollow noreferrer noopener">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
                             <a href="https://www.facebook.com/groups/BlueNanta/?ref=br_rs">Blue Nanta, OrchidRoots User's Group</a>.
                             Copyright credit and a link to your website will be displayed with every photo.
                         {% endif %}
@@ -390,7 +384,7 @@ seedparent, pollparent {
                         <div class="d-flex flex-wrap justify-content-center" >
                             {% if seedimg_list %}
                                 {% for seed in seedimg_list %}
-                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
+                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
                                         {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
                                             <img  class="thumbnails thumbnails2" alt="{{seed.pid.pid.textname}}" src="{% if seed.image_file %}{% static seed.thumb_dir %}{{seed.image_file}}{% else %}{{seed.image_url}}{% endif %}">
                                     </a>
@@ -456,7 +450,7 @@ seedparent, pollparent {
                                  <div class="d-flex flex-wrap justify-content-center">
                                    {% if ss_list %}
                                         {% for seedseed in ss_list %}
-                                                <a href="{% static seedseed.image_dir %}{{seedseed.image_file}}" data-lightbox="seedseed" data-title="
+                                                <a href="{% static seedseed.image_dir %}{{seedseed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seedseed" data-title="
                                                     <h6><small>{{seedseed.id}}: {{seedseed.imgname}}
                                                     {% if seedseed.text_data %}{{seedseed.text_data|safe}}{% endif %}</small></h6>">
                                                     <img  class="thumbnails thumbnails2" alt="{{seedseed.pid.pid.textname}}" src="{% static seedseed.thumb_dir %}{{seedseed.image_file}}">
@@ -468,7 +462,7 @@ seedparent, pollparent {
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.seed_id.hybrid.seed_id %}
-                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
                                     {% else %}
                                     Unknown
                                     {% endif %}

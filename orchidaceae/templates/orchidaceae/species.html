@@ -8,34 +8,6 @@
 
 <style>
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 1;
-    top: 100%;
-    left: 50%;
-    margin-left: -60px;
-    margin-left: -60px;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
-
 a {
     text-decoration: none;
     color: blue;
@@ -87,40 +59,6 @@ option {
 .btn-custom {
     width: 180px;
 }
-/* Pagination container */
-.dataTables_paginate {
-    padding-top: 10px;
-}
-
-/* Pagination buttons */
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 0.5em 1em;
-    margin-left: 2px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-/* Current/active page */
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-/* Hover state */
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-/* Disabled state */
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 </style>
 <br>
 <div style="clear:both"></div>
@@ -131,12 +69,11 @@ option {
             <h4>
                 {{genus|title}}
                 {% if genus.num_hybrid > 0 %}
-                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
                 {% endif %}
                 <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse</a>
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                     <input form="display" type="hidden" name="genus" value="{{genus}}" >
-                    <input form="display" type="hidden" name="family" value="{{family|default:'Orchidaceae'}}" >
                     <input form="display" type="hidden" name="alpha" value="{{alpha}}" >
                     <input form="display" type="hidden" name="myspecies" value="{{myspecies}}" >
                     <input form="display" type="hidden" name="subgenus" value="{{subgenus}}" >
@@ -150,21 +87,20 @@ option {
                         <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
                     {% endif %}
                 </form>
-                <form action="?" id="myspecies" style="display:inline-block">
-                    <input form="myspecies" type="hidden" name="genus" value="{{genus}}" >
-                    <input form="myspecies" type="hidden" name="family" value="{{family|default:'Orchidaceae'}}" >
-                    <input form="myspecies" type="hidden" name="subgenus" value="{{subgenus}}" >
-                    <input form="myspecies" type="hidden" name="section" value="{{section}}" >
-                    <input form="myspecies" type="hidden" name="subsection" value="{{subsection}}" >
-                    <input form="myspecies" type="hidden" name="alpha" value="{{alpha}}" >
-                    <input form="myspecies" type="hidden" name="role" value="{{role}}" >
-                    <input form="myspecies" type="hidden" name="syn" value="{{syn}}" >
-<!--                    {% if myspecies %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>-->
-<!--                    {% else %}-->
-<!--                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>-->
-<!--                    {% endif %}-->
-                </form>
+<!--                <form action="?" id="myspecies" style="display:inline-block">-->
+<!--                    <input form="myspecies" type="hidden" name="genus" value="{{genus}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="subgenus" value="{{subgenus}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="section" value="{{section}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="subsection" value="{{subsection}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="alpha" value="{{alpha}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="role" value="{{role}}" >-->
+<!--                    <input form="myspecies" type="hidden" name="syn" value="{{syn}}" >-->
+<!--&lt;!&ndash;                    {% if myspecies %}&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" checked onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                    {% else %}&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input type="checkbox" class="form-check-input" name="myspecies" value="1" onchange="this.form.submit()" style="margin:10px 0 0 0;"><span style="margin-left:30px;font-size:13px;">My species only</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                    {% endif %}&ndash;&gt;-->
+<!--                </form>-->
 
             </h4>
 
@@ -174,7 +110,6 @@ option {
         <div class="card-body d-flex flex-wrap" style="display:inline-block">
             <!--Genus-->
             <form action="?" id="filter" style="display:inline-block; margin-top: 5px;">
-                <input form="filter" type="hidden" name="family" value="{{family.|default:'Orchidaceae'}}" >
                 <input form="filter" type="hidden" name="alpha" value="{{alpha}}" >
                 <input form="filter" type="hidden" name="syn" value="N" >
                 <input form="filter" class="btn btn-custom p-1" form="filter" name="genus" onfocus="this.select()" value="{{genus}}" placeholder="genus" data-bs-toggle="tooltip"  data-placement="top" title="Genus" style="margin-right: 3px !important;">
@@ -187,9 +122,9 @@ option {
                     {{subgenus|default:"Select new subgenus"}}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="subfamButton">
-                    <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
+                    <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
                     {% for g in subgenus_list %}
-                        <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&subgenus={{g.subgenus}}&alpha=All&syn=N">{{g}}</a>
+                        <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&subgenus={{g.subgenus}}&alpha=All&syn=N">{{g}}</a>
                     {% endfor %}
                 </div>
             </div>
@@ -201,9 +136,9 @@ option {
                             {{section|default:"Select new section"}}
                         </button>
                         <div class="dropdown-menu" aria-labelledby="SectionButton">
-                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&syn=N">----</a>
+                            <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&syn=N">----</a>
                             {% for g in section_list %}
-                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&section={{g.section}}&alpha=All&syn=N">{{g}}</a>
+                                <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&section={{g.section}}&alpha=All&syn=N">{{g}}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -216,9 +151,9 @@ option {
                             {{subsection|default:"Select new subsection"}}
                         </button>
                         <div class="dropdown-menu" aria-labelledby="SubSectionButton">
-                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
+                            <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&alpha={{alpha}}&syn=N">----</a>
                             {% for g in subsection_list %}
-                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&subsection={{g.subsection}}&alpha=All&syn=N">{{g}}</a>
+                                <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&subsection={{g.subsection}}&alpha=All&syn=N">{{g}}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -230,9 +165,9 @@ option {
                             {{subseries|default:"Select new series"}}
                         </button>
                         <div class="dropdown-menu" aria-labelledby="seriesButton">
-                            <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&series={{g.series}}&alpha={{alpha}}&syn=N">----</a>
+                            <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&series={{g.series}}&alpha={{alpha}}&syn=N">----</a>
                             {% for g in series_list %}
-                                <a class="dropdown-item" href="?family={{family.family|default:'Orchidaceae'}}&role={{role}}&genus={{genus}}&series={{g.series}}&alpha=All&syn=N">{{g}}</a>
+                                <a class="dropdown-item" href="?role={{role}}&genus={{genus}}&series={{g.series}}&alpha=All&syn=N">{{g}}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -243,7 +178,6 @@ option {
             <!--Main table-->
     <div class="card m-2">
 
-    <!--Pagination        -->
     {% include "orchidaceae/alpha_list_species.html" %}
     {% if page_list %}
         <div class="flex">
@@ -252,7 +186,7 @@ option {
             <table id="sortTable"  class="table table-condensed table-sm  table-bordered table-hover">
                 <thead  class="thead-light">
     {#                First column - All options#}
-                    <tr class="center" bgcolor="#e3e3e3">
+                    <tr class="center" style="background-color: #e3e3e3">
                         <th class="text-center">Binomial</th>
                         <th class="text-center">Author</th>
                         <th class="text-center">Year</th>
@@ -269,15 +203,15 @@ option {
                             {% if species.status == 'synonym' %}
                                 <i>{{species.genus}} {{species.get_species}}</i>
                                     (syn. {% if species.getAcc %} {{species.getAccepted.pid}}
-                                            <a href="{ url 'display:information' species.getAccepted.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
+                                            <a href="{ url 'display:information' species.getAccepted.pid %}?role={{role}}">{{species.getAccepted.binomial|safe}}</a>)
                                         {% else %}
                                             {{species.getAccepted.binomial|safe}}
                                         {% endif %}
                             {% else %}
                                 {% if role == 'cur' %}
-                                    <a href="{% url 'display:photos' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role={{role}}"><i>{{species.binomial}}</i></a>
+                                    <a href="{% url 'display:photos' species.pid %}?role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% else %}
-                                    <a href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role={{role}}"><i>{{species.binomial}}</i></a>
+                                    <a href="{% url 'display:information' species.pid %}?role={{role}}"><i>{{species.binomial}}</i></a>
                                 {% endif %}
                             {% endif %}
                             {% if species.status == 'synonym' %}
@@ -287,10 +221,10 @@ option {
                         <td class="align-center">{{species.author|default:''}}</td>
                         <td class="align-center">{{species.year|default:''}}</td>
                         <td class="align-center">
-                            {% if species.accepted.subgenus %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&subgenus={{species.accepted.subgenus}}&type=species&genus={{genus}}">{{species.accepted.subgenus}}</a>{% endif %}
-                            {% if species.accepted.section %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&section={{species.accepted.section}}&type=species&genus={{genus}}">{{species.accepted.section}}</a>{% endif %}
-                            {% if species.accepted.subsection %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&subsection={{species.accepted.subsection}}&type=species&genus={{genus}}">{{species.accepted.subsection}}</a>{% endif %}
-                            {% if species.accepted.series %}<a href="?app=orchidaceae&family={{species.gen.family|default:'Orchidaceae'}}&alpha={{alpha}}&series={{species.accepted.series}}&type=species&genus={{genus}}">{{species.accepted.series}}</a>{% endif %}
+                            {% if species.accepted.subgenus %}<a href="?alpha={{alpha}}&subgenus={{species.accepted.subgenus}}&type=species&genus={{genus}}">{{species.accepted.subgenus}}</a>{% endif %}
+                            {% if species.accepted.section %}<a href="?alpha={{alpha}}&section={{species.accepted.section}}&type=species&genus={{genus}}">{{species.accepted.section}}</a>{% endif %}
+                            {% if species.accepted.subsection %}<a href="?alpha={{alpha}}&subsection={{species.accepted.subsection}}&type=species&genus={{genus}}">{{species.accepted.subsection}}</a>{% endif %}
+                            {% if species.accepted.series %}<a href="?alpha={{alpha}}&series={{species.accepted.series}}&type=species&genus={{genus}}">{{species.accepted.series}}</a>{% endif %}
                         </td>
                         <td class="align-center">
                             {% if species.status == 'synonym' %}
@@ -314,7 +248,6 @@ option {
             </table>
         <!--Pagination-->
         </div>
-        {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
     {% endif %}
     </div>
 </div>
@@ -336,19 +269,6 @@ for (var i = 0; i < toggler.length; i++) {
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
     var initialFilterValue = "{{ spc | default:'' | escapejs }}";
-
-    // $('[data-toggle="dropdown1"]').tooltip();
-    // var initialFilterValue = "{{ subgenus | default:'' | escapejs }}";
-    //
-    // $('[data-toggle="dropdown2"]').tooltip();
-    // var initialFilterValue = "{{ section | default:'' | escapejs }}";
-    //
-    // $('[data-toggle="dropdown3"]').tooltip();
-    // var initialFilterValue = "{{ subsection | default:'' | escapejs }}";
-    //
-    // $('[data-toggle="dropdown4"]').tooltip();
-    // var initialFilterValue = "{{ series | default:'' | escapejs }}";
-
     var table = $('#sortTable').DataTable({
         "info": true,
         "paging": true,  // Enable paging

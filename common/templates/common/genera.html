@@ -22,7 +22,7 @@
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family|default:'Orchidaceae'}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
                                 <a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Detailed list</a>
                             {% endif %}
@@ -40,7 +40,11 @@
                                     </thead>
                                         {% for genus in genus_list %}
                                         <tr><td>
+                                            {% if not app or app == 'orchidaceae' %}
+                                                <a href="{% url 'orchidaceae:species' %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                            {% else %}
                                                 <a href="{% url 'common:species' %}?app={{app}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                            {% endif %}
                                                 {{genus.author|default:""}}
                                             </td>
 
@@ -74,10 +78,10 @@
 $(document).ready(function() {
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,
-        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "aLengthMenu": [[50,100,150,200,-1], [50,100,150,200,"All"]],
         "lengthChange": false,
         "bPaginate": true,
-        // "pagingType": "simple", # only show previous/next
+        "pagingType": "simple",
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
         },

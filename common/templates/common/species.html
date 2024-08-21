@@ -1,5 +1,4 @@
 {% load static %}
-{% load testtags %}
 {% include "base.html" %}
 {% block body %}
 <head>
@@ -55,7 +54,7 @@
                         {% if species_list %}
                             <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
-                                        <tr>
+                                        <tr style="background-color: #e3e3e3">
                                             <th class="spc_column">Species</th>
 <!--                                            <th>Higher taxonomic levels</th>-->
                                             <th class="d-none d-lg-table-cell">Common Name</th>
