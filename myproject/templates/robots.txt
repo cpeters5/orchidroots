@@ -32,5 +32,15 @@ Disallow: /orchid/
 
 Sitemap: https://www.orchidroots.com/sitemap.xml
 
+User-agent: meta-externalagent
+Crawl-delay: 10
+
+User-agent: facebookexternalhit
+Crawl-delay: 10
+
+# More generic rule for other potential Facebook bots
+User-agent: *facebook*
+Crawl-delay: 10
+
 User-agent: Bytespider
 Disallow: /
