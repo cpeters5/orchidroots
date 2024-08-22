@@ -42,11 +42,11 @@
             {% for hybrid in result_list %}
             <tr style="text-align: left">
                 <td>
-                    <a href="{% url 'display:information' hybrid.0.did.pid.pid %}?role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
+                    <a href="{% url 'display:summary' app hybrid.0.did.pid.pid %}?role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
                 </td>
                 <td >
                     {% if hybrid.0.did.seed_id.pid %}
-                        <a href="{% url 'display:information' hybrid.0.did.seed_id.pid %}?role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
+                        <a href="{% url 'display:summary' app hybrid.0.did.seed_id.pid %}?role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
                     {% else %}
                         na
                     {% endif %}
@@ -54,7 +54,7 @@
                 <td>
 <!--                        Some hybrrid's parent(s) are missing-->
                     {% if hybrid.0.did.pollen_id.pid %}
-                        <a href="{% url 'display:information' hybrid.0.did.pollen_id.pid %}?role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
+                        <a href="{% url 'display:summary' app hybrid.0.did.pollen_id.pid %}?role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
                     {% else %}
                         na
                     {% endif %}

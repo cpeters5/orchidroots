@@ -4,7 +4,6 @@
 <head>
     Home page of orchidroots.com
 </head>
-
 <style>
 
 .imageitem {
@@ -46,10 +45,8 @@
     padding:0 10px;
     width: 100%;
     color: #0a6aa1;
-    overflow: hidden; /* Hide overflow content */
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-overflow: ellipsis; /* Add ellipsis if text overflows */
 }
+
 .imgtitle {
     font-size: 18px;
     font-weight: bold;
@@ -161,8 +158,7 @@ img{
 
                     <br>
                     </div>
-                    <br>
-                    <br>
+<!--                    <br>-->
 <!--                    <div class="d-flex justify-content-center">-->
 <!--                        <form action="/search/search/">-->
 <!--                            <input type="hidden" form="search" name="app" value="{% if app %}{{app}}{% else %}{{ family.application }}{% endif %}" >-->
@@ -170,7 +166,8 @@ img{
 <!--                            <input value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" size="30" placeholder="scientific name" height="10px">-->
 <!--                        </form>-->
 <!--                    </div>-->
-<!--                    <br>-->
+                    <br>
+                    <br>
                     <div class="d-flex justify-content-center">
                         <h5>Orchids</h5>
                      </div>
@@ -178,13 +175,13 @@ img{
                         <div class="imageitem">
                             <div class="imgtitle">
                                 <a href="{% url 'common:newbrowse' %}?app={{image.pid.gen.family.application}}&family={{image.gen.family}}&role={{role}}&display=checked">{{image.pid.genus}}</a></div>
-                                <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">
+                                <a href="{% url 'display:summary' image.gen.family.application image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
                                     <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                 </div>
                                 </a>
                             <div class="imgcaption">
-                                <a href="{% url 'display:information' image.pid_id %}?family={{image.gen.family}}&role={{role}}">
+                                <a href="{% url 'display:summary' image.gen.family.application image.pid_id %}?family={{image.gen.family}}&role={{role}}">
                                     {{image.pid.name|safe}} {% if cacfamily.application == 'other' %}({{image.gen.family}}){% endif %}
                                 </a>
                                 <br><a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}},</a>
@@ -206,7 +203,7 @@ img{
                                 </div>
                                 </a>
                             <div class="imgcaption">
-                                <a href="{% url 'display:information' othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}">
+                                <a href="{% url 'display:summary' othimage.1.gen.family.application othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}">
                                     {{othimage.1.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.1.gen.family}}){% endif %}
                                 </a>
                                 <br><a href="{{othimage.1.source_url}}" target="_blank" >{{othimage.1.get_displayname}},</a>

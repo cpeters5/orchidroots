@@ -3,7 +3,7 @@
 {% include "base.html" %}
 {% block body %}
 <head>
-    List of {{family}} hybrids
+    <title>List of {{family}} hybrids</title>
 </head>
 
 <div style="min-height:200px;background-color:white;width: 100%;">
@@ -103,13 +103,13 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}"><i>{{species.name|safe}} (syn.)</i></a>
+                                                        <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.gen.family}}"><i>{{species.name|safe}} (syn.)</i></a>
                                                             {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %}
                                                     {% else %}
                                                         {{species.name|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="{% url 'display:information' species.pid %}?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.get_subfamily}}&tribe={{species.gen.get_tribe}}&subtribe={{species.gen.get_subtribe}}">
+                                                    <a href="{% url 'display:summary' species.family.application species.pid %}?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.get_subfamily}}&tribe={{species.gen.get_tribe}}&subtribe={{species.gen.get_subtribe}}">
                                                         <i>{{species.genus}} {{species.species}}</i></a> {{genus.author|default:""}} {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.year|default:""}}

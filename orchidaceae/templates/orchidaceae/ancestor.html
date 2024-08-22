@@ -47,7 +47,7 @@
                     <tr>
                         <td class="text-left">
                         {% if anc.aid.pid > 0 %}
-                        <a href="{% url 'display:information' anc.aid.pid %}?role={{role}}">{{anc.aid.name|safe}}</a>
+                        <a href="{% url 'display:summary' app anc.aid.pid %}?role={{role}}">{{anc.aid.name|safe}}</a>
                         {% else %}
                             unknown
                         {% endif %}

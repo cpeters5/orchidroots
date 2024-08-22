@@ -1372,7 +1372,7 @@ def compare(request, pid):
                        'spcimg1_list': spcimg1_list,
                        'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                        'message2': message,
-                       'tab': 'sbs', 'sbs': 'active', 'role': role}
+                       'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
             return render(request, 'common/compare.html', context)
         elif len(species2) > 1:
             if year2:
@@ -1388,14 +1388,14 @@ def compare(request, pid):
                 context = {'species': species, 'genus': genus, 'pid': pid,  # original
                            'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message2': message, 'family': family,
-                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                           'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
                 return render(request,  'common/compare.html', context)
             else:  # No match found
                 message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
                 context = {'species': species, 'genus': genus, 'pid': pid,  # original
                            'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
                            'message1': message, 'family': family,
-                           'tab': 'sbs', 'sbs': 'active', 'role': role}
+                           'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app,}
                 return render(request, 'common/compare.html', context)
         else:
             species2 = species2[0]
@@ -1440,5 +1440,5 @@ def compare(request, pid):
                'genus2': gen2, 'species2': spc2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family, 'binomial2': binomial2,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
-               'tab': 'sbs', 'sbs': 'active', 'role': role}
+               'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
     return render(request, 'common/compare.html', context)
