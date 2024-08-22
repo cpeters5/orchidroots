@@ -2,7 +2,7 @@
 {% include "base.html" %}
 {% block body %}
 <head>
-    Comparing two different species and/or hybrids of {{genus}}
+    <title>Comparing two different species and/or hybrids of {{genus}}</title>
 </head>
 
 <style>
@@ -182,34 +182,30 @@ input[type=text] {
                 <!-- Results -->
                 <div style="width:100%;margin: 0 auto; border:0 solid blue;">
                     <div class="title" style="margin:0 auto;padding:10px;text-align: center; border:0 solid blue;">
-                    {% if cross %}
-                        This cross has already been
-                        {% if cross.pid.source == 'RHS' %}
-                        registered at <a href="{{cross.pid.sourceurl}}" target="_blank">({{cross.pid.source}}</a>):
-                        {% else %}
-                        temporarily created:
-                        {% endif %}
-                        {% if role == 'cur' %}
-                            <a href="{% url 'display:photos' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
-                        {% else %}
-                            <a href="{% url 'display:information' cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
-                        {% endif %}
-                    {% else %}
-                        {% if pid and pid2 and pid != pid2 %}
-                            This cross has not been registered. <br>
-                            {% if role == 'cur' %}
-                                {% if msgnogenus %}
-                                    <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
-                                {% else %}
-                                    <a class="btn btn-primary btn-xs" href="#">
-                                        Create a new grex - {{species.binomial}} × {{species2.binomial}}
-                                    </a>
-                                {% endif %}
+                        {% if cross %}
+                            This cross has already been
+                            {% if cross.pid.source == 'RHS' %}
+                            registered at <a href="{{cross.pid.sourceurl}}" target="_blank">({{cross.pid.source}}</a>):
                             {% else %}
-                                Please contact Bluenanta admins to create one.
+                            temporarily created:
+                            {% endif %}
+                            <a href="{% url 'display:summary' species.family.application cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
+                        {% else %}
+                            {% if pid and pid2 and pid != pid2 %}
+                                This cross has not been registered. <br>
+                                {% if role == 'cur' %}
+                                    {% if msgnogenus %}
+                                        <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
+                                    {% else %}
+                                        <a class="btn btn-primary btn-xs" href="#">
+                                            Create a new grex - {{species.binomial}} × {{species2.binomial}}
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    Please contact Bluenanta admins to create one.
+                                {% endif %}
                             {% endif %}
                         {% endif %}
-                    {% endif %}
                     </div>
                     <div style="clear:both;"></div>
                 </div>
@@ -219,7 +215,6 @@ input[type=text] {
                 <div class="d-flex justify-content-between" >
                     <div class="p-2" style="width:48%;">
                         <div style="padding:10px;">
-                            <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             {% if message1 %}
                                 <span class="text-danger">{{message1|safe}}</span>
                             {% elif species %}
@@ -227,12 +222,12 @@ input[type=text] {
                             {% else %}
                                 Enter the correct name of the first orchid
                             {% endif %}
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea">{{genus}}</button>
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.species}}</button>
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.infraspr|default_if_none:' '}}</button>
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.infraspe|default_if_none:' '}}</button>
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.author|default_if_none:' '}}</button>
-                            <button type="text" class="form-control form-control-sm text-left m-2" style="background-color:#eaeaea" >{{species.year|default_if_none:' '}}</button>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{genus}}"/>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{species.species}}"/>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{species.infraspr|default_if_none:' '}}"/>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{species.infraspe|default_if_none:' '}}"/>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{species.author|default_if_none:' '}}"/>
+                            <input type="text" disabled class="form-control form-control-sm" style="background-color:#eaeaea" value="{{species.year|default_if_none:' '}}"/>
                         </div>
                         <div class="d-flex justify-content-center" style="display:inline-block;text-align:center; boundary:0 solid blue;">
                             {% if species and not spcimg1_list %}
@@ -287,8 +282,6 @@ input[type=text] {
                             <button form="compare" type="submit" class="btn btn-primary btn-sm" style="padding:0 20px; margin:0;">Go</button>
                             {% if message2 %}
                                 <span class="text-danger">{{message2|safe}}</span>
-                            {% elif species2 %}
-                            <a href="{% url 'display:information' pid2 %}?family={{family}}&role={{role}}"><h6>{{binomial2}}</h6></a>
                             {% else %}
                                 Enter the correct name of second orchid.
                             {% endif %}
