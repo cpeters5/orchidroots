@@ -1,26 +1,30 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import Count
+from django.apps import apps
 from urllib.parse import urlencode
 from sitemap.models import SitemapEntry
 from orchidaceae.models import Species, Genus
+from utils import config
+applications = config.applications
 
 class Command(BaseCommand):
     help = 'Update a specific section of the sitemap entries in the database'
 
     def add_arguments(self, parser):
         parser.add_argument('section', type=str,
-                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "genera", "species", "hybrid", "information")')
+                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "genera", "species", "hybrid", "summary")')
 
     def handle(self, *args, **options):
         section = options['section']
 
-        if section not in ['animalia', 'aves', 'fungi', 'other', 'genera', 'species', 'hybrid', 'information']:
+        if section not in ['animalia', 'aves', 'fungi', 'other', 'genera', 'species', 'hybrid', 'summary']:
             self.stdout.write(self.style.ERROR(f'Invalid section: {section}'))
             return
 
         # Delete existing entries for the specified section
         SitemapEntry.objects.filter(section=section).delete()
+        SitemapEntry.objects.filter(section='information').delete()
 
         # Update the specified section
         update_method = getattr(self, f'update_{section}', None)
@@ -35,7 +39,7 @@ class Command(BaseCommand):
         from animalia.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/information/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/animalia/{item.pid}/?family={item.family}",
                 section="animalia",
                 change_frequency='monthly',
                 priority=0.2
@@ -45,7 +49,7 @@ class Command(BaseCommand):
         from aves.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/information/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/aves/{item.pid}/?family={item.family}",
                 section="aves",
                 change_frequency='monthly',
                 priority=0.2
@@ -55,7 +59,7 @@ class Command(BaseCommand):
         from fungi.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/information/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/fungi/{item.pid}/?family={item.family}",
                 section="fungi",
                 change_frequency='monthly',
                 priority=0.2
@@ -65,7 +69,7 @@ class Command(BaseCommand):
         from other.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/information/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/other/{item.pid}/?family={item.family}",
                 section="other",
                 change_frequency='monthly',
                 priority=0.2
@@ -115,23 +119,26 @@ class Command(BaseCommand):
                 }
             )
 
-    def update_information(self):
+    def update_summary(self):
         print("Get info pages for species/hybrids")
         priority_genera = ['Cattleya', 'Dendrobium', 'Phalaenopsis', 'Paphiopedilum', 'Cymbidium', 'Rhyncholaeliocattleya',
                            'Oncidium', 'Vanda', 'Rhyncattleanthe', 'Cattlianthe', 'Miltoniopsis', 'Masdevallia', 'Tolumnia', 'Phragmipedium']
-        for species in Species.objects.all():
-            if species.status == 'synonym':
-                priority = 0.3
-            elif species.genus in priority_genera:
-                priority = 0.5
-            else:
-                priority = 0.4
-            species_url = f"{settings.SITE_URL}/display/information/{species.pid}/?family={species.family}"
-            SitemapEntry.objects.update_or_create(
-                url=species_url,
-                section="information",
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': priority
-                }
-            )
+
+        for app in applications:
+            Species = apps.get_model(app, 'Species')
+            for species in Species.objects.all():
+                if species.status == 'synonym':
+                    priority = 0.3
+                elif species.genus in priority_genera:
+                    priority = 0.5
+                else:
+                    priority = 0.4
+                species_url = f"{settings.SITE_URL}/display/summary/{species.family.application}/{species.pid}"
+                SitemapEntry.objects.update_or_create(
+                    url=species_url,
+                    section="summary",
+                    defaults={
+                        'change_frequency': 'monthly',
+                        'priority': priority
+                    }
+                )
