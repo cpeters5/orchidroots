@@ -710,7 +710,7 @@ def uploadweb(request, pid, orid=None):
             author = None
 
     context = {'form': form, 'img': img, 'sender': sender,
-               'species': species, 'loc': 'active',
+               'species': species, 'loc': 'active', 'app': 'orchidaceae',
                'family': species.gen.family, 'author': author,
                'role': role, 'title': 'uploadweb'}
     return render(request, 'detail/uploadweb.html', context)
@@ -765,7 +765,7 @@ def uploadfile(request, pid):
 
     context = {'form': form, 'species': species, 'web': 'active',
                'author': author, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadfile'}
+               'role': role, 'app': 'orchidaceae', 'title': 'uploadfile'}
     return render(request, app + '/uploadfile.html', context)
 
 

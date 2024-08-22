@@ -146,17 +146,13 @@ td {
                         <tr >
                             <td style="width:20%;">
                                 {% if species.get_best_img.image_file %}
-                                <a href="{% url 'display:information' species.pid %}?family={{species.family}}&role={{role}}">
+                                <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family}}&role={{role}}">
                                  <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                                 </a>
                                 {% endif %}
                             </td>
                             <td style="text-align: left;">
-                                {% if user.tier.tier > 3 %}
-                                    <a href="{% url 'display:photos' species.pid %}?family={{species.family}}&role={{role}}">{{species.binomial|safe}}</a>
-                                {% else %}
-                                    <a href="{% url 'display:information' species.pid %}?role={{role}}&family={{species.family}}">{{species.binomial|safe}}</a>
-                                {% endif %}
+                                <a href="{% url 'display:summary' species.family.application species.pid %}?role={{role}}&family={{species.family}}">{{species.binomial|safe}}</a>
                                 ({{species.family.family}})
                                 {% if species.status == 'synonym' %} (syn. {{species.acc.binomial}}){% endif %}
                             </td>

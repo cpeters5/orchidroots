@@ -42,18 +42,18 @@
                 {% for hybrid in prim_list %}
                 <tr style="text-align: left">
                     <td>
-                        <a href="{% url 'display:information' hybrid.pid.pid %}?role={{role}}"><i>{{hybrid.pid.binomial_it|safe}}</i></a>
+                        <a href="{% url 'display:summary' app hybrid.pid.pid %}?role={{role}}"><i>{{hybrid.pid.binomial_it|safe}}</i></a>
                     </td>
                     <td >
                         {% if hybrid.seed_id.pid %}
-                            <a href="{% url 'display:information' hybrid.seed_id.pid %}?role={{role}}">{{hybrid.registered_seed_name|safe}}</a>
+                            <a href="{% url 'display:summary' app hybrid.seed_id.pid %}?role={{role}}">{{hybrid.registered_seed_name|safe}}</a>
                         {% else %}
                             na
                         {% endif %}
                     </td>
                     <td>
                         {% if hybrid.pollen_id.pid %}
-                            <a href="{% url 'display:information' hybrid.pollen_id.pid %}?role={{role}}">{{hybrid.registered_pollen_name|safe}}</a>
+                            <a href="{% url 'display:summary' app hybrid.pollen_id.pid %}?role={{role}}">{{hybrid.registered_pollen_name|safe}}</a>
                         {% else %}
                             na
                         {% endif %}

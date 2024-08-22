@@ -135,31 +135,31 @@ option {
                     </thead>
                         {% for spc in my_list %}
                             <tr>
-                                <td class="align-left"><a href="{% url 'display:information' spc.pid %}?role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
+                                <td class="align-left"><a href="{% url 'display:summary' app spc.pid %}?role={{role}}">{% if spc.is_hybrid %}<i>{{spc.binomial}}</i>{% else %}{{spc.binomial}}{% endif %}</a></td>
                                 <td class="align-center">
                                     {% if spc.status == 'synonym' %}
                                     Synonym of
                                         {% if spc.getAccepted %}
-                                            <a href="{% url 'display:information' spc.getAccepted.pid %}?role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
+                                            <a href="{% url 'display:summary' app spc.getAccepted.pid %}?role={{role}}">{{spc.getAccepted.binomial|safe}}</a>
                                         {% else %}}
                                             {{spc.getAccepted.name|safe}}
                                         {% endif %}
                                     {% else %}
                                         {% if spc.hybrid.seed_id.type == 'species' %}
                                             {% if spc.hybrid.seed_id_id %}
-                                                <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                                <a href="{% url 'display:summary' app spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                             {% else %}
                                                 <a href="#">{{spc.hybrid.seed_id.abrevname|safe}}</a>
                                             {% endif %}
                                         {% elif spc.hybrid.seed_id.type == 'hybrid' %}
-                                            <a href="{% url 'display:information' spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:summary' app spc.hybrid.seed_id_id %}?role={{role}}">{{spc.hybrid.seed_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                             ×
                                         {% if spc.hybrid.pollen_id.type == 'species' %}
-                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:summary' app spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% elif spc.hybrid.pollen_id.type == 'hybrid' %}
-                                            <a href="{% url 'display:information' spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
+                                            <a href="{% url 'display:summary' app spc.hybrid.pollen_id_id %}?role={{role}}">{{spc.hybrid.pollen_id.binomial|safe}}</a>
                                         {% else %}na
                                         {% endif %}
                                     {% endif %}

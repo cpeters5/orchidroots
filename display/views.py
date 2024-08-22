@@ -2,6 +2,7 @@ import string
 import re
 import logging
 import random
+import json
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpRequest
 from django.db.models import Q
@@ -15,6 +16,10 @@ from common.views import rank_update, quality_update
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
 from accounts.models import User, Photographer, Sponsor
+from urllib.parse import urlencode
+import utils.config
+
+applications = utils.config.applications
 
 epoch = 1740
 logger = logging.getLogger(__name__)
@@ -33,24 +38,225 @@ def is_crawler(request: HttpRequest) -> bool:
     return any(bot in user_agent for bot in crawler_patterns)
 
 
-def information(request, pid=None):
+def summary(request, application, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
-    author = ''
+    #  Handle a faulty url redirection (/display/information/application/1234)
+    if application == 'application':
+        application = 'orchidaceae'
+
     if pid is None:
         pid = request.GET.get('pid')
-    if not pid or not str(pid).isnumeric():
+
+    if not pid or not str(pid).isnumeric() or application not in applications:
         handle_bad_request(request)
         return HttpResponseRedirect('/')
 
     # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/display/summary/{application}/{pid}/')
 
-    # If accessed via query parameter, redirect to the canonical URL
-    if 'pid' in request.GET:
-        return HttpResponsePermanentRedirect(canonical_url)
+    Species = apps.get_model(application, 'Species')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        return HttpResponseRedirect('/')
+
+    Synonym = apps.get_model(application, 'Synonym')
+    Hybrid = apps.get_model(application, 'hybrid')
+    AncestorDescendant = apps.get_model(application, 'AncestorDescendant')
+
+    SpcImages = apps.get_model(application, 'SpcImages')
+    if application == 'orchidaceae':
+        HybImages = apps.get_model(application, 'HybImages')
+    else:
+        HybImages = apps.get_model(application, 'SpcImages')
+
+    ps_list = pp_list = ss_list = sp_list = ()
+    ancspc_list = []
+    seedimg_list = []
+    pollimg_list = []
+
+    # If pid is a synonym, convert to accept
+    req_pid = pid
+    req_species = species
+    genus = species.gen
+    display_items = []
+    pid = species.pid
+    syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+
+    if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
+        if req_pid != pid:  # req_pid is a synonym, just show the synonym
+            images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
+        else:
+            images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
+        if species.status != 'synonym':
+            accepted = species.hybrid
+        else:
+            # accid = species.getAcc()
+            # accepted = Species.objects.get(pk=accid).hybrid
+            accepted = species.getAccepted().hybrid
+    else:
+        if req_pid != pid:  # req_pid is a synonym, just show the synonym
+            images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
+        else:               # req_pid is accepted species, show the accepted photos and all of its synonyms photos
+            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
+        if species.status == 'synonym':
+            accid = species.getAcc()
+            try:
+                myspecies = Species.objects.get(pk=accid)
+            except Species.DoesNotExist:
+                myspecies = ''
+        else:
+            myspecies = species
+        if myspecies.type == 'species':
+            accepted = myspecies.accepted
+        else:
+            accepted = myspecies.hybrid
+
+    # Build display in main table
+    if images_list:
+        i_1, i_2, i_3, i_4, i_5, i_7, i_8 = 0, 0, 0, 0, 0, 0, 0
+        for x in images_list:
+            if x.rank == 1 and i_1 <= 0:
+                i_1 += 1
+                display_items.append(x)
+            elif x.rank == 2 and i_2 <= 0:
+                i_2 += 1
+                display_items.append(x)
+            elif x.rank == 3 and i_3 <= 1:
+                i_3 += 1
+                display_items.append(x)
+            elif x.rank == 4 and i_4 <= 3:
+                i_4 += 1
+                display_items.append(x)
+            elif x.rank == 5 and i_5 <= 3:
+                i_5 += 1
+                display_items.append(x)
+            elif x.rank == 7 and i_7 <= 2:
+                i_7 += 1
+                display_items.append(x)
+            elif x.rank == 8 and i_8 < 2:
+                i_8 += 1
+                display_items.append(x)
+
+    if species.type == 'hybrid':
+        if accepted.seed_id and accepted.seed_id.type == 'species':
+            try:
+                seed_obj = Species.objects.get(pk=accepted.seed_id.pid)
+            except Species.DoesNotExist:
+                seed_obj = ''
+            seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+        elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
+            try:
+                seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
+            except Hybrid.DoesNotExist:
+                seed_obj = ''
+            if seed_obj:
+                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+                assert isinstance(seed_obj, object)
+                if seed_obj.seed_id:
+                    ss_type = seed_obj.seed_id.type
+                    if ss_type == 'species':
+                        ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                    elif ss_type == 'hybrid':
+                        ss_list = HybImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                if seed_obj.pollen_id:
+                    sp_type = seed_obj.pollen_id.type
+                    if sp_type == 'species':
+                        sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+                    elif sp_type == 'hybrid':
+                        sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+        # Pollen
+        if accepted.pollen_id and accepted.pollen_id.type == 'species':
+            try:
+                pollen_obj = Species.objects.get(pk=accepted.pollen_id.pid)
+            except Species.DoesNotExist:
+                pollen_obj = ''
+            pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+        elif accepted.pollen_id and accepted.pollen_id.type == 'hybrid':
+            try:
+                pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
+            except Hybrid.DoesNotExist:
+                pollen_obj = ''
+            pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+            if pollen_obj.seed_id:
+                ps_type = pollen_obj.seed_id.type
+                if ps_type == 'species':
+                    ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                elif ps_type == 'hybrid':
+                    ps_list = HybImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+            if pollen_obj.pollen_id:
+                pp_type = pollen_obj.pollen_id.type
+                if pp_type == 'species':
+                    pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                elif pp_type == 'hybrid':
+                    pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+
+        if species.status == 'synonym':
+            accid = species.getAcc()
+            ancspc_list = AncestorDescendant.objects.filter(did=accid).filter(anctype='species').order_by('-pct')
+        else:
+            ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
+    if req_species.status == 'synonym':
+        # if request pid is a synopnym, return the synonym instance
+        species = req_species
+    role = request.GET.get('role', None)
+    write_output(request, str(application) + " " + str(species))
+    context = {'pid': species.pid, 'species': species,
+               'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
+               'display_items': display_items, 'family': species.family,
+               'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
+               'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
+               'app': application, 'ancspc_list': ancspc_list,
+               'canonical_url': canonical_url,
+               'tab': 'rel', 'view': 'information',
+               }
+    response = render(request, 'display/summary.html', context)
+
+    # Add Link header
+    # response['Link'] = f'<{canonical_url}>; rel="canonical"'
+
+    return response
+
+# Faulty url /information/pid
+def xxxinformation_tmp1(request, pid):
+    application = 'orchidaceae'
+    # Use reverse to generate the correct URL
+    corrected_url = f'/display/summary/{application}/{pid}/'
+
+    # Redirect to the corrected URL
+    return HttpResponsePermanentRedirect(corrected_url)
+
+# Another faulty url /information/application/1234
+def information_tmp(request, application, pid):
+    application = 'orchidaceae'
+    # Use reverse to generate the correct URL
+    corrected_url = f'/display/summary/{application}/{pid}/'
+
+    # Redirect to the corrected URL
+    return HttpResponsePermanentRedirect(corrected_url)
+
+def information(request, pid=None):
+    # As of June 2022, synonym will have its own display page
+    # NOTE: seed and pollen id must all be accepted.
+    if pid is None:
+        pid = request.GET.get('pid')
+
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        return HttpResponseRedirect('/')
 
     app, family = get_application(request)
+
+    # Construct the canonical URL
+    canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
+
+
+    # If accessed via query parameter, redirect to the canonical URL
+    # TODO - Just orchid for now. Add canonical_url for other app / family later.
+    if family == 'Orchidaceae' and 'pid' in request.GET:
+        return HttpResponsePermanentRedirect(canonical_url)
+
 
     Species = apps.get_model(app, 'Species')
     try:
@@ -208,7 +414,7 @@ def information(request, pid=None):
     write_output(request, str(family))
     context = {'pid': species.pid, 'species': species,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
-               'display_items': display_items, 'family': family,
+               'display_items': display_items, 'family': species.family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list,
@@ -221,6 +427,7 @@ def information(request, pid=None):
     # response['Link'] = f'<{canonical_url}>; rel="canonical"'
 
     return response
+
 
 def xinformation(request, pid=None):
     # As of June 2022, synonym will have its own display page

@@ -676,7 +676,7 @@ nav .search-container button:hover {
                                     <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
                                     <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
                                     {% if species %}
-                                        <li><a class="dropdown-item" href="{% url 'display:information' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'display:photos' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
                                     {% else %}
                                         <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
                                     {% endif %}

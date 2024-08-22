@@ -154,7 +154,7 @@ def genera(request):
                'st_obj': st_obj, 'st_list': st_list,
                'title': 'taxonomy', 'genustype': genustype, 'status': status,
                'formula1': formula1, 'formula2': formula2, 'alpha': alpha, 'alpha_list': alpha_list,
-               'sort': sort, 'prev_sort': prev_sort, 'role': role,
+               'sort': sort, 'prev_sort': prev_sort, 'role': role, 'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/genera.html', context)
 
@@ -162,28 +162,28 @@ def genera(request):
 def subgenus(request):
     # -- List Genuses
     subgenus_list = Subgenus.objects.order_by('subgenus')
-    context = {'subgenus_list': subgenus_list, 'title': 'subgenus', }
+    context = {'subgenus_list': subgenus_list, 'title': 'subgenus',  'app': 'orchidaceae',}
     return render(request, 'orchidaceae/subgenus.html', context)
 
 
 def section(request):
     # -- List Genuses
     section_list = Section.objects.order_by('section')
-    context = {'section_list': section_list, 'title': 'section', }
+    context = {'section_list': section_list, 'title': 'section', 'app': 'orchidaceae', }
     return render(request, 'orchidaceae/section.html', context)
 
 
 def subsection(request):
     # -- List Genuses
     subsection_list = Subsection.objects.order_by('subsection')
-    context = {'subsection_list': subsection_list, 'title': 'subsection', }
+    context = {'subsection_list': subsection_list, 'title': 'subsection', 'app': 'orchidaceae', }
     return render(request, 'orchidaceae/subsection.html', context)
 
 
 def series(request):
     # -- List Genuses
     series_list = Series.objects.order_by('series')
-    context = {'series_list': series_list, 'title': 'series', }
+    context = {'series_list': series_list, 'title': 'series', 'app': 'orchidaceae', }
     return render(request, 'orchidaceae/series.html', context)
 
 # Get the list of matching genus along with related generaa
@@ -314,7 +314,7 @@ def species(request):
                'series': series, 'series_list': series_list,
                'msg': msg,
                'syn': syn,
-               'title': 'taxonomy', 'type': 'species'
+               'title': 'taxonomy', 'type': 'species', 'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/species.html', context)
 
@@ -412,7 +412,7 @@ def hybrid(request):
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
                'author': author, 'originator': originator, 'seed_binomial': seed_binomial, 'pollen_binomial': pollen_binomial,
-               'role': role, 'level': 'list', 'title': 'hybrid_list',
+               'role': role, 'level': 'list', 'title': 'hybrid_list',  'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
@@ -477,7 +477,7 @@ def datatable_hybrid(request):
 
 def browsedist(request):
     dist_list = get_distlist()
-    context = {'dist_list': dist_list, }
+    context = {'dist_list': dist_list,  'app': 'orchidaceae',}
     return render(request, 'orchidaceae/browsedist.html', context)
 
 
@@ -504,7 +504,7 @@ def ancestor(request, pid):
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
                'anc': 'active', 'tab': 'anc',
-               'title': 'ancestor', 'role': role,
+               'title': 'ancestor', 'role': role, 'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/ancestor.html', context)
 
@@ -630,7 +630,7 @@ def ancestrytree(request, pid=None):
                'spc': spc, 'tree': 'active', 'tab': 'tree',
                's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
                'p': p, 'ps': ps, 'pp': pp, 'pss': pss, 'psp': psp, 'pps': pps, 'ppp': ppp,
-               'title': 'ancestrytree', 'role': role,
+               'title': 'ancestrytree', 'role': role, 'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/ancestrytree.html', context)
 
@@ -703,13 +703,11 @@ def progeny(request, pid):
         Q(pollen_id__in=syn_list)
     )
     if prim:
-        print("1. prime = ", prim)
         context = {'prim_list': prim_list, 'species': species,
                    'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
-                   'title': 'progeny', 'section': 'Public Area', 'role': role,
+                   'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                    }
         return render(request, 'orchidaceae/progeny_immediate.html', context)
-    print("2. prime = ", prim)
     #All descendants
     if len(syn_list) > 100:
         # des_list = get_des_list_large(pid, syn_list)
@@ -732,7 +730,7 @@ def progeny(request, pid):
             result_list.append([x,'remote'])
     context = {'result_list': result_list, 'species': species,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
-               'title': 'progeny', 'section': 'Public Area', 'role': role,
+               'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                }
 
     return render(request, 'orchidaceae/progeny.html', context)
@@ -781,7 +779,7 @@ def progenyimg(request, pid):
                'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,
                'genus': genus, 'page': page,
                'page_range': page_range, 'last_page': last_page, 'next_page': next_page, 'prev_page': prev_page,
-               'title': 'progenyimg', 'section': 'Public Area',
+               'title': 'progenyimg', 'section': 'Public Area', 'app': 'orchidaceae',
                }
     return render(request, 'orchidaceae/progenyimg.html', context)
 
