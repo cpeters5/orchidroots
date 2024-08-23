@@ -39,6 +39,7 @@ def is_crawler(request: HttpRequest) -> bool:
 
 
 def summary(request, application, pid=None):
+    print("In summary", request)
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
     #  Handle a faulty url redirection (/display/information/application/1234)
@@ -229,6 +230,7 @@ def xxxinformation_tmp1(request, pid):
 
 # Another faulty url /information/application/1234
 def information_tmp(request, application, pid):
+    print("In information_tmp", request)
     application = 'orchidaceae'
     # Use reverse to generate the correct URL
     corrected_url = f'/display/summary/{application}/{pid}/'
@@ -237,6 +239,8 @@ def information_tmp(request, application, pid):
     return HttpResponsePermanentRedirect(corrected_url)
 
 def information(request, pid=None):
+    print("In information", request)
+    # Will be eventually removed once all requests are permanently redirected to /summay/app/pid
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
     if pid is None:
@@ -246,16 +250,37 @@ def information(request, pid=None):
         handle_bad_request(request)
         return HttpResponseRedirect('/')
 
+    print("information", request)
     app, family = get_application(request)
+    # print("family", family)
+
+    # Try to identify app through family (if available)
+    if family:
+        try:
+            family = Family.objects.get(pk=family)
+        except FamilyDoesNotExist:
+            # Fall back to defaul if no family found
+            family = 'Orchidaceae'
+            pass
+    if isinstance(family, Family):
+        # Get app
+        app = family.application
+        # print("ready to go on to", app)
+        if app != 'orchidaceae':
+            # This is from other applications, redirect permanently to where they belong
+            corrected_url = f'/display/summary/{app}/{pid}/'
+            # print("corrected_url", corrected_url)
+            # Redirect to the corrected URL
+            return HttpResponsePermanentRedirect(corrected_url)
 
     # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
+    # canonical_url = request.build_absolute_uri(f'/display/information/{pid}/')
 
 
     # If accessed via query parameter, redirect to the canonical URL
     # TODO - Just orchid for now. Add canonical_url for other app / family later.
-    if family == 'Orchidaceae' and 'pid' in request.GET:
-        return HttpResponsePermanentRedirect(canonical_url)
+    # if family == 'Orchidaceae' and 'pid' in request.GET:
+    #     return HttpResponsePermanentRedirect(canonical_url)
 
 
     Species = apps.get_model(app, 'Species')
@@ -418,7 +443,7 @@ def information(request, pid=None):
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'ancspc_list': ancspc_list,
-               'canonical_url': canonical_url,
+               # 'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
     response = render(request, 'display/information.html', context)
@@ -623,6 +648,7 @@ def xinformation(request, pid=None):
 
 
 def photos(request, pid=None):
+    print("In photos", request)
     author = ''
     if pid is None:
         pid = request.GET.get('pid')
@@ -634,7 +660,6 @@ def photos(request, pid=None):
         author = Photographer.objects.filter(user_id=request.user.id)
         if author.exists():
             author = author.first().author_id
-    print("author = ", author)
     related = ''
     related_species = ''
     related_pids = []
@@ -648,6 +673,8 @@ def photos(request, pid=None):
     #     author = None
 
     # Get application and family
+    print("photos", request)
+
     app, family = get_application(request)
 
     # Define Species, Synonym and Image classes based on the application
