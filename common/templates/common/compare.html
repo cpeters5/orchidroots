@@ -137,6 +137,24 @@ input[type=text] {
 
 <!--Title-->
 <div class="detail-title" style="text-align:center">
+     <h1 class="hidden-h1">
+<!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
+        {% if pid and pid2 %}
+            {% if pid != pid2 %}
+                {{species.binomial|safe}} V.S. {{species2.binomial|safe}}
+            {% else %}
+                The two orchids are the identical or synonymous!
+            {% endif %}
+        {% else %}
+            {% if pid %}
+                Comparing {{species.name|safe}} with ?
+            {% elif pid2 %}
+                Comparing ? with {{species2.name|safe}}
+            {% else %}
+                Comparing two Orchids
+            {% endif %}
+        {% endif %}
+    </h1>
     <h6>
 <!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
         {% if pid and pid2 %}
