@@ -100,6 +100,19 @@
 
 
 <style>
+/*Use in every page needed crawlers    */
+.hidden-h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 img {
 max-width: 100%;
 display: block;
@@ -667,10 +680,12 @@ nav .search-container button:hover {
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <div class="nav-item dropdown" style="">
+
+
                         <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
                         <ul class="dropdown-menu">
                             {% if user.tier.tier > 2 %}
-                                {% if user.tier.tier == 5 %}
+                                {% if user.tier.tier == 15 %}
                                     <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae" rel="nofollow noreferrer noopener" data-nosnippet>Orchidroots</a></li>
                                     <li><a class="dropdown-item" href="{% url 'admin:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Admin</a></li>
                                     <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
@@ -678,7 +693,7 @@ nav .search-container button:hover {
                                     {% if species %}
                                         <li><a class="dropdown-item" href="{% url 'display:photos' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
                                     {% else %}
-                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' %}?role=cur&app=aves&family={{family.family|default:'Orchidaceae'}}&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' aves %}?role=cur&family={{family.family|default:'Orchidaceae'}}&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
                                     {% endif %}
                                     <li><a class="dropdown-item" href="{% url 'gallery:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Gallery</a></li>
                                 {% endif %}
@@ -730,14 +745,80 @@ nav .search-container button:hover {
 
 <!--Second navbar-->
 <div class="p-2" style="background-color:black; color: white !important; font-size: 11px;">
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'orchidaceae' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&display=checked&role={{role}}" data-nosnippet>Orchids</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'fungi' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=fungi&display=checked&role={{role}}" data-nosnippet>Fungi</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'other' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=other&display=checked&role={{role}}" data-nosnippet>Plants</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'aves' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=aves&display=checked&role={{role}}" data-nosnippet>Birds</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if app == 'animalia' %}active1{% endif %}" href="{% url 'common:newbrowse' %}?app=animalia&display=checked&role={{role}}" data-nosnippet>Animals</a>
-     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'research' %}active1{% endif %}" href="{% url 'gallery:index' %}?" data-nosnippet>Gallery</a>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'orchidaceae' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             Orchid
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'orchidaceae' %}?display=checked&role={{role}}" data-nosnippet>Orchid Taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'orchidaceae' %}?display=checked&role={{role}}" data-nosnippet>Orchid genera </a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?&alpha=A&display=checked&role={{role}}" data-nosnippet>Orchid species </a></li>
+             <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?alpha=A&display=checked&role={{role}}" data-nosnippet>Orchid hybrids </a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?display=checked&role={{role}}" data-nosnippet>Orchid images</a></li>
+         </ul>
+     </div>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'orchidaceae' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             Fungi
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'fungi' %}?display=checked&role={{role}" data-nosnippet>Fungi taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'fungi' %}?display=checked&role={{role}}" data-nosnippet>Fungi families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'fungi' %}?display=checked&role={{role}}" data-nosnippet>Fungi genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'fungi' %}?display=checked&role={{role}}" data-nosnippet>Fungi species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'fungi' %}?display=checked&role={{role}}" data-nosnippet>Fungi images</a></li>
+         </ul>
+     </div>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'other' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             Plants
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant images</a></li>
+         </ul>
+     </div>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'other' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             Birds
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?app=aves&display=checked&role={{role}}" data-nosnippet>Bird species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird images</a></li>
+         </ul>
+     </div>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'other' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             Animals
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Anoimal taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?app=animalia&display=checked&role={{role}}" data-nosnippet>Animal species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal images</a></li>
+         </ul>
+     </div>
+     <div class="btn-group">
+         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'other' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
+             McGivens
+         </button>
+         <ul class="dropdown-menu">
+             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
+             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
+             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
+         </ul>
+     </div>
 <!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
+
     </div>
+
 </div>
 
     {%  block body %}

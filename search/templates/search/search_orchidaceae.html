@@ -152,13 +152,13 @@ td {
             <tr style="background-color: white;">
                 <td>
                     {% if not genus.num_hybrid or genus.num_species > 0 %}
-                        <a href="{% url 'common:species' %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
+                        <a href="{% url 'common:species' genus.family.application %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
                         {% if genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
                         {% if genus.family.family == 'Orchidaceae' %}
                             <a href="{% url 'orchidaceae:hybrid' %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                         {% else %}
-                            <a href="{% url 'common:hybrid' %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
+                            <a href="{% url 'common:hybrid' genus.family.application %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
                         {% endif %}
                     {% endif %}
                 {% if user.tier.tier > 3 %}

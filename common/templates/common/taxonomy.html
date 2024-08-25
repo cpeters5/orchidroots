@@ -1,5 +1,8 @@
+{% load static %}
+{% include "base.html" %}
+
 <head>
-    <title>List of infrageneric ranks </title>
+    <title>Taxonomy structure of {{app}} section </title>
 </head>
 <style>
 ul, #myUL {
@@ -71,78 +74,77 @@ a:hover {
 
 .taxtree {
     overflow-y:auto;
-    height:1000px;
     margin: 10px 10px;
     padding: 10px 10px;
 }
 @media only screen and (max-width: 600px) {
     .taxtree {
-        height: 300px;
         width: 100%;
     }
 }
 
 </style>
-            <div class="dropdown taxtree border" style="width:100%">
-                {% include "common/alpha_list_core.html" %}
-                <ul id="myUL">
-                    {% for fam in family_list %}
-                        {% if forloop.counter == 1 %}<div class="indent">favorites</div>{% endif %}
-                        {% if forloop.counter == 4 %}<li class="indent fam"><a class="fam" href="{% url 'common:genera' %}?app=other&spc_string={{spc_string}}&spckeyword={{spckeyword}}&display=checked">All other families</a></li><hr>{% endif %}
 
-                        {% if fam.subfamily_set.all or fam.tribe_set.all %}
-                        <li><span class="caret fam"><a href="{% url 'common:genera' %}?family={{fam.family}}{% if fam.family == 'Orchidaceae' %}&talpha=A{% endif %}&alpha={{alpha}}&spc_string={{spc_string}}&spckeyword={{spckeyword}}&display=checked" >{{fam.family}}</a></span>
-                            <ul class="nested" style="color:#a20850">
-                                {% if fam.subfamily_set.all %}
-                                    {% for subfam in fam.subfamily_set.all %}
-                                        {% if subfam.tribe_set.all %}
-                                            <li><span class="caret subfam"><a href="{% url 'common:genera' %}?subfamily={{subfam.subfamily}}&family={{subfam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subfam.subfamily}}</a></span>
-                                            <ul class="nested" style="color:green">
-                                                {% if subfam.tribe_set.all %}
-                                                    {% for tribe in subfam.tribe_set.all %}
-                                                        {% if tribe.subtribe_set.all %}
-                                                        <li><span class="caret tribe"><a href="{% url 'common:genera' %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></span>
-                                                            <ul class="nested" style="color:purple">
-                                                               {% for subtribe in tribe.subtribe_set.all %}
-                                                                    <li class="indent subtribe"><a href="{% url 'common:genera' %}?subtribe={{subtribe.subtribe}}&tribe={{subtribe.tribe}}&subfamily={{subtribe.subfamily}}&family={{subtribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subtribe.subtribe}}</a></li>
-                                                               {% endfor %}
+<div class="taxtree border" style="width:100%; padding-left:50px;">
+    <h1 class="hidden-h1">Taxonomy catalog for {% if app == 'other' %}Other plant families{% else %}{{app|title}}{% endif %}</h1>
+    <h5>Taxonomy catalog for {% if app == 'other' %}Other plant families{% else %}{{app|title}}{% endif %}</h5>
+    <br>
+    {% include "common/alpha_list_core.html" %}
+    <ul id="myUL">
+        {% for fam in family_list %}
+            {% if fam.subfamily_set.all or fam.tribe_set.all %}
+            <li><span class="caret fam"><a href="{% url 'common:genera' app %}?family={{fam.family}}{% if fam.family == 'Orchidaceae' %}&alpha=A{% endif %}&alpha={{alpha}}&spc_string={{spc_string}}&spckeyword={{spckeyword}}&display=checked" >{{fam.family}}</a></span>
+                <ul class="nested" style="color:#a20850">
+                    {% if fam.subfamily_set.all %}
+                        {% for subfam in fam.subfamily_set.all %}
+                            {% if subfam.tribe_set.all %}
+                                <li><span class="caret subfam"><a href="{% url 'common:genera' app %}?subfamily={{subfam.subfamily}}&family={{subfam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subfam.subfamily}}</a></span>
+                                <ul class="nested" style="color:green">
+                                    {% if subfam.tribe_set.all %}
+                                        {% for tribe in subfam.tribe_set.all %}
+                                            {% if tribe.subtribe_set.all %}
+                                            <li><span class="caret tribe"><a href="{% url 'common:genera' app %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></span>
+                                                <ul class="nested" style="color:purple">
+                                                   {% for subtribe in tribe.subtribe_set.all %}
+                                                        <li class="indent subtribe"><a href="{% url 'common:genera' app %}?subtribe={{subtribe.subtribe}}&tribe={{subtribe.tribe}}&subfamily={{subtribe.subfamily}}&family={{subtribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subtribe.subtribe}}</a></li>
+                                                   {% endfor %}
 
-                                                            </ul>
-                                                        </li>
-                                                        {% else %}
-                                                        <li class="indent tribe"><a href="{% url 'common:genera' %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></li>
-                                                        {% endif %}
-                                                   {% endfor %}
-                                                {% else %}
-                                                    <li class="indent tribe"><a href="{% url 'common:genera' %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">2 {{tribe.tribe}}</a></li>
-                                                {% endif %}
-                                            </ul>
-                                        </li>
-                                        {% else %}
-                                        <li class="indent subfam"><a href="{% url 'common:genera' %}?subfamily={{subfam.subfamily}}&family={{subfam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subfam.subfamily}}</a></li>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif fam.tribe_set.all %}
-                                    <li>
-                                        <ul class="nested">
-                                            <li><span class="caret tribe"><a href="{% url 'common:genera' %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></span>
-                                                <ul class="nested">
-                                                    {% for subtribe in tribe.subtribe_set.all %}
-                                                        <li class="subtribe"><a href="{% url 'common:genera' %}?subtribe={{subtribe.subtribe}}&tribe={{subtribe.tribe}}&subfamily={{subtribe.subfamily}}&family={{subtribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subtribe.subtribe}}</a></li>
-                                                   {% endfor %}
                                                 </ul>
                                             </li>
-                                        </ul>
-                                    </li>
-                                {% endif %}
+                                            {% else %}
+                                            <li class="indent tribe"><a href="{% url 'common:genera' app %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></li>
+                                            {% endif %}
+                                       {% endfor %}
+                                    {% else %}
+                                        <li class="indent tribe"><a href="{% url 'common:genera' app %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">2 {{tribe.tribe}}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            {% else %}
+                            <li class="indent subfam"><a href="{% url 'common:genera' app %}?subfamily={{subfam.subfamily}}&family={{subfam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subfam.subfamily}}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    {% elif fam.tribe_set.all %}
+                        <li>
+                            <ul class="nested">
+                                <li><span class="caret tribe"><a href="{% url 'common:genera' app %}?tribe={{tribe.tribe}}&subfamily={{tribe.subfamily}}&family={{tribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{tribe.tribe}}</a></span>
+                                    <ul class="nested">
+                                        {% for subtribe in tribe.subtribe_set.all %}
+                                            <li class="subtribe"><a href="{% url 'common:genera' app %}?subtribe={{subtribe.subtribe}}&tribe={{subtribe.tribe}}&subfamily={{subtribe.subfamily}}&family={{subtribe.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked">{{subtribe.subtribe}}</a></li>
+                                       {% endfor %}
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
-                        {% else %}
-                        <li class="indent fam"><a class="fam" href="?family={{fam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked"  >{{fam.family}}</a></li>
-                        {% endif %}
-                    {% endfor %}
+                    {% endif %}
                 </ul>
-            </div>
+            </li>
+            {% else %}
+            <li class="indent fam"><a class="fam" href="?family={{fam.family}}&alpha={{alpha}}&spc_string={{spc_string}}&display=checked"  >{{fam.family}}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
 
 <script type="text/javascript">
 var toggler = document.getElementsByClassName("caret");

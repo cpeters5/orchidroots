@@ -14,45 +14,51 @@
 <!--            Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
                     <div class="card-header border">
-                        <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of Genera in {% if family %}family <i>{{family.family}}</i> {% else %}All {{app|title}} Families{% endif %} {% if subfamily %} subfamily <i>{{subfamily}}</i>  {% endif %}
-                            {% if tribe %} tribe <i>{{tribe}}</i>  {% endif %}
-                                {% if subtribe %} subtribe <i>{{subtribe}}</i>  {% endif %}
-                        </div>
+                        <h1 class="hidden-h1">{{app|title}} genera</h1>
+                        <h4 class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">{{app|title}} genera</h4>
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family|default:'Orchidaceae'}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:newbrowse' app %}?app={{app}}&family={{family|default:'Orchidaceae'}}&genus={{genus}}&display=checked&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
                                 <a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Detailed list</a>
                             {% endif %}
                         </div>
                         <!--   Main table-->
+                        {% include "common/alpha_list_common.html" %}
                         {% if genus_list %}
-                            {% include "common/alpha_list_common.html" %}
                             <div style="clear: both"></div>
                             <div class="flex">
                                 <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <th>Genus</th>
+                                        {% if app == 'aves' %}
+                                        <th>Common name</th>
+                                        {% endif %}
                                         <th class="d-none d-lg-table-cell hidden-xs">{% if app != 'orchidaceae' %}Family  {% endif %} Subfamily  Tribe  Subtribe</th>
                                         <th>#images</th>
                                     </thead>
                                         {% for genus in genus_list %}
-                                        <tr><td>
+                                        <tr>
+                                            <td>
                                             {% if not app or app == 'orchidaceae' %}
-                                                <a href="{% url 'orchidaceae:species' %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' 'orchidaceae' %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
                                             {% else %}
-                                                <a href="{% url 'common:species' %}?app={{app}}&genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
                                             {% endif %}
                                                 {{genus.author|default:""}}
                                             </td>
+                                            {% if app == 'aves' %}
+                                            <td>
+                                                {{genus.common_name| default:''}}
+                                            </td>
+                                            {% endif %}
 
                                             <td class="d-none d-lg-table-cell hidden-xs">
                                                 {% if app != 'orchidaceae' %}{{genus.family}} {% endif %} {% if genus.subfamily %}  {{genus.subfamily}} {% endif %}
                                                 {% if genus.tribe %}{{genus.tribe}} {% endif %} {% if genus.subtribe %}{{genus.subtribe}} {% endif %}
                                             </td>
-                                            <td class="align-center">{% if genus.num_spcimage or  genus.num_hybimage %} {% add genus.num_spcimage genus.num_hybimage %} {% endif %}</td>
+                                            <td class="align-center">{% if genus.genusstat.num_spcimage > 0 or genus.genusstat.num_hybimage > 0 %}{%  add genus.genusstat.num_spcimage genus.genusstat.num_hybimage %}{% endif %}</td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
                                         {% endfor %}
@@ -80,6 +86,7 @@ $(document).ready(function() {
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,-1], [50,100,150,200,"All"]],
         "lengthChange": false,
+        "order": [[0,'asc'],],
         "bPaginate": true,
         "pagingType": "simple",
  	    "fnPreDrawCallback": function( oSettings ) {

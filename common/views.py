@@ -31,6 +31,7 @@ Accepted = []
 Synonym = []
 alpha_list = config.alpha_list
 applications = config.applications
+default_genus = config.default_genus
 
 def getAllGenera():
     # Call this when Family is not provided
@@ -170,197 +171,168 @@ def require_get(view_func):
     return wrap
 
 
-def taxonomy(request):
-    family_list, alpha = get_taxonomy(request)
-    context = {'family_list': family_list,
-               }
+def taxonomy(request, app):
+    alpha = request.GET.get('alpha','')
+
+    family_list = get_taxonomy(request, app, alpha)
+    context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, }
     return render(request, "common/taxonomy.html", context)
 
 
-def genera(request):
-    path = resolve(request.path).url_name
-    talpha = request.GET.get('talpha','')
+def family(request, app):
+    alpha = request.GET.get('alpha','')
+    family_list = Family.objects.filter(application=app)
+    if alpha:
+        family_list = family_list.filter(family__istartswith=alpha)
+
+    context = {
+        'app': app, 'alpha': alpha,
+        'family': family,
+        'family_list': family_list,
+        'alpha_list': alpha_list,
+    }
+    return render(request, "common/family.html", context)
+
+
+def genera(request, app):
+    alpha = request.GET.get('alpha','')
     subfamily = ''
     tribe = ''
     subtribe = ''
     family_list = []
-    family = request.GET.get('family','Orchidaceae')
-    try:
-        family = Family.objects.get(family=family)
-        app = family.application
-        family_list = Family.objects.filter(application=app)
-    except Family.DoesNotExist:
-        family = ''
-        app = request.GET.get('app',None)
-        if app == 'orchidaceae':
-            family = Family.objects.get(family='Orchidaceae')
-        else:
-            family_list = Family.objects.filter(application=app)
-
-    if app:
-        Genus = apps.get_model(app, 'Genus')
-    else:
-        return render(request, "common/family.html", {})
-    if family_list and talpha:
-        # Non orchid genera
-        family_list = family_list.filter(family__istartswith=talpha)
-
+    family = request.GET.get('family', '')
     if family:
+        try:
+            family = Family.objects.get(family=family)
+        except Family.DoesNotExist:
+            family = ''
+    if isinstance(family, Family) and family.application != app:
+        family = ''
+
+    Genus = apps.get_model(app, 'Genus')
+    if app == 'orchidaceae':
         # Orchid genera
         subfamily, tribe, subtribe = getSuperGeneric(request)
+        # subfamily = request.GET.get('subfamily', '')
+        # tribe = request.GET.get('tribe', '')
+        # subtribe = request.GET.get('subtribe', '')
+
         genus_list = Genus.objects.exclude(status='synonym')
-        if subtribe != '':
+        if subtribe:
             genus_list = genus_list.filter(subtribe=subtribe)
-        elif tribe != '':
+        if tribe:
             genus_list = genus_list.filter(tribe=tribe)
-        elif subfamily != '':
+        if subfamily:
             genus_list = genus_list.filter(subfamily=subfamily)
-    elif family_list:
-        # No family (e.g. first landing on this page), show all non-Orchidaceae genera
-        # OrGenus, OtGenus = getAllGenera()
-        Genus = apps.get_model(app, 'Genus')
-        genus_list = Genus.objects.filter(family__in=family_list.values_list('family', flat=True))
+
     else:
-        genus_list = ''
-    # If private request
-    if genus_list or family:
-        # Complete building genus list
-        if talpha:
-            genus_list = genus_list.filter(genus__istartswith=talpha)
-
-        total = len(genus_list)
-        write_output(request, str(family))
-        context = {
-            'genus_list': genus_list,  'app': app, 'total':total, 'talpha': talpha,
-            'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-            'alpha_list': alpha_list,
-            'path': path
-        }
-        return render(request, "common/genera.html", context)
-    else:
-        context = {
-            'app': app, 'total':len(family_list), 'talpha': talpha,
-            'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-            'family_list': family_list,
-            'alpha_list': alpha_list,
-            'path': path
-        }
-        return render(request, "common/family.html", context)
-
-
-def species(request):
-    # path = resolve(request.path).url_name
-    path_link = 'information'
-    talpha = request.GET.get('talpha','')
-    if request.user.is_authenticated  and request.user.tier.tier > 3:
-        path_link = 'photos'
-    req_type = request.GET.get('type', 'species')
-    req_family = request.GET.get('family', None)
-    req_genus = request.GET.get('genus', None)
-
-    # alpha = request.GET.get('alpha', '')
-    syn = request.GET.get('syn', None)
-
-    # If Orchidaceae, go to full table.
-    if req_family == 'Orchidaceae':
-        if req_type == 'hybrid':
-            url = "%s?family=%s&genus=%s&type=hybrid" % (reverse('orchidaceae:hybrid'), req_family, req_genus)
+        if not family:
+            genus_list = Genus.objects.all()
         else:
-            url = "%s?family=%s&genus=%s&type=species" % (reverse('orchidaceae:species'), req_family, req_genus)
+            genus_list = Genus.objects.filter(family=family)
 
-        return HttpResponseRedirect(url)
-    max_items = 3000
-    genus_list = []
-    species_list = []
+
+    # Complete building genus list
+    if alpha:
+        genus_list = genus_list.filter(genus__istartswith=alpha)
+
+    write_output(request, str(family))
+    context = {
+        'genus_list': genus_list,  'app': app, 'alpha': alpha,
+        'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+        'alpha_list': alpha_list,
+    }
+    return render(request, "common/genera.html", context)
+
+
+def species(request, app):
+    # path = resolve(request.path).url_name
+    alpha = request.GET.get('alpha','')
+    role = request.GET.get('role','pub')
+    req_type = request.GET.get('type', 'species')
+
+    req_family = request.GET.get('family', '')
+    # if new family requested, it must be family in the same application
     if req_family:
         try:
             req_family = Family.objects.get(family=req_family)
             app = req_family.application
         except Family.DoesNotExist:
-            app = ''
             req_family = ''
-    if req_family and req_family != '':
-        Genus = apps.get_model(app, 'Genus')
-        Species = apps.get_model(app, 'Species')
-        if req_genus != '':
-            try:
-                req_genus = Genus.objects.get(genus=req_genus)
-            except Genus.DoesNotExist:
-                req_genus = ''
-            # If genus object found, build species list
-            if req_genus != '':
-                species_list = Species.objects.filter(genus=req_genus).filter(family=req_family)
-                if req_type != '':
-                    species_list = species_list.filter(type=req_type)
-                if talpha != '':
-                    species_list = species_list.filter(species__istartswith=talpha)
-                if syn == 'N':
-                    species_list = species_list.exclude(status='synonym')
-                    syn = 'N'
-                else:
-                    syn = 'Y'
+        if req_family.application != app:
+            req_family = ''
+
+    syn = request.GET.get('syn', '')
+    req_genus = request.GET.get('genus', '')
+
+    # Define a default genus for large sections
+    if not req_genus:
+        req_genus = default_genus[app]
+
+    # hybrids are in Orchidaceae only.
+    if req_family == 'Orchidaceae':
+        if req_type == 'hybrid':
+            url = "%s?family=%s&genus=%s&type=hybrid&alpha=%s" % (reverse('orchidaceae:hybrid'), req_family, req_genus, alpha)
+        # else:
+        #     url = "%s?family=%s&genus=%s&type=species&alpha=%s" % (reverse('orchidaceae:species'), req_family, req_genus, alpha)
+            return HttpResponseRedirect(url)
+
+    max_items = 3000
+    Genus = apps.get_model(app, 'Genus')
+    Species = apps.get_model(app, 'Species')
+    species_list = []
+
+    if req_genus:
+        # Case 1: Genus is given, list only species of that genus
+        try:
+            req_genus = Genus.objects.get(genus=req_genus)
+        except Genus.DoesNotExist:
+            # No genus found in this category, go to the next.
+            req_genus = ''
+        if req_genus:
+            species_list = Species.objects.filter(genus=req_genus)
+            # if req_type:
+            #     this_species_list = this_species_list.filter(type=req_type)
+            # if alpha:
+            #     this_species_list = this_species_list.filter(species__istartswith=alpha)
+            # if syn == 'N':
+            #     this_species_list = this_species_list.exclude(status='synonym')
+            #     syn = 'N'
+            # else:
+            #     syn = 'Y'
+    if not req_genus:
+        if req_family and req_family != '':
+            # Case 2: Family is given, search for species in teh family
+            # Large cases were already fall back to default.
+            species_list = Species.objects.filter(family=req_family)
         else:
-            # If requested genus in not valid return list of genera
-            genus_list = Genus.objects.filter(family=req_family)
-    elif req_genus != '':
-        # Get list of req_genus species from all applications
-        species_list = []
-        for app in applications:
-            # Go through all applications
-            Genus = apps.get_model(app, 'Genus')
-            Species = apps.get_model(app, 'Species')
-            try:
-                req_genus = Genus.objects.get(genus=req_genus)
-            except Genus.DoesNotExist:
-                continue
-            species_list = None
-            if req_genus != '':
-                this_species_list = Species.objects.filter(genus=req_genus)
-                if req_type != '':
-                    this_species_list = this_species_list.filter(type=req_type)
-                if talpha != '':
-                    this_species_list = this_species_list.filter(species__istartswith=talpha)
-                if syn == 'N':
-                    this_species_list = this_species_list.exclude(status='synonym')
-                    syn = 'N'
-                else:
-                    syn = 'Y'
-                if this_species_list:
-                    if not species_list:
-                        species_list = this_species_list
-                    else:
-                        species_list = species_list.union(this_species_list)
-    if not genus_list and not species_list and not req_genus:
-        #     No filter requested, return family list
-        family_list = Family.objects.all()
-        if talpha:
-            family_list = family_list.filter(family__istartswith=talpha)
+            species_list = Species.objects.all()
 
-        req_app = request.GET.get('app', '')
-        if req_app in applications:
-            family_list = family_list.filter(application=req_app)
-        context = {
-            'family_list': family_list,  'app': req_app,
-            'alpha_list': alpha_list,
-        }
-        return render(request, "common/family.html", context)
+    if req_type != '':
+        species_list = species_list.filter(type=req_type)
+    if alpha != '':
+        species_list = species_list.filter(species__istartswith=alpha)
+    if syn == 'N':
+        species_list = species_list.exclude(status='synonym')
+        syn = 'N'
+    else:
+        syn = 'Y'
 
-    total = len(species_list)
-    msg = ''
-    if total > max_items:
-        species_list = species_list[0:max_items]
+
+    if len(species_list) > max_items:
+        if not alpha:
+            alpha = 'A'
+            species_list = species_list.filter(species__istartswith=alpha)
+        if len(species_list) > max_items:
+            species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
-        total = max_items
-    role = ''
-    if request.user.is_authenticated  and request.user.tier.tier > 2:
-        role = 'cur'
-    write_output(request, str(req_family))
+
+    write_output(request, str(app))
     context = {
-        'genus': req_genus, 'genus_list': genus_list, 'species_list': species_list, 'app': app, 'total':total,
+        'genus': req_genus, 'species_list': species_list, 'app': app,
         'syn': syn, 'type': req_type, 'role':role,
         'family': req_family,
-        'alpha_list': alpha_list, 'talpha': talpha,
-        'msg': msg, 'path_link': path_link, 'from_path': 'species',
+        'alpha_list': alpha_list, 'alpha': alpha,
     }
     return render(request, "common/species.html", context)
 
@@ -385,115 +357,123 @@ def quality_update(quality, orid, SpcImages):
     return quality
 
 
-def newbrowse(request):
-    # Application must be in request
-    talpha = request.GET.get('talpha','')
-    if talpha == 'ALL':
-        talpha = ''
+def newbrowse(request, app=None):
+    write_output(request, str(app))
+    if app == None:
+        app = request.GET.get('app', '')
+    if not app:
+        app = 'fungi'
 
-    app = request.GET.get('app','')
+    Family = apps.get_model('common', 'Family')
     family = request.GET.get('family', '')
-    genus = request.GET.get('genus', '')
-    display = request.GET.get('display', 'checked')
-
-    # if app == 'orchidaceae':
-        # Special case for orchids
-        # family = 'Orchidaceae'
-
-    if family and not genus:
-        # Family is requested
+    if family:
         try:
             family = Family.objects.get(family=family)
         except Family.DoesNotExist:
-            family = None
+            family = ''
+
+    Genus = apps.get_model(app, 'Genus')
+    genus = request.GET.get('genus', 'Cattleya')
+    if genus:
+        try:
+            genus = Genus.objects.get(genus=genus)
+        except Genus.DoesNotExist:
+            genus = ''
+
+    type = request.GET.get('type','species')
+    alpha = request.GET.get('alpha','')
+    if alpha == 'ALL':
+        alpha = ''
+
+    family_list = genus_list = species_list = [], [], []
+
+    display = request.GET.get('display', 'checked')
+
+    if not family and not genus:
+        # Browse family images
+        family_list = Family.objects.filter(application=app)
+
+    elif family and not genus:
+        # Browse genus image in the Family
 
         if family:
-            app = family.application
             Genus = apps.get_model(app.lower(), 'Genus')
             SpcImages = apps.get_model(app.lower(), 'SpcImages')
             # genera = Genus.objects.filter(family=family)
             if app == 'orchidaceae':
-                genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen',
-                                                                                                        flat=True).distinct()
+                if type == 'species':
+                    genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
+                else:
+                    genera = HybImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
             else:
-                genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by(
-                    'gen').values_list('gen', flat=True).distinct()
+                genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
             if genera:
                 genus_list = []
                 genera = set(genera)
                 genlist = Genus.objects.filter(pid__in=genera)
-                if talpha:
-                    genlist = genlist.filter(genus__istartswith=talpha)
+                if alpha:
+                    genlist = genlist.filter(genus__istartswith=alpha)
                 genlist = genlist.order_by('genus')
                 for gen in genlist:
                     genus_list = genus_list + [gen.get_best_img()]
-                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'talpha': talpha,
-                           'alpha_list': alpha_list, }
+                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'alpha': alpha,
+                           'alpha_list': alpha_list, 'app': app,}
                 return render(request, 'common/newbrowse.html', context)
 
-
-    if app in applications:
-        # If app is requested, find family_list and sample image by family
-        # If family is requested, get sample list by genera
-        genus = request.GET.get('genus', None)
-        if genus:
-            # Go to browse genus.species
-            Genus = apps.get_model(app.lower(), 'Genus')
-            Species = apps.get_model(app.lower(), 'Species')
-            Accepted = apps.get_model(app.lower(), 'Accepted')
-            try:
-                genus = Genus.objects.get(genus=genus)
-            except Genus.DoesNotExist:
-                genus = ''
-            if genus:
-                species = Species.objects.filter(genus=genus)
-                if not talpha and app == 'orchidaceae' and len(species) > 2000:
-                    talpha = 'A'
-                if talpha:
-                    species = species.filter(species__istartswith=talpha)
-                section = request.GET.get('section', '')
-                if section:
-                    sections = Accepted.objects.filter(gen=genus.pid).filter(section=section).values_list('pid', flat=True)
-                    species = species.filter(pid__in=sections)
-
-                species = species.order_by('species')
-                if len(species) > 500:
-                    species = species[0: 500]
-                species_list = []
-                for x in species:
-                    spcimage = x.get_best_img()
-                    if spcimage:
-                        species_list = species_list + [spcimage]
-                context = {'species_list': species_list, 'family': genus.family, 'app': genus.family.application, 'genus': genus, 'talpha': talpha, 'alpha_list': alpha_list,}
-                return render(request, 'common/newbrowse.html', context)
-
-        # Neither app, family, nor genus were requested. Building sample by families
-        #  Typically requested from navbar buttons
-        families = Family.objects.filter(application=app)
-        if talpha:
-            families = families.filter(family__istartswith=talpha)
-        families = families.order_by('family')
+    # If only app is requested, find family_list and sample image by family
+    # If family is requested, get sample list by genera
+    if genus:
+        # Go to browse genus.species
         Genus = apps.get_model(app.lower(), 'Genus')
-        family_list = []
-        for fam in families:
-            genimage = Genus.objects.filter(family=fam.family).order_by('?')[0:1]
-            if len(genimage) > 0 and genimage[0].get_best_img():
-                family_list = family_list + [(genimage[0])]
-        role = request.GET.get('role', '')
-        context = {'family_list': family_list, 'app': app, 'talpha': talpha, 'alpha_list': alpha_list, 'role': role,
-                   'display': display}
-        return render(request, 'common/newbrowse.html', context)
+        Species = apps.get_model(app.lower(), 'Species')
+        Accepted = apps.get_model(app.lower(), 'Accepted')
+        try:
+            genus = Genus.objects.get(genus=genus)
+        except Genus.DoesNotExist:
+            genus = ''
+        if isinstance(genus, Genus):
+            species = Species.objects.filter(genus=genus)
+            if not alpha and app == 'orchidaceae' and len(species) > 2000:
+                alpha = 'A'
+            if alpha:
+                species = species.filter(species__istartswith=alpha)
+            section = request.GET.get('section', '')
+            if section:
+                sections = Accepted.objects.filter(gen=genus.pid).filter(section=section).values_list('pid', flat=True)
+                species = species.filter(pid__in=sections)
 
-    # Bad application, and neither families nor genus are valid, list all genera in the app
-    write_output(request, str(family))
-    return HttpResponseRedirect('/')
+            species = species.order_by('species')
+            if len(species) > 500:
+                species = species[0: 500]
+            species_list = []
+            for x in species:
+                spcimage = x.get_best_img()
+                if spcimage:
+                    species_list = species_list + [spcimage]
+            context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list,}
+            return render(request, 'common/newbrowse.html', context)
 
-    # Now we get family_list of sample genera
+    # Neither family, nor genus were requested. Building sample by families
+    #  Typically requested from navbar buttons
+    families = Family.objects.filter(application=app)
+    if alpha:
+        families = families.filter(family__istartswith=alpha)
+    families = families.order_by('family')
+    Genus = apps.get_model(app, 'Genus')
+    family_list = []
+    for fam in families:
+        genimage = Genus.objects.filter(family=fam.family).order_by('?')[0:1]
+        if len(genimage) > 0 and genimage[0].get_best_img():
+            family_list = family_list + [(genimage[0])]
+    role = request.GET.get('role', '')
+    context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, 'role': role,
+               'display': display}
+    return render(request, 'common/newbrowse.html', context)
 
 
 def distribution(request):
     # For non-orchids only
-    talpha = ''
+    alpha = ''
     distribution = ''
     genus = ''
     commonname = ''
@@ -502,7 +482,6 @@ def distribution(request):
     tribe = ''
     subtribe = ''
     crit = 0
-    from_path = pathinfo(request)
     role = request.GET.get('role', 'pub')
     family = request.GET.get('family', None)
     if family:
@@ -572,14 +551,15 @@ def distribution(request):
                     species_list = Species.objects.filter(pid__in=dist_list)
 
         if species_list:
-            talpha = request.GET.get('talpha', '')
-            if talpha != '':
-                species_list = species_list.filter(species__istartswith=talpha)
+            alpha = request.GET.get('alpha', '')
+            if alpha != '':
+                species_list = species_list.filter(species__istartswith=alpha)
             species_list = species_list.order_by('species')
         total = len(species_list)
     context = {'species_list': species_list, 'distribution': distribution, 'commonname': commonname,
                'family': family, 'genus': genus,
-               'role': role, 'app': 'other', 'talpha': talpha, 'alpha_list': alpha_list, 'from_path': from_path}
+               'role': role, 'app': 'other', 'alpha': alpha, 'alpha_list': alpha_list,
+               }
     write_output(request, str(distribution))
     return render(request, "common/distribution.html", context)
 

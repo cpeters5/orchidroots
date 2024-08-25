@@ -226,14 +226,12 @@ img{
         <div class="col" style="text-align:left;margin-top:25px;">
             <div class="card">
                 <div class="card-header">
-                    <span style="color:darkgreen; font-size:22px;font-weight:normal">
-                        Sample images Role = {{role}}
+                    <h1 class="hidden-h1">
                             <i>
                         {% if genus %}
-                                of species in <b>{{genus}}</b> genus
+                                Species in <b>{{genus}}</b> genus
                         {% elif family %}
-                                by genera in
-                                <b>{{family.family}}</b> family
+                                {{app|title}} family <b>{{family.family}}</b>
                             {% if subfamily %}
                                 subfamily {{subfamily.subfamily}}
                             {% endif %}
@@ -243,34 +241,49 @@ img{
                                     subtribe {{subtribe.subtribe}}
                                 {% endif %}
                             {% endif %}
-                        {% elif app %}
-                                by families in <b>{{app|title}}</b>
                         {% endif %}
                             </i>
-                        </span>
+                    </h1>
+                    <span style="color:darkgreen; font-size:22px;font-weight:normal">
+                            <i>
+                        {% if genus %}
+                             Species in <b>{{genus}}</b> genus
+                        {% elif family %}
+                             {{app|title}} family <b>{{family.family}}</b>
+                            {% if subfamily %}
+                                subfamily {{subfamily.subfamily}}
+                            {% endif %}
+                            {% if tribe %}
+                                tribe {{tribe.tribe}}
+                                {% if subtribe %}
+                                    subtribe {{subtribe.subtribe}}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                            </i>
+                    </span>
                         &nbsp;
                     {% if genus %}
-                    <a href="{% url 'common:species' %}?app={{family.application}}&family={{family}}&genus={{genus}}">List {{genus}} species</a>
+                    <a href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}">List {{genus}} species</a>
                     {% elif family %}
-                    <a href="{% url 'common:genera' %}?app={{family.application}}&family={{family}}">List {{family.family}} genera</a>
+                    <a href="{% url 'common:genera' app %}?app={{family.application}}&family={{family}}">List {{family.family}} genera</a>
                     {% else %}
-                    <a href="{% url 'common:genera' %}?app={{app}}">List {{app}} families</a>
+                    <a href="{% url 'common:genera' app %}?app={{app}}">List {{app}} families</a>
                     {% endif %}
                 </div>
 
                 <div class="card-body">
                     <div style="font-size:16px;">
-<!--                        <a href="{% url 'common:genera' %}?family={{family}}&alpha={{alpha}}&talpha={{talpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}">List {{app}} genera</a>-->
                         <form action="?" id="fam" style="display:inline-block">
 <!--                            <input form="fam" type="hidden" name="app" value="{{app}}" >-->
-                            <input form="fam" type="hidden" name="talpha" value="{{talpha}}" >
+                            <input form="fam" type="hidden" name="alpha" value="{{alpha}}" >
                             <input form="fam" type="hidden" name="app" value="{{app}}" >
                             <input form="fam" type="text" class="btn-custom" name="family" value="{{family|default:''}}" placeholder="family" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
                         <form action="?" id="gen" style="display:inline-block">
                             <input form="gen" type="hidden" name="app" value="{{app}}" >
                             <input type="hidden" name="family" value="{{family}}" >
-                            <input form="gen" type="hidden" name="talpha" value="{{talpha}}" >
+                            <input form="gen" type="hidden" name="alpha" value="{{alpha}}" >
                             <input form="gen" type="text" class="btn-custom" name="genus" value="{{genus|default:''}}" placeholder="genus" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
                     </div>
@@ -281,7 +294,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{x.family.application}}&family={{x.family.family}}&role={{role}}">{{x.family}}</a>
+                                <a href="{% url 'common:newbrowse' app %}?family={{x.family.family}}&role={{role}}">{{x.family}}</a>
                                 {% if x.get_best_img.pid_id %}
                                     <a href="{% url 'display:summary' app  x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}&role={{role}}">
                                         <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.thumb_dir %}{{ x.get_best_img.image_file}}" >
@@ -300,7 +313,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{x.gen.genus}}&role={{role}}">{{x.gen.genus}}</a>
+                                <a href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{x.gen.genus}}&role={{role}}">{{x.gen.genus}}</a>
                                 {% if x.pid.pid.type == 'hybrid' and x.pid.pid.family.family == 'Orchidaceae' %}
                                     <a href="{% url 'display:summary' app x.pid.pid.pid %}?app={{x.pid.pid.family.application}}&family={{x.pid.pid.family}}&role={{role}}">
                                         {% if x.image_file %}

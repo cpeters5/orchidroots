@@ -4,11 +4,14 @@ from display.views import photos as display_photos, information as display_infor
 app_name = 'common'
 urlpatterns = [
     # Top level
-    path('genera/', views.genera, name='genera'),
-    path('species/', views.species, name='species'),
+    path('family/<str:app>/', views.family, name='family'),
+    # path('genera_orig/', views.genera_orig, name='genera_orig'),
+    path('genera/<str:app>/', views.genera, name='genera'),
+    path('species/<str:app>/', views.species, name='species'),
     path('distribution/', views.distribution, name='distribution'),
+    path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
-    path('taxonomy/', views.taxonomy, name='taxonomy'),
+    path('taxonomy/<str:app>/', views.taxonomy, name='taxonomy'),
 
     # Redirect to display
     path('information/', display_information, name='information'),
