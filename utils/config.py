@@ -21,3 +21,11 @@ big_genera = [
     'Brassolaeliocattleya',
     'Doritaenopsis'
 ]
+
+default_genus = {
+    'animalia': 'Zygaena',
+    'aves': 'Falco',
+    'fungi': 'Amanita',
+    'orchidaceae': 'Cattleya',
+    'other': 'Silene',
+}

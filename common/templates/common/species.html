@@ -15,20 +15,21 @@
 <!--                Display list of genus in the family (subfamily/tribe or subtribe) -->
                 <div class="card m-1">
                     <div class="card-header border">
+                        <h1 class="hidden-h1">List of species or hybrid of {{app}} category</h1>
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
                             List of
-                            {% if genus_list %}Genera{% else %}
                                <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="type" name="family" value="{{family}}" >
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
                                     <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
-                            {% endif %} in family
+
+                            in family
                                <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
-                                    <input class="searchbox border" form="family" value="{{family}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{family|default:'family'}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
                                    genus
-                                    <input class="searchbox border" form="family" value="{{genus}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{genus|default:'genus'}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
                                 </form>
                             <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
@@ -36,7 +37,7 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' %}?app={{family.application}}&family={{family}}&genus={{genus}}">Browse images</a>
+                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}">Browse images</a>
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                             <input type="hidden" form="display" name="type" value="{{type}}" >
                             <input type="hidden" form="display" name="family" value="{{family.family}}" >
@@ -47,17 +48,17 @@
                             <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
                             {% endif %}
                         </form>
-                        {% if alpha_list %}
-                            <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
-                        {% endif %}
+                        <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
                         {% if species_list %}
                             <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <tr style="background-color: #e3e3e3">
                                             <th class="spc_column">Species</th>
-<!--                                            <th>Higher taxonomic levels</th>-->
-                                            <th class="d-none d-lg-table-cell">Common Name</th>
+                                            {% if app == 'orchidaceae' %}
+                                            <th class="d-none d-lg-table-cell">Higher taxonomic levels</th>
+                                            {% endif %}
+                                            <th>Common Name</th>
                                             <th>#images</th>
                                         </tr>
                                     </thead>
@@ -66,58 +67,36 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y">{{species.binomial_it|safe}}</a>
-                                                        (syn. <a href="/display/{{path_link}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
+                                                        <a href="/display/summary/{{app}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y">{{species.binomial_it|safe}}</a>
+                                                        (syn. <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}">
                                                             <i>{{species.getAccepted.binomial_it|safe}}</i></a>
                                                         {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %}
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/{{path_link}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y"><i>{{species.binomial_it|safe}}</i></a>
+                                                    <a href="/display/summary/{{app}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y"><i>{{species.binomial_it|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
                                             </td>
 
-<!--                                            <td>-->
-<!--                                                <a href="?genus={{species.genus}}&family={{species.gen.family}}">{{species.gen.family}}</a>-->
-<!--                                                {% if species.gen.subfamily %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}">{{species.gen.subfamily}}</a> {% endif %}-->
-<!--                                                {% if species.gen.tribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}"> {{species.gen.tribe}}</a> {% endif %}-->
-<!--                                                {% if species.gen.subtribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}&subtribe={{species.gen.subtribe}}">{{species.gen.subtribe}}</a> {% endif %}-->
-<!--                                            </td>-->
-                                            <td class="d-none d-lg-table-cell">{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
-                                            <td style="text-align:center">{{species.num_image|default:""}}</td>
-<!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
-                                        </tr>
-                                        {% endfor %}
-                                </table>
-                        {% elif genus_list %}genus list = {{genus_list|length}}
-                            <table id="sortTable" style="font-size: 13px;" class="table table-condensed table-sm  table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th class="spc_column">Genus</th>
-                                            <th class="d-none d-lg-table-cell">Higher taxonomic levels</th>
-                                            <th class="d-none d-lg-table-cell">Common Name</th>
-                                            <th>#images</th>
-                                        </tr>
-                                    </thead>
-                                        {% for genus in genus_list %}
-                                        <tr>
-                                            <td>
-                                                <a href="?genus={{genus.genus}}&family={{genus.family}}"><i>{{genus}}</i></a> {{genus.author|default:""}} {{genus.year}}
-                                            </td>
+                                            {% if app == 'orchidaceae' %}
                                             <td class="d-none d-lg-table-cell">
-                                                {{genus.family|default:''}} {{genus.subfamily|default:''}} {{genus.tribe|default:''}} {{genus.subtribe|default:''}}
+                                                <a href="?genus={{species.genus}}&family={{species.gen.family}}">{{species.gen.family}}</a>
+                                                {% if species.gen.subfamily %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}">{{species.gen.subfamily}}</a> {% endif %}
+                                                {% if species.gen.tribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}"> {{species.gen.tribe}}</a> {% endif %}
+                                                {% if species.gen.subtribe %}> <a href="?genus={{species.genus}}&family={{species.gen.family}}&subfamily={{species.gen.subfamily}}&tribe={{species.gen.tribe}}&subtribe={{species.gen.subtribe}}">{{species.gen.subtribe}}</a> {% endif %}
                                             </td>
-                                            <td class="d-none d-lg-table-cell">{{genus.common_name|default:''}}</td>
-                                            <td style="text-align:center">{{genus.num_spcimage|default:""}}</td>
+                                            {% endif %}
+                                            <td>{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
+                                            <td style="text-align:center">{{species.speciesstat.num_image|default:""}}</td>
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
                                         {% endfor %}
                                 </table>
                         {% else %}
-                            <br><br>There currently is no <i>{{genus}}</i> {{type}} {% if talpha %} begins with {{talpha}}{% endif %}  in our system yet!
+                            <br><br>No <i>{{genus}}</i> {{type}} {% if alpha %} begins with {{alpha}}{% endif %} found.
                         {% endif %}
 
                     </div>
@@ -143,6 +122,7 @@ $(document).ready(function() {
 
         "LengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
+        "order": [[0,'asc'],],
         "bPaginate": true,
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter species list'});//tips
@@ -162,6 +142,34 @@ $(document).ready(function() {
             // searchPlaceholder: "Search this page"
         }
     });
+
+    var dataTable = $('#sortTable1').dataTable({
+        "pageLength": 50,
+        "pagingType": "numbers",
+
+        "LengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "order": [[0,'asc'],],
+        "bPaginate": true,
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter species list'});//tips
+        },
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "next": "Next",
+                "previous": "Previous"
+            }
+            // "sSearch": "Searching:",
+            // searchPlaceholder: "Search this page"
+        }
+    });
+
 });
 </script>
 

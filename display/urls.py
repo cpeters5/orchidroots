@@ -5,10 +5,12 @@ from . import views
 app_name = 'display'
 urlpatterns = [
     path('summary/<str:application>/<int:pid>/', views.summary, name='summary'),
-    path('information/<str:application>/<int:pid>/', RedirectView.as_view(pattern_name='display:summary', permanent=True)),
+    # path('information/<str:application>/<int:pid>/', RedirectView.as_view(pattern_name='display:summary', permanent=True)),
     # path('information/<str:application>/<int:pid>/', views.information_tmp, name='information_tmp'),
 
-    path('information/<int:pid>/', RedirectView.as_view(pattern_name='display:photos', permanent=True)),
+    # old path structure (no app present),
+    path('information/<int:pid>/', views.information, name='information'),
+    # path('information/<int:pid>/', RedirectView.as_view(pattern_name='display:photos', permanent=True)),
     path('photos/<int:pid>/', views.photos, name='photos'),
 
     path('videos/<int:pid>/', views.videos, name='videos'),

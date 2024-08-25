@@ -46,7 +46,7 @@
         {% if species %}
             <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' species.pid %}?app={{app}}&family={{family}}&role={{role}}">All photos</a>
         {% else %}
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' %}?app={{app}}&family={{family}}&role={{role}}">All photos</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' app %}?family={{family}}&role={{role}}">All photos</a>
         {% endif %}
         {% if species %}
                 {% if author.author_id == 'anonymous' %}

@@ -75,7 +75,7 @@ option {
                 </form>
             </h4>
                 {% if total > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' %}?app=orchidaceae&family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
                 {% endif %}
         </div>
 

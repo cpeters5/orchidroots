@@ -3,7 +3,7 @@
 {% include 'detail-title.html' %}
 {% block body %}
 <head>
-    <title>General information about {{species.binomial}}</title>
+    <title>Detail about {{species.binomial}}</title>
     <link rel="canonical" href="{{ canonical_url }}">
     <meta name='description' content='Ganeology information about {{species.binomial}}'>.
 </head>
@@ -308,8 +308,8 @@ seedparent, pollparent {
         <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} of
-                &nbsp;<a href="{% url 'common:newbrowse' species.gen.family.application %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;family,
-                &nbsp;<a href="{% url 'common:newbrowse' species.gen.family.application %}?family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
+                &nbsp;<a href="{% url 'common:newbrowse' species.family.application %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;family,
+                &nbsp;<a href="{% url 'common:newbrowse' species.family.application %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
                 {% if species.accepted.subgenus %}
                     &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>&nbsp;subgenus
                 {% endif %}
@@ -323,7 +323,7 @@ seedparent, pollparent {
                     &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;series
                 {% endif %}
                 {% if species.status == 'synonym' %}
-                    This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted }}</a>
+                    This name is a synonym of <a href="{% url 'display:information'  species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted }}</a>
                 {% endif %}
                 {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}
             {% else %}
@@ -365,7 +365,7 @@ seedparent, pollparent {
                     <div style="width: 80%; font-size:16px;border:0 solid lightgrey; margin:50px auto; text-align: center; padding:10px">
                         No image available.
                         {% if species.status == 'synonym' %}
-                        Please try the accepted species <a href="{% url 'display:summary' app species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted}}</a>
+                        Please try the accepted species <a href="{% url 'display:information' species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted}}</a>
                         {% else %}
                             if you have one please consider uploading it
                             <a href="/{{app}}/uploadfile/{{species.pid}}/" rel="nofollow noreferrer noopener">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
@@ -396,12 +396,12 @@ seedparent, pollparent {
                         </div>
                         <div class="parent-text " style="text-align:center; margin-bottom:10px;">
                             {% if species.hybrid.seed_id.pid %}
-                                <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
+                                <a href="{% url 'display:information' species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
                                 {% if species.hybrid.seed_id.status == 'synonym' %}
-                                    (syn. <a href="{% url 'display:summary' app species.hybrid.seed_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'display:information' species.hybrid.seed_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% elif species.status == 'synonym' and species.getAccepted.hybrid.seed_id.pid %}
-                                    <a href="{% url 'display:summary' app species.getAccepted.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_seed_name_long|safe}}</a>
+                                    <a href="{% url 'display:information' species.getAccepted.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_seed_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.seed_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -422,17 +422,17 @@ seedparent, pollparent {
                                     </a>
                                 {% endfor %}
                             {% else %}
-                            <img class="thumbnails thumbnails2"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                            <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                             {% endif %}
                         </div>
                         <div class="parent-text" style="text-align:center;">
                             {% if species.hybrid.pollen_id.pid %}
-                                <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
+                                <a href="{% url 'display:information' species.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_pollen_name_long|safe}}</a>
                                 {% if species.hybrid.pollen_id.status == 'synonym' %}
-                                    (syn. <a href="{% url 'display:summary' app species.hybrid.pollen_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'display:information' species.hybrid.pollen_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% elif species.status == 'synonym' and species.getAccepted.hybrid.pollen_id.pid %}
-                                <a href="{% url 'display:summary' app species.getAccepted.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_pollen_name_long|safe}}</a>
+                                <a href="{% url 'display:information' species.getAccepted.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_pollen_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.pollen_genus | default:"Nodata"}} ?
                             {% endif %}
@@ -463,7 +463,7 @@ seedparent, pollparent {
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.seed_id.hybrid.seed_id %}
-                                    <a href="{% url 'display:summary' app species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener">{{species.hybrid.seed_id.hybrid.seed_id.name|safe}}</a>
                                     {% else %}
                                     Unknown
                                     {% endif %}
@@ -485,7 +485,7 @@ seedparent, pollparent {
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.seed_id.hybrid.pollen_id %}
-                                    <a href="{% url 'display:summary' app species.hybrid.seed_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.pollen_id.name|safe}}</a>
+                                    <a href="{% url 'display:information' species.hybrid.seed_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.hybrid.pollen_id.name|safe}}</a>
                                     {% else %}
                                     unknown
                                     {% endif %}
@@ -512,12 +512,12 @@ seedparent, pollparent {
                                         </a>
                                         {% endfor %}
                                     {% else %} <!-- if seed_list -->
-                                        <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                        <img class="thumbnails thumbnails2" alt="no image"  src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.pollen_id.hybrid.seed_id %}
-                                            <a href="{% url 'display:summary' app species.hybrid.pollen_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.seed_id.name|safe}}</a>
+                                            <a href="{% url 'display:information' species.hybrid.pollen_id.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.seed_id.name|safe}}</a>
                                     {% else %}
                                         Unknown
                                     {% endif %} <!-- if pollenpollen_id -->
@@ -535,13 +535,13 @@ seedparent, pollparent {
                                             </a>
                                         {% endfor %}
                                     {% else %} <!-- if seed_list -->
-                                        <img class="thumbnails thumbnails2"  alt="no image" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                        <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
 
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
                                     {% if species.hybrid.pollen_id.hybrid.pollen_id %}
-                                            <a href="{% url 'display:summary' app species.hybrid.pollen_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.pollen_id.name|safe}}</a>
+                                            <a href="{% url 'display:information' species.hybrid.pollen_id.hybrid.pollen_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.pollen_id.hybrid.pollen_id.name|safe}}</a>
                                     {% else %}
                                         Unknown
                                     {% endif %} <!-- if pollenpollen_id -->
@@ -568,14 +568,14 @@ seedparent, pollparent {
                                         <img class="thumbnails thumbnails3"  alt="{{p.aid.textname}}" src="/static/utils/thumbs/species/{{p.aid.get_best_img.image_file}}">
                                 </a>
                             {% else %}
-                                <img class="thumbnails thumbnails3"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                <img class="thumbnails thumbnails3" alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
                             {% endif %}
                             <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
                                    <br>
                                 {% if p.aid_id == 0 or not p.aid_id %}
                                     unknown
                                 {% else %}
-                                    <a href="{% url 'display:summary' app p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
+                                    <a href="{% url 'display:information' p.aid.pid %}?family={{species.gen.family}}&role={{role}}">{{p.aid.abrevname|safe}}</a>
                                 {% endif %}
                                     {{p.pct|default:0|floatformat:2}}%
                                 <br>
