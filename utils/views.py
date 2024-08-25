@@ -8,12 +8,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET
 # from django.core.urlresolvers import resolve
 from django.db.models import Func, Q, Value, CharField
-from django.http import HttpResponse
 from django.urls import resolve, get_resolver, URLResolver, URLPattern
 from django.apps import apps
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.shortcuts import redirect
-from urllib.parse import urlparse, urlencode
+from urllib.parse import urlparse, urlencode, parse_qs
 
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Species, UploadFile, SpcImages, HybImages
@@ -158,7 +157,13 @@ def get_random_sponsor():
 # Get family and app from request
 # If not exist, force return Orchidaceae
 def get_application(request):
-    family = request.GET.get('family', None)
+    full_path = request.get_full_path()
+    parsed_url = urlparse(full_path)
+    query_params = parse_qs(parsed_url.query)
+    family = query_params.get('family', [None])[0]
+    app = query_params.get('app', [None])[0]
+
+    # family = request.GET.get('family', None)
     if family:
         try:
             family = Family.objects.get(family=family)
@@ -177,33 +182,24 @@ def get_application(request):
             family = None
     return app, family
 
+def get_family(family):
+    try:
+        family = Family.objects.get(family=family)
+    except Family.DoesNotExist:
+        family = Family.objects.get(family='Orchidaceae')
+    if isinstance(family, Family):
+        app = family.application
+    else:
+        family = ''
+        app = ''
+    return app, family
 
 # Obsolete. Used in taxonomy view to generate taxonomy tree
-def get_taxonomy(request):
-    alpha = request.GET.get('alpha', '')
-    app = request.GET.get('app', None)
-    if app not in applications:
-        app = None
-
-    if not app:
-        family = request.GET.get('family', none)
-        if family:
-            try:
-                family = Family.objects.get(family=family)
-                app = family.application
-            except Family.DoesNotExist:
-                return [], alpha
-        else:
-            return [], alpha
-
+def get_taxonomy(request, app, alpha):
     family_list = Family.objects.filter(application=app)
-
     if alpha != '':
         family_list = family_list.filter(family__istartswith=alpha)
-    # favorite = Family.objects.filter(family__in=('Orchidaceae'))
-    # family_list = favorite.union(family_list)
-    return family_list, alpha
-
+    return family_list
 
 # Logging message for tracing users requests
 def write_output(request, detail=None):
