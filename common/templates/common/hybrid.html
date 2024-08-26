@@ -144,7 +144,7 @@
                                                     </a>
                                                 {% endif %}
                                             </td>
-                                                <td align="center">{% if species.num_image %} {{species.num_image}} {% endif %}</td>
+                                                <td align="center">{{species.speciesstat.num_image|default:''}}</td>
                                         </tr>
                                         {% endfor %}
                                 </table>
