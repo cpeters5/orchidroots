@@ -266,7 +266,7 @@ a:hover {
             {% if owner == 'Y' %}
                 <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
-                <a href="{% url 'display:photos' species.pid %}?family={{family}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
+                <a href="{% url 'common:myphoto' species.pid %}?family={{family}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
             {% endif %}
         {% endif %}
 <!--                <form action="?" style="display:inline-block; margin-top: 5px;">-->
@@ -324,7 +324,7 @@ a:hover {
                                     <a href="{% url 'common:approvemediaphoto' image.pid.pid %}?family={{species.gen.family}}&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
                                 {% endif %}
                             {% endif %}
-                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?role={{role}}&next=photos" rel="nofollow noreferrer noopener" >Delete</a>
+                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?app={{species.family.application}}&role={{role}}&next=photos" rel="nofollow noreferrer noopener" >Delete</a>
                         {% endif %}
                      </div>
 
