@@ -223,49 +223,6 @@ class HybridInfoForm(forms.ModelForm):
         return super(HybridInfoForm, self).save(commit=commit)
 
 
-class ReidentifySpeciesForm(forms.ModelForm):
-    gen = ModelChoiceField(
-        queryset=Genus.objects.filter(num_hybrid__gt=0).values_list('pid', 'genus'),
-        required=True,
-        widget=Select2Widget
-    )
-    # gen = forms.ChoiceField(required=True,
-    #                           choices=Genus.objects.filter(num_hybrid__gt=0).values_list('pid', 'genus'))
-    pid = forms.ChoiceField(required=True, )  # cannot directly add a queryset
-
-    def __init__(self, *args, **kwargs):
-        super(ReidentifySpeciesForm, self).__init__(*args, **kwargs)
-        # self.fields['gen'].required = True
-        # self.fields['pid'].required = True
-        # self.fields['pid'].queryset = Accepted.objects.none()
-        # self.fields['gen'].queryset = Genus.objects.filter(num_hybrid__gt=0)
-
-        self.fields['pid'].choices = Accepted.objects.filter().values_list('pid')  # initiaize choices here
-        if 'gen' in self.data:
-            try:
-                gen = int(self.data.get('gen'))
-                self.fields['pid'].queryset = Accepted.objects.filter(gen=gen).order_by('species')
-            except (ValueError, TypeError):
-                pass  # invalid input from the client; ignore and fallback to empty City queryset
-        elif self.instance.pk:
-            self.fields['pid'].queryset = self.instance.gen.pid_set  # .order_by('name')
-
-    class Meta:
-        model = SpcImages
-        fields = ('gen', 'pid')
-        labels = {
-            'gen': 'Genus',
-            'pid': 'Species',
-        }
-        widgets = {
-            # 'pid': forms.HiddenInput(),
-            # 'gen': TextInput(attrs={'size': 50, 'style': 'font-size: 13px',}),
-            'species': TextInput(attrs={'size': 50, 'style': 'font-size: 13px', }),
-            'infraspr': TextInput(attrs={'size': 50, 'style': 'font-size: 13px', }),
-            'infraspe': TextInput(attrs={'size': 50, 'style': 'font-size: 13px', }),
-        }
-
-
 class AcceptedInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AcceptedInfoForm, self).__init__(*args, **kwargs)
