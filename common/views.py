@@ -643,8 +643,9 @@ def delete_image_files(app, spc_obj, orid):
                     except FileNotFoundError:
                         pass
             spc.delete()
+            return True
         except HybImages.DoesNotExist:
-            pass
+            return False
     else:
         try:
             SpcImages = apps.get_model(app, 'SpcImages')
@@ -660,9 +661,9 @@ def delete_image_files(app, spc_obj, orid):
                 if os.path.isfile(filename):
                     os.remove(filename)
             spc.delete()
+            return True
         except SpcImages.DoesNotExist:
-            pass
-
+            return False
 
 @login_required
 def delete_bad_image_files(orid, app):
@@ -682,9 +683,7 @@ def delete_bad_image_files(orid, app):
 
 
 @login_required
-def deletephoto(request, orid, pid=None):
-    # pid not available for upload new species
-
+def deletephoto(request, orid, pid):
     family = request.GET.get('family', None)
     try:
         family = Family.objects.get(family=family)
@@ -704,41 +703,70 @@ def deletephoto(request, orid, pid=None):
     if not app:
         return HttpResponseRedirect('/')
 
-    Species = apps.get_model(app, 'Species')
-    Synonym = apps.get_model(app, 'Synonym')
+    Species = apps.get_model('orchidaceae', 'Species')
+    try:
+        species = Species.objects.get(pk=pid)
+        print(species, pid)
+    except Species.DoesNotExist:
+        message = 'This item does not exist!'
+        return HttpResponse(message)
 
-    if pid:
+    # delete_image_files('orchidaceae', species, orid)
+    # ----------------------------------------
+    try:
+        UploadFile = apps.get_model(app, 'UploadFile')
+        upl = UploadFile.objects.get(id=orid)
+        filename = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+        if os.path.isfile(filename):
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
+        upl.delete()
+    except UploadFile.DoesNotExist:
+        pass
+    if species.type == 'hybrid' and species.family.family == 'Orchidaceae':
         try:
-            species = Species.objects.get(pk=pid)
-        except Species.DoesNotExist:
-            message = 'This item does not exist! Use arrow key to go back to previous page.'
-            return HttpResponse(message)
-        delete_image_files(app, species, orid)
+            HybImages = apps.get_model(app, 'HybImages')
+            spc = HybImages.objects.get(id=orid)
+            if spc.image_file:
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+                if os.path.isfile(filename):
+                    try:
+                        os.remove(filename)
+                    except FileNotFoundError:
+                        pass
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+                if os.path.isfile(filename):
+                    try:
+                        os.remove(filename)
+                    except FileNotFoundError:
+                        pass
+            spc.delete()
+            return True
+        except HybImages.DoesNotExist:
+            return False
     else:
-        delete_bad_image_files(orid, app)
-        # Delete file
-        # delete uploadfile record
-        # Exit to curate new upload
-    if pid:
-        # (Historical) synonym files may be tagged as accepted species
-        if species.status == 'synonym':
-            synonym = Synonym.objects.get(pk=species.pid)
-            pid = synonym.acc_id
-            species = Species.objects.get(pk=pid)
+        try:
+            SpcImages = apps.get_model(app, 'SpcImages')
+            spc = SpcImages.objects.get(id=orid)
 
-        delete_image_files(app, species, orid)
+            if spc.image_file:
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
+                if os.path.isfile(filename) and spc.image_file:
+                    os.remove(filename)
 
-        next = request.GET.get('next','photos')
-        if next == 'photos':
-            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
-        else:
-            url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
 
-        write_output(request, str(family))
-        return HttpResponseRedirect(url)
-    else:
-        url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
-        return HttpResponseRedirect(url)
+                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
+                if os.path.isfile(filename):
+                    os.remove(filename)
+            spc.delete()
+        except SpcImages.DoesNotExist:
+            pass
+    # ----------------------------------------
+    write_output(request, str(family))
+    url = "%s?role=cur&family=Orchidaceae&species=%s" % (reverse('display:photos', args=(species.pid,)), species)
+    return HttpResponseRedirect(url)
 
 
 @login_required
@@ -877,7 +905,8 @@ def myphoto(request, pid):
         return HttpResponseRedirect(url)
     else:
         author, author_list = get_author(request)
-
+    print("family", family)
+    print("species", species)
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
@@ -925,7 +954,7 @@ def myphoto(request, pid):
         private_list = private_list.filter(author=author)
     context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
-               'pri': 'active', 'role': role, 'author': author, 'family': family,
+               'pri': 'active', 'role': role, 'author': author, 'family': family.family,
                'app': family.application,
                }
     write_output(request, str(family))
