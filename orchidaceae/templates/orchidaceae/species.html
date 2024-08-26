@@ -3,7 +3,7 @@
 {% include "base.html" %}
 {% block body %}
 <head>
-    <title>List of {{genus}} species</title>
+    <title>{{app|title}} Species in {{genus}} genus</title>
 </head>
 
 <style>
@@ -66,12 +66,13 @@ option {
 <div class="justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 95%; text-align:left">
     <div class="card m-2">
         <div class="card-header">
+            <h1 class="hidden-h1">{{app|title}} Species in {{genus}} genus</h1>
             <h4>
                 {{genus|title}}
-                {% if genus.num_hybrid > 0 %}
+                {% if genus.genusstat.num_hybrid > 0 %}
                     <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
                 {% endif %}
-                <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:newbrowse' %}?app=orchidaceae&family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse</a>
+                <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse</a>
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                     <input form="display" type="hidden" name="genus" value="{{genus}}" >
                     <input form="display" type="hidden" name="alpha" value="{{alpha}}" >
@@ -234,11 +235,11 @@ option {
                             {% endif %}
                         </td>
                         <td class="d-none d-sm-table-cell text-center">
-                            {% if species.num_descendant %}
-                                <a href="{% url 'orchidaceae:progeny' species.pid %}?role={{role}}">{{species.num_descendant}}</a>
+                            {% if species.speciesstat.num_descendant %}
+                                <a href="{% url 'orchidaceae:progeny' species.pid %}?role={{role}}">{{species.speciesstat.num_descendant}}</a>
                             {% endif %}
                         </td>
-                        <td class="d-none d-sm-table-cell text-center">{% if species.num_image %}{{species.num_image}}{% endif %}</td>
+                        <td class="d-none d-sm-table-cell text-center">{% if species.speciesstat.num_image %}{{species.speciesstat.num_image}}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </table>
@@ -276,7 +277,7 @@ $(document).ready(function(){
             { "type": "priority", "targets": 1 },
             // { targets: [5, 6, 7], className: 'none' }
         ],
-        "order": [[ 1, "asc" ], [0,'asc']],
+        "order": [[ 0, "asc" ],],
         responsive: true,
         "dom": "<'row'<'col-sm-6'f><'col-sm-6'p>>" +  // Top pagination
                "<'row'<'col-sm-12'tr>>" +

@@ -132,10 +132,10 @@ td {
         <tr>
             <td>
                 {% if not matched_genus.type == 'species' %}
-                    <a href="{% url 'orchidaceae:species' %}?role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                    <a href="{% url 'orchidaceae:species' %}?app={{matched_genus.family.application}}&role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                     {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                 {% else %}
-                     <a href="{% url 'orchidaceae:hybrid' %}?role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                     <a href="{% url 'orchidaceae:hybrid' %}?app={{matched_genus.family.application}}&role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                 {% endif %}
                 {% if user.tier.tier > 3 %}
                 {{matched_genus.pid|default:''}}
@@ -151,7 +151,7 @@ td {
         {% for genus in genus_list %}
             <tr style="background-color: white;">
                 <td>
-                    {% if not genus.num_hybrid or genus.num_species > 0 %}
+                    {% if not genus.genusstat.num_hybrid or genus.genusstat.num_species > 0 %}
                         <a href="{% url 'common:species' genus.family.application %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
                         {% if genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
@@ -192,7 +192,7 @@ td {
                     {{species.accepted.common_name|default:''}}
                     {% if species.status == 'synonym' %}(syn. {{species.getAccepted.binomial_it|safe}}){% endif %}
                     {% if user.tier.tier > 3 %}
-                        <br>{{species.pid}}-{{species.getAccepted.pid}}
+                        <br>{{species.pid}}-{{species.getAccepted.pid}} {{species.speciesstat.num_image|default:''}}
                     {% endif %}
                 </td>
                 <td style="text-align: center; border-bottom:0">
@@ -224,8 +224,8 @@ td {
                 </td>
                 <td>{{species.accepted.common_name|default:''}}</td>
                 <td>{{species.distribution|default:''}}</td>
-                {% if user.tier.tier > 3 %}
-                <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{species.num_image|default:''}}</td>
+                {% if user.tier.tier == 3 %}
+                <td class="d-none d-lg-table-cell hidden-xs" style="text-align: center;">{{species.speciesstat.num_image|default:''}}</td>
                 {% endif %}
             </tr>
         {% endfor %}
