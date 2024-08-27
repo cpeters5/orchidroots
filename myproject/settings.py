@@ -53,9 +53,6 @@ ALLOWED_HOSTS = [
     'www.beta.bluenanta.com',
     # 'orchidroots.com',
     # 'www.orchidroots.com',
-    # '45.55.134.164',
-    # '127.0.0.1',
-    # 'localhost',
 ]
 
 
