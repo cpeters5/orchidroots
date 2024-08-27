@@ -254,7 +254,6 @@ def species(request):
     reqgenus = request.GET.get('genus', '')
     if not reqgenus:
         reqgenus = 'Cattleya'
-
     alpha = request.GET.get('alpha', '')
     # For big genera, forces alpha to A.
     if reqgenus in config.big_genera and not alpha:
@@ -275,26 +274,25 @@ def species(request):
     if reqgenus or alpha or spc or subgenus or section or subsection:
         genus, this_species_list, intragen_list = getPartialPid(reqgenus, type, '')
         write_output(request, str(genus))
-        if subgenus:
-            this_species_list = this_species_list.filter(accepted__subgenus=subgenus)
-        elif section:
-            this_species_list = this_species_list.filter(accepted__section=section)
-        elif subsection:
-            this_species_list = this_species_list.filter(accepted__subsection=subsection)
-        elif series:
-            this_species_list = this_species_list.filter(accepted__series=series)
-
-
         if this_species_list:
-            if syn == 'N':
-                this_species_list = this_species_list.exclude(status='synonym')
-            else:
-                syn = 'Y'
-            if spc:
-                this_species_list = this_species_list.filter(species__istartswith=spc)
-            elif alpha:
-                if len(alpha) == 1:
-                    this_species_list = this_species_list.filter(species__istartswith=alpha)
+            if subgenus:
+                this_species_list = this_species_list.filter(accepted__subgenus=subgenus)
+            elif section:
+                this_species_list = this_species_list.filter(accepted__section=section)
+            elif subsection:
+                this_species_list = this_species_list.filter(accepted__subsection=subsection)
+            elif series:
+                this_species_list = this_species_list.filter(accepted__series=series)
+            if this_species_list:
+                if syn == 'N':
+                    this_species_list = this_species_list.exclude(status='synonym')
+                else:
+                    syn = 'Y'
+                if spc:
+                    this_species_list = this_species_list.filter(species__istartswith=spc)
+                elif alpha:
+                    if len(alpha) == 1:
+                        this_species_list = this_species_list.filter(species__istartswith=alpha)
 
     subgenus_list = Subgenus.objects.filter(genus=genus).order_by('subgenus')
     section_list = Section.objects.filter(genus=genus).order_by('section')
@@ -487,16 +485,18 @@ def hybrid(request):
     write_output(request, str(reqgenus))
 
     # Genus unchanged, see if seed/pollen are requested
-    if (reqgenus and (reqgenus == prev_genus)):
-        seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
-        pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
-    if len(seed_binomial) > 0:
-        seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
-        this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
+    if this_species_list:
+        if (reqgenus and (reqgenus == prev_genus)):
+            seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
+            pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
 
-    if len(pollen_binomial) > 0:
-        poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
-        this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
+        if len(seed_binomial) > 0:
+            seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
+            this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
+
+        if len(pollen_binomial) > 0:
+            poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
+            this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
 
     if crit and this_species_list:
         if spc:
