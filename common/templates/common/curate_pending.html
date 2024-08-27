@@ -175,7 +175,7 @@ div.text-br {
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.num_image}} photos)
+                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.name|safe}}</a> ({{image.pid.speciesstat.num_image}} photos)
                                     <br>Approved by {{image.approved_by}}, {{image.modified_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
