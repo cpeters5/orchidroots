@@ -1,19 +1,19 @@
 User-agent: *
 Allow: /display/information/
+Allow: /common/taxonomy/
+Allow: /common/family/
+Allow: /common/genera/
+Allow: /common/species/
+Allow: /common/hybrid/
 Allow: /orchidaceae/progeny/
 Allow: /orchidaceae/ancestor/
 Allow: /orchidaceae/species/
 Allow: /orchidaceae/hybrid/
-Allow: /common/taxonomy/
 Allow: /animalia/genera/
 Allow: /aves/genera/
 Allow: /fungi/genera/
 Allow: /other/genera/
 Allow: /orchidaceae/genera/
-Allow: /common/species/
-Allow: /common/hybrid/
-Allow: /orchidaceae/species/
-Allow: /orchidaceae/hybrid/
 Allow: /home/
 
 Disallow: /admin/
