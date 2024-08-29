@@ -16,6 +16,25 @@
     height: 100%;
 }
 
+.imageitem {
+    display:inline-block;
+    margin:2px;
+    width : 17vw;
+    height: 20vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+.imageitem-cur {
+    display:inline-block;
+    margin:2px;
+    width : 17vw;
+    height: 24vw;
+    background-color: #f7f7f7;
+    border:1px solid lightgrey;
+    text-align:center;
+}
+
 .box {
     position: relative;
     display: inline-block;
@@ -33,6 +52,15 @@
    padding:2px;
     margin:5px auto;
 }
+
+/*.thumbnail-tiny {*/
+/*   object-fit: cover;*/
+/*   overflow: hidden;*/
+/*   height: 11vw;*/
+/*   width : 11vw;*/
+/*   padding:2px;*/
+/*    margin:5px auto;*/
+/*}*/
 
 .imgcaption {
     font-size: 10px;
@@ -295,7 +323,7 @@ a:hover {
                                   {{image.id}}: {{image.imgname}}
                                   <br>{{image.get_displayname}}
                                   <br>{{image.text_data|default:''|safe}}" rel="nofollow noreferrer noopener">
-                                  <img class="thumbnails" alt="{{image.imgname}}" src="{% static 'media/' %}{{image.image_file_path}}">
+                                  <img class="thumbnails" alt="{{image.get_displayname}}" src="{% static 'media/' %}{{image.image_file_path}}">
                                   <div class="text text-br">{{image.id}}
                                   </div>
                              </a>
@@ -303,7 +331,7 @@ a:hover {
                      {% else %}
                          <div class="box">
                              <a href="#">
-                                <img class="thumbnails" alt="{{image.imgname}}" src="{{image.image_url}}" class="img-fluid" style="width:100%;">
+                                <img class="thumbnails" alt="{{image.get_displayname}}" src="{{image.image_url}}" class="img-fluid" style="width:100%;">
                                 <div class="text text-br">{{image.id}}
                                 </div>
                              </a>
