@@ -1097,6 +1097,13 @@ class SpcImages(models.Model):
         else:
             return None
 
+    def binomial_it(self):
+        return self.pid.binomial_it()
+
+    def binomial(self):
+        return self.pid.binomial
+
+
 class HybImages(models.Model):
     binomial = models.CharField(max_length=200, null=True, blank=True)
     form = models.CharField(max_length=50, null=True, blank=True)
@@ -1224,27 +1231,11 @@ class HybImages(models.Model):
         else:
             return None
 
-    # def save(self, *args, **kwargs):
-    #     if self.image_file_path:
-    #         pilImage = Img.open(BytesIO(self.image_file_path.read()))
-    #         for orientation in ExifTags.TAGS.keys():
-    #             if ExifTags.TAGS[orientation] == 'Orientation':
-    #                 break
-    #         exif = dict(pilImage._getexif().items())
-    #
-    #         if exif[orientation] == 3:
-    #             pilImage = pilImage.rotate(180, expand=True)
-    #         elif exif[orientation] == 6:
-    #             pilImage = pilImage.rotate(270, expand=True)
-    #         elif exif[orientation] == 8:
-    #             pilImage = pilImage.rotate(90, expand=True)
-    #
-    #         output = BytesIO()
-    #         pilImage.save(output, format='JPEG', quality=75)
-    #         output.seek(0)
-    #         self.image_file_path = File(output, self.image_file_path.name)
-    #
-    #     return super(HybImages, self).save(*args, **kwargs)
+    def binomial_it(self):
+        return self.pid.pid.binomial_it()
+
+    def binomial(self):
+        return self.pid.pid.binomial
 
 
 class Video(models.Model):

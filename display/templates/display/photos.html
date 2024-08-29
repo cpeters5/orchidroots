@@ -340,13 +340,13 @@ a:hover {
                                 {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                 {{image.get_displayname}}
                                 <br>{{image.text_data|default:''|safe}}">
-                                    <img class="thumbnails" alt="{{image.pid.pid.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
+                                    <img class="thumbnails" alt="{{image.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                     <div class="text text-br">{{image.id}}</div>
                         </a>
                     </div>
                     <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                         <div style="width:100%;word-wrap: break-word;">
-                            {{image.pid.binomial_it|safe}}
+                            {{image.binomial_it|safe}}
                             {{image.imginfo|default:''}}
                             <br>
                             {% if image.source_url %}
@@ -372,7 +372,7 @@ a:hover {
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     {{image.text_data|default:''|safe}} </small></h6>">
-                                        <img class="thumbnails" alt="{{image.pid.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="{{image.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                 </a>
                             </div>
@@ -380,7 +380,7 @@ a:hover {
                         {% else %}
                             <div class="box">
                                 <a href="#">
-                                    <img class="thumbnails" alt="{{image.pid.pid.binomial}}" src="{{image.image_url}}" class="img-fluid">
+                                    <img class="thumbnails" alt="{{image.binomial}}" src="{{image.image_url}}" class="img-fluid">
                                     <div class="text text-br">{{image.id}}
                                     </div>
                                 </a>
