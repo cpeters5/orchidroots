@@ -57,47 +57,28 @@
                         ({{species.source}})
                     {% endif %}
                 </h4>
-                {% if species.status == 'synonym' %}
-                    syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>
-                    {{species.getAccepted.accepted.common_name|default:''}}
-                    {{species.getAccepted.accepted.local_name|default:''}}
-                <br>
-                {% endif %}
-                {% if species.type == 'hybrid' and species.status != 'synonym' %}
-                    {% if species.hybrid.seed_id.pid %}
-                        {{species.hybrid.registered_seed_name_long|safe}}</a>
-                    {% else %}
-                        na
-                    {% endif %}
-                    ×
-                    {% if species.hybrid.pollen_id.pid %}
-                        {{species.hybrid.registered_pollen_name_long|safe}}</a>
-                    {% else %}
-                        na
-                    {% endif %}
+                <div style="font-size: 16px;">
+                    {% if species.status == 'synonym' %}
+                        syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>
+                        {{species.getAccepted.accepted.common_name|default:''}}
+                        {{species.getAccepted.accepted.local_name|default:''}}
                     <br>
-                {% endif %}
-                {{species.accepted.common_name|default:''}}
-                {{species.accepted.local_name|default:''}}
-                {% if species.accepted.comment %}
-                    <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
-                        {{species.accepted.comment|safe}}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                    {% if species.type == 'hybrid' and species.status != 'synonym' %}
+                        {{species.hybrid.registered_seed_name_long|default:'na'|safe}}</a>
+                        ×
+                        {{species.hybrid.registered_pollen_name_long|default:'na'|safe}}</a>
+                        <br>
+                    {% endif %}
+                    {{species.accepted.common_name|default:''}}
+                    {{species.accepted.local_name|default:''}}
+                    {% if species.accepted.comment %}
+                        <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
+                            {{species.accepted.comment|safe}}
+                        </div>
+                    {% endif %}
+                </div>
                 <br>
-<!--                {% if species.pid %}-->
-<!--                    {% if user.tier.tier > 2 %}-->
-<!--                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>-->
-<!--                         <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>-->
-<!--                         <a class="btn btn-custom {% if role == 'cur' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=cur">Curate</a>-->
-<!--                    {% elif user.tier.tier > 1 %}-->
-<!--                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>-->
-<!--                         <a class="btn btn-custom {% if role == 'pri' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pri">Private</a>-->
-<!--                    {% else %}-->
-<!--                         <a class="btn btn-custom {% if role == 'pub' %}btn-current{% endif %}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&genus={{genus}}&role=pub">Public</a>-->
-
-<!--                    {% endif %}-->
-<!--                {% endif %}-->
             </div>
         </div>
 
