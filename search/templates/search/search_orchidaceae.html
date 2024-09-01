@@ -192,7 +192,7 @@ td {
             </thead>
         {% for species in match_spc_list %}
             <tr style="background-color: white;">
-                <td style="text-align: left; border-bottom:none">{{species.family.application}}
+                <td style="text-align: left; border-bottom:none">
                     <a href="{% url 'display:summary' species.family.application species.pid %}?role={{role}}&related=ALL&syn=Y&searchdata={{searchdata}}">
                         <i>{{species.binomial|safe}}</i>
                     </a>
