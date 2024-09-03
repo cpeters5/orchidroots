@@ -3,7 +3,9 @@
 {% include 'detail-title.html' %}
 {% block body %}
 <head>
+    <link rel="canonical" href="{{ canonical_url }}?alpha={{alpha}}">
     <title>List of {{species.binomial}} immediate offsprings</title>
+    <meta name='description' content='Immediate offsprings of {{species.binomial}}'>
 </head>
 
 <style>

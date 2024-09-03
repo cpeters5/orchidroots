@@ -47,7 +47,13 @@
     <div class="row">
         <div class="col">
             <div class="nav2 detail-title" style="text-align:center">
-                <h1 class="hidden-h1">{{species.genus}} {{species.species}}</h1>
+                {% if species.status == 'synonym' %}
+                    <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
+                {% elif species.type == 'hybrid' %}
+                    <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
+                {% else %}
+                    <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+                {% endif %}
                 <h4>
                     {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},
                     {{species.author|default:""}} {{species.year|default:''}}
@@ -62,16 +68,14 @@
                         syn. <a href="{% url 'display:photos' species.getAcc %}?family={{species.gen.family}}&role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>
                         {{species.getAccepted.accepted.common_name|default:''}}
                         {{species.getAccepted.accepted.local_name|default:''}}
-                    <br>
-                    {% endif %}
-                    {% if species.type == 'hybrid' and species.status != 'synonym' %}
-                        {{species.hybrid.registered_seed_name_long|default:'na'|safe}}</a>
-                        ×
-                        {{species.hybrid.registered_pollen_name_long|default:'na'|safe}}</a>
                         <br>
+                    {% elif species.type == 'hybrid' %}
+                        {{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}}
+                        <br>
+                    {% else %}
+                        {{species.accepted.common_name|default:''}}
+                        {{species.accepted.local_name|default:''}}
                     {% endif %}
-                    {{species.accepted.common_name|default:''}}
-                    {{species.accepted.local_name|default:''}}
                     {% if species.accepted.comment %}
                         <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
                             {{species.accepted.comment|safe}}

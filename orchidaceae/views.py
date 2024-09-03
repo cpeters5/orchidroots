@@ -145,12 +145,16 @@ def genera(request):
     t_list = t_list.order_by('tribe')
     st_list = st_list.order_by('subtribe')
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
+
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/genera/')
+
     context = {'my_list': genus_list, 'genus_lookup': genus_lookup,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,
                'st_obj': st_obj, 'st_list': st_list,
                'title': 'taxonomy', 'genustype': genustype, 'status': status,
                'formula1': formula1, 'formula2': formula2, 'alpha': alpha, 'alpha_list': alpha_list,
                'sort': sort, 'prev_sort': prev_sort, 'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/genera.html', context)
 
@@ -298,6 +302,9 @@ def species(request):
     section_list = Section.objects.filter(genus=genus).order_by('section')
     subsection_list = Subsection.objects.filter(genus=genus).order_by ('subsection')
     series_list = Series.objects.filter(genus=genus).order_by ('subsection')
+
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/species/?genus={genus}')
+
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'genus': genus,
                'subgenus': subgenus, 'subgenus_list': subgenus_list,
@@ -307,6 +314,7 @@ def species(request):
                'msg': msg,
                'syn': syn,
                'title': 'taxonomy', 'type': 'species', 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/species.html', context)
 
@@ -521,11 +529,13 @@ def hybrid(request):
         this_species_list = []
         msg = "Please select a search criteria"
     role = getRole(request)
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/hybrid/?genus={reqgenus}')
     context = {'my_list': this_species_list,
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
                'author': author, 'originator': originator, 'seed_binomial': seed_binomial, 'pollen_binomial': pollen_binomial,
                'role': role, 'level': 'list', 'title': 'hybrid_list',  'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
@@ -614,10 +624,12 @@ def ancestor(request, pid):
     # List of ancestors in the left panel
     anc_list = AncestorDescendant.objects.filter(did=pid)
 
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
                'anc': 'active', 'tab': 'anc',
                'title': 'ancestor', 'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/ancestor.html', context)
 
@@ -816,9 +828,11 @@ def progeny(request, pid):
         Q(pollen_id__in=syn_list)
     )
     if prim:
+        canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/?prim=1')
         context = {'prim_list': prim_list, 'species': species,
                    'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                    'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
+                   'canonical_url': canonical_url,
                    }
         return render(request, 'orchidaceae/progeny_immediate.html', context)
     #All descendants
@@ -841,9 +855,13 @@ def progeny(request, pid):
             result_list.append([x,'secondary'])
         else:
             result_list.append([x,'remote'])
+
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
+
     context = {'result_list': result_list, 'species': species,
                 'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
 
     return render(request, 'orchidaceae/progeny.html', context)
