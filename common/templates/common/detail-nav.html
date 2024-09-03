@@ -26,9 +26,9 @@
         <ul class="nav nav-tabs navbar-expand-lg" >
             {% if species %}
                 <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' species.family.application species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Summary<br></a></li>
-                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:{{related}}&syn={{syn}}" data-nosnippet>Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:ALL&syn=Y" data-nosnippet>Photos<br></a></li>
                 {% if app == 'aves' or app == 'animalia' %}
-                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:{{related}}&syn={{syn}}" data-nosnippet>Videos<br></a></li>
+                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Videos<br></a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Compare<br></a></li>
 

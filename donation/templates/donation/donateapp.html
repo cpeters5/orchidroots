@@ -2,7 +2,9 @@
 {% include "base.html" %}
 
 {% block extra-head %}
-    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+    <title>Donation</title>
+    <meta name='description' content='Donation form'>
+   <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
     <style>
        #donateamt{
             width:80px;
@@ -106,6 +108,7 @@
 
             <div class="card mt-2">
                 <div class="card-header">
+                    <h1 class="hidden-h1">Please donate</h1>
                     <h6 class="card-title" style="margin-bottom: 0">Your donation, even a small amount, will make a difference.</h6>
                 </div>
                 <div class="container" style="width:100%; margin:0 auto;">

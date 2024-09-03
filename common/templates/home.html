@@ -179,7 +179,7 @@ img{
                                 <a href="{% url 'common:newbrowse' 'orchidaceae' %}?genus={{image.gen.genus}}&role={{role}}&display=checked">{{image.pid.genus}}</a></div>
                                 <a href="{% url 'display:summary' image.gen.family.application image.pid_id %}?family={{image.gen.family}}&role={{role}}&display=checked">
                                 <div class="box">
-                                    <img class="thumbnails" alt="{{image.pid.pid.textname}}" src="{% static image.thumb_dir %}{{image.image_file}}">
+                                    <img class="thumbnails" alt="{{image.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                 </div>
                                 </a>
                             <div class="imgcaption">
@@ -201,7 +201,7 @@ img{
                             <div class="imgtitle"><a href="{% url 'common:newbrowse' othimage.1.pid.gen.family.application %}?family={{othimage.1.gen.family}}&role={{role}}&display=checked">{{othimage.1.pid.gen.family}}</a></div>
                                 <a href="{% url 'common:newbrowse' othimage.1.pid.gen.family.application %}?role={{role}}&display=checked">
                                 <div class="box">
-                                    <img class="thumbnails" alt="{{othimage.1.pid.pid.textname}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
+                                    <img class="thumbnails" alt="{{othimage.1.binomial}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
                                 </div>
                                 </a>
                             <div class="imgcaption">

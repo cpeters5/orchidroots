@@ -3,9 +3,9 @@
 {% include "detail-title.html" %}
 {% block body %}
 <head>
-    <title>Images of {{species.binomial}}</title>
-    <link rel="canonical" href="{% url 'display:summary' application=species.family.application pid=species.pid %}" />
-    <meta name='description' content='Image gallery of {{species.binomial}}'>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>{{species.binomial}} orchid photo gallery</title>
+    <meta name='description' content="Browse the photo gallery of {{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} x {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})">.
 </head>
 <style>
     /*Styles for Top Descendants*/

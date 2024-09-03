@@ -175,7 +175,10 @@ def taxonomy(request, app):
     alpha = request.GET.get('alpha','')
 
     family_list = get_taxonomy(request, app, alpha)
-    context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, }
+    canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/')
+    context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list,
+               'canonical_url': canonical_url,
+               }
     return render(request, "common/taxonomy.html", context)
 
 
@@ -185,11 +188,14 @@ def family(request, app):
     if alpha:
         family_list = family_list.filter(family__istartswith=alpha)
 
+    canonical_url = request.build_absolute_uri(f'/common/family/{app}/')
+
     context = {
         'app': app, 'alpha': alpha,
         'family': family,
         'family_list': family_list,
         'alpha_list': alpha_list,
+        'canonical_url': canonical_url,
     }
     return render(request, "common/family.html", context)
 
@@ -236,11 +242,14 @@ def genera(request, app):
     if alpha:
         genus_list = genus_list.filter(genus__istartswith=alpha)
 
+    canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
+
     write_output(request, str(family))
     context = {
         'genus_list': genus_list,  'app': app, 'alpha': alpha,
         'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
         'alpha_list': alpha_list,
+        'canonical_url': canonical_url,
     }
     return render(request, "common/genera.html", context)
 
@@ -259,7 +268,8 @@ def species(request, app):
             app = req_family.application
         except Family.DoesNotExist:
             req_family = ''
-        if req_family.application != app:
+        # Ifnore requested family if it is not in the application.
+        if isinstance(req_family, Family) and req_family.application != app:
             req_family = ''
 
     syn = request.GET.get('syn', '')
@@ -318,7 +328,6 @@ def species(request, app):
     else:
         syn = 'Y'
 
-
     if len(species_list) > max_items:
         if not alpha:
             alpha = 'A'
@@ -327,12 +336,15 @@ def species(request, app):
             species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
 
+    canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}')
+
     write_output(request, str(app))
     context = {
         'genus': req_genus, 'species_list': species_list, 'app': app,
         'syn': syn, 'type': req_type, 'role':role,
         'family': req_family,
         'alpha_list': alpha_list, 'alpha': alpha,
+        'canonical_url': canonical_url,
     }
     return render(request, "common/species.html", context)
 
@@ -608,7 +620,6 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
-@login_required
 def delete_image_files(app, spc_obj, orid):
     # look in uploaded files first
     try:
@@ -665,7 +676,7 @@ def delete_image_files(app, spc_obj, orid):
         except SpcImages.DoesNotExist:
             return False
 
-@login_required
+
 def delete_bad_image_files(orid, app):
     # Delete file
     try:
@@ -684,6 +695,43 @@ def delete_bad_image_files(orid, app):
 
 @login_required
 def deletephoto(request, orid, pid):
+    family = request.GET.get('family', '')
+    print("1 family", family)
+
+    try:
+        family = Family.objects.get(family=family)
+        app = family.application
+    except Family.DoesNotExist:
+        family = ''
+        app = ''
+    role = getRole(request)
+    print("2 family", family)
+
+    if not family:
+        app = request.GET.get('app', '')
+        if app and app not in applications:
+            app = ''
+    print("3 app", app)
+
+    # Something wrong here. All delete request mush have app
+    if not app:
+        return HttpResponseRedirect('/')
+
+    print("app", app)
+
+    Species = apps.get_model(app, 'Species')
+    try:
+        species = Species.objects.get(pk=pid)
+        print(species, pid)
+    except Species.DoesNotExist:
+        message = 'This item does not exist!'
+        return HttpResponse(message)
+
+    delete_image_files(app, species, orid)
+    write_output(request, str(family))
+    url = "%s?role=cur&app=%s&species=%s" % (reverse('display:photos', args=(species.pid,)), app, species)
+    return HttpResponseRedirect(url)
+def xdeletephoto(request, orid, pid):
     family = request.GET.get('family', None)
     try:
         family = Family.objects.get(family=family)
@@ -1078,6 +1126,7 @@ def myphoto_browse_hyb(request):
                    }
         return render(request, 'common/myphoto_browse_hyb.html', context)
     img_list = HybImages.objects.filter(author=author).order_by('binomial')
+    print(img_list[0].binomial)
     if owner == 'Y':
         img_list = img_list.filter(credit_to__isnull=True)
 

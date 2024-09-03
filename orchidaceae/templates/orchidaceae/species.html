@@ -3,6 +3,7 @@
 {% include "base.html" %}
 {% block body %}
 <head>
+    <link rel="canonical" href="{{ canonical_url }}?alpha={{alpha}}">
     <title>{{app|title}} Species in {{genus}} genus</title>
     <meta name='description' content='List of species in the genus {{genus}}'>
 </head>
