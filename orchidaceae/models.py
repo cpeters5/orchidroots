@@ -1100,9 +1100,6 @@ class SpcImages(models.Model):
     def binomial_it(self):
         return self.pid.binomial_it()
 
-    def binomial(self):
-        return self.pid.binomial
-
 
 class HybImages(models.Model):
     binomial = models.CharField(max_length=200, null=True, blank=True)
@@ -1233,9 +1230,6 @@ class HybImages(models.Model):
 
     def binomial_it(self):
         return self.pid.pid.binomial_it()
-
-    def binomial(self):
-        return self.pid.pid.binomial
 
 
 class Video(models.Model):
