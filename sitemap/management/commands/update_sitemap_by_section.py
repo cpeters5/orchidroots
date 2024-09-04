@@ -12,12 +12,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('section', type=str,
-                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "genera", "species", "hybrid", "orchidaceae")')
+                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "taxnomy", "species", "hybrid", "orchidaceae")')
 
     def handle(self, *args, **options):
         section = options['section']
 
-        if section not in ['animalia', 'aves', 'fungi', 'other', 'genera', 'species', 'hybrid', 'orchidaceae']:
+        if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'species', 'hybrid', 'orchidaceae']:
             self.stdout.write(self.style.ERROR(f'Invalid section: {section}'))
             return
 
@@ -127,25 +127,39 @@ class Command(BaseCommand):
                 }
             )
 
-    def update_genera(self):
+    def update_taxonomy(self):
         # query_params = urlencode({'family': 'Orchidaceae'})
+        section = 'taxonomy'
         for app in applications:
+            taxa_url = f"{settings.SITE_URL}/common/taxonomy/{app}/"
+            SitemapEntry.objects.create(
+                url=taxa_url,
+                section=section,
+                change_frequency='yearly',
+                priority=0.2
+            )
+            family_url = f"{settings.SITE_URL}/common/family/{app}/"
+            SitemapEntry.objects.create(
+                url=family_url,
+                section=section,
+                change_frequency='yearly',
+                priority=0.2
+            )
             genus_url = f"{settings.SITE_URL}/common/genera/{app}/"
             SitemapEntry.objects.create(
                 url=genus_url,
-                section="genera",
+                section=section,
                 change_frequency='monthly',
                 priority=0.6
             )
+
+
 
 # Orchid only sections
     def update_species(self):
         from orchidaceae.models import Species, Genus
         print("Get genus with species - Counting species")
-        genera_with_species = Genus.objects.filter(num_species__gt=0)
-        # genera_with_species = Genus.objects.annotate(species_count=Count('or5gen')).filter(species_count__gt=0)
-        # for genus in genera_with_species:
-        for genus in Genus.objects.exclude(status='synonym'):
+        for genus in Genus.objects.filter(genusstat__num_species__gt=0):
             query_params = urlencode({'genus': genus.genus,})
             genus_url = f"{settings.SITE_URL}/common/species/orchidaceae/?{query_params}"
             entry, created = SitemapEntry.objects.update_or_create(
@@ -162,11 +176,11 @@ class Command(BaseCommand):
     def update_hybrid(self):
         from orchidaceae.models import Species, Genus
         print("Get genus with hybrid - Counting hybrids")
-        genera_with_hybrids = Genus.objects.filter(num_hybrid__gt=0)
+        genera_with_hybrids = Genus.objects.filter(genusstat__num_hybrid__gt=0)
         # genera_with_hybrids = Genus.objects.annotate(hybrid_count=Count('or7gen')).filter(hybrid_count__gt=0)
         for genus in genera_with_hybrids:
             query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/orchidaceae/hybrid/?{query_params}"
+            genus_url = f"{settings.SITE_URL}/common/hybrid/orchidaceae/?{query_params}"
             SitemapEntry.objects.update_or_create(
                 url=genus_url,
                 section="hybrid",
