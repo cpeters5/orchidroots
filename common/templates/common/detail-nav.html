@@ -10,27 +10,37 @@
 .nav3 {
     font-size: 12px;
 }
+.xnav-item {
+    width:50px;
+}
+
 @media only screen and (max-width: 500px) {
     .nav-link {
-        font-size: 11px;
+        font-size: 10px;
         width: 95%;
+        margin: 5px;
+        padding: 4px;
     }
     .nav3 {
         font-size: 11px;
 
     }
+    .nav-item {
+        width:60px;
+    }
+
 }
 </style>
 <nav>
     <div class="nav3">
         <ul class="nav nav-tabs navbar-expand-lg" >
             {% if species %}
-                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' species.family.application species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Summary<br></a></li>
-                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}&related:ALL&syn=Y" data-nosnippet>Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' species.family.application species.pid %}?role={{role}}" data-nosnippet>Summary<br></a></li>
+                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' species.pid %}?role={{role}}&app={{app}}" data-nosnippet>Photos<br></a></li>
                 {% if app == 'aves' or app == 'animalia' %}
-                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Videos<br></a></li>
+                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>Videos<br></a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>Compare<br></a></li>
+                <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>Compare<br></a></li>
 
                     {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
@@ -39,60 +49,38 @@
                     </a>
                     <div class="nav2 dropdown-menu">
                     {% if family.family == 'Orchidaceae' %}
-                        <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?family=Orchidaceae&role={{role}}" data-nosnippet>upload file</a>
+                        <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet>upload file</a>
                         {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet>upload url</a>
                         {% endif %}
                     {% else %}
-                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&family={{species.gen.family}}&role={{role}}" data-nosnippet>upload file</a>
+                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload file</a>
                         <!--                        Fix common.uploadfile to use family specific form -->
                         {% if app == 'animalia' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'animalia:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'animalia:uploadweb' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload url</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'animalia:uploadvid' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload video</a>
+                            <a class="dropdown-item" href="{% url 'animalia:uploadvid' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload video</a>
                         {% elif app == 'aves' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'aves:uploadweb' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload url</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload video</a>
+                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload video</a>
                         {% elif app == 'fungi' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'fungi:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'fungi:uploadweb' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload url</a>
                             {% endif %}
                         {% elif app == 'other' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'other:uploadweb' species.pid %}?family={{species.gen.family}}&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'other:uploadweb' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload url</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
                     </div>
                 </li>
                     {% endif %}
-                {% if related_list and species.type != 'hybrid' %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>Infraspecific</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y" data-nosnippet>All Infraspecific</a>
-                        {% for spc in related_list %}
-                            <a class="dropdown-item" href="/display/photos/{{spc.pid}}/?family={{spc.gen.family}}&role={{role}}&related={{spc.pid}}&role={{role}}&syn=Y" data-nosnippet>{{spc.binomial_it|safe}}</a>
-                        {% endfor %}
-                    </div>
-                </li>
-                {% endif %}
 
-                {% if syn_list %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link {{rel}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>Include Synonyms</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/display/photos/{{species.pid}}/?family={{species.gen.family}}&related=ALL&role={{role}}&syn=Y" data-nosnippet>All synonyms</a>
-                        {% for spc in syn_list %}
-                            <a class="dropdown-item" href="/display/photos/{{spc.spid.pid}}/?family={{spc.spid.gen.family}}&role={{role}}&related={{spc.spid.pid}}" data-nosnippet>{{spc.spid.binomial_it|safe}}</a>
-                        {% endfor %}
-                    </div>
-
-                </li>
-                {% endif %}
+                <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
                 <li class="nav-item dropdown">
@@ -100,9 +88,9 @@
                         {% if tab == 'pro' %}Progeny{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
                     </a>
                     <div class="nav3 dropdown-menu">
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progeny/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Progeny</a>
-                            <a class="dropdown-item" href="/{{species.gen.family.application}}/progenyimg/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>images</a>
+                            <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?app={{app}}&role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
+                            <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Progeny</a>
+                            <a class="dropdown-item" href="/{{app}}/progenyimg/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>images</a>
                     </div>
                 </li>
 
@@ -113,8 +101,8 @@
                             </a>
                             <div class="nav2 dropdown-menu">
                             {% if species.gen.family.family == 'Orchidaceae' %}
-                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestor/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Ancestry list</a>
-                                <a class="dropdown-item" href="/{{species.gen.family.application}}/ancestrytree/{{species.pid}}/?family={{species.gen.family}}&role={{role}}" data-nosnippet>Ancestry tree</a>
+                                <a class="dropdown-item" href="/{{app}}/ancestor/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry list</a>
+                                <a class="dropdown-item" href="/{{app}}/ancestrytree/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry tree</a>
                             {% endif %}
                            </div>
                         </li>

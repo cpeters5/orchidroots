@@ -113,8 +113,8 @@ div.text-br {
                     {% if user.tier.tier > 1 %}
                         {% if role == 'cur' %}
                             {% if role == 'cur' %}
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?family={{family}}&app={{app}}">New Uploads</a>
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&gen=&type={{species.type}}">All private photos</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newupload' %}?app={{app}}">New Uploads</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?app={{app}}&gen=&type={{species.type}}">All private photos</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -138,8 +138,8 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="hybridDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type=species&days={{days}}">Species</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type=hybrid&days={{days}}">Hybrid</a>
+                                <a class="dropdown-item" href="?app={{app}}&type=species&days={{days}}">Species</a>
+                                <a class="dropdown-item" href="?app={{app}}&type=hybrid&days={{days}}">Hybrid</a>
                             </div>
                         </div>
                          <div class="dropdown p-2">
@@ -151,11 +151,11 @@ div.text-br {
                                 {% endif %}
                             </button>
                             <div class="dropdown-menu" aria-labelledby="hybridDropdown" style="font-size:13px">
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days="></a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=3">past 3 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=7">past 7 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=20">past 20 days</a>
-                                <a class="dropdown-item" href="?family={{family}}&app={{app}}&type={{type}}&days=30">past 30 days</a>
+                                <a class="dropdown-item" href="?app={{app}}&type={{type}}&days="></a>
+                                <a class="dropdown-item" href="?app={{app}}&type={{type}}&days=3">past 3 days</a>
+                                <a class="dropdown-item" href="?app={{app}}&type={{type}}&days=7">past 7 days</a>
+                                <a class="dropdown-item" href="?app={{app}}&type={{type}}&days=20">past 20 days</a>
+                                <a class="dropdown-item" href="?app={{app}}&type={{type}}&days=30">past 30 days</a>
                             </div>
                         </div>
                     </div>
@@ -169,13 +169,13 @@ div.text-br {
                         {% for image in file_list %}
                             <div class="imageitem p-1 justify-content-center">
                                 <div class="box">
-                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}">
+                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?app={{app}}">
                                         <img class="thumbnails" alt="" src="{% static image.thumb_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
+                                    <a href="{% url 'display:photos' image.pid_id %}?app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
                                     <br>Approved by {{image.approved_by}}, {{image.modified_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
@@ -184,21 +184,21 @@ div.text-br {
                                     {% endif %}
                                     <br>
                                     Rank:
-                                        {% if image.rank == 0 %}<span style="color:red">0</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="private" href='?family={{family}}&app={{app}}&rank=0&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>0</a>{% endif %} |
-                                        {% if image.rank == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="habitat" href='?family={{family}}&app={{app}}&rank=1&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>1</a>{% endif %} |
-                                        {% if image.rank == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="plant" href='?family={{family}}&app={{app}}&rank=2&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>2</a>{% endif %} |
-                                        {% if image.rank == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="inflorescences" href='?family={{family}}&app={{app}}&rank=3&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>3</a>{% endif %} |
-                                        {% if image.rank == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="group" href='?family={{family}}&app={{app}}&rank=4&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>4</a>{% endif %} |
-                                        {% if image.rank == 5 %}<span style="color:red">5</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="single flower" href='?family={{family}}&app={{app}}&rank=5&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>5</a>{% endif %} |
+                                        {% if image.rank == 0 %}<span style="color:red">0</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="private" href='?app={{app}}&rank=0&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>0</a>{% endif %} |
+                                        {% if image.rank == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="habitat" href='?app={{app}}&rank=1&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>1</a>{% endif %} |
+                                        {% if image.rank == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="plant" href='?app={{app}}&rank=2&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>2</a>{% endif %} |
+                                        {% if image.rank == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="inflorescences" href='?app={{app}}&rank=3&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>3</a>{% endif %} |
+                                        {% if image.rank == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="group" href='?app={{app}}&rank=4&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>4</a>{% endif %} |
+                                        {% if image.rank == 5 %}<span style="color:red">5</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="single flower" href='?app={{app}}&rank=5&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>5</a>{% endif %} |
                                 <!--        {% if image.rank == 6 %}<span style="color:#7e1b86">6</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="selected" href='?rank=6&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>6</a>{% endif %} |-->
-                                        {% if image.rank == 7 %}<span style="color:red">7</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="closeup" href='?family={{family}}&app={{app}}&rank=7&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>7</a>{% endif %} |
-                                        {% if image.rank == 8 %}<span style="color:red">8</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="info" href='?family={{family}}&app={{app}}&rank=8&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>8</a>{% endif %}
+                                        {% if image.rank == 7 %}<span style="color:red">7</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="closeup" href='?app={{app}}&rank=7&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>7</a>{% endif %} |
+                                        {% if image.rank == 8 %}<span style="color:red">8</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="info" href='?app={{app}}&rank=8&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>8</a>{% endif %}
                                         <br>
                                     quality:
-                                        {% if image.quality == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Top" href='?family={{family}}&app={{app}}&quality=1&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>1</a>{% endif %} |
-                                        {% if image.quality == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="High" href='?family={{family}}&app={{app}}&quality=2&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>2</a>{% endif %} |
-                                        {% if image.quality == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Average" href='?family={{family}}&app={{app}}&quality=3&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>3</a>{% endif %} |
-                                        {% if image.quality == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Low" href='?family={{family}}&app={{app}}&quality=4&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>4</a>{% endif %} |
+                                        {% if image.quality == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Top" href='?app={{app}}&quality=1&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>1</a>{% endif %} |
+                                        {% if image.quality == 2 %}<span style="color:red">2</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="High" href='?app={{app}}&quality=2&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>2</a>{% endif %} |
+                                        {% if image.quality == 3 %}<span style="color:red">3</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Average" href='?app={{app}}&quality=3&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>3</a>{% endif %} |
+                                        {% if image.quality == 4 %}<span style="color:red">4</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="Low" href='?app={{app}}&quality=4&days={{days}}&id={{image.id}}&page={{page}}&type={{type}}'>4</a>{% endif %} |
                                         <br>
                                 </div>
                             </div>

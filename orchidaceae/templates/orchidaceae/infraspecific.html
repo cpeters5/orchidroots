@@ -1,0 +1,81 @@
+{% load static %}
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
+<head>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>Infra specific species related to {{species.binomial}} orchid</title>
+    <meta name='description' content='Infra specific subspecies of the orchid {{species.binomial}}'>
+</head>
+
+<style>
+
+.progen {
+    margin:10px;
+    width:90%;
+    font-size: 14px;
+}
+
+
+@media only screen and (max-width: 700px){
+    .progen {
+        width:95%;
+        font-size: 10px;
+    }
+}
+
+
+</style>
+
+
+    <div class="progen">
+        <!--main section-->
+    {% include "common/detail-nav.html" %}
+    <div class="tab-content clearfix" style="width: 60%; background:white; margin:0 auto;">
+        <br>
+        <table id="sortTable" class="table table-condensed table-sm table-hover">
+            <thead style="background-color: #e3e3e3">
+                <th>Infra species - {{infraspecific_list|length}}</th>
+            </thead>
+            <tr style="text-align: left">
+                <td><a href="{% url 'display:photos' species.pid %}?app={{species.family.application}}&role={{role}}">{{species}}</a></td>
+            </tr>
+            {% for infra in infraspecific_list %}
+            <tr style="text-align: left">
+                <td><a href="{% url 'display:photos' infra.pid %}?app={{species.family.application}}&role={{role}}"><i>{{infra.binomial_it|safe}}</i></a></td>
+            </tr>
+            {% endfor %}
+     </table>
+    </div>
+
+
+</div>
+
+<script>
+
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        "colReorder": true,  // Enable column reordering
+        "order": [[ 0, "asc" ]],
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "None",
+        }
+
+    });
+});
+
+
+</script>
+
+{% endblock %}

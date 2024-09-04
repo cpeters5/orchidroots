@@ -313,33 +313,42 @@ seedparent, pollparent {
         <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} in
-                &nbsp;the family <a href="{% url 'common:newbrowse' species.gen.family.application %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;
+                &nbsp;the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;
                 {% if species.gen.subfamily %}
-                subfamily: <a href="{% url 'common:genera' species.gen.family.application %}?subfamily={{species.gen.subfamily}}&role={{role}}">{{species.gen.subfamily}}</a>, {% endif %}
+                subfamily: <a href="{% url 'common:genera' app %}?subfamily={{species.gen.subfamily}}&role={{role}}">{{species.gen.subfamily}}</a>, {% endif %}
                 {% if species.gen.tribe %}
-                tribe: <a href="{% url 'common:genera' species.gen.family.application %}?tribe={{species.gen.tribe}}&role={{role}}">{{species.gen.tribe}}</a>, {% endif %}
+                tribe: <a href="{% url 'common:genera' app %}?tribe={{species.gen.tribe}}&role={{role}}">{{species.gen.tribe}}</a>, {% endif %}
                 {% if species.gen.subtribe %}
-                subtribe: <a href="{% url 'common:genera' species.gen.family.application %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>, {% endif %}
+                subtribe: <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>, {% endif %}
                 &nbsp;<br>
-                Genus <a href="{% url 'common:newbrowse' species.gen.family.application %}?family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp
+                Genus <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp
                 {% if app == 'orchidaceae' %}
                     {% if species.accepted.subgenus %}
-                        &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
+                        &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
                     {% endif %}
                     {% if species.accepted.section %}
-                        &nbsp;section: <a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;
+                        &nbsp;section: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;
                     {% endif %}
                     {% if species.accepted.subsection %}
-                        &nbsp;subsection: <a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;
+                        &nbsp;subsection: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;
                     {% endif %}
                     {% if species.accepted.series %}
-                        &nbsp;series: <a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;
+                        &nbsp;series: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;
                     {% endif %}
                 {% endif %}
 
                 {% if species.status == 'synonym' %}
-                    This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted }}</a>
+                    This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted }}</a>
                 {% endif %}
+
+                {% if app == 'orchidaceae' and infraspecifics %}
+                    <br>
+                    Infraspecific taxa recognized within {{species.main_species_name}}:
+                    <a href="{% url 'orchidaceae:infraspecific' species.pid %}" rel="nofollow noreferrer noopener">infraspecific taxa</a>
+
+                {% endif %}
+
+
                 {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}
             {% else %}
                 The orchid {{species.binomial}} is a hybrid
@@ -401,12 +410,12 @@ seedparent, pollparent {
                             </div>
                         {% endfor %}
                     </div>
-                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?app={{app}}&role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
                 {% else %}
                     <div style="width: 100%; font-size:16px; margin:1px auto;border:1px solid lightgrey;  text-align: center; padding:10px">
                         No image available.
                         {% if species.status == 'synonym' %}
-                        Please try the accepted species <a href="{% url 'display:summary' app species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted}}</a>
+                        Please try the accepted species <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted}}</a>
                         {% else %}
                             if you have one please consider uploading it
                             <a href="/{{app}}/uploadfile/{{species.pid}}/" rel="nofollow noreferrer noopener">here</a>.  You must login to upload a photo.  You could also post it in our facebook group
@@ -437,12 +446,12 @@ seedparent, pollparent {
                         </div>
                         <div class="parent-text " style="text-align:center; margin-bottom:10px;">
                             {% if species.hybrid.seed_id.pid %}
-                                <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
+                                <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?role={{role}}">{{species.hybrid.registered_seed_name_long|safe}}</a>
                                 {% if species.hybrid.seed_id.status == 'synonym' %}
-                                    (syn. <a href="{% url 'display:summary' app species.hybrid.seed_id.getAccepted.pid %}?family={{species.gen.family}}&role={{role}}">{{species.hybrid.seed_id.getAccepted.name|safe}}</a>)
+                                    (syn. <a href="{% url 'display:summary' app species.hybrid.seed_id.getAccepted.pid %}?role={{role}}">{{species.hybrid.seed_id.getAccepted.name|safe}}</a>)
                                 {% endif %}
                             {% elif species.status == 'synonym' and species.getAccepted.hybrid.seed_id.pid %}
-                                    <a href="{% url 'display:summary' app species.getAccepted.hybrid.seed_id.pid %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted.hybrid.registered_seed_name_long|safe}}</a>
+                                    <a href="{% url 'display:summary' app species.getAccepted.hybrid.seed_id.pid %}?role={{role}}">{{species.getAccepted.hybrid.registered_seed_name_long|safe}}</a>
                             {% else %}
                                 {{species.hybrid.seed_genus | default:"Nodata"}} ?
                             {% endif %}

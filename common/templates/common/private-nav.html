@@ -40,13 +40,13 @@
 </style>
 
     <div class="d-flex justify-content-center mynav" >
-        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?app={{app}}&family={{family}}&role={{role}}">My List</a>
-        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&family={{family}}&role={{role}}">My Species</a>
-        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&family={{family}}&role={{role}}">My Hybrids</a>
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?app={{app}}&role={{role}}">My List</a>
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}">My Species</a>
+        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&role={{role}}">My Hybrids</a>
         {% if species %}
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' species.pid %}?app={{app}}&family={{family}}&role={{role}}">All photos</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}">All photos</a>
         {% else %}
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' app %}?family={{family}}&role={{role}}">All photos</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' app %}?role={{role}}">All photos</a>
         {% endif %}
         {% if species %}
                 {% if author.author_id == 'anonymous' %}
@@ -60,7 +60,7 @@
                     </div>
                 {% else %}
                     {% if app != 'orchidaceae' %}
-                        <a class="btn btn-xs btn-outline-primary m-1" style="width:100px;" href="/{{app}}/uploadfile/{{species.pid}}/?family={{family}}&role={{role}}">upload file</a>
+                        <a class="btn btn-xs btn-outline-primary m-1" style="width:100px;" href="/{{app}}/uploadfile/{{species.pid}}/?app={{app}}&role={{role}}">upload file</a>
                     {% endif %}
                 {% endif %}
             {% endif %}

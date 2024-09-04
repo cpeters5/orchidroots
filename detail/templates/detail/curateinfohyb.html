@@ -71,7 +71,7 @@ table {
                 <input type="hidden" name="role" value="{{ role }}" >
                 <input type="hidden" name="family" value="{{ family }}" >
                 <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                &nbsp;&nbsp;&nbsp;<a href="{% url 'display:summary' species.family.application species.pid %}?family={{family.family}}&role={{role}}">Cancel</a>
+                &nbsp;&nbsp;&nbsp;<a href="{% url 'display:summary' species.family.application species.pid %}?app={{app}}&role={{role}}">Cancel</a>
                 {{spcform|crispy}}
 <!--                <hr>-->
                 {{form|crispy}}

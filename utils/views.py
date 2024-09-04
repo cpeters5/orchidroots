@@ -122,7 +122,13 @@ def handle_bad_request(request):
 
 # Generate unique file name. Used in ApproveMediaPhoto method
 def regenerate_file(source_path, destination_folder):
-    filename = os.path.basename(source_path)
+    # Truncate file name if too long
+    print("util", source_path, destination_folder)
+    new_source_path = truncate_filename(source_path, 30)
+    print("util", new_source_path)
+
+    filename = os.path.basename(new_source_path)
+    print("filename", filename)
     while True:
         # Generate a new unique filename using shortuuid
         unique_filename = shortuuid.uuid() + "_" + filename
@@ -136,7 +142,37 @@ def regenerate_file(source_path, destination_folder):
         else:
             continue
 
+    print("unique_filename", unique_filename)
     return unique_filename
+
+
+def truncate_filename(filepath, max_length=40):
+    # Split the path into directory and filename
+    parts = filepath.rsplit('/', 1)
+    if len(parts) == 2:
+        directory, filename = parts
+    else:
+        directory, filename = '', parts[0]
+
+    # Split the filename into name and extension
+    name, ext = filename.rsplit('.', 1)
+
+    # Calculate the maximum length for the name
+    max_name_length = max_length - len(ext) - 1  # -1 for the dot
+
+    # Truncate the name if necessary
+    if len(name) > max_name_length:
+        name = name[:max_name_length]
+
+    # Reconstruct the filename
+    new_filename = f"{name}.{ext}"
+
+    # Reconstruct the full path
+    if directory:
+        return f"{directory}/{new_filename}"
+    else:
+        return new_filename
+
 
 # Not used
 def pathinfo(request):
@@ -269,11 +305,11 @@ def get_random_img(spcobj):
 
 
 def getRole(request):
-    role = request.GET.get('role', None)
+    role = request.GET.get('role', '')
     if not role and 'role' in request.POST:
         role = request.POST['role']
         if not role:
-            role = none
+            role = ''
     if request.user.is_authenticated:
         if not role:
             if request.user.tier.tier < 2:

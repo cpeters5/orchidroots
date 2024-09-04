@@ -97,8 +97,8 @@ img{
                     {% if user.tier.tier > 1 %}
                         {% if role == 'cur' %}
                             {% if role == 'cur' %}
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}?family={{family}}&app={{app}}&">Recently approved</a>
-                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?family={{family}}&app={{app}}&gen=&type={{species.type}}">All private photos</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_newapproved' %}?app={{app}}&">Recently approved</a>
+                                <a class="btn btn-xs btn-outline-primary btn-color" href="{% url 'common:curate_pending' %}?app={{app}}&gen=&type={{species.type}}">All private photos</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -115,11 +115,11 @@ img{
                                 <div style="font-size:12px">
                                     {% if image.pid %}
                                         {% if image.binomial == image.pid.binomial %}
-                                            <a href="{% url 'display:photos' image.pid_id %}?family={{family}}&app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
+                                            <a href="{% url 'display:photos' image.pid_id %}?app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
                                         {% else %}
                                             {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                         <br>
-                                            <a href="{% url 'common:deletephoto' image.id %}?family={{family}}&app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
+                                            <a href="{% url 'common:deletephoto' image.id %}?app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>
                                         {% endif %}
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}

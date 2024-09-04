@@ -7,7 +7,7 @@
     <!--Main sections-->
 <div style="width:95%;margin:0 auto;padding:0;">
         <!--main section-->
-<!--    {% include 'common/detail-nav.html' %}-->
+    {% include 'common/detail-nav.html' %}
 
      <div class="tab-content clearfix border" style="background:white; margin:0;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;min-height:500px">
         <br>
@@ -16,8 +16,8 @@
                  {% csrf_token %}
                  <span style="font-size:16px;">
                      <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                     <a class="btn btn-custom" href="{% url 'display:photos' species.pid %}?role={{role}}&variety={{var}}&family={{family}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
-                     <a class="btn btn-custom" href="{% url 'display:photos' species.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener">Back to photos</a>
+                     <a class="btn btn-custom" href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                     <a class="btn btn-custom" href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}" rel="nofollow noreferrer noopener">Back to photos</a>
                      <br><span style="margin-left: 20px;">The reidentified species/hybrid must be within the same family and the new name must be complete and correct and must not be a synonym.</span>
                  </span>
                  <br>

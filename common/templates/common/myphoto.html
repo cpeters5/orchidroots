@@ -209,13 +209,8 @@ div.text-br {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                {% if family == 'Orchidaceae' %}
-                                    <a href="{% url 'orchidaceae:approvemediaphoto' image.pid_id %}?&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
-                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?app=orchidaceae&family={{family}}&role={{role}}" rel="nofollow noreferrer noopener" >Delete</a>
-                                {% else %}
-                                    <a href="{% url 'common:approvemediaphoto' image.pid_id %}?&id={{image.id}}&gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
-                                    <a href="{% url 'common:deletephoto' image.id image.pid_id %}?app={{image.family.application}}&family={{image.family}}&role={{role}}" rel="nofollow noreferrer noopener" >- Delete</a>
-                                {% endif %}
+                                <a href="{% url 'common:approve_mediaphoto' app image.id image.pid_id %}?gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                <a href="{% url 'common:deletephoto' image.id image.pid_id %}?app={{app}}&role={{role}}" rel="nofollow noreferrer noopener" >Delete</a>
                             {% endif %}
                         {% endif %}
                      </div>

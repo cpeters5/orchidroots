@@ -4,14 +4,18 @@ from display.views import photos as display_photos, information as display_infor
 app_name = 'common'
 urlpatterns = [
     # Top level
+    path('taxonomy/<str:app>/', views.taxonomy, name='taxonomy'),
+    path('taxonomy/', views.taxonomy, name='taxonomy'),
     path('family/<str:app>/', views.family, name='family'),
+    path('family/', views.family, name='family'),
     # path('genera_orig/', views.genera_orig, name='genera_orig'),
     path('genera/<str:app>/', views.genera, name='genera'),
+    path('genera/', views.genera, name='genera'),
     path('species/<str:app>/', views.species, name='species'),
+    path('species/', views.species, name='species'),
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
-    path('taxonomy/<str:app>/', views.taxonomy, name='taxonomy'),
 
     # Redirect to display
     path('information/', display_information, name='information'),
@@ -23,8 +27,7 @@ urlpatterns = [
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),
     path('deletephoto/<int:orid>/', views.deletephoto, name='deletephoto'),
     path('deletewebphoto/<int:pid>/', views.deletewebphoto, name='deletewebphoto'),
-    path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
-    path('approvemediaphoto/', views.approvemediaphoto, name='approvemediaphoto'),
+    path('approve_mediaphoto/<str:app>/<int:orid>/<int:pid>/', views.approve_mediaphoto, name='approve_mediaphoto'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('get_new_uploads/', views.get_new_uploads, name='get_new_uploads'),
 

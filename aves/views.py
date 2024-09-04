@@ -62,7 +62,7 @@ def curate_newupload(request):
     family = ''
     write_output(request)
     context = {'file_list': page_list,
-               'tab': 'upl', 'role': role, 'upl': 'active', 'days': days, 'family': family,
+               'tab': 'upl', 'role': role, 'upl': 'active', 'days': days, 'family': family, 'app': app,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'section': 'Curator Corner',
@@ -105,7 +105,7 @@ def curate_pending(request):
     role = getRole(request)
     write_output(request)
     context = {'file_list': page_list, 'type': ortype,
-               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days, 'family': family,
+               'tab': 'pen', 'role': role, 'pen': 'active', 'days': days, 'family': family, 'app': app,
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page,
                'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
@@ -120,7 +120,7 @@ def reidentify(request, orid, pid):
     old_species = Species.objects.get(pk=pid)
     old_family = old_species.gen.family
     if role != 'cur':
-        url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
+        url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(pid,)), role, app)
         return HttpResponseRedirect(url)
 
     if old_species.status == 'synonym':
@@ -137,7 +137,7 @@ def reidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(pid,)), role, old_family)
+                url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(pid,)), role, app)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same genus. Just change pid
@@ -157,7 +157,7 @@ def reidentify(request, orid, pid):
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
                     os.rename(from_path, to_path)
                 else:
-                    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, old_family)
+                    url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(new_species.pid,)), role, app)
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
@@ -182,9 +182,9 @@ def reidentify(request, orid, pid):
             old_img.delete()
 
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(new_species.pid,)), role, str(new_species.gen.family))
+            url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(new_species.pid,)), role, app)
             return HttpResponseRedirect(url)
-    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, }
+    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, 'app': app, }
     return render(request, 'aves/reidentify.html', context)
 
 
@@ -237,7 +237,7 @@ def uploadweb(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
 
-            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
+            url = "%s?role=cur&app=%s" % (reverse('display:photos', args=(species.pid,)), app)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 
@@ -260,7 +260,7 @@ def uploadweb(request, pid, orid=None):
             author = None
         form = UploadSpcWebForm(instance=img)
     context = {'form': form, 'img': img, 'sender': sender, 'loc': 'active',
-               'species': species, 'family': family, 'author': author,
+               'species': species, 'family': family, 'app': app, 'author': author,
                'role': role}
     return render(request, 'aves/uploadweb.html', context)
 
@@ -288,7 +288,7 @@ def uploadvid(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
 
-            url = "%s?role=cur&family=%s" % (reverse('display:photos', args=(species.pid,)), species.gen.family)
+            url = "%s?role=cur&app=%s" % (reverse('display:photos', args=(species.pid,)), app)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 
@@ -300,7 +300,7 @@ def uploadvid(request, pid, orid=None):
         form = UploadVidForm(instance=vid)
 
     context = {'form': form, 'vid': vid, 'loc': 'active',
-               'species': species, 'family': family,
+               'species': species, 'family': family, 'app': app,
                'role': role}
     return render(request, 'aves/uploadvid.html', context)
 
@@ -405,7 +405,7 @@ def curateinfospc(request, pid):
     else:
         accepted = Accepted.objects.get(pk=species.pid)
         form = AcceptedInfoForm(instance=accepted)
-        context = {'form': form, 'genus': genus, 'species': species, 'family': family,
+        context = {'form': form, 'genus': genus, 'species': species, 'family': family, 'app': app,
                    'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
                    'role': role,}
         return render(request, 'aves/curateinfospc.html', context)

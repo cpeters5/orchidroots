@@ -312,22 +312,22 @@ seedparent, pollparent {
         <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} of
-                &nbsp;<a href="{% url 'common:newbrowse' species.family.application %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;family,
-                &nbsp;<a href="{% url 'common:newbrowse' species.family.application %}?app={{species.gen.family.application}}&family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
+                &nbsp;<a href="{% url 'common:newbrowse' app %}?display=checked">{{species.gen.family}}</a>&nbsp;family,
+                &nbsp;<a href="{% url 'common:newbrowse' app %}?genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
                 {% if species.accepted.subgenus %}
-                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>&nbsp;subgenus
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?app={{app}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>&nbsp;subgenus
                 {% endif %}
                 {% if species.accepted.section %}
-                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;section
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?app={{app}}&genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;section
                 {% endif %}
                 {% if species.accepted.subsection %}
-                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;subsection
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?app={{app}}&genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;subsection
                 {% endif %}
                 {% if species.accepted.series %}
-                    &nbsp;<a href="{% url 'orchidaceae:species' %}?family={{species.gen.family}}&genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;series
+                    &nbsp;<a href="{% url 'orchidaceae:species' %}?app={{app}}&genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;series
                 {% endif %}
                 {% if species.status == 'synonym' %}
-                    This name is a synonym of <a href="{% url 'display:information'  species.getAcc %}?family={{species.gen.family}}&role={{role}}">{{species.getAccepted }}</a>
+                    This name is a synonym of <a href="{% url 'display:information'  species.getAcc %}?app={{app}}&role={{role}}">{{species.getAccepted }}</a>
                 {% endif %}
                 {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}
             {% else %}
