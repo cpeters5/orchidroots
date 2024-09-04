@@ -5,7 +5,7 @@ import logging
 import random
 import shutil
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
@@ -171,24 +171,40 @@ def require_get(view_func):
     return wrap
 
 
-def taxonomy(request, app):
-    alpha = request.GET.get('alpha','')
+def taxonomy(request, app=None):
+    if not app:
+        app = request.GET.get('app', 'orchidaceae')
+        if app not in applications:
+            app = 'orchidaceae'
 
-    family_list = get_taxonomy(request, app, alpha)
+        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
+        # Redirect permanent to preferred url
+        return HttpResponsePermanentRedirect(canonical_url)
+
     canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/')
+    alpha = request.GET.get('alpha','')
+    family_list = get_taxonomy(request, app, alpha)
     context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list,
                'canonical_url': canonical_url,
                }
     return render(request, "common/taxonomy.html", context)
 
 
-def family(request, app):
+def family(request, app=None):
+    if not app:
+        app = request.GET.get('app', '')
+        if not app or app not in applications:
+            app = 'orchidaceae'
+
+        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
+        # Redirect permanent to preferred url
+        return HttpResponsePermanentRedirect(canonical_url)
+
+    canonical_url = request.build_absolute_uri(f'/common/family/{app}/')
     alpha = request.GET.get('alpha','')
     family_list = Family.objects.filter(application=app)
     if alpha:
         family_list = family_list.filter(family__istartswith=alpha)
-
-    canonical_url = request.build_absolute_uri(f'/common/family/{app}/')
 
     context = {
         'app': app, 'alpha': alpha,
@@ -200,7 +216,18 @@ def family(request, app):
     return render(request, "common/family.html", context)
 
 
-def genera(request, app):
+def genera(request, app=None):
+    # If app is not given (non canonical_url for old code)
+    if not app:
+        app = request.GET.get('app', '')
+        if not app or app not in applications:
+            app = 'orchidaceae'
+
+        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
+        # Redirect permanent to preferred url
+        return HttpResponsePermanentRedirect(canonical_url)
+
+    canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
     alpha = request.GET.get('alpha','')
     subfamily = ''
     tribe = ''
@@ -242,7 +269,6 @@ def genera(request, app):
     if alpha:
         genus_list = genus_list.filter(genus__istartswith=alpha)
 
-    canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
 
     write_output(request, str(family))
     context = {
@@ -254,8 +280,28 @@ def genera(request, app):
     return render(request, "common/genera.html", context)
 
 
-def species(request, app):
+def species(request, app=None):
     # path = resolve(request.path).url_name
+    # Determine application if not given
+
+    no_app = 0;
+    if not app:
+        no_app = 1
+        app = request.GET.get('app', '')
+        if not app or app not in applications:
+            #  Default to orchid
+            app = 'orchidaceae'
+
+    syn = request.GET.get('syn', '')
+    req_genus = request.GET.get('genus', '')
+    if not req_genus:
+        req_genus = default_genus[app]
+
+    canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}')
+        # Redirect permanent to preferred url
+    if no_app:
+        return HttpResponsePermanentRedirect(canonical_url)
+
     alpha = request.GET.get('alpha','')
     role = request.GET.get('role','pub')
     req_type = request.GET.get('type', 'species')
@@ -272,12 +318,8 @@ def species(request, app):
         if isinstance(req_family, Family) and req_family.application != app:
             req_family = ''
 
-    syn = request.GET.get('syn', '')
-    req_genus = request.GET.get('genus', '')
 
     # Define a default genus for large sections
-    if not req_genus:
-        req_genus = default_genus[app]
 
     # hybrids are in Orchidaceae only.
     if req_family == 'Orchidaceae':
@@ -336,7 +378,6 @@ def species(request, app):
             species_list = species_list[0:max_items]
         msg = "List too long, truncated to " + str(max_items) + ". Please refine your search criteria."
 
-    canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}')
 
     write_output(request, str(app))
     context = {
@@ -632,49 +673,34 @@ def delete_image_files(app, spc_obj, orid):
             except FileNotFoundError:
                 pass
         upl.delete()
+        return True
     except UploadFile.DoesNotExist:
         pass
 
     # Then look in the system
     if spc_obj.type == 'hybrid' and spc_obj.family.family == 'Orchidaceae':
-        try:
-            HybImages = apps.get_model(app, 'HybImages')
-            spc = HybImages.objects.get(id=orid)
-            if spc.image_file:
-                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
-                if os.path.isfile(filename):
-                    try:
-                        os.remove(filename)
-                    except FileNotFoundError:
-                        pass
-                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
-                if os.path.isfile(filename):
-                    try:
-                        os.remove(filename)
-                    except FileNotFoundError:
-                        pass
-            spc.delete()
-            return True
-        except HybImages.DoesNotExist:
-            return False
+        Images = apps.get_model(app, 'HybImages')
     else:
-        try:
-            SpcImages = apps.get_model(app, 'SpcImages')
-            spc = SpcImages.objects.get(id=orid)
-
-            if spc.image_file:
-                filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir()), str(spc.image_file))
-                if os.path.isfile(filename) and spc.image_file:
+        Images = apps.get_model(app, 'SpcImages')
+    try:
+        spc = Images.objects.get(id=orid)
+        if spc.image_file:
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.image_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                try:
                     os.remove(filename)
-
-
-                filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir()), str(spc.image_file))
-                if os.path.isfile(filename):
+                except FileNotFoundError:
+                    pass
+            filename = os.path.join(settings.STATIC_ROOT, str(spc.thumb_dir() + spc.image_file))
+            if os.path.isfile(filename):
+                try:
                     os.remove(filename)
-            spc.delete()
-            return True
-        except SpcImages.DoesNotExist:
-            return False
+                except FileNotFoundError:
+                    pass
+        spc.delete()
+        return True
+    except Images.DoesNotExist:
+        return False
 
 
 def delete_bad_image_files(orid, app):
@@ -695,41 +721,41 @@ def delete_bad_image_files(orid, app):
 
 @login_required
 def deletephoto(request, orid, pid):
-    family = request.GET.get('family', '')
-    print("1 family", family)
+    app = request.GET.get('app', '')
+    print("1 app", app)
+    # family = request.GET.get('family', '')
+    # print("1 family", family)
 
-    try:
-        family = Family.objects.get(family=family)
-        app = family.application
-    except Family.DoesNotExist:
-        family = ''
-        app = ''
+    # if family:
+    #     try:
+    #         family = Family.objects.get(family=family)
+    #         app = family.application
+    #     except Family.DoesNotExist:
+    #         family = ''
+    #         app = ''
     role = getRole(request)
-    print("2 family", family)
+    # print("2 family", family, app)
 
-    if not family:
-        app = request.GET.get('app', '')
-        if app and app not in applications:
-            app = ''
-    print("3 app", app)
 
     # Something wrong here. All delete request mush have app
     if not app:
         return HttpResponseRedirect('/')
 
-    print("app", app)
+    print("2. app", app)
 
     Species = apps.get_model(app, 'Species')
     try:
         species = Species.objects.get(pk=pid)
-        print(species, pid)
+        print("3 species", species, pid)
     except Species.DoesNotExist:
         message = 'This item does not exist!'
         return HttpResponse(message)
 
     delete_image_files(app, species, orid)
-    write_output(request, str(family))
-    url = "%s?role=cur&app=%s&species=%s" % (reverse('display:photos', args=(species.pid,)), app, species)
+    write_output(request, str(app))
+
+    url = "%s?role=cur&app=%s" % (reverse('display:photos', args=(species.pid,)), app)
+    print(url)
     return HttpResponseRedirect(url)
 def xdeletephoto(request, orid, pid):
     family = request.GET.get('family', None)
@@ -866,37 +892,41 @@ def deletewebphoto(request, pid):
 
 
 @login_required
-def approvemediaphoto(request, pid):
+def approve_mediaphoto(request, app, pid, orid):
     from utils.views import regenerate_file
     role = getRole(request)
     if role != "cur":
         message = 'You do not have privilege to approve photos.'
         return HttpResponse(message)
 
-    # !!! UNTESTED
-    # Move to a utiles method
-    family = request.GET.get('family', None)
+    UploadFile = apps.get_model(app, 'UploadFile')
+    Species = apps.get_model(app, 'Species')
+    SpcImages = apps.get_model(app, 'SpcImages')
     try:
-        family = Family.objects.get(family=family)
-        # if family != '' and family.family != 'Orchidaceae':
-        #     crit = 1
-    except Family.DoesNotExist:
-        msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%s?role=%s&family=%s" % (reverse('common:curate_newupload'), role, family)
-        return HttpResponseRedirect(url)
-
-    UploadFile = apps.get_model(family.application, 'UploadFile')
-    Species = apps.get_model(family.application, 'Species')
-    SpcImages = apps.get_model(family.application, 'SpcImages')
-    species = Species.objects.get(pk=pid)
-    family = species.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'Pid does not exist.'
+        return HttpResponse(message)
 
-    image_dir = "utils/images/" + str(family)
-    orid = request.GET.get('id', None)
+    family = species.family
+    if app != family.application:
+        message = 'Application and family name do not match.'
+        return HttpResponse(message)
+
+    # if species.status == 'synonym':
+    #     # synonym = Synonym.objects.get(pk=pid)
+    #     # pid = synonym.acc_id
+    #     pid = species.getAcc()
+    #     species = Species.accid
+
+    if app == 'orchidaceae':
+        if species.type == 'hybrid':
+            image_dir = "utils/images/hybrid"
+        else:
+            image_dir = "utils/images/species"
+    else:
+        image_dir = "utils/images/" + str(family)
+
     try:
         int(orid)
     except ValueError:
@@ -907,26 +937,46 @@ def approvemediaphoto(request, pid):
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
         msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
+        url = "%s?role=%s&msg=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, msg, app)
         return HttpResponseRedirect(url)
 
-    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
-    new_path = os.path.join(settings.STATIC_ROOT, image_dir)
-    unique_filename = regenerate_file(old_name, new_path)
-
-
-    spc = SpcImages(
+    if app == 'orchidaceae':
+        if species.type == 'species':
+            spc = SpcImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+                            credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation,
+                            form=upl.forma, rank=0, description=upl.description, location=upl.location,
+                            created_date=upl.created_date, source_url=upl.source_url, text_data=upl.text_data)
+            # hist = SpcImgHistory(pid=Species.objects.get(pk=pid), user_id=request.user, img_id=spc.id,
+            #                      action='approve file')
+            new_path = os.path.join(settings.STATIC_ROOT, "utils/images/species")
+        else:
+            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+                            credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
+                            description=upl.description, location=upl.location, created_date=upl.created_date,
+                            source_url=upl.source_url, text_data=upl.text_data)
+            new_path = os.path.join(settings.STATIC_ROOT, "utils/images/hybrid")
+    else:
+        spc = SpcImages(
                 pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, credit_to=upl.credit_to,
                 source_file_name=upl.source_file_name, variation=upl.variation,
                 form=upl.forma, rank=0, description=upl.description, location=upl.location,
                 created_date=upl.created_date, source_url=upl.source_url)
+        new_path = os.path.join(settings.STATIC_ROOT, "utils/images/", family.family)
+
+    old_name = os.path.join(settings.MEDIA_ROOT, str(upl.image_file_path))
+    print("old_name", old_name)
+    print("new_path", new_path)
+    unique_filename = regenerate_file(old_name, new_path)
+    print("common", unique_filename)
+
     spc.approved_by = request.user
     spc.image_file = unique_filename
-    spc.save()
+    status = spc.save()
+    print("save status ", status)
     upl.approved = True
     upl.delete(0)
     write_output(request, str(family))
-    url = "%s?role=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role, family)
+    url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(species.pid,)), role, app)
     return HttpResponseRedirect(url)
 
 
@@ -1002,8 +1052,7 @@ def myphoto(request, pid):
         private_list = private_list.filter(author=author)
     context = {'species': species, 'private_list': private_list, 'public_list': public_list, 'upload_list': upload_list,
                'myspecies_list': myspecies_list, 'myhybrid_list': myhybrid_list, 'author_list': author_list,
-               'pri': 'active', 'role': role, 'author': author, 'family': family.family,
-               'app': family.application,
+               'pri': 'active', 'role': role, 'author': author, 'family': family, 'app': app,
                }
     write_output(request, str(family))
     return render(request, 'common/myphoto.html', context)
@@ -1340,8 +1389,8 @@ def uploadfile(request, pid):
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             spc.save()
-            url = "%s?role=%s&author=%s&family=%s" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, family)
+            url = "%s?role=%s&author=%s&app=%s" % (reverse('display:photos', args=(species.pid,)), role,
+                                                request.user.photographer.author_id, app)
             return HttpResponseRedirect(url)
 
     context = {'form': form, 'species': species, 'web': 'active',

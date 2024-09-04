@@ -28,7 +28,7 @@
                         <input type="hidden" name="family" value="{{species.gen.family}}">
                         <input type="hidden" name="role" value="{{role}}">
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                        <a href="{% url 'display:photos' species.pid %}?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        <a href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
                         <div class="form-row">
                             <div class="form-group col-md-6 mb-0">
                                 <h6><br>Author: {{request.user}}</h6>
@@ -48,7 +48,7 @@
                         {{form.description|as_crispy_field}}
                         {{form.text_data|as_crispy_field}}
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                        <a href="/{{app}}/uploadfile/{{species.pid}}/?role={{role}}&family={{family.family}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                        <a href="/{{app}}/uploadfile/{{species.pid}}/?app={{app}}&role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
 
                         {% if redirect_field_value %}
                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">

@@ -101,8 +101,8 @@ img{
                     <div style="text-align:center"><h5>My Species Photo Collection {{app_name|title}}</h5></div>
                     {% include "common/private-nav.html" %}
                     <div style="text-align:center">
-                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=Y">Show all uploaded photos</a>&nbsp;&nbsp;
-                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?family={{family}}&role={{role}}&owner=N">Show only your own photos</a>
+                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}&owner=N">Show all uploaded photos</a>&nbsp;&nbsp;
+                       <a class="btn btn-xs btn-outline-primary m-1 mybtn" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}&owner=Y">Show only your own photos</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -113,7 +113,7 @@ img{
                                 {% if last_page > 1 %} {% include "common/paginator_brw.html" %} {% endif %}
                                 {% for x in my_list %}
                                     <div class="imageitem">
-                                        <a href="{% url 'common:myphoto' x.pid_id %}?family={{family}}&role={{role}}&author={{author.author_id}}">
+                                        <a href="{% url 'common:myphoto' x.pid_id %}?app={{app}}&role={{role}}&author={{author.author_id}}">
                                             <div class="box">
                                                 <img class="thumbnails" alt="" src="{% static x.thumb_dir %}{{ x.image_file }}" class="img-fluid fullimg">
                                             </div>

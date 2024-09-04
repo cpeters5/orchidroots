@@ -464,7 +464,8 @@ class Species(models.Model):
             return self.synonym.acc_id
         return "Not a synonym."
 
-
+    def main_species_name(self):
+        return self.genus + ' ' + self.species
 
     def getAbrevName(self):
         name = self.species

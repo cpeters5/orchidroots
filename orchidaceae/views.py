@@ -806,6 +806,65 @@ def get_des_list(pid, syn_list):
     return list(base_query.filter(Q(aid=pid) | Q(aid__in=syn_list)))
 
 
+def synonym(request, pid):
+    role = getRole(request)
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    if species.status == 'synonym':
+        species = species.getAccepted()
+
+    write_output(request, species.binomial)
+    genus = species.genus
+    synonym_list = Synonym.objects.filter(acc_id=species.pid)
+
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
+
+    context = {'synonym_list': synonym_list, 'species': species,
+               'tab': 'syn', 'syn': 'active', 'genus': genus,
+               'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
+               }
+
+    return render(request, 'orchidaceae/synonym.html', context)
+
+
+def infraspecific(request, pid):
+    role = getRole(request)
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+
+    write_output(request, species.binomial)
+
+    if species.type == 'hybrid' and species.source == 'RHS':
+        infraspecific_list = []
+        canonical_url = ''
+    else:
+        this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
+        main_species = Species.objects.filter(binomial=this_species_name)
+        if len(main_species) > 0:
+            species = main_species[0]
+
+        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
+        print("infraspecific_list", len(infraspecific_list))
+        canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
+
+    context = {'infraspecific_list': infraspecific_list, 'species': species,
+               'tab': 'pho', 'pho': 'active',
+               'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
+               }
+
+    return render(request, 'orchidaceae/infraspecific.html', context)
+
+
 def progeny(request, pid):
     role = getRole(request)
     direct = request.GET.get('direct', '')

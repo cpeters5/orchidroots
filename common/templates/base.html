@@ -690,7 +690,7 @@ nav .search-container button:hover {
                                     <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
                                     <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
                                     {% if species %}
-                                        <li><a class="dropdown-item" href="{% url 'display:photos' species.pid %}?family={{species.gen.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'display:photos' species.pid %}?app={{app|default:'orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
                                     {% else %}
                                         <li><a class="dropdown-item" href="{% url 'common:newbrowse' aves %}?role=cur&family={{family.family|default:'Orchidaceae'}}&display=checked" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
                                     {% endif %}
@@ -753,7 +753,7 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:genera' 'orchidaceae' %}?display=checked&role={{role}}" data-nosnippet>Orchid genera </a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?&alpha=A&display=checked&role={{role}}" data-nosnippet>Orchid species </a></li>
              <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?alpha=A&display=checked&role={{role}}" data-nosnippet>Orchid hybrids </a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?display=checked&role={{role}}" data-nosnippet>Orchid images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?display=checked&role={{role}}&alpha=A" data-nosnippet>Orchid images</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -777,7 +777,7 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:family' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant families</a></li>
              <li><a class="dropdown-item" href="{% url 'common:genera' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant genera</a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'other' %}?display=checked&role={{role}}" data-nosnippet>Plant images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'other' %}?display=checked&role={{role}}&alpha=A" data-nosnippet>Plant images</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -789,7 +789,7 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:family' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird families</a></li>
              <li><a class="dropdown-item" href="{% url 'common:genera' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird genera</a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?app=aves&display=checked&role={{role}}" data-nosnippet>Bird species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?display=checked&role={{role}}" data-nosnippet>Bird images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?display=checked&role={{role}}&alpha=A" data-nosnippet>Bird images</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -801,7 +801,7 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:family' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal families</a></li>
              <li><a class="dropdown-item" href="{% url 'common:genera' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal genera</a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?app=animalia&display=checked&role={{role}}" data-nosnippet>Animal species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?display=checked&role={{role}}" data-nosnippet>Animal images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?display=checked&role={{role}}&alpha=A" data-nosnippet>Animal images</a></li>
          </ul>
      </div>
      <div class="btn-group">
