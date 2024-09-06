@@ -9,13 +9,11 @@
 </head>
 
 <style>
-
 .progen {
-    margin:10px;
+    margin:0 auto;
     width:90%;
     font-size: 14px;
 }
-
 
 @media only screen and (max-width: 700px){
     .progen {
@@ -23,15 +21,15 @@
         font-size: 10px;
     }
 }
-
-
 </style>
-
 
     <div class="progen">
         <!--main section-->
     {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0;">
+        <br>
+        <h1 class="hidden-h1">Progenies of {{species.binomial}}</h1>
+        <h5>Progenies of {{species.binomial}}</h5>
         <br>
         <table id="sortTable" class="table table-condensed table-sm table-hover">
             <thead style="background-color: #e3e3e3">
@@ -78,15 +76,6 @@
 <script>
 
 $(document).ready(function() {
-    // $.fn.dataTable.ext.type.order['priority-pre'] = function(data) {
-    //     switch (data) {
-    //         case 'primary': return 1;
-    //         case 'secondary': return 2;
-    //         case 'remote': return 3;
-    //         default: return 4;  // Handles unexpected or empty values
-    //     }
-    // };
-
     var dataTable = $('#sortTable').dataTable({
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
@@ -103,20 +92,22 @@ $(document).ready(function() {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
         },
 
-        // "dom": '<"top"i>rt<"bottom"flp><"clear">',
-        // "dom": '<"top"flp>rt<"bottom"i><"clear">',
-        // "dom": '<"wrapper"flipt>',
-        // "dom": "<'row'<'col-md-6'l><'col-md-6'Bf>>" + "<'row'<'col-md-6'><'col-md-6'>>" + "<'row'<'col-md-12't>><'row'<'col-md-12'ip>>",
-        // "dom": "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-4'f><'col-sm-8'p>>",
-        // "dom": "<'row'<'col-sm-4'f><'col-sm-8'p>>" + "<'row'<'col-sm-12'tr>>",
         "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
-        // "sDom": '<"top"flp>rt<"bottom"ip><"clear">',
         language: {
             search: "_INPUT_",
             "sProcessing": "Processing...",
             "sZeroRecords": "None",
-            // "sSearch": "Searching:",
-            // searchPlaceholder: "Search this page"
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Check if the total number of rows is less than or equal to the page length
+            if (pageInfo.recordsTotal <= pageInfo.length) {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
+            } else {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
+            }
         }
 
     });

@@ -627,7 +627,7 @@ def ancestor(request, pid):
     canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
-               'anc': 'active', 'tab': 'anc',
+               'lineage': 'active', 'tab': 'lineage',
                'title': 'ancestor', 'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
@@ -752,7 +752,7 @@ def ancestrytree(request, pid=None):
         ppp = get_pollen_parent(pp)
         species.img = hybdir + get_random_img(species)
     context = {'species': species,
-               'spc': spc, 'tree': 'active', 'tab': 'tree',
+               'spc': spc, 'lineage': 'active', 'tab': 'lineage',
                's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
                'p': p, 'ps': ps, 'pp': pp, 'pss': pss, 'psp': psp, 'pps': pps, 'ppp': ppp,
                'title': 'ancestrytree', 'role': role, 'app': 'orchidaceae',
@@ -857,7 +857,7 @@ def infraspecific(request, pid):
         canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
 
     context = {'infraspecific_list': infraspecific_list, 'species': species,
-               'tab': 'pho', 'pho': 'active',
+               'tab': 'infra', 'infra': 'active',
                'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
@@ -889,7 +889,7 @@ def progeny(request, pid):
     if prim:
         canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/?prim=1')
         context = {'prim_list': prim_list, 'species': species,
-                   'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
+                   'tab': 'lineage', 'lineage': 'active', 'genus': genus, 'direct': direct,
                    'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                    'canonical_url': canonical_url,
                    }
@@ -918,7 +918,7 @@ def progeny(request, pid):
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
 
     context = {'result_list': result_list, 'species': species,
-                'tab': 'pro', 'pro': 'active', 'genus': genus, 'direct': direct,
+                'tab': 'lineage', 'lineage': 'active', 'genus': genus, 'direct': direct,
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
@@ -965,7 +965,7 @@ def progenyimg(request, pid):
     page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item = mypaginator(
             request, img_list, page_length, num_show)
 
-    context = {'img_list': page_list, 'species': species, 'tab': 'proimg', 'proimg': 'active',
+    context = {'img_list': page_list, 'species': species, 'tab': 'lineage', 'lineage': 'active',
                'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,
                'genus': genus, 'page': page,
                'page_range': page_range, 'last_page': last_page, 'next_page': next_page, 'prev_page': prev_page,

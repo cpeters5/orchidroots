@@ -11,7 +11,7 @@
 <style>
 
 .progen {
-    margin:10px;
+    margin: 0 auto;
     width:90%;
     font-size: 14px;
 }
@@ -32,6 +32,9 @@
         <!--main section-->
     {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="width: 60%; background:white; margin:0 auto;">
+        <br>
+        <h1 class="hidden-h1">Synonyms of {{species.binomial}}</h1>
+        <h5>Synonyms of {{species.binomial}}</h5>
         <br>
         <table id="sortTable" class="table table-condensed table-sm table-hover">
             <thead style="background-color: #e3e3e3">
@@ -67,6 +70,17 @@ $(document).ready(function() {
             search: "_INPUT_",
             "sProcessing": "Processing...",
             "sZeroRecords": "None",
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Check if the total number of rows is less than or equal to the page length
+            if (pageInfo.recordsTotal <= pageInfo.length) {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
+            } else {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
+            }
         }
 
     });
