@@ -79,34 +79,28 @@
                     </div>
                 </li>
                     {% endif %}
-
+                {% if app == 'orchidaceze' and 'species.type == 'species' %}
+                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'orchidaceae:infraspecific' species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link {{pro}} {{proimg}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
-                        {% if tab == 'pro' %}Progeny{% elif tab == 'proimg' %}Progeny images{% else %}Progeny{% endif %}
+                    <a class="nav-link {{lineage}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
+                        Lineage
                     </a>
                     <div class="nav3 dropdown-menu">
                             <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?app={{app}}&role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
                             <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Progeny</a>
-                            <a class="dropdown-item" href="/{{app}}/progenyimg/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>images</a>
+                            <a class="dropdown-item" href="/{{app}}/progenyimg/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Progeny images</a>
+                            {% if species.type == 'hybrid' %}
+                                <a class="dropdown-item" href="/{{app}}/ancestor/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry list</a>
+                                <a class="dropdown-item" href="/{{app}}/ancestrytree/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry tree</a>
+
+                            {% endif %}
                     </div>
                 </li>
 
-                    {% if species.type == 'hybrid' %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link {{anc}} {{tree}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
-                                {% if tab == 'anc' %}Ancestry list{% elif tab == 'tree' %}Ancestry Tree{% else %}Ancestry{% endif %}
-                            </a>
-                            <div class="nav2 dropdown-menu">
-                            {% if species.gen.family.family == 'Orchidaceae' %}
-                                <a class="dropdown-item" href="/{{app}}/ancestor/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry list</a>
-                                <a class="dropdown-item" href="/{{app}}/ancestrytree/{{species.pid}}/?app={{app}}&role={{role}}" data-nosnippet>Ancestry tree</a>
-                            {% endif %}
-                           </div>
-                        </li>
-                    {% endif %}
                     {% if user.tier.tier > 2 %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}" data-nosnippet>New uploads</a>

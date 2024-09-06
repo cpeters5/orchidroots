@@ -190,10 +190,12 @@ a {
     <div class="tab-content clearfix" style="min-width:2000px;overflow-x:auto;padding:0;background-color:white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
         {% if species.type == 'hybrid' %}
         <br>
+        <h1 class="hidden-h1">Ancestors of {{species.binomial}}</h1>
+        <br>
         <div class="card m-2" style="margin:100px;">
             <div class="card-header">
                 <div style="margin-left:200px;">
-                <h5>Family Tree</h5>
+                    <h5>Family Tree of {{species.binomial}}</h5>
                 </div>
             </div>
             <br>
