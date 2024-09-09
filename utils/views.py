@@ -230,12 +230,6 @@ def get_family(family):
         app = ''
     return app, family
 
-# Obsolete. Used in taxonomy view to generate taxonomy tree
-def get_taxonomy(request, app, alpha):
-    family_list = Family.objects.filter(application=app)
-    if alpha != '':
-        family_list = family_list.filter(family__istartswith=alpha)
-    return family_list
 
 # Logging message for tracing users requests
 def write_output(request, detail=None):
@@ -331,13 +325,14 @@ def getSuperGeneric(request):
             subtribe = Subtribe.objects.get(pk=subtribe)
         except Subtribe.DoesNotExist:
             subtribe = ''
-
+    print("subtribe", subtribe)
     tribe = request.GET.get('tribe', None)
     if tribe:
         try:
             tribe = Tribe.objects.get(pk=tribe)
         except Tribe.DoesNotExist:
             tribe = ''
+    print("tribe", subtribe)
 
     subfamily = request.GET.get('subfamily', None)
     if subfamily:
@@ -345,6 +340,7 @@ def getSuperGeneric(request):
             subfamily = Subfamily.objects.get(pk=subfamily)
         except Subfamily.DoesNotExist:
             subfamily = ''
+    print("subfamily", subfamily)
 
     return subfamily, tribe, subtribe
 

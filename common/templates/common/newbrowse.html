@@ -303,7 +303,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" >
                                 {% endif %}
                                     <div class="imgcaption">
-                                        {% if x.common_name %}{{x.common_name|default:''}}{% else %}{{x.get_best_img.pid.binomial_it|safe}}{% endif %}</p>
+                                        {% if x.common_name %}{{x.common_name|default:''}}{% else %}{{x.get_best_img.pid.binomial_it|safe}}{% endif %}
                                     </div>
                             </div>
                         {% endfor %}
@@ -349,7 +349,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        {{x.pid|safe}}<p>{{x.pid.accepted.common_name|default:''}}</p>
+                                        <p>{{x.pid.accepted.common_name|default:''}} ({{x.binomial}})</p>
                                     </div>
                             </div>
                         {% endfor %}

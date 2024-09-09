@@ -3,7 +3,7 @@
 {% include 'detail-title.html' %}
 {% block body %}
 <head>
-    <link rel="canonical" href="{{ canonical_url }}?alpha={{alpha}}">
+    <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{species.binomial}} immediate offsprings</title>
     <meta name='description' content='Immediate offsprings of {{species.binomial}}'>
 </head>
@@ -64,7 +64,7 @@
                         {% endif %}
                     </td>
                     <td class="text-left d-sm-table-cell">
-                        {% if hybrid.pid.num_image %}{{hybrid.pid.num_image}} {% endif %}
+                        {% if hybrid.pid.num_image %}{{hybrid.pid.speciesstat.num_image}} {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

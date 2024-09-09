@@ -27,13 +27,13 @@
 <div class="container-fluid" style="margin:0 auto">
     <ul class="pagination pagination-xs" style="clear:left">
         {% if page > 1 %}
-            <li class="page-item"><a class="page-link" href="?page=1&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-double-left" ></span></a></li>
+            <li class="page-item"><a class="page-link" href="?page=1&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-double-left" ></span></a></li>
         {% else %}
             <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-left"></span></a></li>
         {% endif %}
 
         {% if page > 1 %}
-            <li class="page-item"><a class="page-link" href="?page={{prev_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-left"></span></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{prev_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-left"></span></a></li>
         {% else %}
             <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
         {% endif %}
@@ -42,20 +42,20 @@
             {% if pg == page %}
                 <li class="page-item active"><a class="page-link" href="#">{{pg}}</a></li>
             {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{pg}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}" rel="nofollow noreferrer noopener">{{pg}}</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{pg}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}" rel="nofollow noreferrer noopener">{{pg}}</a></li>
             {% endif %}
         {% endfor %}
 
         {% if page == last_page %}
             <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
         {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{next_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-right"></span></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{next_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-right"></span></a></li>
         {% endif %}
 
         {% if page == last_page %}
             <li class="page-item"><a class="page-link" href="#"><span class="fa fa-angle-double-right"></span></a></li>
         {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{last_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}&display={{display}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-double-right"></span></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{last_page}}&role={{role}}&type={{type}}&year={{year}}&status={{status}}&genus={{genus}}&subgenus={{subgenus_obj.subgenus}}&section={{section_obj.section}}&subsection={{subsection_obj.subsection}}&series={{series_obj.series}}&alpha={{alpha}}" rel="nofollow noreferrer noopener"><span class="fa fa-angle-double-right"></span></a></li>
         {% endif %}
   </ul>
 </div>

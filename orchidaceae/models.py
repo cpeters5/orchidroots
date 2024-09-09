@@ -434,15 +434,15 @@ class Species(models.Model):
             name = name + " (" + self.is_hybrid
             if self.year:
                 name = name + " " + str(self.year)
-            if self.num_image > 0:
-                name = name + " #img " + str(self.num_image)
+            if self.speciesstat.num_image > 0:
+                name = name + " #img " + str(self.speciesstat.num_image)
             return name + ")"
         elif self.year:
             name = name + " (" + str(self.year)
             if self.status == 'synonym':
                 name = name + " syn"
-            elif self.num_image and self.num_image > 0:
-                name = name + " #img " + str(self.num_image)
+            elif self.speciesstat.num_image and self.speciesstat.num_image > 0:
+                name = name + " #img " + str(self.speciesstat.num_image)
             return name + ")"
         return name
 
@@ -665,8 +665,6 @@ class Accepted(models.Model):
     series = models.ForeignKey(Series, db_column='series', related_name='or3series', null=True,on_delete=models.DO_NOTHING)
     intrasource = models.CharField(max_length=10)
 
-    num_image = models.IntegerField(null=True, blank=True)
-    num_descendant = models.IntegerField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     operator = models.ForeignKey(User, db_column='operator', related_name='oroperator', null=True,on_delete=models.DO_NOTHING)
@@ -765,10 +763,6 @@ class Hybrid(models.Model):
     culture = models.TextField(null=True, blank=True)
     etymology = models.TextField(null=True, blank=True)
 
-    num_image = models.IntegerField(null=True, blank=True)
-    num_ancestor = models.IntegerField(null=True, blank=True)
-    num_species_ancestor = models.IntegerField(null=True, blank=True)
-    num_descendant = models.IntegerField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 

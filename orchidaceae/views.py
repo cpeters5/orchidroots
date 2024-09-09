@@ -146,7 +146,10 @@ def genera(request):
     st_list = st_list.order_by('subtribe')
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
 
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/genera/')
+    if alpha and alpha != 'All':
+        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae&alpha={alpha}')
+    else:
+        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae')
 
     context = {'my_list': genus_list, 'genus_lookup': genus_lookup,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,

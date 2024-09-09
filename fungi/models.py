@@ -142,6 +142,28 @@ class Genus(models.Model):
         return None
 
 
+class GenusStat(models.Model):
+    pid = models.OneToOneField(
+        Genus,
+        db_column='pid',
+        related_name='genusstat',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    num_species = models.IntegerField(null=True,default=0)
+    num_species_synonym = models.IntegerField(null=True,default=0)
+    num_species_total = models.IntegerField(null=True,default=0)
+    num_hybrid  = models.IntegerField(null=True,default=0)
+    num_hybrid_synonym  = models.IntegerField(null=True, default=0)
+    num_hybrid_total  = models.IntegerField(null=True,default=0)
+    num_synonym  = models.IntegerField(null=True,default=0)
+    num_spcimage = models.IntegerField(null=True,default=0)
+    num_spc_with_image = models.IntegerField(null=True,default=0)
+    pct_spc_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
+    num_hybimage = models.IntegerField(null=True,default=0)
+    num_hyb_with_image = models.IntegerField(null=True,default=0)
+    pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
+
+
 class Gensyn(models.Model):
     # pid = models.BigIntegerField(null=True, blank=True)
     pid = models.OneToOneField(
@@ -359,12 +381,27 @@ class Species(models.Model):
         return len(img) + len(upl)
 
 
+class SpeciesStat(models.Model):
+    pid = models.OneToOneField(
+        Species,
+        db_column='pid',
+        related_name='speciesstat',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    num_image = models.IntegerField(blank=True)
+    num_ancestor = models.IntegerField(null=True, blank=True)
+    num_species_ancestor = models.IntegerField(null=True, blank=True)
+    num_descendant = models.IntegerField(null=True, blank=True)
+    num_dir_descendant = models.IntegerField(null=True, blank=True)
+
+
 class FungiManager(Manager):
     def search(self, query):
         return self.raw(
             'SELECT * FROM fungi_accepted WHERE MATCH(binomial, common_name) AGAINST (%s IN NATURAL LANGUAGE MODE)',
             [query]
         )
+
 
 class Accepted(models.Model):
     pid = models.OneToOneField(
@@ -422,6 +459,7 @@ class Accepted(models.Model):
     #         return img
     #     return None
     #
+
 
 class Hybrid(models.Model):
     pid = models.OneToOneField(

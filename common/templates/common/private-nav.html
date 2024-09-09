@@ -44,7 +44,7 @@
         <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}">My Species</a>
         <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&role={{role}}">My Hybrids</a>
         {% if species %}
-            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}">All photos</a>
+            <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'display:photos' app species.pid %}?role={{role}}">All photos</a>
         {% else %}
             <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:newbrowse' app %}?role={{role}}">All photos</a>
         {% endif %}

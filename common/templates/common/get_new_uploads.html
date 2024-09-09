@@ -27,7 +27,7 @@
                                 <div style="font-size:12px">
                                     {% if image.pid %}
                                         {% if image.binomial == image.pid.binomial %}
-                                            <a href="{% url 'display:photos' image.pid_id %}?app=orchidaceae&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
+                                            <a href="{% url 'display:photos' 'orchidaceae' image.pid_id %}?role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                         {% else %}
                                             {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                         <br>
@@ -58,7 +58,7 @@
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.binomial == image.pid.binomial %}
-                                        <a href="{% url 'display:photos' image.pid_id %}?app=animalia&id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
+                                        <a href="{% url 'display:photos' 'animalia' image.pid_id %}?id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     <br>
@@ -86,7 +86,7 @@
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.binomial == image.pid.binomial %}
-                                        <a href="{% url 'display:photos' image.pid_id %}?app=aves&id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
+                                        <a href="{% url 'display:photos' 'aves' image.pid_id %}?id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     <br>
@@ -115,7 +115,7 @@
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.binomial == image.pid.binomial %}
-                                        <a href="{% url 'display:photos' image.pid_id %}?app=fungi&id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
+                                        <a href="{% url 'display:photos' 'fungi' image.pid_id %}?id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     <br>
@@ -144,7 +144,7 @@
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.binomial == image.pid.binomial %}
-                                        <a href="{% url 'display:photos' image.pid_id %}?app=other&id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
+                                        <a href="{% url 'display:photos' 'other' image.pid_id %}?id={{image.id}}&role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     <br>

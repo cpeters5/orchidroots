@@ -312,8 +312,8 @@ seedparent, pollparent {
         <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} of
-                &nbsp;<a href="{% url 'common:newbrowse' app %}?display=checked">{{species.gen.family}}</a>&nbsp;family,
-                &nbsp;<a href="{% url 'common:newbrowse' app %}?genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp;genus
+                &nbsp;<a href="{% url 'common:newbrowse' app %}?">{{species.gen.family}}</a>&nbsp;family,
+                &nbsp;<a href="{% url 'common:newbrowse' app %}?genus={{species.genus}}">{{species.genus}}</a>&nbsp;genus
                 {% if species.accepted.subgenus %}
                     &nbsp;<a href="{% url 'orchidaceae:species' %}?app={{app}}&genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>&nbsp;subgenus
                 {% endif %}
@@ -364,7 +364,7 @@ seedparent, pollparent {
                             </div>
                         {% endfor %}
                     </div>
-                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?family={{species.gen.family}}&role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos' species.family.application species.pid %}?role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
                 {% else %}
                     <div style="width: 80%; font-size:16px;border:0 solid lightgrey; margin:50px auto; text-align: center; padding:10px">
                         No image available.

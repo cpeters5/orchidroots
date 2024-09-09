@@ -505,7 +505,7 @@ def reidentify(request, orid, pid):
     source_file_name = ''
     role = getRole(request)
     if role != 'cur':
-        url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(pid,)), role, family)
+        url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
         return HttpResponseRedirect(url)
 
     old_species = Species.objects.get(pk=pid)
@@ -529,7 +529,7 @@ def reidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(pid,)), role, family)
+                url = "%s?role=%s" % (reverse('display:photos', args=(app,pid,)), role)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same type
@@ -559,7 +559,7 @@ def reidentify(request, orid, pid):
                                              user_id=request.user, created_date=old_img.created_date)
                     os.rename(from_path, to_path)
                 else:
-                    url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(new_species.pid,)), role, family)
+                    url = "%s?role=%s" % (reverse('display:photos', args=(app, new_species.pid,)), role)
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
@@ -588,7 +588,7 @@ def reidentify(request, orid, pid):
             old_img.delete()
 
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(new_species.pid,)), role, family)
+            url = "%s?role=%s" % (reverse('display:photos', args=(app, new_species.pid,)), role)
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': family}
     return render(request, 'detail/reidentify.html', context)
@@ -677,7 +677,7 @@ def uploadweb(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
             # logger.error(" family = " + str(species.gen.family))
-            url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)),role, species.gen.family)
+            url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)),role)
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 
@@ -718,6 +718,10 @@ def uploadweb(request, pid, orid=None):
 
 @login_required
 def uploadfile(request, pid):
+    # Called from orchidaceae upload file only. All other application use their own uploadfile
+    # TODO ocnsolidate with other application uploadfile.
+    app = 'orchidaceae'
+
     role = getRole(request)
     species = Species.objects.get(pk=pid)
     if request.user.tier.tier < 2 or not request.user.photographer.author_id:
@@ -735,9 +739,7 @@ def uploadfile(request, pid):
     except Species.DoesNotExist:
         message = 'This name does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
-    # app = species.gen.family.application
     # Orchid is a speciel case
-    app = 'detail'
     family = species.gen.family
     if species.status == 'synonym':
         synonym = Synonym.objects.get(pk=pid)
@@ -759,14 +761,14 @@ def uploadfile(request, pid):
             spc.user_id = request.user
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             spc.save()
-            url = "%s?role=%s&author=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)), role,
-                                                request.user.photographer.author_id, family)
+            url = "%s?role=%s&author=%s" % (reverse('display:photos', args=(app, species.pid,)), role,
+                                                request.user.photographer.author_id)
             return HttpResponseRedirect(url)
 
     context = {'form': form, 'species': species, 'web': 'active',
                'author': author, 'family': family,
-               'role': role, 'app': 'orchidaceae', 'title': 'uploadfile'}
-    return render(request, app + '/uploadfile.html', context)
+               'role': role, 'app': app, 'title': 'uploadfile'}
+    return render(request, 'detail/uploadfile.html', context)
 
 
 @login_required
@@ -796,7 +798,7 @@ def approvemediaphoto(request, pid):
         upl = UploadFile.objects.get(pk=orid)
     except UploadFile.DoesNotExist:
         msg = "uploaded file #" + str(orid) + "does not exist"
-        url = "%s?role=%s&msg=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)), role, msg, family)
+        url = "%s?role=%s&msg=%s" % (reverse('display:photos', args=(app, species.pid,)), role, msg)
         return HttpResponseRedirect(url)
     upls = UploadFile.objects.filter(pid=pid)
     for upl in upls:
@@ -832,7 +834,7 @@ def approvemediaphoto(request, pid):
                 shutil.copy(old_name, tmp_name)
                 shutil.move(old_name, newpath + ext)
             except shutil.Error:
-                url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)), role, family)
+                url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
                 return HttpResponseRedirect(url)
             spc.image_file = image_file + ext
         else:
@@ -846,7 +848,7 @@ def approvemediaphoto(request, pid):
                         shutil.move(old_name, x)
                     except shutil.Error:
                         upl.delete()
-                        url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)), role, family)
+                        url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
                         return HttpResponseRedirect(url)
                     spc.image_file = image_file
                     break
@@ -856,6 +858,6 @@ def approvemediaphoto(request, pid):
         upl.approved = True
         upl.delete(0)
     write_output(request, str(family))
-    url = "%s?role=%s&family=%s&app=orchidaceae" % (reverse('display:photos', args=(species.pid,)), role, family)
+    url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
     return HttpResponseRedirect(url)
 

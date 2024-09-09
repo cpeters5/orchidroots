@@ -3,7 +3,7 @@
 {% include "base.html" %}
 {% block body %}
 <head>
-    <link rel="canonical" href="{{ canonical_url }}?alpha={{alpha}}">
+    <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{genus}} hybrids</title>
 </head>
 
@@ -76,7 +76,7 @@ option {
                 </form>
             </h4>
                 {% if total > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
-                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family={{family}}&type=hybrid&genus={{genus}}&display=checked&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family={{family}}&type=hybrid&genus={{genus}}&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
                 {% endif %}
         </div>
 
@@ -168,9 +168,9 @@ option {
                                 <td>{{spc.author|default:''}}</td>
                                 <td>{{spc.originator|default:''}}</td>
                                 <td>{{spc.year|default:''}}</td>
-                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:ancestor' spc.pid %}?role={{role}}">{{spc.num_ancestor|default:''}}</a></td>
-                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:progeny' spc.pid %}?role={{role}}">{{spc.num_descendant|default:''}}</a></td>
-                                <td class="d-none d-sm-table-cell text-center">{{spc.num_image|default:''}}</td>
+                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:ancestor' spc.pid %}?role={{role}}">{{spc.speciesstat.num_ancestor|default:''}}</a></td>
+                                <td class="d-none d-sm-table-cell text-center"><a href="{% url 'orchidaceae:progeny' spc.pid %}?role={{role}}">{{spc.speciesstat.num_descendant|default:''}}</a></td>
+                                <td class="d-none d-sm-table-cell text-center">{{spc.speciesstat.num_image|default:''}}</td>
                             </tr>
                         {% endfor %}
                 </table>

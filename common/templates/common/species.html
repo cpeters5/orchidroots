@@ -23,14 +23,14 @@
                     <div class="card-header border">
                         <h1 class="hidden-h1">List of species or hybrid of {{app}} category</h1>
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of
+                            List of {{app|title}}
                                <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="type" name="family" value="{{family}}" >
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
                                     <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
 
-                            in family
+                            in the family
                                <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
                                     <input class="searchbox border" form="family" value="{{family|default:''}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">

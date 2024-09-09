@@ -14,21 +14,20 @@
         <div style="text-align:left;font-size:13px;margin-top: 20px;">
 <!--            If family is requested, then populate right section with genus list-->
 <!--            Display list of genus in the family (subfamily/tribe or subtribe) -->
-                <h1 class="hidden-h1">{{app|title}} families catalog</h1>
+                <h1 class="hidden-h1">{{app|title}} {{family|title}} Genera</h1>
                 <div class="card m-1">
                     <div class="card-header border">
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                                {% if app == 'other' %} Plantae
+                                {% if app == 'other' %} Plantae (except Orchidaceae)
                                 {% else %}{{app|title}}
                                 {% endif %}
-                                Family {% if app == 'other' %}(except Orchidaceae){% endif %}
                                 {% if subfamily %} subfamily <i>{{subfamily}}</i>
                                 {% endif %}
                                 {% if tribe %} tribe <i>{{tribe}}</i>
                                 {% endif %}
                                 {% if subtribe %} subtribe <i>{{subtribe}}</i>
                                 {% endif %}
-                            Catalog
+                                Families
                         </div>
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
@@ -45,7 +44,7 @@
                                     </thead>
                                         {% for family in family_list %}
                                         <tr><td>
-                                                <a href="{% url 'common:genera' app %}?app={{app}}&family={{family.family}}&year={{ year }}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{family.family}}</i></a>
+                                                <a href="{% url 'common:genera' app %}?app={{app}}&family={{family.family}}"><i>{{family.family}}</i></a>
                                                 {{family.author|default:""}}
                                             </td>
                                             <td>{{family.common_name|default:''}}</td>

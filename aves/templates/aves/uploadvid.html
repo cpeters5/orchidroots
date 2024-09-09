@@ -31,7 +31,7 @@
                  </div>
              {% endif %}
                  <input type="hidden" name="role" value="{{role}}" >
-                 <a href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                 <a href="{% url 'display:photos' app species.pid %}?role={{role}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
                  <div class="form-row">
                     <div class="form-group col-md-6 mb-0">
                         <h6><br>Author: {{request.user}}</h6>
@@ -49,7 +49,7 @@
 
                  <span style="font-size:16px;">
                     <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
-                    <a href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}&variety={{var}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
+                    <a href="{% url 'display:photos' app species.pid %}?role={{role}}" rel="nofollow noreferrer noopener"> &nbsp;&nbsp;&nbsp;Cancel</a>
                  </span>
                  <input type="hidden" name="role" value="{{ role }}" >
              </form>

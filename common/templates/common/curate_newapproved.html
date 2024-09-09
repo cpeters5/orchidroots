@@ -169,13 +169,13 @@ div.text-br {
                         {% for image in file_list %}
                             <div class="imageitem p-1 justify-content-center">
                                 <div class="box">
-                                    <a class=myCarousel" href="{% url 'display:photos' image.pid_id %}?app={{app}}">
+                                    <a class=myCarousel" href="{% url 'display:photos' app image.pid_id %}">
                                         <img class="thumbnails" alt="" src="{% static image.thumb_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                     </a>
                                 </div>
                                 <div class="imgcaption">
-                                    <a href="{% url 'display:photos' image.pid_id %}?app={{app}}&role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
+                                    <a href="{% url 'display:photos' app image.pid_id %}?role=cur&id={{image.id}}&gen={{species.gen.pid}}&action=file">{{image.pid.pid.name|safe}}</a>
                                     <br>Approved by {{image.approved_by}}, {{image.modified_date.date}}
                                     {% if image.source_url %}
                                         <a href="{{image.source_url}}" target="_blank">{{image.get_displayname}}</a>
