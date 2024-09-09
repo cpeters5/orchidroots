@@ -35,12 +35,9 @@
             <thead style="background-color: #e3e3e3">
                 <th>Infra species - {{infraspecific_list|length}}</th>
             </thead>
-<!--            <tr style="text-align: left">-->
-<!--                <td><a href="{% url 'display:photos' species.pid %}?app={{species.family.application}}&role={{role}}">{{species}}</a></td>-->
-<!--            </tr>-->
             {% for infra in infraspecific_list %}
             <tr style="text-align: left">
-                <td><a href="{% url 'display:photos' infra.pid %}?app={{species.family.application}}&role={{role}}"><i>{{infra.binomial_it|safe}}</i></a></td>
+                <td><a href="{% url 'display:photos' species.family.application infra.pid %}?role={{role}}"><i>{{infra.binomial_it|safe}}</i></a></td>
             </tr>
             {% endfor %}
      </table>

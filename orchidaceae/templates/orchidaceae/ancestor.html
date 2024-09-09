@@ -4,7 +4,7 @@
 {% block body %}
 <head>
     <title>List of ancestors of {{species.binomial}}</title>
-    <link rel="canonical" href="{{ canonical_url }}?alpha={{alpha}}">
+    <link rel="canonical" href="{{ canonical_url }}">
     <meta name='description' content='Ancestors of {{species.binomial}}'>
 </head>
 
@@ -63,7 +63,7 @@
                         </td>
                         <td class="text-center">{{anc.anctype}}</td>
                         <td class="text-center">{{anc.prettypct}}%</td>
-                        <td class="text-center d-none d-md-table-cell">{% if anc.aid.num_image %}{{anc.aid.num_image}} {% endif %}</td>
+                        <td class="text-center d-none d-md-table-cell">{% if anc.aid.speciesstat.num_image %}{{anc.aid.speciesstat.num_image}} {% endif %}</td>
                     </tr>
                     {% endfor %}
                 </table>

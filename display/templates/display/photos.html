@@ -296,7 +296,7 @@ a:hover {
             &nbsp;&nbsp;
         {% if user.is_authenticated %}
             {% if owner == 'Y' %}
-                <a href="{% url 'display:photos' species.pid %}?app={{app}}&role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
+                <a href="{% url 'display:photos' app species.pid %}?role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
                 <a href="{% url 'common:myphoto' species.pid %}?app={{app}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
             {% endif %}
@@ -414,7 +414,7 @@ a:hover {
         {% else %}
             {% if species.status == 'synonym' %}
                 <br><br><div style="text-align:center">No images available.  Please try the accepted species
-                            <a href="{% url 'display:photos' species.getAcc %}?app={{app}}">{{species.getAccepted.binomial|safe}}</a>
+                            <a href="{% url 'display:photos' app species.getAcc %}">{{species.getAccepted.binomial|safe}}</a>
                         </div>
             {% else %}
                 <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>

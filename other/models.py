@@ -49,20 +49,6 @@ class Genus(models.Model):
     source = models.CharField(max_length=50, blank=True)
     abrev = models.CharField(max_length=50, blank=True)
     year = models.IntegerField(null=True, blank=True)
-    num_species = models.IntegerField(null=True, default=0)
-    num_species_synonym = models.IntegerField(null=True, default=0)
-    num_species_total = models.IntegerField(null=True, default=0)
-    num_hybrid = models.IntegerField(null=True, default=0)
-    num_hybrid_synonym = models.IntegerField(null=True, default=0)
-    num_hybrid_total = models.IntegerField(null=True, default=0)
-    num_synonym = models.IntegerField(null=True, default=0)
-    num_spcimage = models.IntegerField(null=True, default=0)
-    num_spc_with_image = models.IntegerField(null=True, default=0)
-    pct_spc_with_image = models.DecimalField(decimal_places=2, max_digits=7, null=True, default=0)
-    num_hybimage = models.IntegerField(null=True, default=0)
-    num_hyb_with_image = models.IntegerField(null=True, default=0)
-    pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7, null=True, default=0)
-    notepad = models.CharField(max_length=500, default='')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
@@ -120,10 +106,6 @@ class Genus(models.Model):
         else:
             return None
 
-    class Meta:
-        # verbose_name_plural = "Anni"
-        ordering = ('genus',)
-
     def get_best_img(self):
         img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
                 'quality', '-rank', '?')
@@ -140,6 +122,32 @@ class Genus(models.Model):
                 img = img[0:1][0]
                 return img
         return None
+
+    class Meta:
+        # verbose_name_plural = "Anni"
+        ordering = ('genus',)
+
+
+class GenusStat(models.Model):
+    pid = models.OneToOneField(
+        Genus,
+        db_column='pid',
+        related_name='genusstat',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    num_species = models.IntegerField(null=True,default=0)
+    num_species_synonym = models.IntegerField(null=True,default=0)
+    num_species_total = models.IntegerField(null=True,default=0)
+    num_hybrid  = models.IntegerField(null=True,default=0)
+    num_hybrid_synonym  = models.IntegerField(null=True, default=0)
+    num_hybrid_total  = models.IntegerField(null=True,default=0)
+    num_synonym  = models.IntegerField(null=True,default=0)
+    num_spcimage = models.IntegerField(null=True,default=0)
+    num_spc_with_image = models.IntegerField(null=True,default=0)
+    pct_spc_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
+    num_hybimage = models.IntegerField(null=True,default=0)
+    num_hyb_with_image = models.IntegerField(null=True,default=0)
+    pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
 
 
 class Gensyn(models.Model):
@@ -185,11 +193,9 @@ class Species(models.Model):
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=500, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcotfamily', on_delete=models.DO_NOTHING)
-    # citation = models.CharField(max_length=200)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
     is_parasitic = models.BooleanField(null=True, default=False)
-    # cit_status = models.CharField(max_length=20, null=True)
     conservation_status = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
@@ -199,13 +205,7 @@ class Species(models.Model):
     physiology = models.CharField(max_length=200, blank=True)
     url = models.CharField(max_length=200, blank=True)
     url_name = models.CharField(max_length=100, blank=True)
-    num_image = models.IntegerField(blank=True)
-    num_ancestor = models.IntegerField(null=True, blank=True)
-    num_species_ancestor = models.IntegerField(null=True, blank=True)
-    num_descendant = models.IntegerField(null=True, blank=True)
-    num_dir_descendant = models.IntegerField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='poolgen', default=0, on_delete=models.DO_NOTHING)
-    notepad = models.CharField(max_length=500, default='')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     description = models.TextField(null=True, blank=True)
@@ -363,6 +363,20 @@ class Species(models.Model):
             img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
         upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
         return len(img) + len(upl)
+
+
+class SpeciesStat(models.Model):
+    pid = models.OneToOneField(
+        Species,
+        db_column='pid',
+        related_name='speciesstat',
+        on_delete=models.CASCADE,
+        primary_key=True)
+    num_image = models.IntegerField(blank=True)
+    num_ancestor = models.IntegerField(null=True, blank=True)
+    num_species_ancestor = models.IntegerField(null=True, blank=True)
+    num_descendant = models.IntegerField(null=True, blank=True)
+    num_dir_descendant = models.IntegerField(null=True, blank=True)
 
 
 class OtherManager(Manager):

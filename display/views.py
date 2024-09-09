@@ -38,19 +38,32 @@ def is_crawler(request: HttpRequest) -> bool:
     return any(bot in user_agent for bot in crawler_patterns)
 
 
-def summary(request, app, pid=None):
-    # As of June 2022, synonym will have its own display page
-    # NOTE: seed and pollen id must all be accepted.
-    #  Handle a faulty url redirection (/display/information/application/1234)
+def summary(request, app=None, pid=None):
+    if isinstance(app, int):
+        pid = app
+        app = None
+    query_app = request.GET.get('app', None)
+    query_pid = request.GET.get('pid', None)
+    app = app or query_app
+    pid = pid or query_pid
+
+    # Handle old typo in path, can eventually be removed
     if app == 'application':
         app = 'orchidaceae'
 
+    # handle various old paths, will be eventually removed.
     if not pid:
-        pid = request.GET.get('pid', '')
+        # Worst case scenario when no explicit pid requested. Send it to homepage.
+        return HttpResponsePermanentRedirect(reverse('home'))
 
-    if not pid or not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
+    # Either 'app' or pid is from query string, send to the canonical URL
+    if query_pid != None or app == None:
+        app = None or 'orchidaceae'
+        return HttpResponsePermanentRedirect(reverse('display:summary', args=[app, pid]))
+
+    # logic for the correct url path.
+    # Construct the canonical URL
+    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
 
     family = request.GET.get('family', 'Orchidaceae')
     try:
@@ -58,25 +71,19 @@ def summary(request, app, pid=None):
     except Family.DoesNotExist:
         family = Family.objects.get(family='Orchidaceae')
 
-    if not app:
-        app = request.GET.get('app', '')
-        if not app:
-            app = family.application
-        canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
-        return HttpResponsePermanentRedirect(canonical_url)
-
-    # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
-    # If accessed via query parameter, redirect to the canonical URL
-    # TODO - Just orchid for now. Add canonical_url for other app / family later.
-    if 'pid' in request.GET:
-        return HttpResponsePermanentRedirect(canonical_url)
-
     Species = apps.get_model(app, 'Species')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+
+    # If requested species is a synonym, convert it to accepted species
+    req_species = species #(could be synonym of accepted)
+    req_pid = pid
+    if species.status == 'synonym':
+        species =species.getAccepted()
+        pid = species.pid
+        print("changed to accepted", species.status, species.type)
 
     Synonym = apps.get_model(app, 'Synonym')
     Hybrid = apps.get_model(app, 'hybrid')
@@ -94,41 +101,14 @@ def summary(request, app, pid=None):
     pollimg_list = []
 
     # If pid is a synonym, convert to accept
-    req_pid = pid
-    req_species = species
     genus = species.gen
     display_items = []
-    pid = species.pid
-    syn_list = Synonym.objects.filter(acc_id=req_pid).values_list('spid')
+    syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid')
 
     if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
-        if req_pid != pid:  # req_pid is a synonym, just show the synonym
-            images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
-        else:
-            images_list = HybImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
-        if species.status != 'synonym':
-            accepted = species.hybrid
-        else:
-            # accid = species.getAcc()
-            # accepted = Species.objects.get(pk=accid).hybrid
-            accepted = species.getAccepted().hybrid
+        images_list = HybImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
     else:
-        if req_pid != pid:  # req_pid is a synonym, just show the synonym
-            images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
-        else:               # req_pid is accepted species, show the accepted photos and all of its synonyms photos
-            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
-        if species.status == 'synonym':
-            accid = species.getAcc()
-            try:
-                myspecies = Species.objects.get(pk=accid)
-            except Species.DoesNotExist:
-                myspecies = ''
-        else:
-            myspecies = species
-        if myspecies.type == 'species':
-            accepted = myspecies.accepted
-        else:
-            accepted = myspecies.hybrid
+        images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
 
     # Build display in main table
     if images_list:
@@ -155,35 +135,30 @@ def summary(request, app, pid=None):
             elif x.rank == 8 and i_8 < 2:
                 i_8 += 1
                 display_items.append(x)
-    # Build parents display for Orchidaceae hybrid  only
-    seed_list = Hybrid.objects.filter(seed_id=species.pid).order_by('pollen_genus', 'pollen_species')
-    pollen_list = Hybrid.objects.filter(pollen_id=species.pid)
-    # Remove duplicates. i.e. if both parents are synonym.
-    temp_list = pollen_list
-    pollen_list = pollen_list.order_by('seed_genus', 'seed_species')
 
     # Check if there are infraspecific.
+    print("4. ", species, species.type, species.pid)
     if species.type == 'hybrid' and species.source == 'RHS':
         infraspecifics = 0
-        canonical_url = ''
     else:
-        this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-        main_species = Species.objects.filter(binomial=this_species_name)
+        this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
+        main_species = Species.objects.filter(binomial=this_species_name) # convert requested species to main species
         if len(main_species) > 0:
             species = main_species[0]
         infraspecifics = len(Species.objects.filter(binomial__istartswith=this_species_name))
 
-
+    # If hybrid, find its parents
+    print("5. ", species, species.type, species.pid)
     if species.type == 'hybrid':
-        if accepted.seed_id and accepted.seed_id.type == 'species':
+        if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
             try:
-                seed_obj = Species.objects.get(pk=accepted.seed_id.pid)
+                seed_obj = Species.objects.get(pk=species.hybrid.seed_id.pid)
             except Species.DoesNotExist:
                 seed_obj = ''
             seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
-        elif accepted.seed_id and accepted.seed_id.type == 'hybrid':
+        elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
             try:
-                seed_obj = Hybrid.objects.get(pk=accepted.seed_id)
+                seed_obj = Hybrid.objects.get(pk=species.hybrid.seed_id)
             except Hybrid.DoesNotExist:
                 seed_obj = ''
             if seed_obj:
@@ -202,15 +177,15 @@ def summary(request, app, pid=None):
                     elif sp_type == 'hybrid':
                         sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
         # Pollen
-        if accepted.pollen_id and accepted.pollen_id.type == 'species':
+        if species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'species':
             try:
-                pollen_obj = Species.objects.get(pk=accepted.pollen_id.pid)
+                pollen_obj = Species.objects.get(pk=species.hybrid.pollen_id.pid)
             except Species.DoesNotExist:
                 pollen_obj = ''
             pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
-        elif accepted.pollen_id and accepted.pollen_id.type == 'hybrid':
+        elif species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'hybrid':
             try:
-                pollen_obj = Hybrid.objects.get(pk=accepted.pollen_id)
+                pollen_obj = Hybrid.objects.get(pk=species.hybrid.pollen_id)
             except Hybrid.DoesNotExist:
                 pollen_obj = ''
             pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
@@ -250,31 +225,6 @@ def summary(request, app, pid=None):
     return response
 
 
-def summary_tmp(request, pid=None):
-    # As of June 2022, synonym will have its own display page
-    # NOTE: seed and pollen id must all be accepted.
-    #  Handle a faulty url redirection (/display/information/application/1234)
-    app = request.GET.get('app', '')
-
-    if not pid:
-        pid = request.GET.get('pid', '')
-
-    if not pid or not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
-
-    family = request.GET.get('family', 'Orchidaceae')
-    try:
-        family = Family.objects.get(family=family)
-    except Family.DoesNotExist:
-        family = Family.objects.get(family='Orchidaceae')
-    app = family.application
-
-    # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
-    return HttpResponsePermanentRedirect(canonical_url)
-
-
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
@@ -294,26 +244,6 @@ def information(request, pid=None):
     return HttpResponsePermanentRedirect(canonical_url)
 
 
-def photos(request, pid=None):
-    app = request.GET.get('app')
-    if not pid:
-        pid = request.GET.get('pid', '')
-
-    if not pid or not str(pid).isnumeric() or app not in applications:
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
-    # If family is request, find application and use it
-    if not app:
-        family = request.GET.get('family', 'Orchidaceae')
-        try:
-            family = Family.objects.get(family=family)
-        except Family.DoesNotExist:
-            family = Family.objects.get(family='Orchidaceae')
-        app = family.application
-
-    canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/')
-    return HttpResponsePermanentRedirect(canonical_url)
-
 def get_role(request):
     role = request.GET.get('role', '')
     if not role and request.user.is_authenticated:
@@ -325,14 +255,33 @@ def get_role(request):
         role = 'pub'
     return role
 
-def gallery(request, app, pid=None):
-    author = ''
-    if pid is None:
-        pid = request.GET.get('pid')
-    if not pid or not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
 
+def photos(request, app=None, pid=None):
+    # Cleanup request url
+    if isinstance(app, int):
+        pid = app
+        app = None
+    query_app = request.GET.get('app', None)
+    query_pid = request.GET.get('pid', None)
+
+    app = app or query_app
+    pid = pid or query_pid
+
+    # handle various old paths, will be eventually removed.
+    if not pid:
+        # Worst case scenario when no explicit pid requested. Send it to homepage.
+        return HttpResponsePermanentRedirect(reverse('home'))
+
+    # Either 'app' or pid is from query string, send to the canonical URL
+    if query_pid != None or app == None:
+        app = None or 'orchidaceae'
+        return HttpResponsePermanentRedirect(reverse('display:photos', args=[app, pid]))
+    if not app or app == None:
+        app = 'orchidaceae'
+
+    #  Logic starts here
+    #  Get author (to enable private photos display)
+    author = ''
     if request.user.is_authenticated:
         author = Photographer.objects.filter(user_id=request.user.id)
         if author.exists():
@@ -340,27 +289,27 @@ def gallery(request, app, pid=None):
     private_list = []
     role = get_role(request)
     owner = request.GET.get('owner', '')
-    # if not author or author == 'anonymous':
-    #     author = None
 
-    # Get application and family
-
-    # Define Species, Synonym and Image classes based on the application
+    # Get models
     Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
+    UploadFile = apps.get_model(app, 'UploadFile')
+    # For Orchid, image classes could be species or hybrid depending on species.type
+
+    # Get species
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
 
-    family = species.family
-    # for non-orchids request, family can be anything, depending on pid.
-
-    # For Orchid, image classes could be species or hybrid depending on species.type
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
         SpcImages = apps.get_model(app, 'SpcImages')
-    UploadFile = apps.get_model(app, 'UploadFile')
+
+    # get family
+    # for non-orchids request, family is identified by pid.
+    family = species.family
 
     # handle rank and quality update.
     orid = request.GET.get('id', None)
@@ -373,11 +322,12 @@ def gallery(request, app, pid=None):
         if quality:
             quality_update(quality, orid, SpcImages)
 
-    canonical_url = request.build_absolute_uri(f'/display/photos/{pid}/?app={app}')
-
-    # For synonym species, just render only synonym images and leave
+    # Build canonical url
+    canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/')
+    # For synonym species, just render only synonym images
     if species.status == 'synonym':
         public_list = SpcImages.objects.filter(pid=pid)  # public photos
+        synonym_pid_list = public_list.values_list('pid', flat=True)
         private_list = public_list.filter(rank=0)  # rejected photos
         upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
         context = {'species': species, 'author': author, 'family': family,
@@ -388,14 +338,28 @@ def gallery(request, app, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
-    public_list = SpcImages.objects.filter(pid=pid)  # public photos
+    # Get public list
+    pid_list = [pid]
 
-    #     Handle synonyms
-    public_pid_list = public_list.values_list('pid', flat=True)
-    public_list = SpcImages.objects.filter(pid__in=public_pid_list)
+    #  For typical photos request (e.g. from navigation tab), include ALL photos, including infraspecifics and synonyms.
+    syn = request.GET.get('syn', '')
+    if syn == 'Y':
+        # get list of all synonyms of requested species
+        syn_list = list(Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True))
+        if syn_list:
+            pid_list = pid_list + syn_list
 
-    # Generate upload list, public list and private list
-    upload_list = []
+    ifs = request.GET.get('ifs', '')
+    if ifs == 'Y':
+        main_taxon = species.genus + ' ' + species.species
+        ifs_list = list(Species.objects.filter(binomial__istartswith=main_taxon).exclude(pid=pid))
+        if ifs_list:
+            pid_list = pid_list + ifs_list
+
+    public_list = SpcImages.objects.filter(pid__in=pid_list)
+
+    # Get upload list, public list and private list
+    upload_list, private_list = [], []
     if request.user.is_authenticated:
         upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
         if owner == 'Y':
@@ -407,13 +371,10 @@ def gallery(request, app, pid=None):
             upload_list = upload_list.filter(author=request.user.photographer.author_id)  # Private photos
             private_list = private_list.filter(author=request.user.photographer.author_id)  # Private photos
 
-    public_list = public_list.filter(rank__gt=0)  # public photos
-
-    # Extract first word, potentially an infraspecific
     if public_list:
-        public_list = public_list.order_by('-rank', 'quality', '?')
-        if private_list:
-            private_list = private_list.order_by('created_date')
+        public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?')  # public photos
+    if private_list:
+        private_list = private_list.order_by('created_date')
 
     write_output(request, str(family))
     context = {'species': species, 'author': author,

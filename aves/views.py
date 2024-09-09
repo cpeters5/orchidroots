@@ -120,7 +120,7 @@ def reidentify(request, orid, pid):
     old_species = Species.objects.get(pk=pid)
     old_family = old_species.gen.family
     if role != 'cur':
-        url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(pid,)), role, app)
+        url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
         return HttpResponseRedirect(url)
 
     if old_species.status == 'synonym':
@@ -137,7 +137,7 @@ def reidentify(request, orid, pid):
             try:
                 new_species = Species.objects.get(pk=new_pid)
             except Species.DoesNotExist:
-                url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(pid,)), role, app)
+                url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
                 return HttpResponseRedirect(url)
 
             # If re-idenbtified to same genus. Just change pid
@@ -157,7 +157,7 @@ def reidentify(request, orid, pid):
                         to_path = os.path.join(settings.STATIC_ROOT, "utils/images/" + str(new_species.gen.family) + "/" + old_img.image_file)
                     os.rename(from_path, to_path)
                 else:
-                    url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(new_species.pid,)), role, app)
+                    url = "%s?role=%s" % (reverse('display:photos', args=(app, new_species.pid,)), role)
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
@@ -182,7 +182,7 @@ def reidentify(request, orid, pid):
             old_img.delete()
 
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
-            url = "%s?role=%s&app=%s" % (reverse('display:photos', args=(new_species.pid,)), role, app)
+            url = "%s?role=%s" % (reverse('display:photos', args=(app, new_species.pid,)), role)
             return HttpResponseRedirect(url)
     context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': old_family, 'app': app, }
     return render(request, 'aves/reidentify.html', context)
@@ -237,7 +237,7 @@ def uploadweb(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
 
-            url = "%s?role=cur&app=%s" % (reverse('display:photos', args=(species.pid,)), app)
+            url = "%s?role=cur" % (reverse('display:photos', args=(app, species.pid,)))
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 
@@ -288,7 +288,7 @@ def uploadvid(request, pid, orid=None):
                 spc.created_date = timezone.now()
             spc.save()
 
-            url = "%s?role=cur&app=%s" % (reverse('display:photos', args=(species.pid,)), app)
+            url = "%s?role=cur" % (reverse('display:photos', args=(app, species.pid,)))
             write_output(request, species.textname())
             return HttpResponseRedirect(url)
 

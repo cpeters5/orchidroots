@@ -313,7 +313,7 @@ seedparent, pollparent {
         <div class="info">
             {% if species.type == 'species' %}
                 {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} in
-                &nbsp;the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&display=checked">{{species.gen.family}}</a>&nbsp;
+                &nbsp;the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}">{{species.gen.family}}</a>&nbsp;
                 {% if species.gen.subfamily %}
                 subfamily: <a href="{% url 'common:genera' app %}?subfamily={{species.gen.subfamily}}&role={{role}}">{{species.gen.subfamily}}</a>, {% endif %}
                 {% if species.gen.tribe %}
@@ -321,7 +321,7 @@ seedparent, pollparent {
                 {% if species.gen.subtribe %}
                 subtribe: <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>, {% endif %}
                 &nbsp;<br>
-                Genus <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&genus={{species.genus}}&display=checked">{{species.genus}}</a>&nbsp
+                Genus <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&genus={{species.genus}}">{{species.genus}}</a>&nbsp
                 {% if app == 'orchidaceae' %}
                     {% if species.accepted.subgenus %}
                         &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
@@ -351,7 +351,7 @@ seedparent, pollparent {
 
                 {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}
             {% else %}
-                The orchid {{species.binomial}} is a hybrid
+                The orchid {{species.binomial}} is a {{species.genus}} hybrid
                 {% if species.source == 'RHS' %}registered with the Royal Horticultural Society
                     {% if species.author == 'na' or species.author == '' %} registrant is unknown{% else %} by {{species.author}} in {{species.year}}.{% endif %}
                     {% if species.originator == 'na' or species.originator == '' %} Its originator is unknown.{% elif species.originator != species.author %} It is originated by {{species.originator}}{% endif %}
@@ -410,7 +410,7 @@ seedparent, pollparent {
                             </div>
                         {% endfor %}
                     </div>
-                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos'  species.pid %}?app={{app}}&role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
+                <span style="text-align:center;font-size:18px;"><a href="{% url 'display:photos' app  species.pid %}?role={{role}}" rel="nofollow noreferrer noopener"><b>more ... </b></a></span>
                 {% else %}
                     <div style="width: 100%; font-size:16px; margin:1px auto;border:1px solid lightgrey;  text-align: center; padding:10px">
                         No image available.

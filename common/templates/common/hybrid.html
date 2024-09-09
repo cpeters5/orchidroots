@@ -35,7 +35,7 @@
                             {% if message %}{{message}}<br>{% endif %}
                                 <a class="btn btn-custom" href="{% url 'common:genera' app %}?family={{family}}&alpha={{alpha}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&myspecies={{myspecies}}">Genus list</a>
                                 <a class="btn btn-custom m1" href="{% url 'common:species' app %}?family={{family}}&alpha={{alpha}}&alpha={{alpha}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&genus={{genus}}&alpha={{alpha|default:''}}&syn=N&myspecies={{myspecies}}">Species list</a>
-                                <a class="btn btn-custom" href="{% url 'common:newbrowse' app %}?family={{family}}&alpha={{alpha}}&alpha={{alpha}}&type=hybrid&genus={{genus}}&display=checked&type=hybrid&myspecies={{myspecies}}">Browse</a>
+                                <a class="btn btn-custom" href="{% url 'common:newbrowse' app %}?family={{family}}&alpha={{alpha}}&alpha={{alpha}}&type=hybrid&genus={{genus}}&type=hybrid&myspecies={{myspecies}}">Browse</a>
 <!--                                {% if primary == 'Y' %}-->
 <!--                                    <a class="btn btn-custom m1" href="{% url 'common:hybrid' %}?family={{family}}&alpha={{alpha}}&genus={{genus}}&alpha={{alpha}}&syn=N&primary=Y">Primary hybrid only</a>-->
 <!--                                {% else %}-->

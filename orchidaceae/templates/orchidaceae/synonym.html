@@ -42,7 +42,7 @@
             </thead>
             {% for synonym in synonym_list %}
             <tr style="text-align: left">
-                <td><a href="{% url 'display:summary' app synonym.spid_id %}?role={{role}}"><i>{{synonym.spid.binomial_it|safe}}</i></a></td>
+                <td><a href="{% url 'display:photos' app synonym.spid_id %}?role={{role}}"><i>{{synonym.spid.binomial_it|safe}}</i></a></td>
             </tr>
             {% endfor %}
      </table>
