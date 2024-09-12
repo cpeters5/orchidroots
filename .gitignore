@@ -4,7 +4,6 @@ __pycache__/
 old/
 src/
 venv/
-data/
 dbview/
 .coverage
 .env*
