@@ -42,14 +42,6 @@ def genera(request):
     write_output(request)
     family = 'Orchidaceae'
     genustype = ''
-    formula1 = ''
-    formula2 = ''
-    status = ''
-    sort = ''
-    prev_sort = ''
-    sf_obj = ''
-    t = ''
-    t_obj = ''
     st_obj = ''
     role = getRole(request)
     alpha = request.GET.get('alpha', '')
@@ -68,31 +60,26 @@ def genera(request):
             sf_obj = Subfamily.objects.get(pk=t_obj.subfamily)       # back fill subfamily
         except Subfamily.DoesNotExist:
             pass
-    if 'st' in request.GET:
-        st = request.GET['st']
-        if st:
-            try:
-                st_obj = Subtribe.objects.get(pk=st)
-            except Subtribe.DoesNotExist:
-                pass
-            if st_obj:
-                if not t:
-                    try:
-                        t_obj = Tribe.objects.get(pk=st_obj.tribe.tribe)
-                    except Tribe.DoesNotExist:
-                        pass
-                if not sf_obj and st_obj.subfamily:
-                    try:
-                        sf_obj = Subfamily.objects.get(pk=st_obj.subfamily)
-                    except Subtribe.DoesNotExist:
-                        pass
+    st = request.GET.get('st', '')
+    if st:
+        try:
+            st_obj = Subtribe.objects.get(pk=st)
+        except Subtribe.DoesNotExist:
+            pass
+        if st_obj:
+            if not t:
+                try:
+                    t_obj = Tribe.objects.get(pk=st_obj.tribe.tribe)
+                except Tribe.DoesNotExist:
+                    pass
+            if not sf_obj and st_obj.subfamily:
+                try:
+                    sf_obj = Subfamily.objects.get(pk=st_obj.subfamily)
+                except Subtribe.DoesNotExist:
+                    pass
 
     # Remove genus choide if subfamily, tribe or subtribe is chosen
-
-    if 'genustype' in request.GET:
-        genustype = request.GET['genustype']
-    if not genustype:
-        genustype = 'all'
+    genustype = request.GET.get('genustype', 'all')
 
     formula1 = request.GET.get('formula1', '')
     formula2 = request.GET.get('formula2', '')
@@ -156,7 +143,7 @@ def genera(request):
                'st_obj': st_obj, 'st_list': st_list,
                'title': 'taxonomy', 'genustype': genustype, 'status': status,
                'formula1': formula1, 'formula2': formula2, 'alpha': alpha, 'alpha_list': alpha_list,
-               'sort': sort, 'prev_sort': prev_sort, 'role': role, 'app': 'orchidaceae',
+               'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/genera.html', context)
@@ -249,6 +236,7 @@ def species(request):
     author = ''
     role = getRole(request)
     spc = request.GET.get('spc', '')
+    syn = request.GET.get('syn', '')
     msg = ''
     type = 'species'
     alpha = ''
@@ -320,119 +308,6 @@ def species(request):
                'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/species.html', context)
-
-
-def hybrid_orig(request):
-    # Initialization
-    author = request.GET.get('author', '')
-    year_valid = 0
-    msg = ''
-    crit = 0
-    if author: crit = 1
-    originator = request.GET.get('originator', '')
-    if originator: crit = 1
-    alpha = request.GET.get('alpha', '')
-    if alpha: crit = 1
-    year = request.GET.get('year', '')
-    if valid_year(year):
-        year_valid = 1
-        crit = 1
-    if alpha != 'ALL':
-        alpha = alpha[0:1]
-    status = request.GET.get('status', '')
-    spc = request.GET.get('spc', '')
-    if spc:
-        crit = 1
-    if len(spc) == 1:
-        alpha = spc
-        spc = ''
-    reqgenus = request.GET.get('genus', None)
-    if not reqgenus:
-        reqgenus = 'Cattleya'
-    if alpha == '' and reqgenus in config.big_genera:
-        alpha = 'A'
-
-    prev_genus = request.GET.get('reqgenus', None)
-
-    if reqgenus == None or reqgenus == '':
-        # Sent from base.html in case no genus info, in which case randomize genus
-        while 1:
-            # Just get a random one with some images to show
-            reqgenus = Genus.objects.filter(num_hyb_with_image__gt=100, num_hyb_with_image__lt=300).exclude(
-                status='synonym').order_by('?')
-            if reqgenus:
-                reqgenus = reqgenus[0].genus
-                break
-        prev_genus = reqgenus
-    # If there is no params requested, and for large tables, set alpha = A
-    if not crit and reqgenus in config.big_genera:
-        alpha = 'A'
-
-    # user requests seed or pollen parents
-    # First get seed_id object, then filter the hybrid list matching seed / pollen parent
-    seed_binomial = request.GET.get('seed_binomial', '').strip()
-    pollen_binomial = request.GET.get('pollen_binomial', '').strip()
-
-    # Start building the list
-    # First matching genus, with wild card
-    crit = 1  # ???
-    if crit:
-        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-    else:
-        # If crit = 0 (no filter criteria), ignore request
-        return render(request, 'orchidaceae/hybrid.html', {})
-    write_output(request, str(reqgenus))
-
-    # Genus unchanged, see if seed/pollen are requested
-    if (reqgenus and (reqgenus == prev_genus)):
-        seed_binomial, prev_seed_binomial = getPrev(request, 'seed_binomial', 'prev_seed_binomial')
-        pollen_binomial, prevpollen_binomial = getPrev(request, 'pollen_binomial', 'prev_pollen_binomial')
-    if len(seed_binomial) > 0:
-        seed_pids = Species.objects.filter(
-            Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid',
-                                                                                                        flat=True)
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
-
-    if len(pollen_binomial) > 0:
-        poll_pids = Species.objects.filter(
-            Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid',
-                                                                                                            flat=True)
-        this_species_list = this_species_list.filter(
-            Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
-
-    if crit and this_species_list:
-        if spc:
-            if len(spc) >= 2:
-                this_species_list = this_species_list.filter(species__icontains=spc)
-            else:
-                this_species_list = this_species_list.filter(species__istartswith=spc)
-
-        elif alpha:
-            if len(alpha) == 1:
-                this_species_list = this_species_list.filter(species__istartswith=alpha)
-        if author or originator:
-            this_species_list = this_species_list.filter(author__icontains=author, originator__icontains=originator)
-        if author and originator:
-            this_species_list = this_species_list.filter(
-                Q(author__icontains=author) | Q(originator__icontains=originator))
-        # if originator and not author:
-        #     this_species_list = this_species_list.filter(originator__icontains=originator)
-        if year_valid:
-            year = int(year)
-            this_species_list = this_species_list.filter(year=year)
-    else:
-        this_species_list = []
-        msg = "Please select a search criteria"
-    role = getRole(request)
-    context = {'my_list': this_species_list,
-               'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
-               'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
-               'author': author, 'originator': originator, 'seed_binomial': seed_binomial,
-               'pollen_binomial': pollen_binomial,
-               'role': role, 'level': 'list', 'title': 'hybrid_list', 'app': 'orchidaceae',
-               }
-    return render(request, 'orchidaceae/hybrid.html', context)
 
 
 def hybrid(request):
@@ -543,6 +418,7 @@ def hybrid(request):
     return render(request, 'orchidaceae/hybrid.html', context)
 
 
+# Implementing serverside datatable (in progress)
 def datatable_hybrid(request):
     # Get start and length parameters
     start = int(request.GET.get('start', 0))
@@ -556,7 +432,7 @@ def datatable_hybrid(request):
     order_dir = request.GET.get('order[0][dir]', 'asc')
 
     # Define column list
-    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]  # Replace with your actual column names
+    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]
 
     # Construct queryset
     queryset = YourModel.objects.all()

@@ -44,6 +44,7 @@ def summary(request, app=None, pid=None):
         app = None
     query_app = request.GET.get('app', None)
     query_pid = request.GET.get('pid', None)
+
     app = app or query_app
     pid = pid or query_pid
 
@@ -83,7 +84,6 @@ def summary(request, app=None, pid=None):
     if species.status == 'synonym':
         species =species.getAccepted()
         pid = species.pid
-        print("changed to accepted", species.status, species.type)
 
     Synonym = apps.get_model(app, 'Synonym')
     Hybrid = apps.get_model(app, 'hybrid')
@@ -137,7 +137,6 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
 
     # Check if there are infraspecific.
-    print("4. ", species, species.type, species.pid)
     if species.type == 'hybrid' and species.source == 'RHS':
         infraspecifics = 0
     else:
@@ -148,7 +147,6 @@ def summary(request, app=None, pid=None):
         infraspecifics = len(Species.objects.filter(binomial__istartswith=this_species_name))
 
     # If hybrid, find its parents
-    print("5. ", species, species.type, species.pid)
     if species.type == 'hybrid':
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
             try:
@@ -160,7 +158,12 @@ def summary(request, app=None, pid=None):
             try:
                 seed_obj = Hybrid.objects.get(pk=species.hybrid.seed_id)
             except Hybrid.DoesNotExist:
-                seed_obj = ''
+                try:
+                    seed_obj = Synonym.objects.get(pk=species.hybrid.seed_id.pid)
+                    seed_obj = seed_obj.acc.hybrid
+                except Synonym.DoesNotExist:
+                    seed_obj = ''
+
             if seed_obj:
                 seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
                 assert isinstance(seed_obj, object)
@@ -187,7 +190,12 @@ def summary(request, app=None, pid=None):
             try:
                 pollen_obj = Hybrid.objects.get(pk=species.hybrid.pollen_id)
             except Hybrid.DoesNotExist:
-                pollen_obj = ''
+                try:
+                    pollen_obj = Synonym.objects.get(pk=species.hybrid.pollen_id.pid)
+                    pollen_obj = pollen_obj.acc.hybrid
+                except Synonym.DoesNotExist:
+                    pollen_obj = ''
+
             pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
             if pollen_obj.seed_id:
                 ps_type = pollen_obj.seed_id.type

@@ -5,6 +5,7 @@
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{family}} species</title>
     <meta name='description' content='Species of the genus {{genus}}'>
+
 </head>
 <style>
     .form-inline .my-hidden { display: none; }
@@ -29,21 +30,34 @@
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
                                     <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
-
-                            in the family
-                               <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
+                            {% if app != 'orchidaceae' %}
+                                in the family
+                                <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
                                     <input class="searchbox border" form="family" value="{{family|default:''}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
-                                   genus
+                                genus
                                     <input class="searchbox border" form="family" value="{{genus|default:''}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
                                 </form>
+                            {% else %}
+                                genus
+                                <form class="form-inline" id="genus" action="?" style="display:inline-block; margin-top: 5px;">
+                                    <input type="hidden" form="genus" name="type" value="{{type}}" >
+                                    <input class="searchbox border" form="genus" value="{{genus|default:''}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
+                                    <button class="my-hidden" form="genus" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
+                                </form>
+                            {% endif %}
                             <br><span style="color: red;font-size: 13px;">{{msg|default:''}}</span>
                         </div>
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
                         <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}">Browse images</a>
+                        {% if type == 'species' %}
+                            <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'orchidaceae:species' %}?alpha={{alpha}}&role={{role}}">View more detail</a>
+                        {% else %}
+                            <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'orchidaceae:hybrid' %}?alpha={{alpha}}&role={{role}}">View more detail</a>
+                        {% endif %}
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                             <input type="hidden" form="display" name="type" value="{{type}}" >
                             <input type="hidden" form="display" name="family" value="{{family.family}}" >
@@ -51,7 +65,7 @@
                             {% if syn == 'N' %}
                             <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:25px;"> <span style="margin-left:2px;font-size:13px;">Hide synonyms</span>
                             {% else %}
-                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:40px;font-size:13px;">Hide synonyms</span>
+                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:10px;font-size:13px;">Hide synonyms</span>
                             {% endif %}
                         </form>
                         <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
@@ -62,9 +76,15 @@
                                         <tr style="background-color: #e3e3e3">
                                             <th class="spc_column">Species</th>
                                             {% if app == 'orchidaceae' %}
-                                            <th class="d-none d-lg-table-cell">Higher taxonomic levels</th>
+                                                {% if type == 'hybrid' %}
+                                                    <th class="d-none d-md-table-cell">parents</th>
+                                                {% else %}
+                                                    <th class="d-none d-md-table-cell">Higher taxonomic levels</th>
+                                                {% endif %}
                                             {% endif %}
-                                            <th>Common Name</th>
+                                            {% if app == 'aves' %}
+                                                <th>Common Name</th>
+                                            {% endif %}
                                             <th>#images</th>
                                         </tr>
                                     </thead>
@@ -86,9 +106,21 @@
                                                 {{species.author|default:""}}
                                             </td>
                                             {% if app == 'orchidaceae' %}
-                                                <td class="d-none d-lg-table-cell">
+                                                <td class="d-none d-md-table-cell">
                                                 {% if species.status == 'synonym' %}
                                                     <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
+                                                {% elif species.type == 'hybrid' %}
+                                                    {% if species.hybrid.seed_id.pid %}
+                                                        <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?role={{role}}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>
+                                                    {% else %}
+                                                        na
+                                                    {% endif %}
+                                                    x
+                                                    {% if species.hybrid.pollen_id.pid %}
+                                                        <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}?role={{role}}">{{species.hybrid.pollen_id.name|default:'na'|safe}}</a>
+                                                    {% else %}
+                                                        na
+                                                    {% endif %}
                                                 {% else %}
                                                     {% if species.accepted.subgenus %}<span style="color:#918f8f">subgenus:</span> {{species.accepted.subgenus|default:''}}{% endif %}
                                                     {% if species.accepted.section %}<span style="color:#918f8f">section:</span> {{species.accepted.section|default:''}}{% endif %}
@@ -97,7 +129,9 @@
                                                 {% endif %}
                                                 </td>
                                             {% endif %}
-                                            <td>{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
+                                            {% if app == 'aves' %}
+                                                <td>{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
+                                            {% endif %}
                                             <td style="text-align:center">{{species.speciesstat.num_image|default:""}}</td>
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
@@ -117,10 +151,8 @@
 {% endblock %}
 
 {% block extra-scripts %}
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
+
+{% include "base-datatable.html" %}
 
 <script>
 $(document).ready(function() {

@@ -1,0 +1,4 @@
+testdata.tar.gz filter=lfs diff=lfs merge=lfs -text
+test_imagefiles.tar.gz filter=lfs diff=lfs merge=lfs -text
+data/test_imagefiles.tar.gz filter=lfs diff=lfs merge=lfs -text
+data/testdata.tar.gz filter=lfs diff=lfs merge=lfs -text

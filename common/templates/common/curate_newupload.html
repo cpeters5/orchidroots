@@ -124,6 +124,7 @@ img{
                                     {% else %}
                                         {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     {% endif %}
+                                    <a href="{% url 'common:deletephoto' image.id %}?app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}" rel="nofollow noreferrer noopener">Delete file</a>
                                 </div>
                             </div>
                         {% endfor %}

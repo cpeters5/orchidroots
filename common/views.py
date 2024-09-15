@@ -651,7 +651,7 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
-def delete_image_files(app, spc_obj, orid):
+def delete_file(app, orid):
     # look in uploaded files first
     try:
         UploadFile = apps.get_model(app, 'UploadFile')
@@ -665,9 +665,10 @@ def delete_image_files(app, spc_obj, orid):
         upl.delete()
         return True
     except UploadFile.DoesNotExist:
-        pass
+        return False
 
-    # Then look in the system
+
+def delete_image(app, spc_obj):
     if spc_obj.type == 'hybrid' and spc_obj.family.family == 'Orchidaceae':
         Images = apps.get_model(app, 'HybImages')
     else:
@@ -710,35 +711,31 @@ def delete_bad_image_files(orid, app):
 
 
 @login_required
-def deletephoto(request, orid, pid):
+def deletephoto(request, orid, pid=None):
     app = request.GET.get('app', '')
-    # family = request.GET.get('family', '')
-
-    # if family:
-    #     try:
-    #         family = Family.objects.get(family=family)
-    #         app = family.application
-    #     except Family.DoesNotExist:
-    #         family = ''
-    #         app = ''
-    role = getRole(request)
-
 
     # Something wrong here. All delete request mush have app
     if not app:
         return HttpResponseRedirect('/')
 
     Species = apps.get_model(app, 'Species')
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This item does not exist!'
-        return HttpResponse(message)
+    if pid:
+        try:
+            species = Species.objects.get(pk=pid)
+            st = delete_image(app, species)
+        except Species.DoesNotExist:
+            st = True
+    else:
+        st = True
 
-    delete_image_files(app, species, orid)
+    if st:
+        delete_file(app, orid)
     write_output(request, str(app))
 
-    url = "%s?role=cur" % (reverse('display:photos', args=(app, species.pid,)))
+    if pid:
+        url = "%s?role=cur" % (reverse('display:photos', args=(app, species.pid,)))
+    else:
+        url = "%s?app=%s&role=cur" % (reverse('common:curate_newupload'), app)
     return HttpResponseRedirect(url)
 
 
@@ -774,7 +771,9 @@ def deletewebphoto(request, pid):
 
     orid = int(request.GET.get('id', None))
     if orid:
-        delete_image_files(app, species, orid)
+        st = delete_image(app, species)
+        if st:
+            delete_file(app, orid)
 
     days = 7
     area = ''
