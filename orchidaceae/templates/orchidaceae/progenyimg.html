@@ -111,7 +111,7 @@ img{
             {% for x in img_list %}
                 <div class="imageitem p-1 justify-content-center  border" style="margin:2px;">
                     <div class="box" style="margin:0 auto;">
-                    <a href="{% url 'detail:summary' app x.pid_id %}?role={{role}}">
+                    <a href="{% url 'display:summary' app x.pid_id %}?role={{role}}">
                             <img class="thumbnails" alt="" src="{% static x.thumb_dir %}{{x.image_file}}">
                     </a>
                     </div>
@@ -119,13 +119,13 @@ img{
                         {{x.name|safe}} ({{x.pct}}%)<br>
                         (
                         {% if x.seed %}
-                            <a href="{% url 'detail:summary' app x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
+                            <a href="{% url 'display:summary' app x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
                         {% else %}
                             na
                         {% endif %}
                         ×
                         {% if x.pollen %}
-                            <a href="{% url 'detail:summary' app x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>
+                            <a href="{% url 'display:summary' app x.pollen %}?role={{role}}">{{x.pollen_name|safe}}</a>
                         {% else %}
                             na
                         {% endif %}

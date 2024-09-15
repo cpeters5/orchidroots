@@ -14,14 +14,10 @@ urlpatterns = [
     path('species/<str:app>/', views.species, name='species'),
     path('species/', views.species, name='species'),
     path('distribution/', views.distribution, name='distribution'),
-    path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
+    path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
 
     # Redirect to display
-    path('information/', display_information, name='information'),
-    path('information/<int:pid>/', display_information, name='information'),
-    path('photos/', display_photos, name='photos'),
-    path('photos/<int:pid>/', display_photos, name='photos'),
     path('compare/<int:pid>/', views.compare, name='compare'),
 
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),

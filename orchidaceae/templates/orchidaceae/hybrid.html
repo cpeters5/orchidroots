@@ -60,11 +60,11 @@ option {
 
 <br>
 <div style="clear:both"></div>
-<div class="justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 100%; background-color: blue; text-align:left">
+<div class="justify-content-left align-items-center" style="display:block; clear:left; margin: 0 auto; width: 95%; text-align:left">
     <div class="card" style="width:100%;">
         <div class="card-header">
-            <h4>{{genus|title}} Hybrid List
-                    - <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Show species List</a>
+            <h4>{{genus|title}} Hybrids
+                    - <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'orchidaceae:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&status={{status}}&syn=N&myspecies={{myspecies}}">Show species</a>
                 <form action="?" id="myspecies" style="display:inline-block">
                     <input type="hidden" name="family" value="{{family}}" >
                     <input type="hidden" name="genus" value="{{genus}}" >
@@ -74,10 +74,25 @@ option {
                     <input type="hidden" name="syn" value="{{syn}}" >
                     <input type="hidden" name="req_type" value="hybrid" >
                 </form>
-            </h4>
+                <form action="?" id="display" style="display:inline-block;">
+                    <input form="display" type="hidden" name="genus" value="{{genus}}" >
+                    <input form="display" type="hidden" name="alpha" value="{{alpha}}" >
+                    <input form="display" type="hidden" name="myspecies" value="{{myspecies}}" >
+                    <input form="display" type="hidden" name="subgenus" value="{{subgenus}}" >
+                    <input form="display" type="hidden" name="section" value="{{section}}" >
+                    <input form="display" type="hidden" name="subsection" value="{{subsection}}" >
+                    {% if syn == 'N' %}
+                        <input form="display" type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                        <span style="margin:0 5px;font-size:13px;">exclude synonyms</span>
+                    {% else %}
+                        <input form="display" type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin:10px 0 0 0;">
+                        <span style="margin:0 5px;font-size:13px;">exclude synonyms</span>
+                    {% endif %}
+                </form>
                 {% if total > 0 and genus or seed_genus or pollen_genus or seed or pollen %}
                     <a class="btn btn-xs btn-primary p-1 m-1 custom-link border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family={{family}}&type=hybrid&genus={{genus}}&seed_genus={{seed_genus}}&pollen_genus={{pollen_genus}}&seed={{seed}}&pollen={{pollen}}">Browse images</a>
                 {% endif %}
+            </h4>
         </div>
 
         <!--Filter-->
@@ -182,6 +197,8 @@ option {
 {% endblock %}
 
 {% block extra-scripts %}
+
+{% include "base-datatable.html" %}
 
 
 <script>

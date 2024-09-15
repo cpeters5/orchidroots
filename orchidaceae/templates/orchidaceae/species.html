@@ -70,9 +70,9 @@ option {
         <div class="card-header">
             <h1 class="hidden-h1">{{app|title}} Species in {{genus}} genus</h1>
             <h4>
-                {{genus|title}}
+                {{genus|title}} Species:
                 {% if genus.genusstat.num_hybrid > 0 %}
-                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Hybrid List</a>
+                    <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'orchidaceae:hybrid' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&myspecies={{myspecies}}">Show Hybrids</a>
                 {% endif %}
                 <a class="btn btn-xs btn-primary p-1 m-1 border" href="{% url 'common:newbrowse' 'orchidaceae' %}?family=Orchidaceae&role={{role}}&type=species&genus={{genus}}">Browse</a>
                 <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
@@ -84,10 +84,10 @@ option {
                     <input form="display" type="hidden" name="subsection" value="{{subsection}}" >
                     {% if syn == 'N' %}
                         <input form="display" type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
-                        <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
+                        <span style="margin:0 10px;font-size:13px;">exclude synonyms</span>
                     {% else %}
                         <input form="display" type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin:10px 0 0 0;">
-                        <span style="margin:0 30px;font-size:13px;">exclude synonyms</span>
+                        <span style="margin:0 10px;font-size:13px;">exclude synonyms</span>
                     {% endif %}
                 </form>
 <!--                <form action="?" id="myspecies" style="display:inline-block">-->
@@ -253,6 +253,7 @@ option {
 {% endblock %}
 
 {% block extra-scripts %}
+{% include "base.html" %}
 
 <script>
 

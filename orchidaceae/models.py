@@ -101,13 +101,13 @@ class Genus(models.Model):
             return "%s" % syn
 
     def get_roundspcpct(self):
-        if self.pct_spc_with_image and self.pct_spc_with_image > 0:
-            return str(round(self.pct_spc_with_image)) + '%'
+        if self.genusstat.pct_spc_with_image and self.genusstat.pct_spc_with_image > 0:
+            return str(round(self.genusstat.pct_spc_with_image)) + '%'
         else: return None
 
     def get_roundhybpct(self):
-        if self.pct_hyb_with_image and self.pct_hyb_with_image > 0:
-            return str(round(self.pct_hyb_with_image)) + '%'
+        if self.genusstat.pct_hyb_with_image and self.genusstat.pct_hyb_with_image > 0:
+            return str(round(self.genusstat.pct_hyb_with_image)) + '%'
         else: return None
 
     class Meta:

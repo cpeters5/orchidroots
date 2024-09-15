@@ -7,13 +7,8 @@ Allow: /common/species/
 Allow: /common/hybrid/
 Allow: /orchidaceae/progeny/
 Allow: /orchidaceae/ancestor/
-Allow: /orchidaceae/species/
-Allow: /orchidaceae/hybrid/
-Allow: /animalia/genera/
-Allow: /aves/genera/
-Allow: /fungi/genera/
-Allow: /other/genera/
-Allow: /orchidaceae/genera/
+Allow: /orchidaceae/infraspecific/
+Allow: /orchidaceae/synonym/
 Allow: /home/
 
 Disallow: /admin/
