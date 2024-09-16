@@ -33,18 +33,7 @@ alpha_list = config.alpha_list
 applications = config.applications
 default_genus = config.default_genus
 
-def getAllGenera():
-    # Call this when Family is not provided
-    OrGenus = apps.get_model('orchidaceae', 'Genus')
-    OtGenus = apps.get_model('other', 'Genus')
-    FuGenus = apps.get_model('fungi', 'Genus')
-    return OrGenus, OtGenus
-
-
-def getFamilyImage(family):
-    SpcImages = apps.get_model(family.application, 'SpcImages')
-    return SpcImages.objects.filter(rank__lt=7).order_by('-rank','quality', '?')[0:1][0]
-
+# Note:  common.views applied to all domains (animalia, aves, fungi, orchidaceae and other)
 
 def home(request):
     all_list = []
@@ -158,23 +147,20 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-def require_get(view_func):
-    def wrap(request, *args, **kwargs):
-        if request.method != "GET":
-            return HttpResponseBadRequest("Expecting GET request")
-        return view_func(request, *args, **kwargs)
-    wrap.__doc__ = view_func.__doc__
-    wrap.__dict__ = view_func.__dict__
-    wrap.__name__ = view_func.__name__
-    return wrap
-
-
 def taxonomy(request, app=None):
     if not app:
         app = request.GET.get('app', 'orchidaceae')
         if app not in applications:
             app = 'orchidaceae'
+
     canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/')
+
+    # non canonical url
+    if 'app' in request.GET:
+        print("prepare to redirect!")
+        # Redirect permanent to preferred url
+        return HttpResponsePermanentRedirect(canonical_url)
+
     taxonomy_list = Family.objects.filter(application=app)
     context = {'taxonomy_list': taxonomy_list, 'app': app,
                'canonical_url': canonical_url,
@@ -188,15 +174,16 @@ def family(request, app=None):
         if not app or app not in applications:
             app = 'orchidaceae'
 
-        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
-        # Redirect permanent to preferred url
-        return HttpResponsePermanentRedirect(canonical_url)
-
     alpha = request.GET.get('alpha','')
     if alpha and alpha != 'All':
         canonical_url = request.build_absolute_uri(f'/common/family/{app}/?alpha={alpha}')
     else:
         canonical_url = request.build_absolute_uri(f'/common/family/{app}/')
+
+    if 'app' in request.GET:
+        # Redirect permanent to preferred url
+        return HttpResponsePermanentRedirect(canonical_url)
+
     family_list = Family.objects.filter(application=app)
     if alpha:
         family_list = family_list.filter(family__istartswith=alpha)
@@ -212,10 +199,8 @@ def family(request, app=None):
 
 
 def genera(request, app=None):
-    # If app is not given (non canonical_url for old code)
-    no_app = 0
+    # If app is not given (non canonical_url)
     if not app:
-        no_app = 1
         app = request.GET.get('app', '')
         if not app or app not in applications:
             app = 'orchidaceae'
@@ -226,7 +211,7 @@ def genera(request, app=None):
     else:
         canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
 
-    if no_app:
+    if 'app' in request.GET:
         # Non canonical_url. redirect to canonical
         return HttpResponsePermanentRedirect(canonical_url)
 
@@ -240,10 +225,10 @@ def genera(request, app=None):
         family = ''
 
     Genus = apps.get_model(app, 'Genus')
-    # Orchid genera
-    subfamily, tribe, subtribe = getSuperGeneric(request)
-
     genus_list = Genus.objects.exclude(status='synonym')
+
+    # This happens when a user clicks on one of the suprageneric ranks.
+    subfamily, tribe, subtribe = getSuperGeneric(request)
     if subtribe:
         genus_list = genus_list.filter(subtribe=subtribe)
     if tribe:
@@ -251,14 +236,13 @@ def genera(request, app=None):
     if subfamily:
         genus_list = genus_list.filter(subfamily=subfamily)
 
-    # Complete building genus list
     if alpha:
         genus_list = genus_list.filter(genus__istartswith=alpha)
 
     write_output(request, str(family))
     context = {
         'genus_list': genus_list,  'app': app, 'alpha': alpha,
-        'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
+        'family': family,
         'alpha_list': alpha_list,
         'canonical_url': canonical_url,
     }
@@ -267,9 +251,7 @@ def genera(request, app=None):
 
 def species(request, app=None):
     # Determine application if not given
-    no_app = 0;
     if not app:
-        no_app = 1
         app = request.GET.get('app', '')
         if not app or app not in applications:
             #  Default to orchid
@@ -287,39 +269,28 @@ def species(request, app=None):
     else:
         canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}')
 
-    if no_app:
-        # If requested url is not canonical (old url), redirect permanent to preferred url
+    #  Permanently redirect noncanonical to canonical url
+    if 'app' in request.GET:
         return HttpResponsePermanentRedirect(canonical_url)
 
     role = request.GET.get('role','pub')
     req_type = request.GET.get('type', 'species')
+
+    # Note: orchidaceae app has only one family, Orchidaceae
     if app == 'orchidaceae':
         req_family = 'Orchidaceae'
     else:
+        # For other apps, user may request a family
         req_family = request.GET.get('family', '')
-    # if new family requested, it must be family in the same application
-    if req_family:
-        try:
-            req_family = Family.objects.get(family=req_family)
-            app = req_family.application
-        except Family.DoesNotExist:
-            req_family = ''
-        # Ifnore requested family if it is not in the application.
-        if isinstance(req_family, Family) and req_family.application != app:
-            req_family = ''
-
-
-    # Define a default genus for large sections
-
-    # hybrids are in Orchidaceae only.
-    if req_family == 'Orchidaceae':
-        if req_type == 'hybrid':
-            url = "%s?family=%s&genus=%s&type=hybrid&alpha=%s" % (reverse('orchidaceae:hybrid'), req_family, req_genus, alpha)
-        # else:
-        #     url = "%s?family=%s&genus=%s&type=species&alpha=%s" % (reverse('orchidaceae:species'), req_family, req_genus, alpha)
-            return HttpResponseRedirect(url)
-
-    max_items = 3000
+        if req_family:
+            try:
+                req_family = Family.objects.get(family=req_family)
+                app = req_family.application
+            except Family.DoesNotExist:
+                req_family = ''
+            # Ifnore requested family if it is not in the same application.
+            if isinstance(req_family, Family) and req_family.application != app:
+                req_family = ''
     Genus = apps.get_model(app, 'Genus')
     Species = apps.get_model(app, 'Species')
     species_list = []
@@ -328,20 +299,11 @@ def species(request, app=None):
         # Case 1: Genus is given, list only species of that genus
         try:
             req_genus = Genus.objects.get(genus=req_genus)
+            species_list = Species.objects.filter(genus=req_genus)
         except Genus.DoesNotExist:
             # No genus found in this category, go to the next.
             req_genus = ''
-        if req_genus:
-            species_list = Species.objects.filter(genus=req_genus)
-            # if req_type:
-            #     this_species_list = this_species_list.filter(type=req_type)
-            # if alpha:
-            #     this_species_list = this_species_list.filter(species__istartswith=alpha)
-            # if syn == 'N':
-            #     this_species_list = this_species_list.exclude(status='synonym')
-            #     syn = 'N'
-            # else:
-            #     syn = 'Y'
+
     if not req_genus:
         if req_family and req_family != '':
             # Case 2: Family is given, search for species in teh family
@@ -360,6 +322,25 @@ def species(request, app=None):
     else:
         syn = 'Y'
 
+    #  If user request one of the subgeneric ranks (by clicking on a link in the subgeneric column)
+    # Orchid only
+    if app == 'orchidaceae':
+        subgenus = request.GET.get('subgenus', '')
+        section = request.GET.get('section', '')
+        subsection = request.GET.get('subsection', '')
+        series = request.GET.get('series', '')
+        if subgenus:
+            species_list = species_list.filter(accepted__subgenus=subgenus)
+        if section:
+            species_list = species_list.filter(accepted__section=section)
+        if subsection:
+            species_list = species_list.filter(accepted__subsection=subsection)
+        if series:
+            species_list = species_list.filter(accepted__series=series)
+
+    # Finally truncate the list if it is too long.
+    # A work around to prevent large transactions. Can be removed after serverside dtatatable is implemented
+    max_items = 3000
     if len(species_list) > max_items:
         if not alpha:
             alpha = 'A'

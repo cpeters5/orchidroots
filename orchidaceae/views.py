@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.http import JsonResponse  # For datatable processing by page
 from django.views.decorators.http import require_http_methods  # For datatable of large responses (hybrid and species view)
 from django.urls import reverse, reverse_lazy
@@ -482,17 +482,18 @@ def datatable_hybrid(request):
 
     return JsonResponse(response)
 
-#  in progress
-def browsedist(request):
-    dist_list = get_distlist()
-    context = {'dist_list': dist_list,  'app': 'orchidaceae',}
-    return render(request, 'orchidaceae/browsedist.html', context)
 
-
-def ancestor(request, pid):
-    if not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
+def ancestor(request, pid=None):
+    if not pid:
+        pid = request.GET.get('pid', '')
+        if not pid or not str(pid).isnumeric():
+            # Complete bonker! Send to home page
+            return HttpResponseRedirect('/')
+        else:
+            canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
+            # Redirect permanent to preferred url
+            # Remove in a year or 2?
+            return HttpResponsePermanentRedirect(canonical_url)
 
     role = getRole(request)
     try:
@@ -503,13 +504,13 @@ def ancestor(request, pid):
     write_output(request, species.binomial)
     genus = species.gen
 
-    # List of ancestors for the request pid (pid must be a hybrid)
+    # List of ancestors in the left panel
     anc_list = AncestorDescendant.objects.filter(did=pid)
-
     canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
+
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
-               'lineage': 'active', 'tab': 'lineage',
+               'lineage': 'active', 'tab': 'lineage', 'lineage': 'active',
                'title': 'ancestor', 'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
@@ -660,6 +661,7 @@ def synonym(request, pid):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
+    #  If requested species is a synonym, convert it to accepted species
     if species.status == 'synonym':
         species = species.getAccepted()
 
@@ -674,7 +676,6 @@ def synonym(request, pid):
                'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
-
     return render(request, 'orchidaceae/synonym.html', context)
 
 
@@ -689,6 +690,7 @@ def infraspecific(request, pid):
 
     write_output(request, species.binomial)
 
+    # Infraspecifics exists only for species and natural hybrids
     if species.type == 'hybrid' and species.source == 'RHS':
         infraspecific_list = []
         canonical_url = ''
@@ -706,7 +708,6 @@ def infraspecific(request, pid):
                'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
-
     return render(request, 'orchidaceae/infraspecific.html', context)
 
 
@@ -714,23 +715,23 @@ def progeny(request, pid):
     role = getRole(request)
     try:
         species = Species.objects.get(pk=pid)
+        genus = species.genus
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
 
-    genus = species.genus
-    prim = request.GET.get('prim', None)
-    prim_list, sec_list, result_list = [], [], []
     syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True)
 
-    prim_list = Hybrid.objects.filter(
-        Q(seed_id=pid) |
-        Q(pollen_id=pid) |
-        Q(seed_id__in=syn_list) |
-        Q(pollen_id__in=syn_list)
-    )
+    # Request immediate offsprings?
+    prim = request.GET.get('prim', None)
     if prim:
+        prim_list = Hybrid.objects.filter(
+            Q(seed_id=pid) |
+            Q(pollen_id=pid) |
+            Q(seed_id__in=syn_list) |
+            Q(pollen_id__in=syn_list)
+        )
         canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/?prim=1')
         context = {'prim_list': prim_list, 'species': species,
                    'tab': 'lineage', 'lineage': 'active', 'genus': genus,
@@ -738,15 +739,12 @@ def progeny(request, pid):
                    'canonical_url': canonical_url,
                    }
         return render(request, 'orchidaceae/progeny_immediate.html', context)
-    #All descendants
-    if len(syn_list) > 100:
-        des_list = get_des_list(pid, syn_list)
-    else:
-        des_list = get_des_list(pid, syn_list)
+
+    #Request all offsprings
+    des_list = get_des_list(pid, syn_list)
 
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
-
     context = {'result_list': des_list, 'species': species,
                 'tab': 'lineage', 'lineage': 'active', 'genus': genus,
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
@@ -803,23 +801,6 @@ def progenyimg(request, pid):
     return render(request, 'orchidaceae/progenyimg.html', context)
 
 
-def get_distlist():
-    dist_list = Localregion.objects.exclude(id=0).order_by('continent_name', 'region_name', 'name')
-    prevcon = ''
-    prevreg = ''
-    mydist_list = dist_list
-    for x in mydist_list:
-        x.concard = x.continent_name.replace(" ", "")
-        x.regcard = x.region_name.replace(" ", "")
-        x.prevcon = prevcon
-        x.prevreg = prevreg
-        # mydist_list.append([x, prevcon, prevreg,card] )
-        prevcon = x.continent_name
-        prevreg = x.region_name
-
-    return mydist_list
-
-
 def valid_year(year):
     if year and year.isdigit() and 1700 <= int(year) <= 2020:
         return year
@@ -874,6 +855,30 @@ def mypaginator(request, full_list, page_length, num_show):
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
 
+
+#  in progress
+def get_distlist():
+    dist_list = Localregion.objects.exclude(id=0).order_by('continent_name', 'region_name', 'name')
+    prevcon = ''
+    prevreg = ''
+    mydist_list = dist_list
+    for x in mydist_list:
+        x.concard = x.continent_name.replace(" ", "")
+        x.regcard = x.region_name.replace(" ", "")
+        x.prevcon = prevcon
+        x.prevreg = prevreg
+        # mydist_list.append([x, prevcon, prevreg,card] )
+        prevcon = x.continent_name
+        prevreg = x.region_name
+
+    return mydist_list
+
+def browsedist(request):
+    dist_list = get_distlist()
+    context = {'dist_list': dist_list,  'app': 'orchidaceae',}
+    return render(request, 'orchidaceae/browsedist.html', context)
+
+# in progress
 # Serverside processing for large datatable responses
 # Common query function
 def get_filtered_data_spc(start, length, search_value=None, order_column='id', order_dir='asc'):

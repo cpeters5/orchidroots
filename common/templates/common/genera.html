@@ -53,11 +53,7 @@
                                         {% for genus in genus_list %}
                                         <tr>
                                             <td>
-                                            {% if not app or app == 'orchidaceae' %}
-                                                <a href="{% url 'common:species' 'orchidaceae' %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
-                                            {% else %}
-                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&year={{ year }}&family={{genus.family}}&subfamily={{subfamily}}&tribe={{tribe}}&subtribe={{subtribe}}&syn=N"><i>{{genus.genus}}</i></a>
-                                            {% endif %}
+                                                <a href="{% url 'common:species' 'orchidaceae' %}?genus={{genus.genus}}&syn=N"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
                                             {% if app == 'aves' %}
@@ -67,25 +63,15 @@
                                             {% endif %}
 
                                             <td class="d-none d-lg-table-cell hidden-xs">
-                                            {% if tribe %}
-                                                {% if genus.subtribe %}subtribe
-                                                    <a href="{% url 'common:genera' app %}?family={{family.family}}&subtribe={{genus.subtribe}}"><i>{{genus.subtribe|title}}</i></a>
-                                                {% endif %}
-                                            {% elif subfamily %}
-                                                {% if genus.tribe %}tribe
-                                                    <a href="{% url 'common:genera' app %}?family={{family.family}}&tribe={{genus.tribe}}"><i>{{genus.tribe|title}}</i></a>
-                                                {% endif %}
-                                            {% elif family %}
-                                                {% if genus.subfamily %}subfamily
+                                                {% if genus.subtribe %}subfamily
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subfamily={{genus.subfamily}}"><i>{{genus.subfamily|title}}</i></a>
                                                 {% endif %}
                                                 {% if genus.tribe %}tribe
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&tribe={{genus.tribe}}"><i>{{genus.tribe|title}}</i></a>
                                                 {% endif %}
-                                                {% if genus.subtribe %}subtribe
+                                                {% if genus.subtribe %}subfamily
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subtribe={{genus.subtribe}}"><i>{{genus.subtribe|title}}</i></a>
                                                 {% endif %}
-                                            {% endif %}
                                             </td>
                                             <td class="align-center">{% if genus.genusstat.num_spcimage > 0 or genus.genusstat.num_hybimage > 0 %}{%  add genus.genusstat.num_spcimage genus.genusstat.num_hybimage %}{% endif %}</td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->

@@ -5,7 +5,6 @@
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{family}} species</title>
     <meta name='description' content='Species of the genus {{genus}}'>
-
 </head>
 <style>
     .form-inline .my-hidden { display: none; }
@@ -105,6 +104,7 @@
                                                 {% endif %}
                                                 {{species.author|default:""}}
                                             </td>
+
                                             {% if app == 'orchidaceae' %}
                                                 <td class="d-none d-md-table-cell">
                                                 {% if species.status == 'synonym' %}
@@ -122,10 +122,18 @@
                                                         na
                                                     {% endif %}
                                                 {% else %}
-                                                    {% if species.accepted.subgenus %}<span style="color:#918f8f">subgenus:</span> {{species.accepted.subgenus|default:''}}{% endif %}
-                                                    {% if species.accepted.section %}<span style="color:#918f8f">section:</span> {{species.accepted.section|default:''}}{% endif %}
-                                                    {% if species.accepted.subsection %}<span style="color:#918f8f">subsection:</span> {{species.accepted.subsection|default:''}}{% endif %}
-                                                    {% if species.accepted.series %}<span style="color:#918f8f">series:</span> {{species.accepted.series|default:''}}{% endif %}
+                                                    {% if species.accepted.subgenus %}
+                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&subgenus={{species.accepted.subgenus}}&syn={{syn}}"><span style="color:#918f8f">subgenus:</span> {{species.accepted.subgenus|default:''}}</a>
+                                                    {% endif %}
+                                                    {% if species.accepted.section %}
+                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&section={{species.accepted.section}}&syn={{syn}}"><span style="color:#918f8f">section:</span> {{species.accepted.section|default:''}}</a>
+                                                    {% endif %}
+                                                    {% if species.accepted.subsection %}
+                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&subsection={{species.accepted.subsection}}&syn={{syn}}"><span style="color:#918f8f">subsection:</span> {{species.accepted.subsection|default:''}}</a>
+                                                    {% endif %}
+                                                    {% if species.accepted.series %}
+                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&series={{species.accepted.series}}&syn={{syn}}"><span style="color:#918f8f">series:</span> {{species.accepted.series|default:''}}</a>
+                                                    {% endif %}
                                                 {% endif %}
                                                 </td>
                                             {% endif %}
