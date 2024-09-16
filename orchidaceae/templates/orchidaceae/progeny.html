@@ -42,28 +42,28 @@
             {% for hybrid in result_list %}
             <tr style="text-align: left">
                 <td>
-                    <a href="{% url 'display:summary' app hybrid.0.did.pid.pid %}?role={{role}}"><i>{{hybrid.0.did.pid.binomial_it|safe}}</i></a>
+                    <a href="{% url 'display:summary' app hybrid.did.pid.pid %}?role={{role}}"><i>{{hybrid.did.pid.binomial_it|safe}}</i></a>
                 </td>
                 <td >
-                    {% if hybrid.0.did.seed_id.pid %}
-                        <a href="{% url 'display:summary' app hybrid.0.did.seed_id.pid %}?role={{role}}">{{hybrid.0.did.registered_seed_name|safe}}</a>
+                    {% if hybrid.did.seed_id.pid %}
+                        <a href="{% url 'display:summary' app hybrid.did.seed_id.pid %}?role={{role}}">{{hybrid.did.registered_seed_name|safe}}</a>
                     {% else %}
                         na
                     {% endif %}
                 </td>
                 <td>
 <!--                        Some hybrrid's parent(s) are missing-->
-                    {% if hybrid.0.did.pollen_id.pid %}
-                        <a href="{% url 'display:summary' app hybrid.0.did.pollen_id.pid %}?role={{role}}">{{hybrid.0.did.registered_pollen_name|safe}}</a>
+                    {% if hybrid.did.pollen_id.pid %}
+                        <a href="{% url 'display:summary' app hybrid.did.pollen_id.pid %}?role={{role}}">{{hybrid.did.registered_pollen_name|safe}}</a>
                     {% else %}
                         na
                     {% endif %}
                 </td>
                 <td class="text-center d-none d-sm-block">
-                    {{hybrid.0.pct|floatformat:0}}%
+                    {{hybrid.pct|floatformat:0}}%
                 </td>
                 <td class="text-left d-none d-sm-table-cell" valign="middle">
-                    {% if hybrid.0.did.pid.speciesstat.num_image %}{{hybrid.0.did.pid.speciesstat.num_image}} {% endif %}
+                    {% if hybrid.did.pid.speciesstat.num_image %}{{hybrid.did.pid.speciesstat.num_image}} {% endif %}
                 </td>
             </tr>
             {% endfor %}

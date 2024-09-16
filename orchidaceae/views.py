@@ -37,29 +37,39 @@ Localregion = apps.get_model('common', 'Localregion')
 imgdir, hybdir, spcdir = thumbdir()
 
 alpha_list = config.alpha_list
+app = 'orchidaceae'
+family = 'Orchidaceae'
 
+
+# orchidaceae application is specificly for Orchidaceae family only.
+
+# List genera
 def genera(request):
     write_output(request)
-    family = 'Orchidaceae'
-    genustype = ''
     st_obj = ''
     role = getRole(request)
     alpha = request.GET.get('alpha', '')
+
+    # Get subfamily, tribe, subtribe instance for genus_list filter
+    # Get subfamily list
     sf = request.GET.get('sf', '')
     try:
         sf_obj = Subfamily.objects.get(pk=sf)
     except Subfamily.DoesNotExist:
         sf_obj = None
+
+    # Get tribe instance
     t = request.GET.get('t', '')
     try:
         t_obj = Tribe.objects.get(pk=t)
-    except Tribe.DoesNotExist:
-        t_obj = None
-    if not sf_obj:
         try:
             sf_obj = Subfamily.objects.get(pk=t_obj.subfamily)       # back fill subfamily
         except Subfamily.DoesNotExist:
-            pass
+            sf_obj = ''
+    except Tribe.DoesNotExist:
+        t_obj = ''
+
+    # Get subtribe instance: A bit convoluted, because of incomplete data
     st = request.GET.get('st', '')
     if st:
         try:
@@ -71,22 +81,23 @@ def genera(request):
                 try:
                     t_obj = Tribe.objects.get(pk=st_obj.tribe.tribe)
                 except Tribe.DoesNotExist:
-                    pass
+                    t_obj = ''
             if not sf_obj and st_obj.subfamily:
                 try:
                     sf_obj = Subfamily.objects.get(pk=st_obj.subfamily)
                 except Subtribe.DoesNotExist:
-                    pass
+                    sf_obj = ''
 
-    # Remove genus choide if subfamily, tribe or subtribe is chosen
+
+    # subfamily, tribe or subtribe requests override genus request!
     genustype = request.GET.get('genustype', 'all')
 
     formula1 = request.GET.get('formula1', '')
     formula2 = request.GET.get('formula2', '')
     status = request.GET.get('status', '')
 
+    # Build genus_list and apply filters
     genus_list = Genus.objects.all()
-
     if status == 'synonym':
         genus_list = genus_list.filter(status='synonym')
     elif genustype == 'hybrid':
@@ -115,7 +126,7 @@ def genera(request):
     if alpha and len(alpha) == 1:
         genus_list = genus_list.filter(genus__istartswith=alpha)
 
-    # Get Alliances
+    # Get subfamily, tribe, subtribe list.  These will be shown in dropdown menu in the detail genus list page
     sf_list = Subfamily.objects.filter(family=family).filter(num_genus__gt=0)
 
     t_list = Tribe.objects.all()
@@ -131,8 +142,10 @@ def genera(request):
     sf_list = sf_list.order_by('subfamily')
     t_list = t_list.order_by('tribe')
     st_list = st_list.order_by('subtribe')
+    #   Genus lookuo list
     genus_lookup = Genus.objects.filter(pid__gt=0).filter(type='species')
 
+    # Build canonical_url. Prefer crawlers to use the simpler version /common/genera"
     if alpha and alpha != 'All':
         canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae&alpha={alpha}')
     else:
@@ -148,14 +161,15 @@ def genera(request):
                }
     return render(request, 'orchidaceae/genera.html', context)
 
-
+# Works but not accessible
 def subgenus(request):
-    # -- List Genuses
+    # -- List subgenus
     subgenus_list = Subgenus.objects.order_by('subgenus')
     context = {'subgenus_list': subgenus_list, 'title': 'subgenus',  'app': 'orchidaceae',}
     return render(request, 'orchidaceae/subgenus.html', context)
 
 
+# Works but not accessible
 def section(request):
     # -- List Genuses
     section_list = Section.objects.order_by('section')
@@ -163,6 +177,7 @@ def section(request):
     return render(request, 'orchidaceae/section.html', context)
 
 
+# Works but not accessible
 def subsection(request):
     # -- List Genuses
     subsection_list = Subsection.objects.order_by('subsection')
@@ -170,11 +185,13 @@ def subsection(request):
     return render(request, 'orchidaceae/subsection.html', context)
 
 
+# Works but not accessible
 def series(request):
     # -- List Genuses
     series_list = Series.objects.order_by('series')
     context = {'series_list': series_list, 'title': 'series', 'app': 'orchidaceae', }
     return render(request, 'orchidaceae/series.html', context)
+
 
 # Get the list of matching genus along with related generaa
 def getPartialPid(reqgenus, type, status):
@@ -315,22 +332,15 @@ def hybrid(request):
     author = request.GET.get('author', '')
     year_valid = 0
     msg = ''
-    crit = 0
-    if author: crit = 1
     originator = request.GET.get('originator', '')
-    if originator: crit = 1
     alpha = request.GET.get('alpha', '')
-    if alpha: crit = 1
     year = request.GET.get('year', '')
     if valid_year(year):
         year_valid = 1
-        crit = 1
     if alpha != 'ALL':
         alpha = alpha[0:1]
     status = request.GET.get('status', '')
     spc = request.GET.get('spc', '')
-    if spc:
-        crit = 1
     if len(spc) == 1:
         alpha = spc
         spc = ''
@@ -352,7 +362,7 @@ def hybrid(request):
                 break
         prev_genus = reqgenus
     # If there is no params requested, and for large tables, set alpha = A
-    if not crit and reqgenus in config.big_genera:
+    if reqgenus in config.big_genera:
         alpha = 'A'
 
     # user requests seed or pollen parents
@@ -362,15 +372,11 @@ def hybrid(request):
 
     # Start building the list
     # First matching genus, with wild card
-    crit = 1 #???
-    if crit :
-        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-    else:
-        # If crit = 0 (no filter criteria), ignore request
-        return render(request, 'orchidaceae/hybrid.html', {})
+    reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
     write_output(request, str(reqgenus))
 
     # Genus unchanged, see if seed/pollen are requested
+    # Need redesign here..
     if this_species_list:
         if (reqgenus and (reqgenus == prev_genus)):
             seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
@@ -384,7 +390,7 @@ def hybrid(request):
             poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
             this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
 
-    if crit and this_species_list:
+    if this_species_list:
         if spc:
             if len(spc) >= 2:
                 this_species_list = this_species_list.filter(species__icontains=spc)
@@ -476,7 +482,7 @@ def datatable_hybrid(request):
 
     return JsonResponse(response)
 
-
+#  in progress
 def browsedist(request):
     dist_list = get_distlist()
     context = {'dist_list': dist_list,  'app': 'orchidaceae',}
@@ -484,10 +490,7 @@ def browsedist(request):
 
 
 def ancestor(request, pid):
-    if not pid:
-        pid = request.GET.get('pid', '')
-
-    if not pid or not str(pid).isnumeric():
+    if not str(pid).isnumeric():
         handle_bad_request(request)
         return HttpResponseRedirect('/')
 
@@ -500,7 +503,7 @@ def ancestor(request, pid):
     write_output(request, species.binomial)
     genus = species.gen
 
-    # List of ancestors in the left panel
+    # List of ancestors for the request pid (pid must be a hybrid)
     anc_list = AncestorDescendant.objects.filter(did=pid)
 
     canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
@@ -593,14 +596,7 @@ def get_pollen_parent(child):
     return parent
 
 
-def ancestrytree(request, pid=None):
-    if not pid:
-        pid = request.GET.get('pid', '')
-
-    if not pid or not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
-
+def ancestrytree(request, pid):
     role = getRole(request)
     try:
         species = Species.objects.get(pk=pid)
@@ -608,6 +604,10 @@ def ancestrytree(request, pid=None):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
+
+    #  If requested species is a synonym, convert pid to accepted pid.
+    #  Ancestordescendant only contain accepted pids.
+    # This table will need to be reloaded when there are changes in taxons.
     if species.status == 'synonym':
         species = species.getAccepted()
 
@@ -641,39 +641,6 @@ def ancestrytree(request, pid=None):
 from django.db import connection
 from django.db.models import Subquery, OuterRef, Value, IntegerField, Q
 from django.db.models.functions import Greatest
-
-def get_des_list_large(pid, syn_list):
-    # Create a temporary table with syn_list
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            CREATE TEMPORARY TABLE temp_syn_list (aid INT PRIMARY KEY)
-        """)
-        cursor.executemany(
-            "INSERT INTO temp_syn_list (aid) VALUES (%s)",
-            [(aid,) for aid in syn_list]
-        )
-
-    # Use the temporary table in the query
-    dest_list = list(AncestorDescendant.objects.filter(pct__gt=30)
-                .annotate(
-                    is_in_syn_list=Greatest(
-                        Value(0),
-                        Subquery(
-                            AncestorDescendant.objects.filter(aid=OuterRef('aid'))
-                            .extra(where=['aid IN (SELECT aid FROM temp_syn_list)'])
-                            .values('aid')
-                            .annotate(v=Value(1, output_field=IntegerField()))
-                            .values('v')[:1]
-                        )
-                    )
-                )
-                .filter(Q(aid=pid) | Q(is_in_syn_list=1)))
-
-    # Drop the temporary table
-    with connection.cursor() as cursor:
-        cursor.execute("DROP TEMPORARY TABLE IF EXISTS temp_syn_list")
-
-    return dest_list
 
 
 def get_des_list(pid, syn_list):
@@ -732,7 +699,6 @@ def infraspecific(request, pid):
             species = main_species[0]
 
         infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
-        print("infraspecific_list", len(infraspecific_list))
         canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
 
     context = {'infraspecific_list': infraspecific_list, 'species': species,
@@ -746,14 +712,13 @@ def infraspecific(request, pid):
 
 def progeny(request, pid):
     role = getRole(request)
-    direct = request.GET.get('direct', '')
-
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
+
     genus = species.genus
     prim = request.GET.get('prim', None)
     prim_list, sec_list, result_list = [], [], []
@@ -768,40 +733,25 @@ def progeny(request, pid):
     if prim:
         canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/?prim=1')
         context = {'prim_list': prim_list, 'species': species,
-                   'tab': 'lineage', 'lineage': 'active', 'genus': genus, 'direct': direct,
+                   'tab': 'lineage', 'lineage': 'active', 'genus': genus,
                    'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                    'canonical_url': canonical_url,
                    }
         return render(request, 'orchidaceae/progeny_immediate.html', context)
     #All descendants
     if len(syn_list) > 100:
-        # des_list = get_des_list_large(pid, syn_list)
         des_list = get_des_list(pid, syn_list)
     else:
         des_list = get_des_list(pid, syn_list)
-    # primary
-    prim_list = set(prim_list.values_list('pid', flat=True))
-    # Secondary
-    sec_list = set(Hybrid.objects.filter(
-        Q(seed_id__in=prim_list) |
-        Q(pollen_id__in=prim_list)
-    ).values_list('pid', flat=True))
-    for x in des_list:
-        if x.did.pid.pid in prim_list:
-            result_list.append([x,'primary'])
-        elif x.did.pid.pid in sec_list:
-            result_list.append([x,'secondary'])
-        else:
-            result_list.append([x,'remote'])
 
+    # Build canonical url
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
 
-    context = {'result_list': result_list, 'species': species,
-                'tab': 'lineage', 'lineage': 'active', 'genus': genus, 'direct': direct,
+    context = {'result_list': des_list, 'species': species,
+                'tab': 'lineage', 'lineage': 'active', 'genus': genus,
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
-
     return render(request, 'orchidaceae/progeny.html', context)
 
 
