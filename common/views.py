@@ -1435,7 +1435,7 @@ def compare(request, pid):
     context = {'pid': pid, 'genus': genus, 'species': species,
                'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
                'spcimg1_list': spcimg1_list,
-               'genus2': gen2, 'species2': spc2, 'spcimg2_list': spcimg2_list,
+               'genus2': gen2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family, 'binomial2': binomial2,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
                'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
