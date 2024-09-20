@@ -33,8 +33,9 @@ or groupings.
 For more detailed instructions on using the platform, please refer to the documentation within the project.
 
 ## Contributing
-We welcome all contributions! Please refer to the CONTRIBUTION.md file for 
-detailed installation instructions and contribution guidelines.
+We welcome all contributions to the project, whether they are code contributions, documentation improvements, 
+bug reports, or feature requests! Please refer to the 
+[CONTRIBUTION.md](CONTRIBUTION.md) file for detailed installation instructions and contribution guidelines.
 
 ## Contact
 For questions or feedback, feel free to reach out:
