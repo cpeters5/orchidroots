@@ -15,8 +15,6 @@ import logging.config
 from django.utils.translation import gettext
 from utils.json_encoder import LazyJSONSerializer, LazyEncoder
 
-
-# root = environ.Path(__file__) - 2  # get root of the project
 ROOT_DIR = environ.Path(__file__) - 2  # get root of the project
 
 env = environ.Env()
@@ -25,19 +23,12 @@ DOT_ENV_FILE = env.str("DOT_ENV_FILE", default=".env")
 if DOT_ENV_FILE:
     env.read_env(str(ROOT_DIR.path(DOT_ENV_FILE)))
 
-# SITE_ROOT = root()
 SITE_ROOT = ROOT_DIR
 SITE_URL = env.str("SITE_URL", "https://beta.bluenanta.com")
 SITE_URL = SITE_URL.rstrip('/')
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =  env.str('DJANGO_SECRET_KEY', default='')
 
 SITE_ID = 3
@@ -47,19 +38,12 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    #'bluenanta.com',
-    #'www.bluenanta.com',
     'beta.bluenanta.com',
     'www.beta.bluenanta.com',
-    # 'orchidroots.com',
-    # 'www.orchidroots.com',
 ]
 
 
-# Application definition
-
 INSTALLED_APPS = [
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,9 +55,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'session_cleanup',
     'django_crontab',
-    # 'django_admin_global_sidebar',
-    # 'dbview',
-    # 'thumbnails',
     'imagekit',
     # 'rest_framework',
 
@@ -81,7 +62,6 @@ INSTALLED_APPS = [
     'myproject',
     'accounts',
     'common',
-    # 'core',
     'display',
     'documents',
     'donation',
@@ -93,12 +73,9 @@ INSTALLED_APPS = [
     'aves',
     'animalia',
     'utils',
-    'gallery',
     'sitemap',
 
-
     # Third Party
-    # 'ads',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -108,7 +85,6 @@ INSTALLED_APPS = [
     'robots',  # use myproject/robots.txt
     'jquery',
     'reset_migrations',
-    'sekizai',  # required by django-ads
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
@@ -130,9 +106,7 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    # ...
-    '45.55.134.164',
-    # ...
+    # '45.55.134.164',
 ]
 
 # Session settings
@@ -188,17 +162,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
-
-
-# TEMPLATE_CONTEXT_PROCESSORS = (
-#     "django.core.context_processors.request",
-#     "django.contrib.auth.context_processors.auth",
-    # "allauth.account.context_processors.account",
-    # "allauth.socialaccount.context_processors.socialaccount",
-# )
-
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databasesz
 
 DATABASES = {
     'default': {
@@ -287,9 +250,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
@@ -365,48 +325,6 @@ except: # noqa
     pass
 
 
-# DJANGO_ADMIN_GLOBAL_SIDEBAR_MENUS = [
-#     {
-#         "title": "Home",
-#         "icon": "fa fa-home",
-#         "url": "/admin/",
-#     },{
-#         "title": "Manage Books",
-#         "icon": "fa fa-book",
-#         "children": [
-#             {
-#                 "title": "Manage Categories",
-#                 "icon": "fas fa-list",
-#                 "model": "django_admin_global_sidebar_example.category",
-#                 "permissions": ["django_admin_global_sidebar_example.view_category"],
-#             },{
-#                 "title": "Manage Books",
-#                 "icon": "fas fa-book",
-#                 "model": "django_admin_global_sidebar_example.book",
-#                 "permissions": ["django_admin_global_sidebar_example.view_book"],
-#             }
-#         ]
-#     },{
-#         "title": "Authenticate",
-#         "icon": "fa fa-cogs",
-#         "children": [
-#             {
-#                 "title": "Manage Users",
-#                 "icon": "fas fa-user",
-#                 "model": "auth.user",
-#                 "permissions": ["auth.view_user",],
-#             },
-#             {
-#                 "title": "Manage Groups",
-#                 "icon": "fas fa-users",
-#                 "model": "auth.group",
-#                 "permissions": ["auth.view_group",],
-#             }
-#         ]
-#     },
-# ]
-
-# allauth account settings
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True

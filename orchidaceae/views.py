@@ -674,38 +674,6 @@ def synonym(request, pid):
     return render(request, 'orchidaceae/synonym.html', context)
 
 
-def infraspecific(request, pid):
-    role = getRole(request)
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    write_output(request, species.binomial)
-
-    # Infraspecifics exists only for species and natural hybrids
-    if species.type == 'hybrid' and species.source == 'RHS':
-        infraspecific_list = []
-        canonical_url = ''
-    else:
-        this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-        main_species = Species.objects.filter(binomial=this_species_name)
-        if len(main_species) > 0:
-            species = main_species[0]
-
-        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
-        canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
-
-    context = {'infraspecific_list': infraspecific_list, 'species': species,
-               'tab': 'infra', 'infra': 'active',
-               'role': role, 'app': 'orchidaceae',
-               'canonical_url': canonical_url,
-               }
-    return render(request, 'orchidaceae/infraspecific.html', context)
-
-
 def progeny(request, pid):
     role = getRole(request)
     try:
@@ -850,6 +818,14 @@ def mypaginator(request, full_list, page_length, num_show):
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
+<<<<<<< Updated upstream
+=======
+# Permanently moved to common for other applications
+def infraspecific(request, pid):
+    role = getRole(request)
+    canonical_url = request.build_absolute_uri(f'/common/infraspecific/{app}/{pid}/?role={role}')
+    return HttpResponsePermanentRedirect(canonical_url)
+>>>>>>> Stashed changes
 
 #  in progress
 def get_distlist():

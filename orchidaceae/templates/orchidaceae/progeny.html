@@ -76,45 +76,41 @@
 {% include "base-datatable.html" %}
 
 <script>
-
 $(document).ready(function() {
-    var dataTable = $('#sortTable').dataTable({
+    var dataTable = $('#sortTable').DataTable({
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
         "bPaginate": true,
-        "colReorder": true,  // Enable column reordering
+        "colReorder": true,
         "columnDefs": [
-            // { "orderable": false, "targets": 2 }
             { "type": "priority", "targets": 1 }
         ],
-        "order": [[ 1, "asc" ], [0,'asc']],
-        // "pagingType": "simple", # only show previous/next
- 	    "fnPreDrawCallback": function( oSettings ) {
-            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        "order": [[ 1, "asc" ], [0, 'asc']],
+        "fnPreDrawCallback": function(oSettings) {
+            $('.dataTables_filter input').attr({'name':'', 'placeholder': 'Filter results'}); //tips
         },
-
         "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
-        language: {
+        "language": {
             search: "_INPUT_",
             "sProcessing": "Processing...",
-            "sZeroRecords": "None",
+            "sZeroRecords": "None"
         },
         "drawCallback": function(settings) {
             var api = this.api();
             var pageInfo = api.page.info();
 
-            // Check if the total number of rows is less than or equal to the page length
-            if (pageInfo.recordsTotal <= pageInfo.length) {
+            // Check if the total number of records is less than or equal to the page length
+            if (pageInfo.recordsDisplay <= pageInfo.length) {
+                // Hide the pagination, search filter, and info sections
                 $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
             } else {
+                // Show them if there are more records
                 $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
             }
         }
-
     });
 });
-
 
 </script>
 

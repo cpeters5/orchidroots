@@ -146,17 +146,29 @@ img{
 </style>
 
 <div class="container-fluid">
-            <div class="card mt-3">
-                <div class="card-body" style="font-size:15px">
-                    <h1 class="hidden-h1">Welcome! to OrchidRoots</h1>
-                    <h6 class="card-title d-inline-block">Welcome! to OrchidRoots</h6>
-                    <div class="d-inline-block p-1" style="font-size:16px">
-                        We at OrchidRoots are committed to serving you for many years to come.
-                        To make this possible, we are asking for your support.
-                        You can explore orchids and other life forms on orchidroots.com.
-                        Any amount you are able to contribute would be greatly appreciated.
-                        <a class="btn btn-primary border" style="width: 120px;" href="{% url 'donation:donateapp' %}">Donate</a>
-                        <a class="btn btn-primary border" href="{% url 'documents:list' %}">Documents</a>
+        <div class="card mt-3">
+            <div class="card-body" style="font-size:15px">
+                <h1 class="hidden-h1">Welcome! to OrchidRoots</h1>
+                <div>
+                    <form class="form-inline" id="displaysearch" action="/search/search/" style="margin-top: 5px;">
+                        <input type="hidden" form="displaysearch" name="role" value="{{ role }}">
+
+                        <input class="searchbox" form="displaysearch" value="{{search_string}}"
+                               type="text" name="search_string" pattern=".{3,}"
+                               placeholder="Search..."
+                               style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
+
+                        <button form="displaysearch" type="submit" style="display:none;"></button>
+                    </form>
+                </div>
+                <h6 class="card-title d-inline-block">Welcome! to OrchidRoots</h6>
+                <div class="d-inline-block p-1" style="font-size:16px">
+                    We at OrchidRoots are committed to serving you for many years to come.
+                    To make this possible, we are asking for your support.
+                    You can explore orchids and other life forms on orchidroots.com.
+                    Any amount you are able to contribute would be greatly appreciated.
+                    <a class="btn btn-primary border" style="width: 120px;" href="{% url 'donation:donateapp' %}">Donate</a>
+<!--                    <a class="btn btn-primary border" href="{% url 'documents:list' %}">Documents</a>-->
 
                     <br>
                     </div>

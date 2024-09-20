@@ -341,10 +341,10 @@ seedparent, pollparent {
                     This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted }}</a>
                 {% endif %}
 
-                {% if app == 'orchidaceae' and infraspecifics %}
+                {% if infraspecifics %}
                     <br>
                     Infraspecific taxa recognized within {{species.main_species_name}}:
-                    <a href="{% url 'orchidaceae:infraspecific' species.pid %}" rel="nofollow noreferrer noopener">infraspecific taxa</a>
+                    <a href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecific taxa</a>
 
                 {% endif %}
 
@@ -554,10 +554,10 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if ps_list %}
                                         {% for polseed in ps_list %}
-                                        <a href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed" data-title="
-                                        <h6><small>{{polseed.id}}: {{polseed.imgname}}
+                                        <a href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed"
+                                           data-title="seed: {{polseed.id}}: {{polseed.imgname}}
                                             {% if polseed.text_data %}{{polseed.text_data|safe}}{% endif %}
-                                            </small></h6>">
+                                            ">
                                             <img class="thumbnails thumbnails2"  alt="{{polseed.binomial}}" src="{% static polseed.thumb_dir %}{{polseed.image_file}}">
                                         </a>
                                         {% endfor %}
@@ -612,10 +612,9 @@ seedparent, pollparent {
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
                             {% if p.aid.get_best_img %}
-                                <a href="/static/utils/images/species/{{p.aid.get_best_img.image_file}}" data-lightbox="anc" data-title="
-                                    <h6><small>{{p.id}}: {{p.aid.abrevname|safe}}
-                                    {% if p.text_data %}{{p.text_data|safe}}{% endif %}</small></h6>">
-                                        <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="/static/utils/thumbs/species/{{p.aid.get_best_img.image_file}}">
+                                <a href="/static/utils/images/species/{{p.aid.get_best_img.image_file}}" data-lightbox="anc"
+                                   data-title="No: {{p.id}}: {{p.aid.abrevname|safe}} - {% if p.text_data %}{{p.text_data|safe}}{% endif %}">
+                                   <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="/static/utils/thumbs/species/{{p.aid.get_best_img.image_file}}">
                                 </a>
                             {% else %}
                                 <img class="thumbnails thumbnails3"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
@@ -666,11 +665,9 @@ $(document).ready(function(){
     }
 });
 
-    lightbox.option({
-      'resizeDuration': 200,
-      'wrapAround': true,
-      'disableScrolling': true
-    })
+
+
+
 </script>
 
 

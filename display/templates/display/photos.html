@@ -286,17 +286,17 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">New uploaded photos</a>
         {% endif %}
-<!--        {% if app == 'orchidaceae' and species.type == 'species' %}-->
-<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'orchidaceae:infraspecific' species.pid %}" rel="nofollow noreferrer noopener">infraspecies list</a>-->
-<!--        {% endif %}-->
+        {% if app == 'orchidaceae' and species.type == 'species' %}
+            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecies list</a>
+        {% endif %}
 <!--        {% if user.tier.tier > 1 %}-->
-<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}">My Species Photos</a>-->
-<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&role={{role}}">My Hybrid Photos</a>-->
+<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
+<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>-->
 <!--        {% endif %}-->
             &nbsp;&nbsp;
         {% if user.is_authenticated %}
             {% if owner == 'Y' %}
-                <a href="{% url 'display:photos' app species.pid %}?role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
+                <a href="{% url 'display:photos' app species.pid %}?app={{app}}&role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
                 <a href="{% url 'common:myphoto' species.pid %}?app={{app}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
             {% endif %}
@@ -341,9 +341,13 @@ a:hover {
                             {% if image.approved %}
                                 <b>Approved</b>
                             {% elif role == 'cur' %}
-                                 <a href="{% url 'common:approve_mediaphoto' app image.id image.pid.pid %}?gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                {% if family.family == 'Orchidaceae' %}
+                                    <a href="{% url 'common:approve_mediaphoto' app image.id image.pid.pid %}?gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                {% else %}
+                                    <a href="{% url 'common:approve_mediaphoto' app image.id image.pid.pid %}?gen={{species.gen.pid}}&action=file" rel="nofollow noreferrer noopener">Approve</a> |
+                                {% endif %}
                             {% endif %}
-                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?app={{species.family.application}}&role={{role}}&next=photos" rel="nofollow noreferrer noopener" >Delete</a>
+                            <a href="{% url 'common:deletephoto' image.id image.pid.pid %}?app={{app}}&role={{role}}&next=photos" rel="nofollow noreferrer noopener" >Delete</a>
                         {% endif %}
                      </div>
 
@@ -405,6 +409,7 @@ a:hover {
                             </div>
                         {% endif %}
                         <div class="imgcaption">
+                            {{image.author.displayname}}
                             {% include 'common/curate_links.html' %}
                         </div>
                     </div>
@@ -414,7 +419,7 @@ a:hover {
         {% else %}
             {% if species.status == 'synonym' %}
                 <br><br><div style="text-align:center">No images available.  Please try the accepted species
-                            <a href="{% url 'display:photos' app species.getAcc %}">{{species.getAccepted.binomial|safe}}</a>
+                            <a href="{% url 'display:photos' app species.getAcc %}?app={{app}}">{{species.getAccepted.binomial|safe}}</a>
                         </div>
             {% else %}
                 <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>

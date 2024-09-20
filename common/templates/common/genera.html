@@ -53,7 +53,7 @@
                                         {% for genus in genus_list %}
                                         <tr>
                                             <td>
-                                                <a href="{% url 'common:species' 'orchidaceae' %}?genus={{genus.genus}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
                                             {% if app == 'aves' %}

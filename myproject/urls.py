@@ -59,9 +59,6 @@ urlpatterns = [
     path('orchidaceae/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchidaceae')),
     path('detail/', include(('detail.urls', 'detail'), namespace='detail')),
 
-    # New
-    path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),
-
     # REDIRECTIONS: Remove this in a year or so. @2024
     # redirections (in the process of merging detail with orchidaceae)
     path('detail/ancestor/<int:pid>/', RedirectView.as_view(url='/orchidaceae/ancestor/%(pid)s/', permanent=True)),

@@ -123,12 +123,9 @@ def handle_bad_request(request):
 # Generate unique file name. Used in ApproveMediaPhoto method
 def regenerate_file(source_path, destination_folder):
     # Truncate file name if too long
-    print("util", source_path, destination_folder)
     new_source_path = truncate_filename(source_path, 30)
-    print("util", new_source_path)
 
     filename = os.path.basename(new_source_path)
-    print("filename", filename)
     while True:
         # Generate a new unique filename using shortuuid
         unique_filename = shortuuid.uuid() + "_" + filename
@@ -141,8 +138,6 @@ def regenerate_file(source_path, destination_folder):
             break
         else:
             continue
-
-    print("unique_filename", unique_filename)
     return unique_filename
 
 
@@ -325,14 +320,12 @@ def getSuperGeneric(request):
             subtribe = Subtribe.objects.get(pk=subtribe)
         except Subtribe.DoesNotExist:
             subtribe = ''
-    print("subtribe", subtribe)
     tribe = request.GET.get('tribe', None)
     if tribe:
         try:
             tribe = Tribe.objects.get(pk=tribe)
         except Tribe.DoesNotExist:
             tribe = ''
-    print("tribe", subtribe)
 
     subfamily = request.GET.get('subfamily', None)
     if subfamily:
@@ -340,7 +333,6 @@ def getSuperGeneric(request):
             subfamily = Subfamily.objects.get(pk=subfamily)
         except Subfamily.DoesNotExist:
             subfamily = ''
-    print("subfamily", subfamily)
 
     return subfamily, tribe, subtribe
 

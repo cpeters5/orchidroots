@@ -47,3 +47,12 @@ Crawl-delay: 10
 
 User-agent: Bytespider
 Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: facebookexternalhit
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /

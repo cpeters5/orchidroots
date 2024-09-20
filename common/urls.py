@@ -13,6 +13,7 @@ urlpatterns = [
     path('genera/', views.genera, name='genera'),
     path('species/<str:app>/', views.species, name='species'),
     path('species/', views.species, name='species'),
+    path('infraspecific/<str:app>/<int:pid>/', views.infraspecific, name='infraspecific'),
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),

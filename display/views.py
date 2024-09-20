@@ -48,7 +48,7 @@ def summary(request, app=None, pid=None):
     app = app or query_app
     pid = pid or query_pid
 
-    # Handle old typo in path, can eventually be removed
+    # Handle an old typo in sitemaps.  Crawlers still crawled these urls
     if app == 'application':
         app = 'orchidaceae'
 
@@ -57,26 +57,21 @@ def summary(request, app=None, pid=None):
         # Worst case scenario when no explicit pid requested. Send it to homepage.
         return HttpResponsePermanentRedirect(reverse('home'))
 
-    # Either 'app' or pid is from query string, send to the canonical URL
+    # Either 'app' or pid is from query string, redirect to the canonical URL
     if query_pid != None or app == None:
         app = None or 'orchidaceae'
         return HttpResponsePermanentRedirect(reverse('display:summary', args=[app, pid]))
 
-    # logic for the correct url path.
     # Construct the canonical URL
     canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
-
-    family = request.GET.get('family', 'Orchidaceae')
-    try:
-        family = Family.objects.get(family=family)
-    except Family.DoesNotExist:
-        family = Family.objects.get(family='Orchidaceae')
 
     Species = apps.get_model(app, 'Species')
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponseRedirect('/')
+
+    family = species.family
 
     # If requested species is a synonym, convert it to accepted species
     req_species = species #(could be synonym of accepted)
@@ -141,11 +136,9 @@ def summary(request, app=None, pid=None):
         infraspecifics = 0
     else:
         this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
-        main_species = Species.objects.filter(binomial=this_species_name) # convert requested species to main species
-        if len(main_species) > 0:
-            species = main_species[0]
+        main_species = Species.objects.filter(binomial=this_species_name).exclude(pid=pid) # convert requested species to main species
         infraspecifics = len(Species.objects.filter(binomial__istartswith=this_species_name))
-
+    print("infraspecifics", infraspecifics)
     # If hybrid, find its parents
     if species.type == 'hybrid':
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
@@ -376,8 +369,10 @@ def photos(request, app=None, pid=None):
                 upload_list = upload_list.filter(author=request.user.photographer.author_id)
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
-            upload_list = upload_list.filter(author=request.user.photographer.author_id)  # Private photos
-            private_list = private_list.filter(author=request.user.photographer.author_id)  # Private photos
+        # This shouldn't happen. Need to change the design: make sure user.role and photographer instance is insync.
+            if isinstance(request.user.photographer, Photographer):
+                upload_list = upload_list.filter(author=request.user.photographer.author_id)  # Private photos
+                private_list = private_list.filter(author=request.user.photographer.author_id)  # Private photos
 
     if public_list:
         public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?')  # public photos
@@ -431,6 +426,7 @@ def videos(request, pid):
                'view': 'videos',
                }
     return render(request, 'display/videos.html', context)
+
 
 
 import openai

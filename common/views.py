@@ -359,6 +359,39 @@ def species(request, app=None):
     return render(request, "common/species.html", context)
 
 
+def infraspecific(request, app, pid):
+    role = getRole(request)
+
+    Species = apps.get_model(app, 'Species')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+
+    write_output(request, species.binomial)
+
+    # Infraspecifics exists only for species and natural hybrids
+    if species.type == 'hybrid' and species.source == 'RHS':
+        infraspecific_list = []
+        canonical_url = ''
+    else:
+        this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
+        main_species = Species.objects.filter(binomial=this_species_name)
+        if len(main_species) > 0:
+            species = main_species[0]
+
+        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
+        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{pid}/')
+
+    context = {'infraspecific_list': infraspecific_list, 'species': species,
+               'tab': 'infra', 'infra': 'active',
+               'role': role, 'app': app,
+               'canonical_url': canonical_url,
+               }
+    return render(request, 'common/infraspecific.html', context)
+
+
 def rank_update(rank, orid, SpcImages):
     try:
         image = SpcImages.objects.get(pk=orid)
@@ -631,7 +664,7 @@ def mypaginator(request, full_list, page_length, num_show):
 
 
 def delete_file(app, orid):
-    # look in uploaded files first
+    # Check uploaded files and delete uploaded image
     try:
         UploadFile = apps.get_model(app, 'UploadFile')
         upl = UploadFile.objects.get(id=orid)
@@ -647,7 +680,8 @@ def delete_file(app, orid):
         return False
 
 
-def delete_image(app, spc_obj):
+def delete_image(app, orid, spc_obj):
+    # Delete spcimages or hybridInstance and delete image file if already ingested.
     if spc_obj.type == 'hybrid' and spc_obj.family.family == 'Orchidaceae':
         Images = apps.get_model(app, 'HybImages')
     else:
@@ -701,7 +735,7 @@ def deletephoto(request, orid, pid=None):
     if pid:
         try:
             species = Species.objects.get(pk=pid)
-            st = delete_image(app, species)
+            st = delete_image(app, orid, species)
         except Species.DoesNotExist:
             st = True
     else:
@@ -750,7 +784,7 @@ def deletewebphoto(request, pid):
 
     orid = int(request.GET.get('id', None))
     if orid:
-        st = delete_image(app, species)
+        st = delete_image(app, orid, species)
         if st:
             delete_file(app, orid)
 

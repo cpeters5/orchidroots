@@ -54,7 +54,6 @@ def get_full_search_string(Genus, search_string):
         genus_string = search_string
     else:
         (genus_string, rest) = search_string.split(' ', 1)
-    print("get_full_search_string", genus_string)
     try:
         genus = Genus.objects.get(genus=genus_string)
     except Genus.DoesNotExist:
@@ -238,20 +237,16 @@ def query_orchidaceae_binomial(search_term, search_term1, search_term2, min_scor
 def match_fulltext(search_string):
     # Firest match orchid species  (most popular)
     search_list1 = query_orchidaceae_species(search_string, search_string,  search_string, min_score=20, max_rec=5)
-    print("search: 2.1 search_list1", search_list1)
 
     # Then match orchid binomial
     search_list2 = query_orchidaceae_binomial(search_string, search_string, search_string, min_score=5, max_rec=5)
-    print("search: 2.2 search_list2", search_list2)
     # Then match common name
 
     # Then search non-orchids common_name
     search_list3 = query_commonname_binomial(search_string, search_string, search_string, min_score=5, max_rec=5)
-    print("search: 2.3 search_list3", search_list3)
 
     # Then search non-orchids binomial
     search_list4 = query_commonname_commonname(search_string, search_string, search_string, min_score=5, max_rec=5)
-    print("search: 2.4 search_list4", search_list4)
 
     # Get a combined list
     return search_list1, search_list2, search_list3, search_list4
@@ -259,7 +254,6 @@ def match_fulltext(search_string):
 
 def match_orchid(search_string):
     # First match genus
-    print("search_string", search_string)
     perfect_querysets = []  # Use this to collect querysets
     Species = apps.get_model('orchidaceae', 'Species')
     if len(search_string.split()) >= 2:
@@ -276,7 +270,6 @@ def match_orchid(search_string):
 
     if spc_list.exists():
         perfect_querysets.append(spc_list)
-    print("perfect_querysets =", perfect_querysets)
 
     # Now, merge all collected querysets
     if perfect_querysets:
@@ -285,7 +278,6 @@ def match_orchid(search_string):
             merged_queryset = merged_queryset | queryset
     else:
         merged_queryset = Species.objects.none()  # or any model to create an empty queryset
-    # print("merged_queryset =", merged_queryset)
 
     # Second get partial matches, ignoring perfect matches found above.
     startswith_matches = []
@@ -298,7 +290,6 @@ def match_orchid(search_string):
             ).exclude(Q(binomial=search_string) | Q(species=search_string))
             if spc_list.exists():
                 startswith_matches.append(spc_list)
-            # print("startswith_matches =", startswith_matches)
 
     # Now, merge all collected querysets
     if startswith_matches:
@@ -307,14 +298,10 @@ def match_orchid(search_string):
             startswith_queryset = startswith_queryset | queryset
     else:
         startswith_queryset = Species.objects.none()  # or any model to create an empty queryset
-    # print("startswith_queryset =", startswith_queryset)
 
 
     # Extend combined_list with the queryset converted to a list if not empty
     combined_results = list(chain(merged_queryset, startswith_queryset))
-    # print("merged_queryset =", merged_queryset)
-    # print("startswith_queryset =", startswith_queryset)
-    # print("combined results =", combined_results)
     return combined_results
 
 
@@ -363,9 +350,7 @@ def search(request):
 
 
 
-    print("1. search_string", search_string)
     search_string = clean_search_string(search_string)
-    print("1. search_string normalized", search_string)
 
     # If no search string given, return
     if not search_string or search_string == '':
@@ -417,11 +402,9 @@ def search(request):
         # Try the obvious first! Put basic query against Species.binomial and species.species here
         # First try straight forward matching (binoial and species)
         match_spc_list = match_orchid(search_string)
-        print("1. search_string", search_string)
         if not match_spc_list:
             genus, full_search_string = get_full_search_string(Genus, search_string)
             match_spc_list = match_orchid(full_search_string)
-            print("2. full_search_string", full_search_string)
 
         if match_spc_list:
             write_output(request, search_string)
@@ -441,7 +424,6 @@ def search(request):
         genus, full_search_string = get_full_search_string(Genus, search_string)
         spc_string = clean_name(full_search_string)
         # If genus belongs to orchid famil, redirect to orchidaceae search
-        print("genus = ", genus)
         if isinstance(genus, Genus):
             if genus.family.family == 'orchidaceae':
                 url = "%s?search_string=%s&genus=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus)
@@ -462,9 +444,7 @@ def search(request):
         # if requested application is empty or unknown, look for genus in each app in Applications
         for app in applications:
             Genus = apps.get_model(app, 'Genus')
-            # print("search: 3 app", app)
             genus, full_search_string = get_full_search_string(Genus, search_string)
-            # print("search: 3 genus", genus)
 
             if genus and genus.family.family == 'Orchidaceae':
                 url = "%s?search_string=%s&genus=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus)
@@ -553,7 +533,6 @@ def xsearch(request):
     # If found, get family and application
     # From list of genera, find matching species from the rest of search string.
     # if no results, redirect to common name search
-    print("1 search begins")
     role = getRole(request)
     search_list = []
     genus_list = []
@@ -582,7 +561,6 @@ def xsearch(request):
     search_string = clean_search_string(search_string)
 
     search_string_collapsed = clean_search_string(search_string)
-    print(search_string_collapsed)
 
     # If no search string given, return
     if not search_string or search_string == '':
@@ -595,18 +573,15 @@ def xsearch(request):
         # First try straight forward matching (binoial and species)
         Genus = apps.get_model('orchidaceae', 'Genus')
         match_spc_list = match_orchid(search_string)
-        print("1. search_string", search_string)
         if not match_spc_list:
             genus, full_search_string = get_full_search_string(Genus, search_string)
             match_spc_list = match_orchid(full_search_string)
-            print("2. full_search_string", full_search_string)
         if not match_spc_list:
             words = full_search_string.split()
             if words:
                 words[0] = ''
             species = ' '.join(words)
             match_spc_list = match_orchid(species)
-            print("3. species", species)
 
 
 
@@ -658,13 +633,10 @@ def xsearch(request):
     # If app is requested, will  only search in the requested app space.
     elif selected_app in applications:
         # If app is valid, collect all matching genera in each app
-        print("search: selected_app", selected_app)
         Genus = apps.get_model(selected_app, 'Genus')
         # Identify genus and expand genus abreviation if exists in search_string
         genus, full_search_string = get_full_search_string(Genus, search_string)
-        print("search: 2 genus", genus)
         spc_string = clean_name(full_search_string)
-        print("search: spc_string", spc_string)
         # If genus belongs to orchid famil, redirect to orchidaceae search
         if isinstance(genus, Genus):
             # For orchid, goto search_orchidaceae
@@ -694,9 +666,7 @@ def xsearch(request):
         for app in applications:
             Genus = apps.get_model(app, 'Genus')
             Species = apps.get_model(app, 'Species')
-            print("search: 3 app", app)
             genus, full_search_string = get_full_search_string(Genus, search_string)
-            print("search: 3 genus", genus)
             # If genus is identified as orchid, send it to search_orchid
             if genus and genus.family.family == 'Orchidaceae':
                 url = "%s?search_string=%s&genus=%s" % (reverse('search:search_orchidaceae'), search_string, genus.genus)
@@ -709,11 +679,9 @@ def xsearch(request):
                 Species = apps.get_model(family.application, 'Species')
                 this_match_spc_list = Species.objects.filter(genus=genus).filter(binomial__icontains=full_search_string)
                 match_spc_list = list(chain(match_spc_list, this_match_spc_list))
-                print("search: genus is an instance?", app, match_spc_list)
 
     if len(match_spc_list) == 0:
         this_match_spc_list = query_binomial_non_orchid(search_string, search_string, search_string, 10, 20)
-        print("search: Matches found", this_match_spc_list)
         for x in this_match_spc_list:
             # this_mathch_spc_list contain only Accepted and Hybrid level
             Species = apps.get_model(x['application'], 'Species')
@@ -749,7 +717,6 @@ def xsearch(request):
 
     # # Found one already!
     # if len(match_spc_list) > 0:
-    #     print("search: Matches found - get out", match_spc_list)
     #     context = {'search_string': full_search_string, 'genus_list': genus_list,
     #                'match_spc_list': match_spc_list,
     #                'other_genus_spc': other_genus_spc,
@@ -762,7 +729,6 @@ def xsearch(request):
         search_list = search_string.split()
 
     if genus_list:
-        print("search: 4 in genus_list", genus_list)
         # Get species for each genus in the list
         for genus in genus_list:
             if ' ' not in search_string:
@@ -840,9 +806,7 @@ def xsearch(request):
     # unknown genus, probably misspelled, or search string didn't include genus.
     # Forget genus and match species instead
 
-    print("search: 5 No genus_list")
     if selected_app in applications:
-        print("search: 6 selected_app", selected_app)
         Species = apps.get_model(selected_app, 'Species')
         # Look foir matching binomial with entire search string OR matchind species with elements in search_list
         this_spc_list = Species.objects.filter(
@@ -854,7 +818,6 @@ def xsearch(request):
                    }
         return render(request, "search/search_species.html", context)
     else:
-        print("search: 7 give up. Got to search common name")
         # When all else fails, send it to common nma e search?
         url = "%s?commonname=%s" % (
         reverse('search:search_name'), search_string)
@@ -968,10 +931,8 @@ def search_name(request):
     if not commonname:
         commonname = request.POST.get('commonname', '').strip()
     commonname = commonname.rstrip('s')
-    print("name: commonname", commonname)
     commonname = clean_search_string(commonname)
     commonname_clean = clean_name(commonname)
-    print("name: commonname", commonname)
 
     if not commonname or commonname == '':
         context = {'role': role, }
@@ -1012,7 +973,6 @@ def search_name(request):
 
 # From redirect only. This view is all about orchids
 def search_orchidaceae(request):
-    print("orchid: Redirected to orchid search")
     Genus = apps.get_model('orchidaceae', 'Genus')
     Species = apps.get_model('orchidaceae', 'Species')
     family = Family.objects.get(pk='Orchidaceae')
@@ -1040,7 +1000,6 @@ def search_orchidaceae(request):
     search_string.strip()
     genus, search_string = get_full_search_string(Genus, search_string)
     search_string = clean_search_string(search_string)
-    print("orchid: search_string", search_string)
     # Try to separate genus from species
     if ' ' not in search_string:
         #  This could possibly be genus
@@ -1059,11 +1018,9 @@ def search_orchidaceae(request):
 
     # matching genus
     if genus_string:  # Seach genus table
-        print("orchid: genus_string", genus_string)
         try:
             matched_genus = Genus.objects.get(genus=genus)
             genus_list = [[matched_genus, matched_genus.get_best_img()]]
-            print("orchid: 1 matched_genus", matched_genus)
 
             if matched_genus:
                 matched_genus.img = matched_genus.get_best_img()
@@ -1104,9 +1061,7 @@ def search_orchidaceae(request):
     # Known genus, just get matching species.
 #COMPARE UPTO HERE
     if matched_genus:
-        print("orchid: found genus", matched_genus)
         if spc_string:
-            print("orchid: spc_string", spc_string)
             # match_spc_list = Species.objects.filter(genus=matched_genus, species__istartswith=spc_string[:1])
             # match_spc_list = CommonName.objects.filter(common_name__istartswith=spc_string[:1])
             # pid_list = Binomial.objects.filter(genus=matched_genus, species__istartswith=spc_string).values_list('taxon_id', flat=True)
@@ -1115,10 +1070,8 @@ def search_orchidaceae(request):
             if this_match_spc_list:
                 pid_list = [t['pid'] for t in this_match_spc_list]
 
-            print("orchid: pid_list", pid_list)
             if not pid_list:
                 spc_string = str(genus) + clean_name(spc_string)
-                print("orchid: spc_string", spc_string)
                 pid_list = Species.objects.annotate(clean_field=RemoveSpaces('binomial')).filter(clean_field=spc_string)
             if pid_list:
                 match_spc_list = Species.objects.filter(pid__in=pid_list)
@@ -1229,7 +1182,6 @@ def search_orchidaceae(request):
         # If still no clue, send to common name search!
         if not match_spc_list:
             # In case the first word has been identified as a valid genus, remove it before redirection
-            print("orchid: 3 matched_genus", matched_genus)
             if matched_genus:
                 search_string = spc_string
             url = "%s?commonname=%s" % (reverse('search:search_name'), search_string)
@@ -1262,7 +1214,6 @@ def search_test(request):
         search_string = request.POST.get('search_string', '').strip()
     search_string = search_string.rstrip('s')
     search_string_clean = clean_name(search_string)
-    print("name: search_string", search_string)
 
     if not search_string or search_string == '':
         context = {'role': role, }

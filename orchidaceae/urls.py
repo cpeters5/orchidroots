@@ -18,7 +18,6 @@ urlpatterns = [
     path('ancestrytree/<int:pid>/', views.ancestrytree, name='ancestrytree'),
     path('ancestrytree/', views.ancestrytree, name='ancestrytree'),
     path('synonym/<int:pid>/', views.synonym, name='synonym'),
-    path('infraspecific/<int:pid>/', views.infraspecific, name='infraspecific'),
     path('progeny/<int:pid>/', views.progeny, name='progeny'),
     path('progenyimg/<int:pid>/', views.progenyimg, name='progenyimg'),
     path('progenyimg/', views.progenyimg, name='progenyimg'),
@@ -45,5 +44,8 @@ urlpatterns = [
     path('curateinfohyb/<int:pid>/', detail_curateinfohyb, name='curateinfohyb'),
     path('compare/<int:pid>/', detail_compare, name='compare'),
     path('createhybrid/', detail_createhybrid, name='createhybrid'),
+
+    # Transferredf to common
+    path('infraspecific/<int:pid>/', views.infraspecific, name='infraspecific'),
 
 ]

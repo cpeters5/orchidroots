@@ -9,32 +9,47 @@
     <meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YM7ZEG2RY1');
+    </script>
+
+    <!-- favicons -->
     <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
     <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
     <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
 
-    <!-- jQuery -->
+    <!-- jquery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- navbar jQuery -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!--    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Lightbox -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
 
     <!-- Font Awesome -->
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
 
-    <!-- Google Fonts -->
-    <!--<link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Fondamento" rel="stylesheet">-->
-    <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
-
     <!-- Custom CSS -->
-    <!--<link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">-->
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
     <link rel="stylesheet" href="{% static '/utils/css/style.css' %}">
     <link rel="stylesheet" href="{% static '/utils/css/index.css' %}">
+
 </head>
 
 
@@ -475,7 +490,7 @@ nav .search-container button:hover {
 }
 
 .active1 {
-    background-color: #202978 !important;
+    background-color: #202e8e !important;
 }
 
 /* DataTable style*/
@@ -613,7 +628,7 @@ nav .search-container button:hover {
         <div class="collapse navbar-collapse" id="nav-content">
             <form class="form-inline" id="search" action="/search/search/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="taxon or registered hybrid" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" style="border:1px solid #ccc; border-right: 0">
             </form>
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
@@ -632,9 +647,8 @@ nav .search-container button:hover {
                                     {% if species %}
                                         <li><a class="dropdown-item" href="{% url 'display:photos' app species.pid %}?role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
                                     {% else %}
-                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' aves %}?role=cur&family={{family.family|default:'Orchidaceae'}}" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' aves %}?role=cur&family={{family.family|default:'Orchidaceae'}}&alpha=A" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'gallery:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Gallery</a></li>
                                 {% endif %}
                                     <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" rel="nofollow noreferrer noopener" data-nosnippet>View new uploads</a></li>
                             {% endif %}
@@ -728,7 +742,7 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'aves' %}?role={{role}}" data-nosnippet>Bird taxonomy</a></li>
              <li><a class="dropdown-item" href="{% url 'common:family' 'aves' %}?role={{role}}" data-nosnippet>Bird families</a></li>
              <li><a class="dropdown-item" href="{% url 'common:genera' 'aves' %}?role={{role}}" data-nosnippet>Bird genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?app=aves&role={{role}}" data-nosnippet>Bird species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?role={{role}}" data-nosnippet>Bird species</a></li>
              <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?role={{role}}&alpha=A" data-nosnippet>Bird images</a></li>
          </ul>
      </div>
@@ -740,22 +754,10 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'animalia' %}?role={{role}}" data-nosnippet>Anoimal taxonomy</a></li>
              <li><a class="dropdown-item" href="{% url 'common:family' 'animalia' %}?role={{role}}" data-nosnippet>Animal families</a></li>
              <li><a class="dropdown-item" href="{% url 'common:genera' 'animalia' %}?role={{role}}" data-nosnippet>Animal genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?app=animalia&role={{role}}" data-nosnippet>Animal species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?role={{role}}" data-nosnippet>Animal species</a></li>
              <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?role={{role}}&alpha=A" data-nosnippet>Animal images</a></li>
          </ul>
      </div>
-     <div class="btn-group">
-         <button type="button" class="btn btn-primary fambtn dropdown-toggle {% if app == 'gallery' %}active1{% endif %}" data-bs-toggle="dropdown" aria-expanded="false">
-             McGivens
-         </button>
-         <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
-             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
-             <li><a class="dropdown-item" href="{% url 'gallery:index' %}?" data-nosnippet>Givens Gallery</a></li>
-         </ul>
-     </div>
-<!--     &nbsp;&nbsp;<a class="btn btn-primary fambtn {% if from_path == 'distribution' %}active1{% endif %}" href="{% url 'common:distribution' %}?family={{family|default:'Orchidaceae'}}&role={{cur}}">Native Plants</a>-->
-
     </div>
 
 </div>
@@ -769,51 +771,44 @@ nav .search-container button:hover {
 
 
 {% block extra-scripts %}
-<!--    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>-->
-<!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>-->
-<!--    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>-->
-<!--    <script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>-->
-<!--<script>-->
-
-<!--    (function($) {-->
-
-<!--  $('#search-button').on('click', function(e) {-->
-<!--    if($('#search-input-container').hasClass('hdn')) {-->
-<!--      e.preventDefault();-->
-<!--      $('#search-input-container').removeClass('hdn')-->
-<!--      return false;-->
-<!--    }-->
-<!--  });-->
-
-<!--  $('#hide-search-input-container').on('click', function(e) {-->
-<!--    e.preventDefault();-->
-<!--    $('#search-input-container').addClass('hdn')-->
-<!--    return false;-->
-<!--  });-->
-
-<!--})(jQuery);-->
-
-
-<!--document.getElementById('search').addEventListener('submit', function(event) {-->
-<!--    var input = document.getElementById('your-input-id').value;-->
-<!--    if (!/^[\u0000-\u007F]*$/.test(input)) {-->
-<!--        event.preventDefault();-->
-<!--        alert('Please use only supported characters.');-->
-<!--    }-->
-<!--});-->
-
-<!--</script>-->
-
-{% endblock %}
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-YM7ZEG2RY1');
+    (function($) {
+
+  $('#search-button').on('click', function(e) {
+    if($('#search-input-container').hasClass('hdn')) {
+      e.preventDefault();
+      $('#search-input-container').removeClass('hdn')
+      return false;
+    }
+  });
+
+  $('#hide-search-input-container').on('click', function(e) {
+    e.preventDefault();
+    $('#search-input-container').addClass('hdn')
+    return false;
+  });
+
+})(jQuery);
+
+
+document.getElementById('search').addEventListener('submit', function(event) {
+    var input = document.getElementById('your-input-id').value;
+    if (!/^[\u0000-\u007F]*$/.test(input)) {
+        event.preventDefault();
+        alert('Please use only supported characters.');
+    }
+});
+
 </script>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YM7ZEG2RY1"></script>
+{% endblock %}
+
+    <!-- jQuery (if not already included) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Lightbox JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 
 </body>
 </html>
