@@ -1,5 +1,5 @@
 # OrchidRoots project
-A curated list of living things. 
+A curated list of orchids and other living things. Maintained by Chariya Punyanitya
 Maintained by Chariya Punyanitya
 
 
@@ -43,4 +43,5 @@ For questions or feedback, feel free to reach out:
 * Name: Chariya Punyanitya
 * Email: cpeters5@yahoo.com
 * Github profile: https://github.com/cpeters5
+
 

@@ -216,7 +216,7 @@ input[type=text] {
                                         <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
                                     {% else %}
                                         <a class="btn btn-primary btn-xs" href="#">
-                                            Create a new grex
+                                            Create a new grex - {{species.binomial}} × {{species2.binomial}}
                                         </a>
                                     {% endif %}
                                 {% else %}

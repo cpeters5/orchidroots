@@ -40,7 +40,6 @@ alpha_list = config.alpha_list
 app = 'orchidaceae'
 family = 'Orchidaceae'
 
-
 # orchidaceae application is specificly for Orchidaceae family only.
 
 # List genera
@@ -88,10 +87,8 @@ def genera(request):
                 except Subtribe.DoesNotExist:
                     sf_obj = ''
 
-
     # subfamily, tribe or subtribe requests override genus request!
     genustype = request.GET.get('genustype', 'all')
-
     formula1 = request.GET.get('formula1', '')
     formula2 = request.GET.get('formula2', '')
     status = request.GET.get('status', '')
@@ -191,7 +188,6 @@ def series(request):
     series_list = Series.objects.order_by('series')
     context = {'series_list': series_list, 'title': 'series', 'app': 'orchidaceae', }
     return render(request, 'orchidaceae/series.html', context)
-
 
 # Get the list of matching genus along with related generaa
 def getPartialPid(reqgenus, type, status):
@@ -643,7 +639,6 @@ from django.db import connection
 from django.db.models import Subquery, OuterRef, Value, IntegerField, Q
 from django.db.models.functions import Greatest
 
-
 def get_des_list(pid, syn_list):
     base_query = AncestorDescendant.objects.filter(pct__gt=30)
 
@@ -750,6 +745,7 @@ def progeny(request, pid):
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
                'canonical_url': canonical_url,
                }
+
     return render(request, 'orchidaceae/progeny.html', context)
 
 
@@ -853,7 +849,6 @@ def mypaginator(request, full_list, page_length, num_show):
         # My new page range
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
-
 
 
 #  in progress

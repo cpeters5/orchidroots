@@ -154,10 +154,8 @@ def taxonomy(request, app=None):
             app = 'orchidaceae'
 
     canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/')
-
     # non canonical url
     if 'app' in request.GET:
-        print("prepare to redirect!")
         # Redirect permanent to preferred url
         return HttpResponsePermanentRedirect(canonical_url)
 

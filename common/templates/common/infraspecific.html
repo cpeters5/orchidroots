@@ -1,0 +1,90 @@
+{% load static %}
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
+<head>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>The list of infraspecific taxa of {{species.binomial}}</title>
+    <meta name='description' content='Infraspecific taxa of {{species.binomial}}'>
+</head>
+
+<style>
+.progen {
+    margin:0 auto;
+    width:90%;
+    font-size: 14px;
+}
+@media only screen and (max-width: 700px){
+    .progen {
+        width:95%;
+        font-size: 10px;
+    }
+}
+</style>
+
+
+    <div class="progen">
+        <!--main section-->
+    {% include "common/detail-nav.html" %}
+    <div class="tab-content clearfix">
+        <br>
+        <h1 class="hidden-h1">Infraspecific Taxa of {{species.binomial}}</h1>
+        <h6>Infraspecific Taxa of {{species.binomial}}</h6>
+        <br>
+        <table id="sortTable" class="table table-condensed table-sm table-hover">
+            <thead style="background-color: #e3e3e3">
+                <th>Infra species - {{infraspecific_list|length}}</th>
+            </thead>
+            {% for infra in infraspecific_list %}
+            <tr style="text-align: left">
+                <td><a href="{% url 'display:photos' species.family.application infra.pid %}?role={{role}}"><i>{{infra.binomial_it|safe}}</i></a></td>
+            </tr>
+            {% endfor %}
+     </table>
+    </div>
+
+
+</div>
+
+{% include "base-datatable.html" %}
+
+<script>
+
+$(document).ready(function() {
+    var dataTable = $('#sortTable').dataTable({
+        "pageLength": 100,
+        "aLengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "lengthChange": false,
+        "bPaginate": true,
+        "colReorder": true,  // Enable column reordering
+        "order": [[ 0, "asc" ]],
+ 	    "fnPreDrawCallback": function( oSettings ) {
+            $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter results'});//tips
+        },
+
+        "dom": "<'row'<'col-sm-4'f><'col-sm-4'i><'col-sm-4'p>>" + "<'row'<'col-sm-12'tr>>",
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "None",
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Check if the total number of rows is less than or equal to the page length
+            if (pageInfo.recordsTotal <= pageInfo.length) {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
+            } else {
+                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
+            }
+        }
+
+
+    });
+});
+
+
+</script>
+
+{% endblock %}
