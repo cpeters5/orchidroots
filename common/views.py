@@ -1,11 +1,11 @@
-import string
+
 import re
 import os
 import logging
 import random
 import shutil
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
@@ -905,7 +905,7 @@ def myphoto(request, pid):
     except Species.DoesNotExist:
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
-    if not request.user.is_authenticated  or request.user.tier.tier < 2:
+    if not request.user.is_authenticated or request.user.tier.tier < 2:
         url = "%s?role=%s&family=%s" % (reverse('display:information', args=(pid,)), role, species.gen.family)
         return HttpResponseRedirect(url)
     else:

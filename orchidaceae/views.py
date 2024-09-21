@@ -818,14 +818,12 @@ def mypaginator(request, full_list, page_length, num_show):
         page_range = paginator.page_range[start_index:end_index]
     return page_range, page_list, last_page, next_page, prev_page, page_length, page, first_item, last_item
 
-<<<<<<< Updated upstream
-=======
-# Permanently moved to common for other applications
+
 def infraspecific(request, pid):
     role = getRole(request)
     canonical_url = request.build_absolute_uri(f'/common/infraspecific/{app}/{pid}/?role={role}')
     return HttpResponsePermanentRedirect(canonical_url)
->>>>>>> Stashed changes
+
 
 #  in progress
 def get_distlist():
