@@ -3,7 +3,7 @@
 Thank you for considering contributing to [Project Name]! We appreciate your help in making this project better. Here are some guidelines to get you started.
 
 ## Table of Contents
-* [Getting Started](#getting started)
+* [Getting Started](#getting-started)
 * How to Contribute
 * Reporting Bugs
 * Submitting Code Changes
