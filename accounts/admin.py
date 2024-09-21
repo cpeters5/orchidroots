@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, Profile
 
 from .forms import UserAdminCreationForm, UserAdminChangeForm
-from .models import User, Profile, Photographer, Sponsor
+from .models import User, Profile, Photographer
 
 # Disable admin nav_sidebar which is messed up after update to django 3.2.3
 admin.autodiscover()
@@ -54,20 +54,9 @@ class PhotographerAdmin(admin.ModelAdmin):
     search_fields = ['author_id','fullname','displayname']
 
 
-class SponsorAdmin(admin.ModelAdmin):
-    pass
-    list_display = ('title','pitch','short_description','author', 'is_active',  'start_date', 'end_date', )
-    list_filter = ('title','pitch', 'start_date', 'end_date',)
-    fields = [('title','pitch','author','is_active'),'short_description','description','sponsor_url',('image_file', 'image_file_path'), ('start_date', 'end_date')]
-    ordering = ['title']
-    search_fields = ['title','pitch', 'start_date', 'end_date']
-
-
-
 admin.site.register(User, UserAdmin)
 admin.site.register(Profile)
 admin.site.register(Photographer,PhotographerAdmin)
-admin.site.register(Sponsor,SponsorAdmin)
 
 
 

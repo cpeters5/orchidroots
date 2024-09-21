@@ -11,11 +11,11 @@ from django.urls import reverse
 import django.shortcuts
 from itertools import chain
 from django.apps import apps
-from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_random_sponsor, get_application, handle_bad_request
+from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_application, handle_bad_request
 from common.views import rank_update, quality_update
 from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
-from accounts.models import User, Photographer, Sponsor
+from accounts.models import User, Photographer
 from urllib.parse import urlencode
 import utils.config
 

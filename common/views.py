@@ -19,7 +19,7 @@ from django.apps import apps
 from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 from utils import config
-from utils.views import write_output, getRole, get_author, get_reqauthor, getSuperGeneric, pathinfo, get_random_sponsor, get_application
+from utils.views import write_output, getRole, get_author, get_reqauthor, getSuperGeneric, pathinfo, get_application
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
@@ -133,16 +133,10 @@ def home(request):
             animalia_obj = ''
         all_list = all_list + [["Aves", animalia_obj]]
 
-    # Advertisement
-    # num_blocks = 5
-    # ads_insert = int(random.random() * num_blocks) + 1
-    # sponsor = get_random_sponsor()
     random.shuffle(all_list)
 
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
-               # 'orchid_list': orchid_list,
                'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj, 'role': role,
-               # 'ads_insert': ads_insert, 'sponsor': sponsor,
                }
     return render(request, 'home.html', context)
 

@@ -174,17 +174,6 @@ def pathinfo(request):
     path  = request.path.split('/')[2:][0]
     return path
 
-# Not used
-def get_random_sponsor():
-    from accounts.models import Sponsor
-    from django.utils.timezone import datetime
-    today = datetime.today().date()
-    sponsors = Sponsor.objects.filter(is_active=1).filter(end_date__gte=today).order_by('?')[0:1]
-    sponsor = None
-    if sponsors:
-        sponsor = sponsors[0]
-    return sponsor
-
 # Get family and app from request
 # If not exist, force return Orchidaceae
 def get_application(request):

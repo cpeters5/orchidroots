@@ -420,65 +420,6 @@ def hybrid(request):
     return render(request, 'orchidaceae/hybrid.html', context)
 
 
-# Implementing serverside datatable (in progress)
-def datatable_hybrid(request):
-    # Get start and length parameters
-    start = int(request.GET.get('start', 0))
-    length = int(request.GET.get('length', 10))
-
-    # Get search value
-    search_value = request.GET.get('search[value]', '')
-
-    # Get order column and direction
-    order_column = request.GET.get('order[0][column]', 0)
-    order_dir = request.GET.get('order[0][dir]', 'asc')
-
-    # Define column list
-    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]
-
-    # Construct queryset
-    queryset = YourModel.objects.all()
-
-    # Apply search
-    if search_value:
-        queryset = queryset.filter(
-            Q(name__icontains=search_value) |
-            Q(email__icontains=search_value)
-        )
-
-    # Get total record count
-    total_records = queryset.count()
-
-    # Apply ordering
-    if order_dir == 'asc':
-        queryset = queryset.order_by(columns[int(order_column)])
-    else:
-        queryset = queryset.order_by(f'-{columns[int(order_column)]}')
-
-    # Apply pagination
-    queryset = queryset[start:start + length]
-
-    # Prepare data for response
-    data = []
-    for item in queryset:
-        data.append([
-            item.id,
-            item.name,
-            item.email,
-            # Add more fields as needed
-        ])
-
-    # Prepare response
-    response = {
-        'draw': int(request.GET.get('draw', 1)),
-        'recordsTotal': total_records,
-        'recordsFiltered': total_records,
-        'data': data,
-    }
-
-    return JsonResponse(response)
-
-
 def ancestor(request, pid=None):
     if not pid:
         pid = request.GET.get('pid', '')
@@ -825,7 +766,8 @@ def infraspecific(request, pid):
     return HttpResponsePermanentRedirect(canonical_url)
 
 
-#  in progress
+# in progress
+# Ditribution (start with orchid only)
 def get_distlist():
     dist_list = Localregion.objects.exclude(id=0).order_by('continent_name', 'region_name', 'name')
     prevcon = ''
@@ -850,6 +792,10 @@ def browsedist(request):
 # in progress
 # Serverside processing for large datatable responses
 # Common query function
+# Ajax view
+from django.http import JsonResponse
+from utils.json_encoder import LazyEncoder
+
 def get_filtered_data_spc(start, length, search_value=None, order_column='id', order_dir='asc'):
     query = Employee.objects.all()
     if search_value:
@@ -863,10 +809,6 @@ def get_filtered_data_spc(start, length, search_value=None, order_column='id', o
     total_count = query.count()
     query = query[start:start + length]
     return query, total_count
-
-# Ajax view
-from django.http import JsonResponse
-from utils.json_encoder import LazyEncoder
 
 def server_processing_spc(request):
     start = int(request.GET.get('start', 0))
@@ -890,12 +832,62 @@ def server_processing_spc(request):
     }
     return JsonResponse(response, encoder=LazyEncoder)
 
-# initial html view using the shared function
-# from django.shortcuts import render
+# Implementing serverside datatable (in progress)
+def datatable_hybrid(request):
+    # Get start and length parameters
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 10))
 
-# def species(request):
-#     # Using default parameters to fetch initial data for display
-#     employees, _ = get_filtered_data_spc(0, 10)  # Fetch the first 10 entries
-#     return render(request, 'species.html', {'employees': employees})
+    # Get search value
+    search_value = request.GET.get('search[value]', '')
+
+    # Get order column and direction
+    order_column = request.GET.get('order[0][column]', 0)
+    order_dir = request.GET.get('order[0][dir]', 'asc')
+
+    # Define column list
+    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]
+
+    # Construct queryset
+    queryset = YourModel.objects.all()
+
+    # Apply search
+    if search_value:
+        queryset = queryset.filter(
+            Q(name__icontains=search_value) |
+            Q(email__icontains=search_value)
+        )
+
+    # Get total record count
+    total_records = queryset.count()
+
+    # Apply ordering
+    if order_dir == 'asc':
+        queryset = queryset.order_by(columns[int(order_column)])
+    else:
+        queryset = queryset.order_by(f'-{columns[int(order_column)]}')
+
+    # Apply pagination
+    queryset = queryset[start:start + length]
+
+    # Prepare data for response
+    data = []
+    for item in queryset:
+        data.append([
+            item.id,
+            item.name,
+            item.email,
+            # Add more fields as needed
+        ])
+
+    # Prepare response
+    response = {
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': total_records,
+        'recordsFiltered': total_records,
+        'data': data,
+    }
+
+    return JsonResponse(response)
 
 
