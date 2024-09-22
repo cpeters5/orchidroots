@@ -5,26 +5,27 @@
 {% load testtags %}
 <style>
 table {
-  padding: 100px;
-  margin-left: auto;
-  margin-right: auto;
+    padding: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 14px;
 }
 td {
     /*border: 1px solid lightgrey;*/
     padding: 10px;
 }
 .thumbnails {
-   object-fit: cover;
-   overflow: hidden;
-   height: 100px;
-   width : auto;
-   margin:5px auto;
+    object-fit: cover;
+    overflow: hidden;
+    height: 100px;
+    width : auto;
+    margin:5px auto;
 }
 
 @media only screen and (max-width: 600px) {
     table {
         width: 100%;
-        font-size:10px;
+        font-size:12px;
     }
     .thumbnails {
        height: 80px;
@@ -37,58 +38,84 @@ td {
 
 }
 </style>
-<div style="min-height:200px;background-color:white;width: 100%;">
-    <div style="clear:both"></div>
-    <div class="row" style="margin:0 auto;">
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
-            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
-                <br>
-                <div style="text-align: center;">
-                    <h5>Search results.html for "{{search_string}}"</h5>
-                </div>
-
-                <form action="{% url 'search:search_name' %}" method="post">
-                   {% csrf_token %}
-                    <select class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
-                        <option value="">Select domain</option>
-                        {% for option in options %}
-                            <option value="{{ option.value }}" {% if selected_app  == option.value %}selected{% endif %}>
-                                {{ option.text }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <input type="hidden" name="commonname" value="{{ commonname }}">
-                </form>
-
-                <table class="table-bordered">
-                    <tr><td><b>Species</b></td><td><b></b></td></tr>
-                    {% if match_spc_list %}
-                    {% for species in match_spc_list %}
-                        <tr>
-                            <td style="width:20%;">
-                                <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
-                                    {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
-                            </td>
-                            <td style="width:10%;">
-                                {% if species.status == 'synonym' %}<br> syn.
-                                    {% if species.getAcc %}
-                                        <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
-                                            {{species.getAccepted.binomial}}
-                                        </a>
-                                    {% else %}
-                                        {{species.getAccepted.binomial}} (syn)
-                                    {% endif %}
-                                {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
+<div style="min-height:200px;margin: 0 auto;width: 90%;">
+    <br>
+    <div style="text-align: center;">
+        <h5>Search results for "{{search_string}}" in {{app}}</h5>
+    </div>
+    {% if not matched_genus and not match_spc_list %}
+    <div style="margin-left: 100px;">
+        <br>
+        <ul>
+            <li>If not found, the name might belong to a different genus.  Try removing genus grom your search string</li>
+            <li>You might be in the wrong domain (see navbar).</li>
+            <li>Try selecting a different domain in the nav bar. or switch to</li>
+            <li>In case the name might be a common name, try:&nbsp; &nbsp;
+            <a class="btn btn-primary" href="{% url 'search:search_name' app %}?role={{role}}&search_string={{search_string}}">Search by commonname</a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+    <div class="container m-2"  style="width:100%; display:inline-block; padding-top:0;">
+    {% if matched_genus %}
+        <table class="table table-condensed  table-hover" style="padding-bottom: 0px; width: 85%;">
+            <thead>
+                <th>Genus</th>
+            </thead>
+            <tr>
+                {% for match in matched_genus %}
+                <td>
+                    {% if not match.type == 'species' %}
+                        <a href="{% url 'orchidaceae:species' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                        {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
+                    {% else %}
+                         <a href="{% url 'orchidaceae:hybrid' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                     {% endif %}
-                </table>
-            </div>
-        </div>
+                    {% if user.tier.tier > 3 %}
+                    {{match.pid|default:''}}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
+    {% endif %}
+
+    {% if match_spc_list %}
+        <table class="table-bordered table-condensed table-sm table-hover border" id="sortTable" style="font-size: 14px; width: 100%">
+            <thead>
+                <tr>
+                    <th><b>Species</b></th>
+                    <th><b></b></th>
+                </tr>
+            </thead>
+            {% for species in match_spc_list %}
+                <tr>
+                    <td style="width:20%;">
+                        <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                            {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                    </td>
+                    <td style="width:10%;">
+                        {% if species.status == 'synonym' %} syn.
+                            {% if species.getAcc %}
+                                <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                                    {{species.getAccepted.binomial}}
+                                </a>
+                            {% else %}
+                                {{species.getAccepted.binomial}} (syn)
+                            {% endif %}
+                        {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
     </div>
 </div>
+
+
+{% include "base-datatable.html" %}
+
 <script>
 
 $(document).ready(function(){
@@ -118,6 +145,79 @@ $(document).ready(function(){
       select.form.submit();
     }
 
+
+document.getElementById('search').addEventListener('submit', function(event) {
+    var input = document.getElementById('your-input-id').value;
+    if (!/^[\u0000-\u007F]*$/.test(input)) {
+        event.preventDefault();
+        alert('Please use only supported characters.');
+    }
+});
+
+
+
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    var initialFilterValue = "{{ spc | default:'' | escapejs }}";
+    var table = $('#sortTable').DataTable({
+        "info": true,
+        "paging": true,  // Enable paging
+        "lengthChange": false,
+        "pageLength": 50,
+        "lengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "colReorder": true,
+        "columnDefs": [
+            { "type": "priority", "targets": 1 },
+            // { targets: [5, 6, 7], className: 'none' }
+        ],
+        "order": [[0,'asc'],],
+        responsive: true,
+        "dom": "<'row'<'col-sm-6'f><'col-sm-6'p>>" +  // Top pagination
+               "<'row'<'col-sm-12'tr>>" +
+               "<'row'<'col-sm-5'i><'col-sm-7'p>>",  // Bottom pagination
+
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Show/hide info and pagination
+            $('.dataTables_info, .dataTables_paginate').toggle(pageInfo.pages > 1);
+
+            // Adjust the filter and top pagination position
+            if (pageInfo.pages <= 1) {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '10px'
+                });
+                $('.dataTables_paginate:eq(0)').hide();  // Hide top pagination if only one page
+            } else {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '0'
+                });
+                $('.dataTables_paginate:eq(0)').show().css('float', 'right');  // Show top pagination
+            }
+
+            // Log info for debugging
+            console.log("Total pages:", pageInfo.pages);
+            console.log("Current page:", pageInfo.page);
+            console.log("Total records:", pageInfo.recordsTotal);
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_filter input').attr('placeholder', 'Filter results');
+        }
+    });
+
+    // Set initial filter value and draw table
+    $('.dataTables_filter input').val(initialFilterValue);
+    table.search(initialFilterValue).draw();
+});
 
 </script>
 

@@ -102,9 +102,9 @@ td {
     <div style="text-align: center;width: 90%; margin: 0 auto;">
         <br>
         <h1 class="hidden-h1">Search_orchidaceae.html results for  "<i>{{search_string}}</i>"
-            {% if matched_genus %}in {{matched_genus}} genus{% endif %}</h1>
+            {% if matched_genus %}in {{app}}{% endif %}</h1>
         <h5 class="card-title" style="margin-bottom: 0">Search_orchidaceae.html results for  "<i>{{search_string}}</i>"
-            {% if matched_genus %}in {{matched_genus}} genus{% endif %}</h5>
+            {% if matched_genus %}in {{app}}{% endif %}</h5>
         <div id="accordion">
 <!--            <div class="card mt-1 no-border-bg">-->
 <!--&lt;!&ndash;                <div class="card-header no-border-bg">&ndash;&gt;-->
@@ -137,49 +137,20 @@ td {
     {% if matched_genus %}
     <table class="table table-condensed  table-hover" style="padding-bottom: 0px; width: 85%;">
         <tr>
+            {% for match in matched_genus %}
             <td>
-                {% if not matched_genus.type == 'species' %}
-                    <a href="{% url 'orchidaceae:species' %}?app={{matched_genus.family.application}}&role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                {% if not match.type == 'species' %}
+                    <a href="{% url 'orchidaceae:species' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                     {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                 {% else %}
-                     <a href="{% url 'orchidaceae:hybrid' %}?app={{matched_genus.family.application}}&role={{role}}&family=Orchidaceae&genus={{matched_genus}}"><i>{{matched_genus.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                     <a href="{% url 'orchidaceae:hybrid' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                 {% endif %}
                 {% if user.tier.tier > 3 %}
-                {{matched_genus.pid|default:''}}
+                {{match.pid|default:''}}
                 {% endif %}
             </td>
+            {% endfor %}
         </tr>
-    </table>
-    {% elif genus_list %}
-    <table class="table table-condensed  table-hover" style="padding-bottom: 0px; width: 85%;">
-        <tr>
-            <th>Genus not found. Could there be a typo in the name? Here are some closely matched genera:</th>
-            <th></th>
-        </tr>
-        {% for genus in genus_list %}
-            <tr style="background-color: white;">
-                <td>
-                    {% if not genus.genusstat.num_hybrid or genus.genusstat.num_species > 0 %}
-                        <a href="{% url 'common:species' genus.family.application %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a> {{genus.author|default:''}} {{genus.year|default:''}}
-                        {% if genus.status == 'synonym' %}<br>(syn.){% endif %}
-                    {% else %}
-                        {% if genus.family.family == 'Orchidaceae' %}
-                            <a href="{% url 'orchidaceae:hybrid' %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus.genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
-                        {% else %}
-                            <a href="{% url 'common:hybrid' genus.family.application %}?role={{role}}&family={{genus.family|default:'Orchidaceae'}}&genus={{genus.genus}}"><i>{{genus}}</i></a>  {{genus.author|default:''}} {% if genus.status == 'synonym' %}(syn.){% endif %}
-                        {% endif %}
-                    {% endif %}
-                {% if user.tier.tier > 3 %}
-                <br>{{genus.pid|default:''}}
-                {% endif %}
-                </td>
-                <td style="min-width:100px; text-align: center">
-                    {% if genus.img_file %}
-                     <img class="thumbnails" alt="{{genus.genus}}" src="{% static genus.img_dir %}{{genus.img_file}}">
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
     </table>
     {% endif %}
     {% if match_spc_list %}

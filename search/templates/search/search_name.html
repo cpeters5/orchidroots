@@ -90,87 +90,126 @@ td {
 
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
-    <div style="clear:both"></div>
-    <div class="row" style="margin:0 auto;">
-        <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
-            <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
-                <br>
-        <h5 class="card-title" style="margin-bottom: 0">Search results for  "<i>{{commonname}}</i>"</h5>
-        <div id="accordion">
-            <div class="card mt-1 no-border-bg">
-                <div class="card-header no-border-bg">
-                    <button class="btn btn-danger  flashing-button" type="button" data-toggle="collapse" data-target="#Help">
-                        <h6 class="card-title" style="margin-bottom: 0; width: 120px;"><b>HELP</b></h6>
-                    </button>
-                </div>
-                {% include "search/search_guide.html" %}
-            </div>
+    <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
+        <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
+            <br>
+            <h5 class="card-title" style="margin-bottom: 0">Common name in {{app|title}} matching "<i>{{search_string}}</i>"</h5>
         </div>
-                <form action="{% url 'search:search_name' %}" method="post">
-                   {% csrf_token %}
-                    <select class="btn btn-custom" name="selected_app" onchange="handleSelect(this)">
-                        <option value="">Select domain</option>
-                        {% for option in options %}
-                            <option value="{{ option.value }}" {% if selected_app  == option.value %}selected{% endif %}>
-                                {{ option.text }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <input type="hidden" name="commonname" value="{{ commonname }}">
-                </form>
-                <br><br>
-                {% if not family_list and not genus_list and not species_list %}
-                <div style="text-align: center;font-size: 16px;">
-                   {% if selected_app %}
-                       <h6>
-                        No record found in our system matching commonname "{{commonname}}"
-                            in domain {{selected_app|default:'all'|title }}
-                        </h6>
-                    {% else %}
-                        <h6>No record found in our system matching commonname "{{commonname}}"</h6>
-                   {% endif %}
-                    Ensure that the "Select Domain" button is set to "All Domains" or to a specific domain relevant to your search, if known.
-                    <br>
-                    You may also try the "Scientific/registered name search in case "{{commonname}}" is a taxon or a registered hybrid.
-                </div>
-                {% else %}
-                {% if species_list %}
-                <div style="text-align: center;">
-                    <h5>
-                        <b>{{selected_app|default:'all'|title }}</b> Species with common name contains "{{commonname}}"
-                    </h5>
-                </div>
-                <table id="sortTable" class="table table-condensed table-sm table-hover" style="font-size: 13px;" >
-                    <thead style="text-align: center;"><th>Sample image</th><th>Species</th><th>common name</th><th>distribution</th></thead>
-                    {% for species in species_list %}
-                        <tr >
-                            <td style="width:20%;">
-                                {% if species.get_best_img.image_file %}
-                                <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family}}&role={{role}}">
-                                 <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
-                                </a>
-                                {% endif %}
-                            </td>
-                            <td style="text-align: left;">
-                                <a href="{% url 'display:summary' species.family.application species.pid %}?role={{role}}&family={{species.family}}">{{species.binomial|safe}}</a>
+    </div>
+    {% if not species_list %}
+        <div>
+            <ul  style="text-align:left;font-size:16px;margin-left:100px;">
+                <li>If not found, you might be in the wrong domain (see navbar).
+                Try selecting a different domain in the nav bar</li>
+                <li>The name might be a scientific or registered name, try&nbsp;&nbsp;
+                <a class="btn btn-primary" href="{% url 'search:search' app %}?role={{role}}&search_string={{search_string}}">Search by scientific name</a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+    <br>
+    <div>
+        {% if species_list %}
+            <table id="sortTable" class="table table-condensed table-sm table-hover" style="font-size: 13px;" >
+                <thead style="text-align: center;">
+                    <th>Sample image</th><th>Species</th><th>common name</th><th>distribution</th>
+                </thead>
+                {% for species in species_list %}
+                    <tr >
+                        <td style="width:20%;">
+                            {% if species.get_best_img.image_file %}
+                            <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family}}&role={{role}}">
+                             <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: left;">
+                            {{species.binomial|safe}}
+                            {% if app != 'orchidaceae' %}
                                 ({{species.family.family}})
-                                {% if species.status == 'synonym' %} (syn. {{species.acc.binomial}}){% endif %}
-                            </td>
-                            <td style="text-align: left;">{{species.accepted.common_name|default:''}}</td>
-                            <td style="text-align: left;">{{species.accepted.distribution|default:''}}</td>
-                        </tr>
+                            {% endif %}
+                            {% if species.status == 'synonym' %} (syn. {{species.acc.binomial}}){% endif %}
+                        </td>
+                        <td style="text-align: left;">{{species.accepted.common_name|default:''}}</td>
+                        <td style="text-align: left;">{{species.accepted.distribution|default:''}}</td>
+                    </tr>
 
-                    {% endfor %}
-                </table>
-                {% endif %}
-            {% endif %}
-
-
-            </div>
-        </div>
+                {% endfor %}
+            </table>
+        {% endif %}
     </div>
 </div>
 
-{% include "base-search.html" %}
+{% include "base-datatable.html" %}
 
+
+<script>
+
+
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    var initialFilterValue = "{{ spc | default:'' | escapejs }}";
+    var table = $('#sortTable').DataTable({
+        "info": true,
+        "paging": true,  // Enable paging
+        "lengthChange": false,
+        "pageLength": 50,
+        "lengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
+        "colReorder": true,
+        "columnDefs": [
+            { "type": "priority", "targets": 1 },
+            // { targets: [5, 6, 7], className: 'none' }
+        ],
+        "order": [[1,'asc'],],
+        responsive: true,
+        "dom": "<'row'<'col-sm-6'f><'col-sm-6'p>>" +  // Top pagination
+               "<'row'<'col-sm-12'tr>>" +
+               "<'row'<'col-sm-5'i><'col-sm-7'p>>",  // Bottom pagination
+
+        language: {
+            search: "_INPUT_",
+            "sProcessing": "Processing...",
+            "sZeroRecords": "No match results",
+        },
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var pageInfo = api.page.info();
+
+            // Show/hide info and pagination
+            $('.dataTables_info, .dataTables_paginate').toggle(pageInfo.pages > 1);
+
+            // Adjust the filter and top pagination position
+            if (pageInfo.pages <= 1) {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '10px'
+                });
+                $('.dataTables_paginate:eq(0)').hide();  // Hide top pagination if only one page
+            } else {
+                $('.dataTables_filter').css({
+                    'float': 'left',
+                    'margin-bottom': '0'
+                });
+                $('.dataTables_paginate:eq(0)').show().css('float', 'right');  // Show top pagination
+            }
+
+            // Log info for debugging
+            console.log("Total pages:", pageInfo.pages);
+            console.log("Current page:", pageInfo.page);
+            console.log("Total records:", pageInfo.recordsTotal);
+        },
+
+        "initComplete": function(settings, json) {
+            $('.dataTables_filter input').attr('placeholder', 'Filter results');
+        }
+    });
+
+    // Set initial filter value and draw table
+    $('.dataTables_filter input').val(initialFilterValue);
+    table.search(initialFilterValue).draw();
+});
+
+</script>
+
+</script>
 {% endblock %}

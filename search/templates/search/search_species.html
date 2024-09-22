@@ -46,7 +46,7 @@ tr {
         <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
             <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;">
                 <div style="text-align: center;">
-                    <h5>Search results for "{{search_string}}" in {{selected_app|default:'all domain'}}</h5>
+                    <h5>Search results for species "{{search_string}}" in {{selected_app|default:'all domain'}}</h5>
                 </div>
                 <form action="{% url 'search:search_name' %}" method="post">
                    {% csrf_token %}
