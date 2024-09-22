@@ -69,7 +69,7 @@ urlpatterns = [
     path('detail/progenyimg/<int:pid>/', RedirectView.as_view(url='/orchidaceae/progenyimg/%(pid)s/', permanent=True)),
 
     # path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
-    # path('information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
+    path('information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/information/', RedirectView.as_view(url='/display/summary/', permanent=True)),
     path('orchidaceae/information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/photos/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
