@@ -1,10 +1,10 @@
 {% load static %}
-{% include "base.html" %}
-{% include "detail-title.html" %}
-{% block body %}
 <head>
     <title>Family tree of {{species.binomial}}</title>
 </head>
+{% include "base.html" %}
+{% include "detail-title.html" %}
+{% block body %}
 <style>
 
 .tree {
@@ -134,11 +134,11 @@ right connector from last child*/
    padding:2px;
     margin: 0 2px;
 }
-.thumbnails4 {
-   height: 6vw !important;
-   width : 6vw !important;
-   padding:4px;
-    margin: 0 2px;
+.thumbnails2 {
+   height: 12vw !important;
+   width : 12vw !important;
+   padding:2px;
+    margin: 0 auto;
     border: 0;
 }
 .thumbnails3 {
@@ -147,6 +147,13 @@ right connector from last child*/
     border:0 solid lightgrey;
     padding:2px !important;
     margin:0 !important;
+}
+.thumbnails4 {
+   height: 6vw !important;
+   width : 6vw !important;
+   padding:4px;
+    margin: 0 2px;
+    border: 0;
 }
 
 
@@ -206,8 +213,8 @@ a {
                     <div>
                         <ul style="display:inline-block;float:left;padding:0;margin:0 auto;">
                             <li style="display:inline-block;">
-                                <div style="margin:0 auto; width: 20%">
-                                    <img class="thumbnails thumbnails3" alt="" src="{% static species.img %}" >
+                                <div style="margin:0 auto;">
+                                    <img class="thumbnails thumbnails2" alt="" src="{% static species.img %}" >
                                     {{species.abrevname|safe}}<br>{{species.year|default:'<br>'}}
                                 </div>
                                 <ul>

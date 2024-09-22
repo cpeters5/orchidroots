@@ -1,7 +1,4 @@
 {% load static %}
-{% include "base.html" %}
-{% include "detail-title.html" %}
-{% block body %}
 <head>
     <title>Video clips about {{species.binomial}}</title>
     <link rel="canonical" href="{{ canonical_url }}">
@@ -9,6 +6,9 @@
     <script type="text/javascript" src="{% static 'utils/js/lightbox.js' %}"></script>
     <meta name='description' content='video clips of {{species.binomial}}'>
 </head>
+{% include "base.html" %}
+{% include "detail-title.html" %}
+{% block body %}
 <style>
     /*Styles for Top Descendants*/
 [class*="col-"] {

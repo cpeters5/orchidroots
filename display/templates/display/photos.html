@@ -1,12 +1,12 @@
 {% load static %}
-{% include "base.html" %}
-{% include "detail-title.html" %}
-{% block body %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>{{species.binomial}} orchid photo gallery</title>
     <meta name='description' content="Browse the photo gallery of {{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} x {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})">.
 </head>
+{% include "base.html" %}
+{% include "detail-title.html" %}
+{% block body %}
 <style>
     /*Styles for Top Descendants*/
 [class*="col-"] {

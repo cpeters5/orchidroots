@@ -1,12 +1,12 @@
 {% load static %}
-{% include "base.html" %}
-{% include 'detail-title.html' %}
-{% block body %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>Synonyms of {{species.binomial}}</title>
     <meta name='description' content='The list of all synonyms of the orchid {{species.binomial}}'>
 </head>
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
 
 <style>
 

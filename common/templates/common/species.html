@@ -1,11 +1,11 @@
 {% load static %}
-{% include "base.html" %}
-{% block body %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{family}} species</title>
     <meta name='description' content='Species of the genus {{genus}}'>
 </head>
+{% include "base.html" %}
+{% block body %}
 <style>
     .form-inline .my-hidden { display: none; }
     .table {

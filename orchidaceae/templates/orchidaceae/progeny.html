@@ -1,12 +1,12 @@
 {% load static %}
-{% include "base.html" %}
-{% include 'detail-title.html' %}
-{% block body %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{species.binomial}} offsprings</title>
     <meta name='description' content='Offsprings of {{species.binomial}}'>
 </head>
+{% include "base.html" %}
+{% include 'detail-title.html' %}
+{% block body %}
 
 <style>
 .progen {

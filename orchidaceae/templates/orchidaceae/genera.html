@@ -1,12 +1,12 @@
 {% load static %}
-{% include "base.html" %}
-{% block body %}
 <head>
     <title>List of Orchidaceae genera</title>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>{{species.binomial}} orchid information, </title>
     <meta name='description' content="Images and information about {{species.accepted.common_name|default:''}}, {{species.binomial}} ">.
 </head>
+{% include "base.html" %}
+{% block body %}
 
 <style>
 .tooltip {
