@@ -251,22 +251,22 @@ def species(request, app=None):
 
     syn = request.GET.get('syn', '')
     req_genus = request.GET.get('genus', '')
+    req_type = request.GET.get('type', 'species')
     if not req_genus:
         req_genus = default_genus[app]
 
     # Build canonical url
     alpha = request.GET.get('alpha', '')
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type={req_type}')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type={req_type}')
 
     #  Permanently redirect noncanonical to canonical url
     if 'app' in request.GET:
         return HttpResponsePermanentRedirect(canonical_url)
 
     role = request.GET.get('role','pub')
-    req_type = request.GET.get('type', 'species')
 
     # Note: orchidaceae app has only one family, Orchidaceae
     if app == 'orchidaceae':
@@ -351,6 +351,20 @@ def species(request, app=None):
         'canonical_url': canonical_url,
     }
     return render(request, "common/species.html", context)
+
+
+def hybrid(request, app):
+    # Handle bad url due to a typo in sitemap.
+    # app is always 'orchidaceae'
+    alpha = request.GET.get('alpha', '')
+    req_genus = request.GET.get('genus', '')
+    if alpha and alpha != 'All':
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type=hybrid')
+    else:
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type=hybrid')
+
+    #  Permanently redirect noncanonical to canonical url
+    return HttpResponsePermanentRedirect(canonical_url)
 
 
 def infraspecific(request, app, pid):

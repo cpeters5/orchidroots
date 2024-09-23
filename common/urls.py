@@ -8,7 +8,6 @@ urlpatterns = [
     path('taxonomy/', views.taxonomy, name='taxonomy'),
     path('family/<str:app>/', views.family, name='family'),
     path('family/', views.family, name='family'),
-    # path('genera_orig/', views.genera_orig, name='genera_orig'),
     path('genera/<str:app>/', views.genera, name='genera'),
     path('genera/', views.genera, name='genera'),
     path('species/<str:app>/', views.species, name='species'),
@@ -17,9 +16,10 @@ urlpatterns = [
     path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
-
-    # Redirect to display
     path('compare/<int:pid>/', views.compare, name='compare'),
+
+    # Redirect to canonicalurl
+    path('hybrid/<str:app>/', views.hybrid, name='hybrid'),
 
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),
     path('deletephoto/<int:orid>/', views.deletephoto, name='deletephoto'),
