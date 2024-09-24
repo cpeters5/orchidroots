@@ -11,7 +11,7 @@ from fuzzywuzzy import fuzz, process
 from common.models import Family, Subfamily, Tribe, Subtribe, CommonName, Binomial, SpellChecker
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages, SpcImages
 from accounts.models import User, Photographer
-from utils.views import write_output, getRole, clean_search_string, Replace, MultiReplace, RemoveSpaces, clean_query, clean_name
+from utils.views import write_output, getRole, clean_search_string, expand_genus_name, Replace, MultiReplace, RemoveSpaces, clean_query, clean_name
 from utils import config
 import unicodedata
 
@@ -316,11 +316,11 @@ def match_collapsed(search_string):
 
 # Search scientific name
 def search(request, app=None):
-    Genus = apps.get_model(app, 'Genus')
-    Species = apps.get_model(app, 'Species')
     if not app:
         # Legacy case, app may be given in query string
         app = request.GET.get('app', 'orchidaceae')  # handle legacy case
+    Genus = apps.get_model(app, 'Genus')
+    Species = apps.get_model(app, 'Species')
 
     # Search scientific name only
     # Get genus from the first word in search string.
@@ -340,10 +340,19 @@ def search(request, app=None):
 
     # Get search string
     search_string = request.GET.get('search_string', '').strip()
+
     if not search_string:
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+        context = {'search_string': 'search_string', 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                   'genus_total': len(genus_list), 'app': app,
+                   'role': role}
+        return render(request, "search/search_results.html", context)
+
+    # abrev. only applied to orchids
+    if app == 'orchidaceae':
+        genus_name, search_string = expand_genus_name(search_string)
+        print("genus and search string", genus_name, search_string)
+
     search_string = clean_search_string(search_string)
-    print("search_string", search_string)
 
     if ' ' not in search_string:
         # single word could be genus
@@ -359,6 +368,13 @@ def search(request, app=None):
 
     # Search string more than one word
     match_spc_list = Species.objects.filter(binomial__icontains=search_string)
+    # If no match found (probably wrong genus), drop the first word (genus) and match again
+    # TODO: Limit to check on genera in the same group (family, subfamily, etc.  See genusrelation class)
+    if not match_spc_list:
+        words = search_string.split()
+        species_name = ' '.join(words[1:]) if len(words) > 1 else '' # Must already be > 1
+        match_spc_list = Species.objects.filter(binomial__icontains=species_name)
+
     write_output(request, search_string)
     context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                'genus_total': len(genus_list), 'app': app,
@@ -380,7 +396,11 @@ def search_name(request, app=None):
 
     req_search_string = request.GET.get('search_string', '').strip()
     if not req_search_string:
-        req_search_string = request.POST.get('search_string', '').strip()
+        context = {'search_string': 'req_search_string', 'genus_list': genus_list, 'match_spc_list': match_spc_list,
+                   'genus_total': len(genus_list), 'app': app,
+                   'role': role}
+        return render(request, "search/search_results.html", context)
+
     search_string = req_search_string.rstrip('s')
     search_string = clean_search_string(search_string)
     search_string_clean = clean_name(search_string)

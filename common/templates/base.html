@@ -23,9 +23,6 @@
     <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
     <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
 
-    <!-- jquery-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
     <!-- navbar jQuery -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <!--    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>-->
@@ -36,11 +33,6 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Lightbox -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
-
 
     <!-- Font Awesome -->
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
@@ -626,11 +618,19 @@ nav .search-container button:hover {
 <!-- Links -->
 
         <div class="collapse navbar-collapse" id="nav-content">
-            <form class="form-inline" id="search" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
+            {% if app == 'aves' %}
+            <form class="form-inline" id="search" action="/search/search_name/aves/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input type="hidden" form="search" name="app" value="{{ app }}" >
                 <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" style="border:1px solid #ccc; border-right: 0">
             </form>
+            {% else %}
+            <form class="form-inline" id="search1" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
+                <input type="hidden" form="search1" name="role" value="{{ role }}" >
+                <input type="hidden" form="search1" name="app" value="{{ app }}" >
+                <input class="searchbox" form="search1" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" style="border:1px solid #ccc; border-right: 0">
+            </form>
+            {% endif %}
             <ul class="navbar-nav " style="line-height:25px !important;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -704,13 +704,13 @@ nav .search-container button:hover {
              Orchid
          </button>
          <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'orchidaceae' %}?role={{role}}" data-nosnippet>Orchid Taxonomy</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:genera' 'orchidaceae' %}?role={{role}}" data-nosnippet>Orchid genera </a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?alpha=A&role={{role}}" data-nosnippet>Orchid species </a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?alpha=A&role={{role}}&type=hybrid" data-nosnippet>Orchid hybrids </a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?role={{role}}&alpha=A" data-nosnippet>Orchid images</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search' 'orchidaceae' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search_name' 'orchidaceae' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>search commonname</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'orchidaceae' %}?app=orchidaceae&role={{role}}" data-nosnippet>Orchid Taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'orchidaceae' %}?app=orchidaceae&role={{role}}" data-nosnippet>Orchid genera </a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?app=orchidaceae&alpha=A&role={{role}}" data-nosnippet>Orchid species </a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?app=orchidaceae&alpha=A&role={{role}}&type=hybrid" data-nosnippet>Orchid hybrids </a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?app=orchidaceae&role={{role}}&alpha=A" data-nosnippet>Orchid images</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search' 'orchidaceae' %}?app=orchidaceae&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search_name' 'orchidaceae' %}?app=orchidaceae&role={{role}}&search_string={{search_string}}" data-nosnippet>search commonname</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -718,13 +718,13 @@ nav .search-container button:hover {
              Fungi
          </button>
          <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'fungi' %}?role={{role}" data-nosnippet>Fungi taxonomy</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:family' 'fungi' %}?role={{role}}" data-nosnippet>Fungi families</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:genera' 'fungi' %}?role={{role}}" data-nosnippet>Fungi genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'fungi' %}?role={{role}}" data-nosnippet>Fungi species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'fungi' %}?role={{role}}" data-nosnippet>Fungi images</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search' 'fungi' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search_name' 'fungi' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'fungi' %}?app=fungi&role={{role}" data-nosnippet>Fungi taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'fungi' %}?app=fungi&role={{role}}" data-nosnippet>Fungi families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'fungi' %}?app=fungi&role={{role}}" data-nosnippet>Fungi genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'fungi' %}?app=fungi&role={{role}}" data-nosnippet>Fungi species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'fungi' %}?app=fungi&role={{role}}" data-nosnippet>Fungi images</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search' 'fungi' %}?app=fungi&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search_name' 'fungi' %}?app=fungi&role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -732,13 +732,13 @@ nav .search-container button:hover {
              Plants
          </button>
          <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'other' %}?role={{role}}" data-nosnippet>Plant taxonomy</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:family' 'other' %}?role={{role}}" data-nosnippet>Plant families</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:genera' 'other' %}?role={{role}}" data-nosnippet>Plant genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'other' %}?role={{role}}" data-nosnippet>Plant species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'other' %}?role={{role}}&alpha=A" data-nosnippet>Plant images</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search' 'other' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search_name' 'other' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'other' %}?app=other&role={{role}}" data-nosnippet>Plant taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'other' %}?app=other&role={{role}}" data-nosnippet>Plant families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'other' %}?app=other&role={{role}}" data-nosnippet>Plant genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'other' %}?app=other&role={{role}}" data-nosnippet>Plant species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'other' %}?app=other&role={{role}}&alpha=A" data-nosnippet>Plant images</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search' 'other' %}?app=other&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search_name' 'other' %}?app=other&role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -746,13 +746,13 @@ nav .search-container button:hover {
              Birds
          </button>
          <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'aves' %}?role={{role}}" data-nosnippet>Bird taxonomy</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:family' 'aves' %}?role={{role}}" data-nosnippet>Bird families</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:genera' 'aves' %}?role={{role}}" data-nosnippet>Bird genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?role={{role}}" data-nosnippet>Bird species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?role={{role}}&alpha=A" data-nosnippet>Bird images</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search' 'aves' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search_name' 'aves' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'aves' %}?app=aves&role={{role}}" data-nosnippet>Bird taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'aves' %}?app=aves&role={{role}}" data-nosnippet>Bird families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'aves' %}?app=aves&role={{role}}" data-nosnippet>Bird genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'aves' %}?app=aves&role={{role}}" data-nosnippet>Bird species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'aves' %}?app=aves&role={{role}}&alpha=A" data-nosnippet>Bird images</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search' 'aves' %}?app=aves&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search_name' 'aves' %}?app=aves&role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
          </ul>
      </div>
      <div class="btn-group">
@@ -760,13 +760,13 @@ nav .search-container button:hover {
              Animals
          </button>
          <ul class="dropdown-menu">
-             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'animalia' %}?role={{role}}" data-nosnippet>Anoimal taxonomy</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:family' 'animalia' %}?role={{role}}" data-nosnippet>Animal families</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:genera' 'animalia' %}?role={{role}}" data-nosnippet>Animal genera</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?role={{role}}" data-nosnippet>Animal species</a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?role={{role}}&alpha=A" data-nosnippet>Animal images</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search' 'animalia' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
-             <li><a class="dropdown-item" href="{% url 'search:search_name' 'animalia' %}?role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:taxonomy' 'animalia' %}?app=animalia&role={{role}}" data-nosnippet>Anoimal taxonomy</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:family' 'animalia' %}?app=animalia&role={{role}}" data-nosnippet>Animal families</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:genera' 'animalia' %}?app=animalia&role={{role}}" data-nosnippet>Animal genera</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:species' 'animalia' %}?app=animalia&role={{role}}" data-nosnippet>Animal species</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'animalia' %}?app=animalia&role={{role}}&alpha=A" data-nosnippet>Animal images</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search' 'animalia' %}?app=animalia&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
+             <li><a class="dropdown-item" href="{% url 'search:search_name' 'animalia' %}?app=animalia&role={{role}}&search_string={{search_string}}" data-nosnippet>Search commonname</a></li>
          </ul>
      </div>
     </div>
@@ -815,11 +815,12 @@ document.getElementById('search').addEventListener('submit', function(event) {
 
 {% endblock %}
 
-    <!-- jQuery (if not already included) -->
+    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <!-- Lightbox JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
 </body>
 </html>

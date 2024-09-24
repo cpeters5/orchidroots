@@ -75,6 +75,37 @@ def clean_search_string(search_string):
     search_string =  search_string.replace("’", "'")
     return search_string
 
+def expand_genus_name(search_string):
+    # Check if the first word is a full genus name, or an abreviation, then epand it
+    # Return full genus name and updated search_string
+    first_word = search_string.split()[0]
+    print("first_word", first_word)
+    # Check if the first word is a genus
+    Genus = apps.get_model('orchidaceae', 'Genus')
+    try:
+        genus = Genus.objects.get(genus=first_word)
+        print("genus", genus)
+        # Return the first word as genus, search_string unchanged
+        genus = genus.genus
+    except Genus.DoesNotExist:
+        if not first_word.endswith('.'):
+            first_word = first_word + '.'
+        genus = Genus.objects.filter(abrev=first_word)
+        # Found an abreviation, expanded it
+        # Return expanded genus and updated search-string
+        if genus and len(genus) > 0:
+            genus = genus[0].genus
+            words = search_string.split()
+            words[0] = genus
+            search_string = ' '.join(words)
+        else:
+            genus = ''
+        # No genus in the string. Return '' for genus and unchanged search_string (as species name)
+
+    return genus, search_string
+
+
+
 
 def clean_query(search_string):
     rest = ''

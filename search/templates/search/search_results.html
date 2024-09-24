@@ -39,10 +39,23 @@ td {
 }
 </style>
 <div style="min-height:200px;margin: 0 auto;width: 90%;">
+    <div>
+        <form class="form-inline" id="displaysearch" action="/search/search/{{app}}/" style="margin-top: 5px;">
+            <input type="hidden" form="displaysearch" name="role" value="{{ role }}">
+
+            <input class="searchbox" form="displaysearch" value="{{search_string}}"
+                   type="text" name="search_string" pattern=".{3,}"
+                   placeholder="Search scientific name"
+                   style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;margin:0 auto">
+
+            <button form="displaysearch" type="submit" style="display:none;"></button>
+        </form>
+    </div>
     <br>
     <div style="text-align: center;">
         <h5>Search results for "{{search_string}}" in {{app}}</h5>
     </div>
+
     {% if not matched_genus and not match_spc_list %}
     <div style="margin-left: 100px;">
         <br>

@@ -90,9 +90,21 @@ td {
 
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
+    <br>
+    <div>
+        <form class="form-inline" id="displaysearch" action="/search/search_name/{{app}}/" style="margin-top: 5px;">
+            <input type="hidden" form="displaysearch" name="role" value="{{ role }}">
+
+            <input class="searchbox" form="displaysearch" value="{{search_string}}"
+                   type="text" name="search_string" pattern=".{3,}"
+                   placeholder="Search scientific name"
+                   style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;margin:0 auto">
+
+            <button form="displaysearch" type="submit" style="display:none;"></button>
+        </form>
+    </div>
     <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
         <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
-            <br>
             <h5 class="card-title" style="margin-bottom: 0">Common name in {{app|title}} matching "<i>{{search_string}}</i>"</h5>
         </div>
     </div>
