@@ -13,6 +13,7 @@ from accounts.views import  user_reset_password, login_page, register_page, Upda
     ChangeEmailView, PasswordChangeRedirect, CustomPasswordResetFromKeyView
 from common.views import home
 from . import views
+from display import views as display_views
 from myproject.views import robots_txt
 from sitemap.views import sitemap_index, sitemap_section
 
@@ -70,8 +71,8 @@ urlpatterns = [
 
     # path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
     path('information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
-    path('detail/information/', RedirectView.as_view(url='/display/summary/', permanent=True)),
-    path('orchidaceae/information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
+    path('detail/information/', display_views.information, name='display_information'),
+    path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/photos/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/photos/', RedirectView.as_view(url='/display/photos/orchidaceae/', permanent=True)),
     path('orchidaceae/photos/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
