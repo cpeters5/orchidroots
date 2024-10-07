@@ -1,5 +1,6 @@
 User-agent: *
-Allow: /display/information/
+Allow: /display/summary/
+Allow: /display/photos/
 Allow: /common/taxonomy/
 Allow: /common/family/
 Allow: /common/genera/
@@ -11,27 +12,28 @@ Allow: /orchidaceae/infraspecific/
 Allow: /orchidaceae/synonym/
 Allow: /home/
 
-Disallow: /admin/
-Disallow: /accounts/
-Disallow: /login/
-Disallow: /register/
 Disallow: /animalia/
 Disallow: /aves/
+Disallow: /admin/
+Disallow: /accounts/
 Disallow: /common/
+Disallow: /display/
 Disallow: /data/
 Disallow: /documents/
 Disallow: /donations/
 Disallow: /fungi/
 Disallow: /gallery/
+Disallow: /login/
+Disallow: /natural/
+Disallow: /orchid/
 Disallow: /orchidaceae/
 Disallow: /other/
+Disallow: /orchidlist/
+Disallow: /orchidlite/
+Disallow: /register/
 Disallow: /search/
 Disallow: /tags/
 Disallow: /utils/
-Disallow: /orchidlist/
-Disallow: /orchidlite/
-Disallow: /natural/
-Disallow: /orchid/
 
 Sitemap: https://www.orchidroots.com/sitemap.xml
 
@@ -58,4 +60,13 @@ User-agent: meta-externalagent
 Disallow: /
 
 User-agent: Applebot
+Disallow: /
+
+User-agent: DataForSeo
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SeekportBot
 Disallow: /
