@@ -287,8 +287,10 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">New uploaded photos</a>
         {% endif %}
-        {% if app == 'orchidaceae' and species.type == 'species' %}
-            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecies list</a>
+        {% if species.type == 'species' and infraspecifics %}
+            {% if app == 'orchidaceae' or app == 'aves' %}
+                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecies list</a>
+            {% endif %}
         {% endif %}
 <!--        {% if user.tier.tier > 1 %}-->
 <!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
@@ -369,7 +371,7 @@ a:hover {
                     </div>
                     <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
                         <div style="width:100%;word-wrap: break-word;">
-                            {{image.binomial_it|safe}}
+                            {{image.pid.binomial_it|safe}}
                             {{image.imginfo|default:''}}
                             <br>
                             {% if image.source_url %}
