@@ -31,7 +31,7 @@
                     </div>
                     <div class="card-body border-top"  style="display:inline-block">
                         <div style="padding: 5px;">
-                            <a class="btn btn-custom" href="{% url 'common:newbrowse' app %}?family={{family|default:''}}&genus={{genus}}&myspecies={{myspecies}}">Browse</a>
+                            <a class="btn btn-custom" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}&myspecies={{myspecies}}">Browse</a>
                             {% if app == 'orchidaceae' %}
                                 <a class="btn btn-custom" href="{% url 'orchidaceae:genera' %}?family=Orchidaceae&role={{role}}">Detailed list</a>
                             {% endif %}
