@@ -50,11 +50,11 @@ def summary(request, app=None, pid=None):
     # Handle an old typo in sitemaps.  Crawlers still crawled these urls
     if app == None or app == 'application':
         app = 'orchidaceae'
-
+    print("app, pid", app, pid)
     # handle various old paths, will be eventually removed.
     if not pid:
         # Worst case scenario when no explicit pid requested. Send it to homepage.
-        return HttpResponsePermanentRedirect(reverse('home'))
+        return HttpResponsePermanentRedirect('https://google.com')
 
     # Either 'app' or pid is from query string, redirect to the canonical URL
     if query_pid != None or app == None:
@@ -223,21 +223,6 @@ def summary(request, app=None, pid=None):
                }
     response = render(request, 'display/summary.html', context)
     return response
-
-# Legacy case, app is alwasy orchidaceae
-def information(request, pid=None):
-    # As of June 2022, synonym will have its own display page
-    # NOTE: seed and pollen id must all be accepted.
-    if pid is None:
-        pid = request.GET.get('pid')
-    if isinstance(pid, int):
-        # If pid is found, redirect to canonical url
-        new_url = f'/display/summary/orchidaceae/{pid}/'
-        return HttpResponsePermanentRedirect(new_url)
-    # No pid, send to summary to handle missing pid
-    return HttpResponsePermanentRedirect('/display/summary/orchidaceae/')
-
-
 
 
 def get_role(request):

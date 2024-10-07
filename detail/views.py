@@ -22,7 +22,7 @@ from PIL import Image
 from PIL import ExifTags
 from io import BytesIO
 from django.core.files import File
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
@@ -861,3 +861,41 @@ def approvemediaphoto(request, pid):
     url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
     return HttpResponseRedirect(url)
 
+
+# Redirect old urls to display app.
+# Convert dynamic to static pid parameter
+def information(request):
+    pid = int(request.GET.get('pid'))
+    if isinstance(pid,int):
+        # If pid is found, redirect to canonical url
+        new_url = f'/display/summary/orchidaceae/{pid}/'
+        return HttpResponsePermanentRedirect(new_url)
+    # No pid, send to summary to handle missing pid
+    return HttpResponsePermanentRedirect('/')
+
+def photos(request):
+    pid = int(request.GET.get('pid'))
+    if isinstance(pid,int):
+        # If pid is found, redirect to canonical url
+        new_url = f'/display/photos/orchidaceae/{pid}/'
+        return HttpResponsePermanentRedirect(new_url)
+    # No pid, send to summary to handle missing pid
+    return HttpResponsePermanentRedirect('/')
+
+def ancestrytree(request):
+    pid = int(request.GET.get('pid'))
+    if isinstance(pid,int):
+        # If pid is found, redirect to canonical url
+        new_url = f'/orchidaceae/ancestrytree/{pid}/'
+        return HttpResponsePermanentRedirect(new_url)
+    # No pid, send to summary to handle missing pid
+    return HttpResponsePermanentRedirect('/')
+
+def ancestor(request):
+    pid = int(request.GET.get('pid'))
+    if isinstance(pid,int):
+        # If pid is found, redirect to canonical url
+        new_url = f'/orchidaceae/ancestor/{pid}/'
+        return HttpResponsePermanentRedirect(new_url)
+    # No pid, send to summary to handle missing pid
+    return HttpResponsePermanentRedirect('/')

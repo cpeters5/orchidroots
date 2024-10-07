@@ -1,6 +1,5 @@
 from django.urls import path, re_path
 from . import views
-from display.views import photos as display_photos, information as display_information
 app_name = 'common'
 urlpatterns = [
     # Top level

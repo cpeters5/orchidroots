@@ -63,18 +63,13 @@ urlpatterns = [
     # REDIRECTIONS: Remove this in a year or so. @2024
     # redirections (in the process of merging detail with orchidaceae)
     path('detail/ancestor/<int:pid>/', RedirectView.as_view(url='/orchidaceae/ancestor/%(pid)s/', permanent=True)),
-    path('detail/ancestor/', RedirectView.as_view(url='/orchidaceae/ancestor/', permanent=True)),
     path('detail/ancestrytree/<int:pid>/', RedirectView.as_view(url='/orchidaceae/ancestrytree/%(pid)s/', permanent=True)),
-    path('detail/ancestrytree/', RedirectView.as_view(url='/orchidaceae/ancestrytree/', permanent=True)),
     path('detail/progeny/<int:pid>/', RedirectView.as_view(url='/orchidaceae/progeny/%(pid)s/', permanent=True)),
     path('detail/progenyimg/<int:pid>/', RedirectView.as_view(url='/orchidaceae/progenyimg/%(pid)s/', permanent=True)),
 
-    # path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/information/%(pid)s/', permanent=True)),
     path('information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
-    path('detail/information/', display_views.information, name='display_information'),
     path('detail/information/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/photos/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
-    path('detail/photos/', RedirectView.as_view(url='/display/photos/orchidaceae/', permanent=True)),
     path('orchidaceae/photos/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/species/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/hybrid/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),

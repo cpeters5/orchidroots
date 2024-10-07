@@ -1,6 +1,5 @@
 from django.urls import path, re_path
 from . import views
-from display.views import photos as display_photos, information as display_information
 from detail.views import reidentify as detail_reidentify, uploadfile as detail_uploadfile, \
     uploadweb as detail_uploadweb, curateinfospc as detail_curateinfospc, curateinfohyb as detail_curateinfohyb, \
     compare as detail_compare, createhybrid as detail_createhybrid, approvemediaphoto as detail_approvemediaphoto
@@ -26,12 +25,6 @@ urlpatterns = [
     path('subsection/', views.subsection, name='subsection'),
     path('series/', views.series, name='series'),
     # path('browsegen/', views.browsegen, name='browsegen'),
-
-    # Redirect to display
-    path('information/', display_information, name='information'),
-    path('information/<int:pid>/', display_information, name='information'),
-    path('photos/', display_photos, name='photos'),
-    path('photos/<int:pid>/', display_photos, name='photos'),
 
     # Redirect to detail
     path('reidentify/<int:orid>/<int:pid>/', detail_reidentify, name='reidentify'),

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from display.views import photos, information
 from orchidaceae.views import ancestor as orchidaceae_ancestor, ancestrytree as orchidaceae_ancestrytree, \
     progeny as orchidaceae_progeny, progenyimg as orchidaceae_progenyimg
 
@@ -27,4 +26,11 @@ urlpatterns = [
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
     path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
+
+    # Legacy urls
+    path('information/', views.information, name='redirect_information'),
+    path('photos/', views.photos, name='redirect_photos'),
+    path('ancestor/', views.ancestor, name='redirect_ancestor'),
+    path('ancestrytree/', views.ancestrytree, name='redirect_ancestrytree'),
+
 ]
