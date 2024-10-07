@@ -708,7 +708,8 @@ nav .search-container button:hover {
              <li><a class="dropdown-item" href="{% url 'common:genera' 'orchidaceae' %}?app=orchidaceae&role={{role}}" data-nosnippet>Orchid genera </a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?app=orchidaceae&alpha=A&role={{role}}" data-nosnippet>Orchid species </a></li>
              <li><a class="dropdown-item" href="{% url 'common:species' 'orchidaceae' %}?app=orchidaceae&alpha=A&role={{role}}&type=hybrid" data-nosnippet>Orchid hybrids </a></li>
-             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?app=orchidaceae&role={{role}}&alpha=A" data-nosnippet>Orchid images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?app=orchidaceae&role={{role}}&alpha=A&type=species" data-nosnippet>Species images</a></li>
+             <li><a class="dropdown-item" href="{% url 'common:newbrowse' 'orchidaceae' %}?app=orchidaceae&role={{role}}&alpha=A&type=hybrid" data-nosnippet>Hybrid images</a></li>
              <li><a class="dropdown-item" href="{% url 'search:search' 'orchidaceae' %}?app=orchidaceae&role={{role}}&search_string={{search_string}}" data-nosnippet>Search scientific name</a></li>
              <li><a class="dropdown-item" href="{% url 'search:search_name' 'orchidaceae' %}?app=orchidaceae&role={{role}}&search_string={{search_string}}" data-nosnippet>search commonname</a></li>
          </ul>
