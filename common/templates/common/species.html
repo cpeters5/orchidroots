@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}">Browse images</a>
+                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}&type={{type}}">Browse images</a>
                         {% if type == 'species' %}
                             <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'orchidaceae:species' %}?alpha={{alpha}}&role={{role}}">View more detail</a>
                         {% else %}
