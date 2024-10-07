@@ -1,7 +1,7 @@
-<head>
+ <head>
     <title>Sample images</title>
 </head>
-                                                                                                                                                                                                                                                   {% load static %}
+                                                                                                                                                                                                                                                  {% load static %}
 {% include "base.html" %}
 {% block body %}
 <style>
@@ -295,15 +295,15 @@ img{
                         {% for x in family_list %}
                             <div class="imageitem border ">
                                 <a href="{% url 'common:newbrowse' app %}?family={{x.family.family}}&role={{role}}">{{x.family}}</a>
-                                {% if x.get_best_img.pid_id %}
-                                    <a href="{% url 'display:summary' app  x.get_best_img.pid_id %}?app={{x.family.application}}&family={{x.family}}&role={{role}}">
-                                        <img class="thumbnails p-1" alt="" src="{% static  x.get_best_img.thumb_dir %}{{ x.get_best_img.image_file}}" >
+                                {% if x.pid_id %}
+                                    <a href="{% url 'display:summary' app  x.pid_id %}?app={{x.family.application}}&family={{x.family}}&role={{role}}">
+                                        <img class="thumbnails p-1" alt="" src="{% static  x.thumb_dir %}{{ x.image_file}}" >
                                     </a>
                                 {% else %}
                                         <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" >
                                 {% endif %}
                                     <div class="imgcaption">
-                                        {% if x.common_name %}{{x.common_name|default:''}}{% else %}{{x.get_best_img.pid.binomial_it|safe}}{% endif %}
+                                        {% if x.pid.accepted.common_name %}{{x.pid.accepted.common_name|default:''}}{% else %}{{x.binomial_it|safe}}{% endif %}
                                     </div>
                             </div>
                         {% endfor %}
@@ -323,7 +323,7 @@ img{
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        {{x.pid.accepted.common_name|default:x.pid.pid.binomial_it}}</p>
+                                        {{x.pid.accepted.common_name|default:x.pid.pid.binomial_it|safe}}</p>
                                     </div>
                                 {% else %}
                                     <a href="{% url 'display:summary' app x.pid.pid %}?app={{x.pid.family.application}}&family={{x.pid.family}}&role={{role}}">
@@ -334,7 +334,7 @@ img{
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        {% if x.pid.accepted.common_name %}{{x.pid.accepted.common_name|default:''}}<p>{% endif %} ({{x.pid.binomial_it|safe}})
+                                        {% if x.pid.accepted.common_name %}{{x.pid.accepted.common_name|default:''}}<p>{% endif %} {{x.pid.binomial_it|safe}}
                                     </div>
                                 {% endif %}
                             </div>
@@ -349,7 +349,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <p>{{x.pid.accepted.common_name|default:''}} ({{x.binomial}})</p>
+                                        <p>{{x.pid.accepted.common_name|default:x.binomial_it|safe}}</p>
                                     </div>
                             </div>
                         {% endfor %}
