@@ -44,12 +44,11 @@ def summary(request, app=None, pid=None):
         app = None
     query_app = request.GET.get('app', None)
     query_pid = request.GET.get('pid', None)
-
     app = app or query_app
     pid = pid or query_pid
 
     # Handle an old typo in sitemaps.  Crawlers still crawled these urls
-    if app == 'application':
+    if app == None or app == 'application':
         app = 'orchidaceae'
 
     # handle various old paths, will be eventually removed.
@@ -132,13 +131,13 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
 
     # Check if there are infraspecific.
+    # Exclude artificial hybrids from RHS.
     if species.type == 'hybrid' and species.source == 'RHS':
         infraspecifics = 0
     else:
         this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
         main_species = Species.objects.filter(binomial=this_species_name).exclude(pid=pid) # convert requested species to main species
         infraspecifics = len(Species.objects.filter(binomial__istartswith=this_species_name))
-    print("infraspecifics", infraspecifics)
     # If hybrid, find its parents
     if species.type == 'hybrid':
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
@@ -212,7 +211,7 @@ def summary(request, app=None, pid=None):
         # if request pid is a synopnym, return the synonym instance
         species = req_species
     role = get_role(request)
-    write_output(request, str(family))
+    write_output(request, str(family) + ' ' + species.binomial)
     context = {'pid': species.pid, 'species': species,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'family': family,
@@ -225,24 +224,20 @@ def summary(request, app=None, pid=None):
     response = render(request, 'display/summary.html', context)
     return response
 
-
+# Legacy case, app is alwasy orchidaceae
 def information(request, pid=None):
     # As of June 2022, synonym will have its own display page
     # NOTE: seed and pollen id must all be accepted.
     if pid is None:
         pid = request.GET.get('pid')
+    if isinstance(pid, int):
+        # If pid is found, redirect to canonical url
+        new_url = f'/display/summary/orchidaceae/{pid}/'
+        return HttpResponsePermanentRedirect(new_url)
+    # No pid, send to summary to handle missing pid
+    return HttpResponsePermanentRedirect('/display/summary/orchidaceae/')
 
-    if not pid or not str(pid).isnumeric():
-        handle_bad_request(request)
-        return HttpResponseRedirect('/')
 
-    app, family = get_application(request)
-
-    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
-
-    # If accessed via query parameter, redirect to the canonical URL
-    # if family == 'Orchidaceae' and 'pid' in request.GET:
-    return HttpResponsePermanentRedirect(canonical_url)
 
 
 def get_role(request):
@@ -341,6 +336,13 @@ def photos(request, app=None, pid=None):
 
     # Get public list
     pid_list = [pid]
+    if species.type == 'hybrid' and species.source == 'RHS':
+        infraspecifics = 0
+    else:
+        this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
+        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name).exclude(pid=pid).values_list('pid', flat=True) # convert requested species to main species
+        infraspecifics = len(infraspecific_list)
+        pid_list = pid_list + list(infraspecific_list)
 
     #  For typical photos request (e.g. from navigation tab), include ALL photos, including infraspecifics and synonyms.
     syn = request.GET.get('syn', '')
@@ -349,16 +351,9 @@ def photos(request, app=None, pid=None):
         syn_list = list(Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True))
         if syn_list:
             pid_list = pid_list + syn_list
-
-    ifs = request.GET.get('ifs', '')
-    if ifs == 'Y':
-        main_taxon = species.genus + ' ' + species.species
-        ifs_list = list(Species.objects.filter(binomial__istartswith=main_taxon).exclude(pid=pid))
-        if ifs_list:
-            pid_list = pid_list + ifs_list
+    pid_list = list(set(pid_list))
 
     public_list = SpcImages.objects.filter(pid__in=pid_list)
-
     # Get upload list, public list and private list
     upload_list, private_list = [], []
     if request.user.is_authenticated:
@@ -385,6 +380,7 @@ def photos(request, app=None, pid=None):
                'pho': 'active', 'tab': 'pho', 'app': app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
+               'infraspecifics': infraspecifics,
                'owner': owner,
                }
     return render(request, 'display/photos.html', context)
