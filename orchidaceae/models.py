@@ -2,6 +2,7 @@
 #     BaseUserManager, AbstractBaseUser
 # )
 # import six
+from random import randint, choice
 from mptt.models import MPTTModel, TreeForeignKey
 from django.dispatch import receiver
 from PIL import Image as Img
@@ -11,11 +12,10 @@ import re, os, shutil
 from django.core.files import File
 from django.db import models
 from django.db.models.signals import post_save
-from django.db.models import Manager, Q
+from django.db.models import Manager, Q, Count
 from django.conf import settings
 # from django.utils import timezone
 
-from utils.utils import rotate_image
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
 import math
@@ -34,6 +34,26 @@ QUALITY = (
 
 STATUS_CHOICES = [('accepted','accepted'),('registered','registered'),('nonregistered','nonregistered'),('unplaced','unplaced'),('published','published'),('trade','trade')]
 TYPE_CHOICES = [('species','species'),('hybrid','hybrid')]
+
+
+# input a SpcImages or HybImages query set and output best image
+def top_image(images):
+    if images:
+        image_count = images.count()
+        if image_count > 0:
+            # Get the highest rank value from the filtered images
+            highest_rank = images.order_by('-rank').first().rank
+
+            # Filter the images to include only those with the highest rank
+            top_images = images.filter(rank=highest_rank).order_by('quality')  # Order by quality if needed
+
+            # img = images[random_index]  # Use the index to fetch the random image
+            img = choice(top_images)
+            return img
+    return None
+
+
+
 
 # Genera
 class Genus(models.Model):
@@ -116,14 +136,10 @@ class Genus(models.Model):
 
     def get_best_img(self):
         if self.type == 'species':
-            img = SpcImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank', 'quality', '?')
+            images = SpcImages.objects.filter(gen=self.pid, rank__lt=7, image_file__isnull=False)
         else:
-            img = HybImages.objects.filter(gen=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank', 'quality', '?')
-
-        if img.count() > 0:
-            img = img[0:1][0]
-            return img
-        return None
+            images = HybImages.objects.filter(gen=self.pid, rank__lt=7, image_file__isnull=False)
+        return top_image(images)
 
 
 class GenusStat(models.Model):
@@ -507,51 +523,24 @@ class Species(models.Model):
 
     def get_best_img(self):
         if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank','quality','?')
+            images = SpcImages.objects.filter(pid=self.pid, rank__lt=7, image_file__isnull=False)
         else:
-            img = HybImages.objects.filter(pid=self.pid).filter(image_file__isnull=False).filter(rank__lt=7).order_by('-rank','quality', '?')
-        if len(img) > 0:
-            img = img[0:1][0]
-            return img
-        return None
+            images = HybImages.objects.filter(pid=self.pid, rank__lt=7, image_file__isnull=False)
+        return top_image(images)
 
     def get_best_img_by_author(self, author):
         if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-            if not img:
-                img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
-                    '-rank', 'quality', '?')
+            images = SpcImages.objects.filter(pid=self.pid, author_id=author, rank__lt=7, image_file__isnull=False)
         else:
-            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-            if not img:
-                img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).order_by(
-                    '-rank', 'quality', '?')
-
-        if img.count() > 0:
-            img = img[0:1][0]
-            return img
-        return None
+            images = HybImages.objects.filter(pid=self.pid, author_id=author, rank__lt=7, image_file__isnull=False)
+        return top_image(images)
 
     def get_best_img_by_author_only(self, author):
         if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-            if not img:
-                img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
-                    '-rank', 'quality', '?')
+            images = SpcImages.objects.filter(pid=self.pid, author_id=author, rank__lt=7, image_file__isnull=False).exclude(credit_to__isnull=False)
         else:
-            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-            if not img:
-                img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).exclude(credit_to__isnull=False).order_by(
-                    '-rank', 'quality', '?')
-
-        if img.count() > 0:
-            img = img[0:1][0]
-            return img
-        return None
+            images = HybImages.objects.filter(pid=self.pid, author_id=author, rank__lt=7, image_file__isnull=False).exclude(credit_to__isnull=False)
+        return top_image(images)
 
     def image_dir(self):
         if self.type == 'species':
@@ -562,10 +551,10 @@ class Species(models.Model):
 
     def get_num_img_by_author(self, author):
         if self.type == 'species':
-            img = SpcImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
+            img = SpcImages.objects.filter(pid=self.pid, author_id=author, image_file__isnull=False, rank=0)
         else:
-            img = HybImages.objects.filter(pid=self.pid).filter(author_id=author).filter(image_file__isnull=False).filter(rank=0)
-        upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
+            img = HybImages.objects.filter(pid=self.pid, author_id=author, image_file__isnull=False, rank=0)
+        upl = UploadFile.objects.filter(pid=self.pid, author=author)
         return len(img) + len(upl)
 
 
@@ -677,12 +666,8 @@ class Accepted(models.Model):
 
     def get_best_img(self):
         spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
-        img = SpcImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-        if len(img) > 0:
-            img = img[0:1][0]
-            return img
-        return None
+        images = SpcImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False, rank__lt=7)
+        return top_image(images)
 
 
 class Synonym(models.Model):
@@ -693,25 +678,8 @@ class Synonym(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     acc = models.ForeignKey(Species, verbose_name='accepted genus',related_name='oraccid',on_delete=models.CASCADE)
-    # gen = models.ForeignKey(Genus, db_column='gen', related_name='orgen', null=True, blank=True,on_delete=models.CASCADE)
-    # year = models.IntegerField(null=True, blank=True)
-    # genus = models.CharField(max_length=50, null=True, blank=True)
-    # is_hybrid = models.CharField(max_length=5, null=True, blank=True)
     sbinomial = models.CharField(max_length=200, blank=True)
     binomial = models.CharField(max_length=200, blank=True)
-    # species = models.CharField(max_length=50, null=True, blank=True)
-    # infraspr = models.CharField(max_length=20, null=True, blank=True)
-    # infraspe = models.CharField(max_length=50, null=True, blank=True)
-    # sgen = models.ForeignKey(Genus, db_column='sgen', related_name='orsgen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    # syear = models.IntegerField(null=True, blank=True)
-    # sgenus = models.CharField(max_length=50, null=True, blank=True)
-    # sis_hybrid = models.CharField(max_length=5, null=True, blank=True)
-    # sspecies = models.CharField(max_length=50, null=True, blank=True)
-    # sinfraspr = models.CharField(max_length=20, null=True, blank=True)
-    # sinfraspe = models.CharField(max_length=50, null=True, blank=True)
-    # type = models.CharField(max_length=10, null=True, blank=True)
-    # description = models.TextField(null=True, blank=True)
-    # comment = models.TextField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
 
@@ -829,12 +797,8 @@ class Hybrid(models.Model):
 
     def get_best_img(self):
         spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
-        img = HybImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False).filter(rank__lt=7).order_by(
-                '-rank', 'quality', '?')
-        if len(img) > 0:
-            img = img[0:1][0]
-            return img
-        return None
+        images = HybImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False, rank__lt=7)
+        return top_image(images)
 
 
 class Grexrelation(models.Model):

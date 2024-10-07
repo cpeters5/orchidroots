@@ -645,8 +645,8 @@ def progeny(request, pid):
         return render(request, 'orchidaceae/progeny_immediate.html', context)
 
     #Request all offsprings
-    des_list = get_des_list(pid, syn_list)
-
+    # des_list = get_des_list(pid, syn_list)
+    des_list =  list(AncestorDescendant.objects.filter(pct__gt=30, aid=pid))
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
     context = {'result_list': des_list, 'species': species,
