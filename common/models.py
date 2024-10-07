@@ -2,6 +2,7 @@ from django.db import models
 from django.apps import apps
 from accounts.models import User, Photographer
 from mptt.models import MPTTModel, TreeForeignKey
+from random import randint
 
 RANK_CHOICES = [(i, str(i)) for i in range(0, 10)]
 
@@ -29,16 +30,20 @@ class Family(models.Model):
     def __str__(self):
         return self.family
 
-    def get_best_img(self):
-        Genus = apps.get_model(self.application, 'Genus')
-        genus_list = Genus.objects.filter(family=self.family).filter(num_spcimage__gt=0).order_by('?')
-        for img in genus_list:
-            if img.get_best_img():
-                return img.get_best_img()
-        return None
-
     class Meta:
         ordering = ['family']
+
+    def get_best_img(self):
+        SpcImages = apps.get_model(self.application, 'SpcImages')
+        images = SpcImages.objects.filter(family=self.family, rank__lt=7, image_file__isnull=False).order_by('-rank', 'quality')
+
+        image_count = images.count()
+        if image_count > 0:
+            random_index = randint(0, image_count - 1)
+            img = images[random_index]  # Use the index to fetch the random image
+            return img
+        return None
+
 
 
 class Subfamily(models.Model):
