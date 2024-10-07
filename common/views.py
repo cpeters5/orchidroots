@@ -421,73 +421,62 @@ def quality_update(quality, orid, SpcImages):
 
 
 def newbrowse(request, app=None):
+    # Serves 3 different cases:
+    # 1. Browse sample images by families.  Non orchidaceae only
+    # 2. Browse sample images of genera in a selected family
+    # 3. Browse sample images of species in requested genus
     write_output(request, str(app))
     if app == None:
-        app = request.GET.get('app', '')
-    if not app:
-        app = 'fungi'
+        #  Will redirect this to canonical
+        app = request.GET.get('app', 'orchidaceae')
 
+    # handle request
     Family = apps.get_model('common', 'Family')
     family = request.GET.get('family', '')
     if family:
+        print("family", family)
         try:
             family = Family.objects.get(family=family)
         except Family.DoesNotExist:
             family = ''
 
+    # requested genus?
     Genus = apps.get_model(app, 'Genus')
-    genus = request.GET.get('genus', 'Cattleya')
+    genus = request.GET.get('genus', '')
     if genus:
         try:
             genus = Genus.objects.get(genus=genus)
         except Genus.DoesNotExist:
             genus = ''
 
+    # Orchidaceae is a species case;
+    if app == 'orchidaceae' and not family and not genus:
+        family = 'Orchidaceae'
+
     type = request.GET.get('type','species')
+    display = request.GET.get('display', 'checked')
     alpha = request.GET.get('alpha','')
+    role = request.GET.get('role', '')
     if alpha == 'ALL':
         alpha = ''
 
-    family_list = genus_list = species_list = [], [], []
-
-    display = request.GET.get('display', 'checked')
-
+    #  No family/genus requested, browse image sample of each Family (non-orchidaceae only)
     if not family and not genus:
-        # Browse family images
-        family_list = Family.objects.filter(application=app)
+        families = Family.objects.filter(application=app)
+        if alpha:
+            families = families.filter(family__istartswith=alpha)
+        families = families.order_by('family')
 
-    elif family and not genus:
-        # Browse genus image in the Family
+        family_list = []
+        for fam in families:
+            if fam.get_best_img():
+                family_list = family_list + [fam.get_best_img()]
+        context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, 'role': role,
+                   'display': display}
+        return render(request, 'common/newbrowse.html', context)
 
-        if family:
-            Genus = apps.get_model(app.lower(), 'Genus')
-            SpcImages = apps.get_model(app.lower(), 'SpcImages')
-            # genera = Genus.objects.filter(family=family)
-            if app == 'orchidaceae':
-                if type == 'species':
-                    genera = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
-                else:
-                    genera = HybImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
-            else:
-                genera = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
-            if genera:
-                genus_list = []
-                genera = set(genera)
-                genlist = Genus.objects.filter(pid__in=genera)
-                if alpha:
-                    genlist = genlist.filter(genus__istartswith=alpha)
-                genlist = genlist.order_by('genus')
-                for gen in genlist:
-                    genus_list = genus_list + [gen.get_best_img()]
-                context = {'genus_list': genus_list, 'family': family, 'app': family.application, 'alpha': alpha,
-                           'alpha_list': alpha_list, 'app': app,}
-                return render(request, 'common/newbrowse.html', context)
-
-    # If only app is requested, find family_list and sample image by family
-    # If family is requested, get sample list by genera
-    if genus:
-        # Go to browse genus.species
-        Genus = apps.get_model(app.lower(), 'Genus')
+    elif genus:
+        # browse images of species in requested genus
         Species = apps.get_model(app.lower(), 'Species')
         Accepted = apps.get_model(app.lower(), 'Accepted')
         try:
@@ -495,11 +484,16 @@ def newbrowse(request, app=None):
         except Genus.DoesNotExist:
             genus = ''
         if isinstance(genus, Genus):
-            species = Species.objects.filter(genus=genus)
+            species = Species.objects.filter(genus=genus).exclude(status='synonym')
+            if type:
+                species = species.filter(type=type)
+
+            # For large cases, limit to alpha =A
             if not alpha and app == 'orchidaceae' and len(species) > 2000:
                 alpha = 'A'
             if alpha:
                 species = species.filter(species__istartswith=alpha)
+            # If request a section
             section = request.GET.get('section', '')
             if section:
                 sections = Accepted.objects.filter(gen=genus.pid).filter(section=section).values_list('pid', flat=True)
@@ -516,22 +510,35 @@ def newbrowse(request, app=None):
             context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list,}
             return render(request, 'common/newbrowse.html', context)
 
+    elif family:
+        # Browse genus image in the Family
+        if app == 'orchidaceae' and type == 'hybrid':
+            SpcImages = apps.get_model(app.lower(), 'HybImages')
+        else:
+            SpcImages = apps.get_model(app.lower(), 'SpcImages')
+
+        # genera = Genus.objects.filter(family=family)
+        if app == 'orchidaceae':
+            genimg = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
+        else:
+            genimg = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
+
+        if genimg:
+            genus_list = []
+            genimg = set(genimg)
+            genlist = Genus.objects.filter(pid__in=genimg)
+            if alpha:
+                genlist = genlist.filter(genus__istartswith=alpha)
+            genlist = genlist.order_by('genus')
+            for gen in genlist:
+                genus_list = genus_list + [gen.get_best_img()]
+            context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
+                       'alpha_list': alpha_list, 'app': app,}
+            return render(request, 'common/newbrowse.html', context)
+
+
     # Neither family, nor genus were requested. Building sample by families
     #  Typically requested from navbar buttons
-    families = Family.objects.filter(application=app)
-    if alpha:
-        families = families.filter(family__istartswith=alpha)
-    families = families.order_by('family')
-    Genus = apps.get_model(app, 'Genus')
-    family_list = []
-    for fam in families:
-        genimage = Genus.objects.filter(family=fam.family).order_by('?')[0:1]
-        if len(genimage) > 0 and genimage[0].get_best_img():
-            family_list = family_list + [(genimage[0])]
-    role = request.GET.get('role', '')
-    context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, 'role': role,
-               'display': display}
-    return render(request, 'common/newbrowse.html', context)
 
 
 def distribution(request):
