@@ -534,7 +534,14 @@ def get_pollen_parent(child):
     return parent
 
 
-def ancestrytree(request, pid):
+def ancestrytree(request, pid=None):
+    if not pid:
+        pid = request.GET.get('pid', '')
+
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        return HttpResponseRedirect('/')
+
     role = getRole(request)
     try:
         species = Species.objects.get(pk=pid)
@@ -542,10 +549,6 @@ def ancestrytree(request, pid):
         message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
         return HttpResponse(message)
     write_output(request, species.binomial)
-
-    #  If requested species is a synonym, convert pid to accepted pid.
-    #  Ancestordescendant only contain accepted pids.
-    # This table will need to be reloaded when there are changes in taxons.
     if species.status == 'synonym':
         species = species.getAccepted()
 
@@ -568,11 +571,13 @@ def ancestrytree(request, pid):
         pps = get_seed_parent(pp)
         ppp = get_pollen_parent(pp)
         species.img = hybdir + get_random_img(species)
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestrytree/{pid}/')
     context = {'species': species,
-               'spc': spc, 'lineage': 'active', 'tab': 'lineage',
+               'spc': spc, 'tree': 'lineage', 'tab': 'lineage', 'lineage': 'active',
                's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
                'p': p, 'ps': ps, 'pp': pp, 'pss': pss, 'psp': psp, 'pps': pps, 'ppp': ppp,
                'title': 'ancestrytree', 'role': role, 'app': 'orchidaceae',
+               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/ancestrytree.html', context)
 
