@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import environ
 import os
+import logging
 import logging.config
-from django.utils.translation import gettext
+# from django.utils.translation import gettext
+from django.utils.deprecation import MiddlewareMixin
 from utils.json_encoder import LazyJSONSerializer, LazyEncoder
+from utils.logging import RequestFormatter  # Import the custom formatter
 
 ROOT_DIR = environ.Path(__file__) - 2  # get root of the project
 
@@ -42,6 +45,14 @@ ALLOWED_HOSTS = [
     'www.beta.bluenanta.com',
 ]
 
+# Setup support for proxy headers
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+try:
+    from .local_settings import * # NOQA
+except: # NOQA
+    pass
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -101,12 +112,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middleware.CleanUTF8Middleware',
     'allauth.account.middleware.AccountMiddleware',
+    'utils.middleware.CleanUTF8Middleware',
+    'utils.middleware.LogIPMiddleware',
+    # 'utils.middleware.RemoveWwwMiddleware',
 ]
 
 INTERNAL_IPS = [
-    # '45.55.134.164',
+    '45.55.134.164',
 ]
 
 # Session settings
@@ -280,16 +293,24 @@ CRONJOBS = [
     ('0 3 4 * *', 'django.core.management.call_command', ['update_sitemaps'])
 ]
 
-
 LOGGING_CONFIG = None
 try:
     logging.config.dictConfig({
         'version': 1,
         'disable_existing_loggers': False,
+        'filters': {
+            'ip_filter': {
+                '()': 'utils.log_filters.IPAddressFilter',
+            },
+        },
         'formatters': {
             'console': {
-                # exact format is not important, this is the minimum information
-                'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s [IP: %(ip)s]',
+            },
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {message} [IP: {ip_address}]',
+                'style': '{',
+                'class': 'utils.logging.RequestFormatter',  # Use the custom formatter
             },
         },
         'handlers': {
@@ -297,32 +318,40 @@ try:
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
                 'formatter': 'console',
+                'filters': ['ip_filter'],
             },
             'sentry': {
                 'level': 'WARNING',
                 'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
             },
-            # 'logfile': {
-            #     'level':'DEBUG',
-            #     'class':'logging.FileHandler',
-            #     'filename': BASE_DIR + "/../log/logfile",
-            # },
+            'logfile': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(BASE_DIR, "log", "django.log"),
+                'formatter': 'console',
+                'filters': ['ip_filter'],
+            },
         },
         'loggers': {
             '': {
                 'level': 'WARNING',
-                'handlers': ['console', 'sentry']
+                'handlers': ['console', 'sentry', 'logfile'],
+            },
+            'django': {
+                'handlers': ['console', 'sentry', 'logfile'],
+                'level': 'ERROR',  # Customize the level if needed
+                'propagate': True,
             },
             'myproject': {
                 'level': 'INFO',
-                'handlers': ['console', 'sentry'],
-                # required to avoid double logging with root logger
+                'handlers': ['console', 'sentry', 'logfile'],
                 'propagate': False,
             },
         },
     })
-except: # noqa
+except:  # noqa
     pass
+
 
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -383,16 +412,6 @@ STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_PUBLISHABLE_KEY', default='')
 # paypal settings
 PAYPAL_CLIENT_ID = env('PAYPAL_CLIENT_ID', default='')
 PAYPAL_SECRET =  env('PAYPAL_SECRET', default='')
-
-# Setup support for proxy headers
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-try:
-    from .local_settings import * # NOQA
-except: # NOQA
-    pass
-
 
 ADS_GOOGLE_ADSENSE_CLIENT = None  # 'ca-pub-xxxxxxxxxxxxxxxx'
 

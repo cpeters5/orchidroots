@@ -37,18 +37,38 @@ INTERNAL_RESET_URL_KEY = "set-password"
 INTERNAL_RESET_SESSION_KEY = "_password_reset_key"
 
 
-@login_required
+
+# login_required
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect(reverse('/'))
 
 
+def get_client_ip(request):
+    """Function to get client IP address from request."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 # Will be replaced by the classbase LoginView when the bug is fixed
+def get_client_ip(request):
+    """Function to get client IP address from request."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def login_page(request):
     form = LoginForm(request.POST or None)
     context = {
         "form": form,
-        # 'site_key': settings.RECAPTCHA_SITE_KEY,
     }
     next_ = request.GET.get('next')
     next_post = request.POST.get('next')
@@ -59,12 +79,10 @@ def login_page(request):
         password = form.cleaned_data.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # logging.error(">>> " + request.get_host() + " - user " + str(request.user))
             try:
                 del request.session['guest_email_id']
             except:
                 pass
-            # update the redirect_path here
             if user.is_active:
                 if user.email:
                     return perform_login(request, user, email_verification=settings.ACCOUNT_EMAIL_VERIFICATION,
@@ -73,15 +91,18 @@ def login_page(request):
                     request.session['email_user'] = user.id
                     return redirect('set_email')
 
-            if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
-            # if url_has_allowed_host_and_scheme(redirect_path, request.get_host()):
-            #     return redirect("/detail/myphoto_browse_spc/?role=" + role + "&display=checked")
+            if is_safe_url(redirect_path, request.get_host()):
                 return redirect(redirect_path + "?role=pri")
             else:
                 return redirect("/?role=pri")
         else:
-            message = "LOGIN FAIL:  Username: {} / password: {}".format(username, password)
+            # Get the client IP address
+            client_ip = get_client_ip(request)
+
+            # Log the failed login attempt with the IP address
+            message = f"LOGIN FAIL: Username: {username} / password: {password} [IP: {client_ip}]"
             logger.error(message)
+
             form.add_error(None, 'invalid username or password')
             context['form'] = form
             return render(request, "accounts/login.html", context)

@@ -5,6 +5,7 @@ old/
 src/
 venv/
 dbview/
+log/
 .coverage
 .env*
 .idea/
