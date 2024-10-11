@@ -79,7 +79,7 @@
                     </div>
                 </li>
                     {% endif %}
-                {% if app == 'orchidaceze' and species.type == 'species' %}
+                {% if app == 'orchidaceae' and species.type == 'species' %}
                     <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'orchidaceae:infraspecific' species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
