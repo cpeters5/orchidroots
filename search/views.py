@@ -5,7 +5,6 @@ from django.db.models.functions import Replace
 from django.apps import apps
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils.deprecation import MiddlewareMixin
 from itertools import chain
 from fuzzywuzzy import fuzz, process
 from common.models import Family, Subfamily, Tribe, Subtribe, CommonName, Binomial, SpellChecker
@@ -342,22 +341,17 @@ def search(request, app=None):
     search_string = request.GET.get('search_string', '').strip()
 
     if not search_string:
-        context = {'search_string': 'search_string', 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'genus_total': len(genus_list), 'app': app,
-                   'role': role}
+        context = {'search_string': search_string,'app': app, 'role': role}
         return render(request, "search/search_results.html", context)
 
     # abrev. only applied to orchids
     if app == 'orchidaceae':
         genus_name, search_string = expand_genus_name(search_string)
-        print("genus and search string", genus_name, search_string)
 
     search_string = clean_search_string(search_string)
-
     if ' ' not in search_string:
         # single word could be genus
         matched_genus = Genus.objects.filter(Q(genus__istartswith=search_string) | Q(abrev__istartswith=search_string))
-        print("matched_genus", matched_genus)
         if matched_genus:
             #  Done if found a matching genus.
             context = {'search_string': search_string, 'matched_genus': matched_genus,
@@ -369,11 +363,12 @@ def search(request, app=None):
     # Search string more than one word
     match_spc_list = Species.objects.filter(binomial__icontains=search_string)
     # If no match found (probably wrong genus), drop the first word (genus) and match again
-    # TODO: Limit to check on genera in the same group (family, subfamily, etc.  See genusrelation class)
     if not match_spc_list:
         words = search_string.split()
         species_name = ' '.join(words[1:]) if len(words) > 1 else '' # Must already be > 1
-        match_spc_list = Species.objects.filter(binomial__icontains=species_name)
+        if species_name:
+            match_spc_list = Species.objects.filter(binomial__icontains=species_name)
+
 
     write_output(request, search_string)
     context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
@@ -394,12 +389,14 @@ def search_name(request, app=None):
     if not app:
         app = request.GET.get('app', '')
 
+    species_list = []
     req_search_string = request.GET.get('search_string', '').strip()
     if not req_search_string:
-        context = {'search_string': 'req_search_string', 'genus_list': genus_list, 'match_spc_list': match_spc_list,
-                   'genus_total': len(genus_list), 'app': app,
-                   'role': role}
-        return render(request, "search/search_results.html", context)
+        req_search_string = request.POST.get('search_string', '').strip()
+    if not req_search_string:
+        context = {'search_string': req_search_string, 'app': app, 'role': role}
+        return render(request, "search/search_name.html", context)
+
 
     search_string = req_search_string.rstrip('s')
     search_string = clean_search_string(search_string)
@@ -409,11 +406,6 @@ def search_name(request, app=None):
     if not search_string or search_string == '':
         search_string = request.GET.get('search_string', '').strip()
 
-        # print("app", app)
-        # context = {'role': role, 'app': app, 'search_string': search_string}
-        # return render(request, "search/search_name.html", context)
-
-    species_list, genus_list, family_list = [], [], []
     Species = apps.get_model(app, 'Species')
     Accepted = apps.get_model(app, 'Accepted')
     if app == 'orchidaceae':
@@ -424,7 +416,7 @@ def search_name(request, app=None):
     if pid_list:
         species_list = Species.objects.filter(pid__in=pid_list)
 
-    context = {'family_list': family_list, 'genus_list': genus_list, 'species_list': species_list,
+    context = {'species_list': species_list,
                'search_string': req_search_string, 'app': app, 'role': role,}
     write_output(request, str(search_string))
     return render(request, "search/search_name.html", context)

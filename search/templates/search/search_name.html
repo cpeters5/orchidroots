@@ -105,7 +105,13 @@ td {
     </div>
     <div class="col" style="text-align:left;font-size:13px;margin-top:25px;">
         <div class="card-body"  style="width:100%; display:inline-block; padding-top:0;text-align: center;">
-            <h5 class="card-title" style="margin-bottom: 0">Common name in {{app|title}} matching "<i>{{search_string}}</i>"</h5>
+            <h5 class="card-title" style="margin-bottom: 0">
+                {% if search_string %}
+                    Common name in the {{app|title}} domain matching "<i>{{search_string}}</i>"
+                {% else %}
+                    Please submit a common name to search in the {{app|title}} domain
+                {% endif %}
+            </h5>
         </div>
     </div>
     {% if not species_list %}

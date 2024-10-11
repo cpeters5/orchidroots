@@ -53,22 +53,17 @@ td {
     </div>
     <br>
     <div style="text-align: center;">
-        <h5>Search results for "{{search_string}}" in {{app}}</h5>
+        <h5>
+            {% if search_string %}
+                Scientific name in teh {{app|title}} domain matching "{{search_string}}"
+            {% else %}
+                Please submit a scientific name (genus species) to search in the {{app|title}} domain
+            {% endif %}
+        </h5>
+        To search for common name, try
+            <a class="btn btn-primary" href="{% url 'search:search_name' app %}?role={{role}}&search_string={{search_string}}">Search by commonname</a>
     </div>
 
-    {% if not matched_genus and not match_spc_list %}
-    <div style="margin-left: 100px;">
-        <br>
-        <ul>
-            <li>If not found, the name might belong to a different genus.  Try removing genus grom your search string</li>
-            <li>You might be in the wrong domain (see navbar).</li>
-            <li>Try selecting a different domain in the nav bar. or switch to</li>
-            <li>In case the name might be a common name, try:&nbsp; &nbsp;
-            <a class="btn btn-primary" href="{% url 'search:search_name' app %}?role={{role}}&search_string={{search_string}}">Search by commonname</a>
-            </li>
-        </ul>
-    </div>
-    {% endif %}
     <div class="container m-2"  style="width:100%; display:inline-block; padding-top:0;">
     {% if matched_genus %}
         <table class="table table-condensed  table-hover" style="padding-bottom: 0px; width: 85%;">
