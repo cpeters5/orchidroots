@@ -328,15 +328,22 @@ def hybrid(request):
     author = request.GET.get('author', '')
     year_valid = 0
     msg = ''
+    crit = 0
+    if author: crit = 1
     originator = request.GET.get('originator', '')
+    if originator: crit = 1
     alpha = request.GET.get('alpha', '')
+    if alpha: crit = 1
     year = request.GET.get('year', '')
     if valid_year(year):
         year_valid = 1
+        crit = 1
     if alpha != 'ALL':
         alpha = alpha[0:1]
     status = request.GET.get('status', '')
     spc = request.GET.get('spc', '')
+    if spc:
+        crit = 1
     if len(spc) == 1:
         alpha = spc
         spc = ''
@@ -358,7 +365,7 @@ def hybrid(request):
                 break
         prev_genus = reqgenus
     # If there is no params requested, and for large tables, set alpha = A
-    if reqgenus in config.big_genera:
+    if not crit and reqgenus in config.big_genera:
         alpha = 'A'
 
     # user requests seed or pollen parents
@@ -368,30 +375,37 @@ def hybrid(request):
 
     # Start building the list
     # First matching genus, with wild card
-    reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+    crit = 1 #???
+    if crit :
+        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+    else:
+        # If crit = 0 (no filter criteria), ignore request
+        return render(request, 'orchidaceae/hybrid.html', {})
     write_output(request, str(reqgenus))
 
     # Genus unchanged, see if seed/pollen are requested
-    # Need redesign here..
     if this_species_list:
         if (reqgenus and (reqgenus == prev_genus)):
             seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
             pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
 
         if len(seed_binomial) > 0:
-            seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
+            seed_pids = Species.objects.extra(where=["MATCH(binomial) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[seed_binomial]).values_list('pid', flat=True)
+            # seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
             this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
 
         if len(pollen_binomial) > 0:
-            poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
+            poll_pids = Species.objects.extra(where=["MATCH(binomial) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[pollen_binomial]).values_list('pid', flat=True)
+            # poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
             this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
 
-    if this_species_list:
+    if crit and this_species_list:
         if spc:
-            if len(spc) >= 2:
-                this_species_list = this_species_list.filter(species__icontains=spc)
-            else:
-                this_species_list = this_species_list.filter(species__istartswith=spc)
+            this_species_list = this_species_list.extra(where=["MATCHED(species) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[spc])
+            # if len(spc) >= 2:
+            #     this_species_list = this_species_list.filter(species__icontains=spc)
+            # else:
+            #     this_species_list = this_species_list.filter(species__istartswith=spc)
 
         elif alpha:
             if len(alpha) == 1:
@@ -409,13 +423,11 @@ def hybrid(request):
         this_species_list = []
         msg = "Please select a search criteria"
     role = getRole(request)
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/hybrid/?genus={reqgenus}')
     context = {'my_list': this_species_list,
                'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'genus': reqgenus, 'year': year, 'status': status, 'msg': msg,
                'author': author, 'originator': originator, 'seed_binomial': seed_binomial, 'pollen_binomial': pollen_binomial,
                'role': role, 'level': 'list', 'title': 'hybrid_list',  'app': 'orchidaceae',
-               'canonical_url': canonical_url,
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
