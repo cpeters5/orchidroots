@@ -271,7 +271,12 @@ a:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
-
+.lightbox img {
+    max-width: 100%;
+    max-height: 100vh; /* Ensures it won't exceed the viewport height */
+    width: auto;
+    height: auto;
+}
 </style>
 
 <div style="width:95%;margin:0 auto;padding:0;">
@@ -321,10 +326,9 @@ a:hover {
                                   <br>{{image.get_displayname}}
                                   <br>{{image.text_data|default:''|safe}}" rel="nofollow noreferrer noopener">
                                   <img class="thumbnails" alt="{{image.get_displayname}}" src="{% static 'media/' %}{{image.image_file_path}}">
-                                  <div class="text text-br">{{image.id}}
-                                  </div>
+                                  <div class="text text-br">{{image.id}}</div>
                              </a>
-                             </div>
+                         </div>
                      {% else %}
                          <div class="box">
                              <a href="#">
