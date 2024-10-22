@@ -79,13 +79,12 @@ urlpatterns = [
     path('detail/hybrid_detail/<int:pid>/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/<int:pid>/species_detail/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
     path('detail/<int:pid>/hybrid_detail/', RedirectView.as_view(url='/display/summary/orchidaceae/%(pid)s/', permanent=True)),
-    path('search/search_match/', RedirectView.as_view(url='/search/search_orchidaceae/', permanent=True)),
 
     # Decommissioned applications
-    path('natural/', include(('detail.urls', 'detail'), namespace='natural')),
-    path('orchidlite/', include(('display.urls', 'display'), namespace='orchidlite')),
-    path('orchid/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchid')),
-    path('orchidlist/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchidlist')),
+    # path('natural/', include(('detail.urls', 'detail'), namespace='natural')),
+    # path('orchidlite/', include(('display.urls', 'display'), namespace='orchidlite')),
+    # path('orchid/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchid')),
+    # path('orchidlist/', include(('orchidaceae.urls', 'orchidaceae'), namespace='orchidlist')),
     # re_path(r'^natural/(?P<path>.*)$', RedirectView.as_view(url='/detail/%(path)s', permanent=True)),
     # path('natural/', include('detail.urls'), namespace='natural'),
     # re_path(r'^orchidlite/(?P<path>.*)$', RedirectView.as_view(url='/display/%(path)s', permanent=True)),
