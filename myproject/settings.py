@@ -290,10 +290,71 @@ CELERYBEAT_SCHEDULE = {
 
 
 CRONJOBS = [
-    ('0 3 4 * *', 'django.core.management.call_command', ['update_sitemaps'])
+    ('0 3 4 * *', 'django.core.management.call_command', ['update_sitemap'])
 ]
+#
+# LOGGING_CONFIG = None
+# try:
+#     logging.config.dictConfig({
+#         'version': 1,
+#         'disable_existing_loggers': False,
+#         'filters': {
+#             'ip_filter': {
+#                 '()': 'utils.log_filters.IPAddressFilter',
+#             },
+#         },
+#         'formatters': {
+#             'console': {
+#                 'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s [IP: %(ip)s]',
+#             },
+#             'verbose': {
+#                 'format': '{levelname} {asctime} {module} {message} [IP: {ip_address}]',
+#                 'style': '{',
+#                 'class': 'utils.logging.RequestFormatter',  # Use the custom formatter
+#             },
+#         },
+#         'handlers': {
+#             'console': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.StreamHandler',
+#                 'formatter': 'console',
+#                 'filters': ['ip_filter'],
+#             },
+#             'sentry': {
+#                 'level': 'WARNING',
+#                 'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+#             },
+#             'logfile': {
+#                 'level': 'DEBUG',
+#                 'class': 'logging.FileHandler',
+#                 'filename': os.path.join(BASE_DIR, "log", "django.log"),
+#                 'formatter': 'console',
+#                 'filters': ['ip_filter'],
+#             },
+#         },
+#         'loggers': {
+#             '': {
+#                 'level': 'WARNING',
+#                 'handlers': ['console', 'sentry', 'logfile'],
+#             },
+#             'django': {
+#                 'handlers': ['console', 'sentry', 'logfile'],
+#                 'level': 'ERROR',  # Customize the level if needed
+#                 'propagate': True,
+#             },
+#             'myproject': {
+#                 'level': 'INFO',
+#                 'handlers': ['console', 'sentry', 'logfile'],
+#                 'propagate': False,
+#             },
+#         },
+#     })
+# except:  # noqa
+#     pass
+
 
 LOGGING_CONFIG = None
+
 try:
     logging.config.dictConfig({
         'version': 1,
@@ -306,11 +367,6 @@ try:
         'formatters': {
             'console': {
                 'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s [IP: %(ip)s]',
-            },
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {message} [IP: {ip_address}]',
-                'style': '{',
-                'class': 'utils.logging.RequestFormatter',  # Use the custom formatter
             },
         },
         'handlers': {
@@ -325,7 +381,7 @@ try:
                 'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
             },
             'logfile': {
-                'level': 'DEBUG',
+                'level': 'ERROR',
                 'class': 'logging.FileHandler',
                 'filename': os.path.join(BASE_DIR, "log", "django.log"),
                 'formatter': 'console',
@@ -338,20 +394,20 @@ try:
                 'handlers': ['console', 'sentry', 'logfile'],
             },
             'django': {
-                'handlers': ['console', 'sentry', 'logfile'],
-                'level': 'ERROR',  # Customize the level if needed
+                'handlers': ['logfile'],
+                'level': 'WARNING',  # Customize the level if needed
                 'propagate': True,
             },
-            'myproject': {
-                'level': 'INFO',
-                'handlers': ['console', 'sentry', 'logfile'],
-                'propagate': False,
-            },
+            # Remove the gunicorn.error logger to avoid conflicts with Gunicorn's own logging
+            # 'gunicorn.error': {
+            #     'level': 'INFO',
+            #     'handlers': ['console', 'sentry', 'logfile'],
+            #     'propagate': False,
+            # },
         },
     })
 except:  # noqa
     pass
-
 
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
