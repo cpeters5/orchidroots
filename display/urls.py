@@ -15,4 +15,7 @@ urlpatterns = [
 
     path('videos/<int:pid>/', views.videos, name='videos'),
 
+    # Legacy url
+    path('information/<int:pid>/', views.summary, name='information_with_pid'),
+
 ]
