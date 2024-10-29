@@ -239,26 +239,40 @@ def get_role(request):
 
 def photos(request, app=None, pid=None):
     # Cleanup request url
+    # Get models
     if isinstance(app, int):
         pid = app
         app = None
     query_app = request.GET.get('app', None)
     query_pid = request.GET.get('pid', None)
 
+    family = request.GET.get('family', None)
+
     app = app or query_app
     pid = pid or query_pid
 
-    # handle various old paths, will be eventually removed.
+    # Old ip /display/photosw/<pid>/?family=Orchidaceae
+    # Redirect to /display/photos/orchidaceae/<pid>
+    if not app and family:
+        if family == 'Orchidaceae':
+            app = 'orchidaceae'
+        else:
+            try:
+                family = Family.objects.get(pk=family)
+                app = family.application
+            except Family.DoesNotExist:
+                # Nothing we can do
+                return HttpResponsePermanentRedirect(reverse('home'))
+        return HttpResponsePermanentRedirect(reverse('display:photos', args=[app, pid]))
+
     if not pid:
         # Worst case scenario when no explicit pid requested. Send it to homepage.
         return HttpResponsePermanentRedirect(reverse('home'))
 
-    # Either 'app' or pid is from query string, send to the canonical URL
+    # handle old urls. Either 'app' or pid is from query string, send to the canonical URL
     if query_pid != None or app == None:
         app = None or 'orchidaceae'
         return HttpResponsePermanentRedirect(reverse('display:photos', args=[app, pid]))
-    if not app or app == None:
-        app = 'orchidaceae'
 
     #  Logic starts here
     #  Get author (to enable private photos display)
@@ -275,21 +289,19 @@ def photos(request, app=None, pid=None):
     Species = apps.get_model(app, 'Species')
     Synonym = apps.get_model(app, 'Synonym')
     UploadFile = apps.get_model(app, 'UploadFile')
-    # For Orchid, image classes could be species or hybrid depending on species.type
-
-    # Get species
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
+        return HttpResponsePermanentRedirect(reverse('home'))
 
+    # For Orchid, image classes could be species or hybrid depending on species.type
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
         SpcImages = apps.get_model(app, 'SpcImages')
 
     # get family
-    # for non-orchids request, family is identified by pid.
+    # for non-orchid request, family is identified by pid.
     family = species.family
 
     # handle rank and quality update.
@@ -305,6 +317,7 @@ def photos(request, app=None, pid=None):
 
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/')
+
     # For synonym species, just render only synonym images
     if species.status == 'synonym':
         public_list = SpcImages.objects.filter(pid=pid)  # public photos
@@ -319,15 +332,18 @@ def photos(request, app=None, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
-    # Get public list
+    # Get infraspecific list for species
     pid_list = [pid]
-    if species.type == 'hybrid' and species.source == 'RHS':
-        infraspecifics = 0
-    else:
-        this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
-        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name).exclude(pid=pid).values_list('pid', flat=True) # convert requested species to main species
-        infraspecifics = len(infraspecific_list)
-        pid_list = pid_list + list(infraspecific_list)
+    infraspecifics = 0
+    if species.type != 'hybrid' and species.source != 'RHS':
+        if not species.infraspe:
+            # Unless the requested species is already an infraspecific
+            # get the list of all infraspecifics (regardless of status)
+            this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
+            infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name).values_list('pid',
+                                                                                                             flat=True)  # convert requested species to main species
+            infraspecifics = len(infraspecific_list)
+            pid_list = pid_list + list(infraspecific_list)
 
     #  For typical photos request (e.g. from navigation tab), include ALL photos, including infraspecifics and synonyms.
     syn = request.GET.get('syn', '')
@@ -349,7 +365,7 @@ def photos(request, app=None, pid=None):
                 upload_list = upload_list.filter(author=request.user.photographer.author_id)
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
-        # This shouldn't happen. Need to change the design: make sure user.role and photographer instance is insync.
+            # This shouldn't happen. Need to change the design: make sure user.role and photographer instance is insync.
             if isinstance(request.user.photographer, Photographer):
                 upload_list = upload_list.filter(author=request.user.photographer.author_id)  # Private photos
                 private_list = private_list.filter(author=request.user.photographer.author_id)  # Private photos
@@ -359,7 +375,9 @@ def photos(request, app=None, pid=None):
     if private_list:
         private_list = private_list.order_by('created_date')
 
-    write_output(request, str(family))
+    # for img in public_list:
+    #     print("img", img.id, img.pid, img.get_displayname())
+    write_output(request, str(family) + ' ' + species.binomial)
     context = {'species': species, 'author': author,
                'family': family,
                'pho': 'active', 'tab': 'pho', 'app': app,
