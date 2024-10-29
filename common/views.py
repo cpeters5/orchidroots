@@ -897,6 +897,7 @@ def approve_mediaphoto(request, app, pid, orid):
     status = spc.save()
     upl.approved = True
     upl.delete(0)
+    os.remove(old_name)
     write_output(request, str(family))
     url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
     return HttpResponseRedirect(url)
