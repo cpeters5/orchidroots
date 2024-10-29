@@ -37,7 +37,11 @@
             </thead>
             {% for infra in infraspecific_list %}
             <tr style="text-align: left">
-                <td><a href="{% url 'display:photos' species.family.application infra.pid %}?role={{role}}"><i>{{infra.binomial_it|safe}}</i></a></td>
+                <td><a href="{% url 'display:photos' app infra.pid %}?role={{role}}">
+                    <i>{{infra.binomial_it|safe}}</i></a>
+                    {% if infra.status == 'synonym' %} (syn. <a href="{% url 'display:photos' app infra.pid %}?role={{role}}">{{infra.getAccepted}}</a>){% endif %}
+                </td>
+
             </tr>
             {% endfor %}
      </table>
