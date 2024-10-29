@@ -25,7 +25,6 @@ urlpatterns = [
     path('uploadweb/<int:pid>/', views.uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', views.uploadweb, name='uploadweb'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),
-    path('approvemediaphoto/<int:pid>/', views.approvemediaphoto, name='approvemediaphoto'),
 
     # Legacy urls
     path('information/', views.information, name='redirect_information'),

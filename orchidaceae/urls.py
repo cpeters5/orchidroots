@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from . import views
 from detail.views import reidentify as detail_reidentify, uploadfile as detail_uploadfile, \
     uploadweb as detail_uploadweb, curateinfospc as detail_curateinfospc, curateinfohyb as detail_curateinfohyb, \
-    compare as detail_compare, createhybrid as detail_createhybrid, approvemediaphoto as detail_approvemediaphoto
+    compare as detail_compare, createhybrid as detail_createhybrid
 
 
 app_name = 'orchidaceae'
@@ -31,7 +31,6 @@ urlpatterns = [
     path('uploadweb/<int:pid>/', detail_uploadweb, name='uploadweb'),
     path('uploadweb/<int:pid>/<int:orid>/', detail_uploadweb, name='uploadweb'),
     path('uploadfile/<int:pid>/', detail_uploadfile, name='uploadfile'),
-    path('approvemediaphoto/<int:pid>/', detail_approvemediaphoto, name='approvemediaphoto'),
 
     path('curateinfospc/<int:pid>/', detail_curateinfospc, name='curateinfospc'),
     path('curateinfohyb/<int:pid>/', detail_curateinfohyb, name='curateinfohyb'),
