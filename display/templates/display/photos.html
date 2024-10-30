@@ -271,12 +271,7 @@ a:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
-.lightbox img {
-    max-width: 100%;
-    max-height: 100vh; /* Ensures it won't exceed the viewport height */
-    width: auto;
-    height: auto;
-}
+
 </style>
 
 <div style="width:95%;margin:0 auto;padding:0;">
@@ -304,7 +299,7 @@ a:hover {
             &nbsp;&nbsp;
         {% if user.is_authenticated %}
             {% if owner == 'Y' %}
-                <a href="{% url 'display:photos' app species.pid %}?app={{app}}&role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
+                <a href="{% url 'display:photos' app species.pid %}?role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
             {%  else %}
                 <a href="{% url 'common:myphoto' species.pid %}?app={{app}}&role={{role}}&owner=Y" rel="nofollow noreferrer noopener">Click to view only my photos</a>
             {% endif %}
@@ -326,9 +321,10 @@ a:hover {
                                   <br>{{image.get_displayname}}
                                   <br>{{image.text_data|default:''|safe}}" rel="nofollow noreferrer noopener">
                                   <img class="thumbnails" alt="{{image.get_displayname}}" src="{% static 'media/' %}{{image.image_file_path}}">
-                                  <div class="text text-br">{{image.id}}</div>
+                                  <div class="text text-br">{{image.id}}
+                                  </div>
                              </a>
-                         </div>
+                             </div>
                      {% else %}
                          <div class="box">
                              <a href="#">
@@ -366,8 +362,7 @@ a:hover {
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                     <div class="box">
                         <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
-                                {{image.id}}:  Uploaded since {{image.created_date}}<br>
-                                {{image.get_displayname}}
+                                {{image.id}}:  Uploaded since {{image.created_date}} by {{image.get_displayname}}<br>
                                 <br>{{image.text_data|default:''|safe}}">
                                     <img class="thumbnails" alt="{{image.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                     <div class="text text-br">{{image.id}}</div>
@@ -426,7 +421,7 @@ a:hover {
         {% else %}
             {% if species.status == 'synonym' %}
                 <br><br><div style="text-align:center">No images available.  Please try the accepted species
-                            <a href="{% url 'display:photos' app species.getAcc %}?app={{app}}">{{species.getAccepted.binomial|safe}}</a>
+                            <a href="{% url 'display:photos' app species.getAcc %}?role={{role}}">{{species.getAccepted.binomial|safe}}</a>
                         </div>
             {% else %}
                 <br><br><div style="text-align:center">No images available {% if author %}for {{author.displayname}}{% endif %}</div>
