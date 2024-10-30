@@ -1,6 +1,9 @@
 <!--Title-->
 
 <style>
+.nav2 {
+    font-size: 13px;
+}
    h1 {
         font-size: 24px;
     }
@@ -10,6 +13,28 @@
         font-size: 18px;
 
     }
+    .nav2 {
+        font-size: 11px;
+        font-weight: bold;
+        /*height: 20px;*/
+        /*margin-bottom:30px;*/
+    }
+}
+.btn-custom {
+    width: 120px;
+}
+.btn-current {
+    background-color: blue;
+    color: white;
+}
+.hidden {
+    display: none;
+}
+.adcaption {
+    font-size: 12px;
+    text-align: left;
+    height:70px;
+    /*overflow: hidden;*/
 }
 
   .form-inline {
@@ -22,6 +47,7 @@
   .searchbox {
     padding: 8px 12px; /* Padding inside the search box */
     border: 1px solid #ccc;
+    border-right: none; /* Remove right border */
     border-radius: 4px 0 0 4px; /* Rounded corners for the left side */
     width: 300px; /* Width of the search box */
     font-size: 16px; /* Text size */
@@ -75,7 +101,8 @@
 
                         <button form="displaysearch" type="submit" style="display:none;"></button>
                     </form>
-                {% endif %}
+                    {% endif %}
+
                 </div>
                 {% if species.status == 'synonym' %}
                     <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
@@ -115,25 +142,6 @@
                 <br>
             </div>
         </div>
-
-<!--        {% if sponsor %}-->
-<!--        <div class="col d-none d-md-block" style="max-width:20%">-->
-<!--            <div style="width:150px; height:150px; border: 1px solid white">-->
-<!--                <div class="imgtitle"><span style="font-size:15px;"><a href="{% url 'documents:sponsor' %}">ADVERTISEMENT</a></span></div>-->
-<!--                <a href="{{sponsor.sponsor_url}}" target="_blank">-->
-<!--                    <div  class="sponsorimg">-->
-<!--                         <img alt="Sample advertisement" class="img-fluid" src="/static/{{sponsor.image_file_path}}{{sponsor.image_file}}">-->
-<!--                   </div>-->
-<!--                </a>-->
-<!--                <div class="adcaption">-->
-<!--                    <a href="{{sponsor.sponsor_url}}" target="_blank">-->
-<!--                        {{sponsor.title}}-->
-<!--                    </a>-->
-
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    {% endif %}-->
 </div>
 
 <script>
