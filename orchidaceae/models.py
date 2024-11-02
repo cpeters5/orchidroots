@@ -669,6 +669,9 @@ class Accepted(models.Model):
         images = SpcImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False, rank__lt=7)
         return top_image(images)
 
+    def binomial_it(self):
+        return self.pid.binomial_it()
+
 
 class Synonym(models.Model):
     spid = models.OneToOneField(
@@ -691,6 +694,9 @@ class Synonym(models.Model):
 
     def get_name(self):
         return self.acc.binomial()
+    def binomial_it(self):
+        return self.spid.binomial_it()
+
 
 class Hybrid(models.Model):
     # pid                 = models.IntegerField(db_column='pid',primary_key=True)
@@ -799,6 +805,9 @@ class Hybrid(models.Model):
         spid_list = Synonym.objects.filter(acc_id=self.pid).values_list('spid')
         images = HybImages.objects.filter(Q(pid=self.pid_id) | Q(pid__in=spid_list)).filter(image_file__isnull=False, rank__lt=7)
         return top_image(images)
+
+    def binomial_it(self):
+        return self.pid.binomial_it()
 
 
 class Grexrelation(models.Model):
