@@ -9,6 +9,8 @@ from django.http import JsonResponse  # For datatable processing by page
 from django.views.decorators.http import require_http_methods  # For datatable of large responses (hybrid and species view)
 from django.urls import reverse, reverse_lazy
 from django.apps import apps
+# from django_mysql.models import SearchQuery   --- IMPORT ERROR!!
+
 from urllib.parse import urlparse, urlencode
 from itertools import chain
 from fuzzywuzzy import fuzz, process
@@ -401,11 +403,10 @@ def hybrid(request):
 
     if crit and this_species_list:
         if spc:
-            this_species_list = this_species_list.extra(where=["MATCHED(species) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[spc])
-            # if len(spc) >= 2:
-            #     this_species_list = this_species_list.filter(species__icontains=spc)
-            # else:
-            #     this_species_list = this_species_list.filter(species__istartswith=spc)
+            this_species_list = this_species_list.extra(where=["MATCH(species) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[spc])
+            # TODO: User django.mysql.SearchQuery instead.
+            # Need to fix import error though.
+            # this_species_list = this_species_list.filter(species__search=SearchQuery(spc))
 
         elif alpha:
             if len(alpha) == 1:
