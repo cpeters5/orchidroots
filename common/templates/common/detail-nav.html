@@ -79,10 +79,12 @@
                     </div>
                 </li>
                     {% endif %}
-                {% if app == 'orchidaceae' and species.type == 'species' %}
-                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'orchidaceae:infraspecific' species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
+                {% if synonyms > 0 %}
+                    <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
+                {% if infra > 1 %}
+                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
+                {% endif %}
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
                 <li class="nav-item dropdown">

@@ -50,11 +50,11 @@ def summary(request, app=None, pid=None):
     # Handle an old typo in sitemaps.  Crawlers still crawled these urls
     if app == None or app == 'application':
         app = 'orchidaceae'
-    print("app, pid", app, pid)
+
     # handle various old paths, will be eventually removed.
     if not pid:
         # Worst case scenario when no explicit pid requested. Send it to homepage.
-        return HttpResponsePermanentRedirect('https://google.com')
+        return HttpResponsePermanentRedirect(reverse('home'))
 
     # Either 'app' or pid is from query string, redirect to the canonical URL
     if query_pid != None or app == None:
@@ -102,7 +102,10 @@ def summary(request, app=None, pid=None):
     if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
         images_list = HybImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
     else:
-        images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
+        if req_species.status == 'synonym':
+            images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
+        else:
+            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
 
     # Build display in main table
     if images_list:
@@ -130,14 +133,9 @@ def summary(request, app=None, pid=None):
                 i_8 += 1
                 display_items.append(x)
 
-    # Check if there are infraspecific.
-    # Exclude artificial hybrids from RHS.
-    if species.type == 'hybrid' and species.source == 'RHS':
-        infraspecifics = 0
-    else:
-        this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
-        main_species = Species.objects.filter(binomial=this_species_name).exclude(pid=pid) # convert requested species to main species
-        infraspecifics = len(Species.objects.filter(binomial__istartswith=this_species_name))
+    # get infraspecific list if exists
+    infra = len(species.get_infraspecifics())
+
     # If hybrid, find its parents
     if species.type == 'hybrid':
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
@@ -210,6 +208,11 @@ def summary(request, app=None, pid=None):
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
+
+    # determine if synonyms tab is needed
+    syn_list = species.get_synonyms()
+    synonyms = len(syn_list)
+
     role = get_role(request)
     write_output(request, str(family) + ' ' + species.binomial)
     context = {'pid': species.pid, 'species': species,
@@ -217,7 +220,7 @@ def summary(request, app=None, pid=None):
                'display_items': display_items, 'family': family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'ancspc_list': ancspc_list, 'infraspecifics': infraspecifics,
+               'app': app, 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
                'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
@@ -320,8 +323,8 @@ def photos(request, app=None, pid=None):
 
     # For synonym species, just render only synonym images
     if species.status == 'synonym':
-        public_list = SpcImages.objects.filter(pid=pid)  # public photos
-        synonym_pid_list = public_list.values_list('pid', flat=True)
+        public_list = SpcImages.objects.filter(pid=pid).exclude(status='synonym')  # public photos
+        # synonym_pid_list = public_list.values_list('pid', flat=True)
         private_list = public_list.filter(rank=0)  # rejected photos
         upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
         context = {'species': species, 'author': author, 'family': family,
@@ -334,22 +337,19 @@ def photos(request, app=None, pid=None):
 
     # Get infraspecific list for species
     pid_list = [pid]
-    infraspecifics = 0
-    if species.type != 'hybrid' and species.source != 'RHS':
-        if not species.infraspe:
-            # Unless the requested species is already an infraspecific
-            # get the list of all infraspecifics (regardless of status)
-            this_species_name = species.genus + ' ' + species.species  # the main taxon (w/o infraspecific)
-            infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name).values_list('pid',
-                                                                                                             flat=True)  # convert requested species to main species
-            infraspecifics = len(infraspecific_list)
-            pid_list = pid_list + list(infraspecific_list)
+    infra = species.get_infraspecifics()
+    if infra:
+        pid_list = list(infra.values_list('pid', flat=True).values_list('pid', flat=True))
+    infra = len(infra)
 
     #  For typical photos request (e.g. from navigation tab), include ALL photos, including infraspecifics and synonyms.
     syn = request.GET.get('syn', '')
+
+    syn_list = list(species.get_synonyms().values_list('spid', flat=True))
+    synonyms = len(syn_list)
+    print("synonyms", syn_list)
     if syn == 'Y':
         # get list of all synonyms of requested species
-        syn_list = list(Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True))
         if syn_list:
             pid_list = pid_list + syn_list
     pid_list = list(set(pid_list))
@@ -383,7 +383,7 @@ def photos(request, app=None, pid=None):
                'pho': 'active', 'tab': 'pho', 'app': app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
-               'infraspecifics': infraspecifics,
+               'infra': infra, 'synonyms': synonyms,
                'owner': owner,
                }
     return render(request, 'display/photos.html', context)

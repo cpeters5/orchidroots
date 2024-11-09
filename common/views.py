@@ -380,17 +380,9 @@ def infraspecific(request, app, pid):
     write_output(request, species.binomial)
 
     # Infraspecifics exists only for species and natural hybrids
-    if species.type == 'hybrid' and species.source == 'RHS':
-        infraspecific_list = []
-        canonical_url = ''
-    else:
-        this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-        main_species = Species.objects.filter(binomial=this_species_name)
-        if len(main_species) > 0:
-            species = main_species[0]
-
-        infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
-        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{pid}/')
+    infraspecific_list = species.get_infraspecifics()
+    if len(infraspecific_list) > 0:
+        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{species.pid}/')
 
     context = {'infraspecific_list': infraspecific_list, 'species': species,
                'tab': 'infra', 'infra': 'active',

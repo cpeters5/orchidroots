@@ -382,6 +382,22 @@ class Species(models.Model):
         upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
         return len(img) + len(upl)
 
+    def get_infraspecifics(self):
+        infraspecific_list = []
+        if self.type != 'hybrid' and self.source != 'RHS':
+            # Unless the requested species is already an infraspecific
+            # get the list of all infraspecifics (regardless of status)
+            if not self.infraspe:
+                this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
+                main_species = Species.objects.filter(binomial=this_species_name)
+                infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
+
+        return infraspecific_list
+
+    def get_synonyms(self):
+        synonym_list = Synonym.objects.filter(acc_id=self.pid)
+        return synonym_list
+
 
 class SpeciesStat(models.Model):
     pid = models.OneToOneField(
