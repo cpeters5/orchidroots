@@ -387,8 +387,7 @@ def search_name(request, app=None):
 
     role = getRole(request)
     if not app:
-        app = request.GET.get('app', '')
-
+        app = request.GET.get('app', 'orchidaceae')
     species_list = []
     req_search_string = request.GET.get('search_string', '').strip()
     if not req_search_string:
