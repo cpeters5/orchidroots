@@ -17,8 +17,8 @@ td {
 .thumbnails {
     object-fit: cover;
     overflow: hidden;
-    height: 100px;
-    width : auto;
+    height: 70px;
+    width : 70px;
     margin:5px auto;
 }
 
@@ -92,12 +92,16 @@ td {
         <table class="table-bordered table-condensed table-sm table-hover border" id="sortTable" style="font-size: 14px; width: 100%">
             <thead>
                 <tr>
-                    <th><b>Species</b></th>
-                    <th><b></b></th>
+                    <th style="width:20%;">Sample image</th>
+                    <th style="width:40%; text-align: left;"><b>Species</b></th>
+                    <th style="width:40%; text-align: left;"><b></b></th>
                 </tr>
             </thead>
             {% for species in match_spc_list %}
                 <tr>
+                    <td>
+                        <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                    </td>
                     <td style="width:20%;">
                         <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
                             {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
