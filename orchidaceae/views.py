@@ -146,9 +146,9 @@ def genera(request):
 
     # Build canonical_url. Prefer crawlers to use the simpler version /common/genera"
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae&alpha={alpha}')
+        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae&alpha={alpha}').replace('www.orchidroots.com', 'orchidroots.com')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae')
+        canonical_url = request.build_absolute_uri(f'/common/genera/?app=orchidaceae').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'my_list': genus_list, 'genus_lookup': genus_lookup,
                'sf_obj': sf_obj, 'sf_list': sf_list, 't_obj': t_obj, 't_list': t_list,
@@ -309,7 +309,7 @@ def species(request):
     subsection_list = Subsection.objects.filter(genus=genus).order_by ('subsection')
     series_list = Series.objects.filter(genus=genus).order_by ('subsection')
 
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/species/?genus={genus}')
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/species/?genus={genus}').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'page_list': this_species_list, 'alpha_list': alpha_list, 'alpha': alpha, 'spc': spc,
                'role': role, 'genus': genus,
@@ -379,7 +379,10 @@ def hybrid(request):
     # First matching genus, with wild card
     crit = 1 #???
     if crit :
-        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+        # reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
+        this_species_list = Hybrid.objects.all()
+        if reqgenus:
+            this_species_list = this_species_list.filter(genus=reqgenus)
     else:
         # If crit = 0 (no filter criteria), ignore request
         return render(request, 'orchidaceae/hybrid.html', {})
@@ -440,7 +443,7 @@ def ancestor(request, pid=None):
             # Complete bonker! Send to home page
             return HttpResponseRedirect('/')
         else:
-            canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
+            canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
             # Redirect permanent to preferred url
             # Remove in a year or 2?
             return HttpResponsePermanentRedirect(canonical_url)
@@ -456,7 +459,7 @@ def ancestor(request, pid=None):
 
     # List of ancestors in the left panel
     anc_list = AncestorDescendant.objects.filter(did=pid)
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestor/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'species': species, 'anc_list': anc_list,
                'genus': genus,
@@ -584,7 +587,7 @@ def ancestrytree(request, pid=None):
         pps = get_seed_parent(pp)
         ppp = get_pollen_parent(pp)
         species.img = hybdir + get_random_img(species)
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestrytree/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestrytree/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     context = {'species': species,
                'spc': spc, 'tree': 'lineage', 'tab': 'lineage', 'lineage': 'active',
                's': s, 'ss': ss, 'sp': sp, 'sss': sss, 'ssp': ssp, 'sps': sps, 'spp': spp,
@@ -623,7 +626,7 @@ def synonym(request, pid):
     genus = species.genus
     synonym_list = Synonym.objects.filter(acc_id=species.pid)
 
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/synonym/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'synonym_list': synonym_list, 'species': species,
                'tab': 'syn', 'syn': 'active', 'genus': genus,
@@ -654,7 +657,7 @@ def progeny(request, pid):
             Q(seed_id__in=syn_list) |
             Q(pollen_id__in=syn_list)
         )
-        canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/?prim=1')
+        canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
         context = {'prim_list': prim_list, 'species': species,
                    'tab': 'lineage', 'lineage': 'active', 'genus': genus,
                    'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
@@ -666,7 +669,7 @@ def progeny(request, pid):
     # des_list = get_des_list(pid, syn_list)
     des_list =  list(AncestorDescendant.objects.filter(pct__gt=30, aid=pid))
     # Build canonical url
-    canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     context = {'result_list': des_list, 'species': species,
                 'tab': 'lineage', 'lineage': 'active', 'genus': genus,
                'title': 'progeny', 'section': 'Public Area', 'role': role, 'app': 'orchidaceae',
@@ -780,7 +783,7 @@ def mypaginator(request, full_list, page_length, num_show):
 
 def infraspecific(request, pid):
     role = getRole(request)
-    canonical_url = request.build_absolute_uri(f'/common/infraspecific/{app}/{pid}/?role={role}')
+    canonical_url = request.build_absolute_uri(f'/common/infraspecific/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     return HttpResponsePermanentRedirect(canonical_url)
 
 

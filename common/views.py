@@ -147,7 +147,7 @@ def taxonomy(request, app=None):
         if app not in applications:
             app = 'orchidaceae'
 
-    canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/')
+    canonical_url = request.build_absolute_uri(f'/common/taxonomy/{app}/').replace('www.orchidroots.com', 'orchidroots.com')
     # non canonical url
     if 'app' in request.GET:
         # Redirect permanent to preferred url
@@ -168,9 +168,9 @@ def family(request, app=None):
 
     alpha = request.GET.get('alpha','')
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/family/{app}/?alpha={alpha}')
+        canonical_url = request.build_absolute_uri(f'/common/family/{app}/?alpha={alpha}').replace('www.orchidroots.com', 'orchidroots.com')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/family/{app}/')
+        canonical_url = request.build_absolute_uri(f'/common/family/{app}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     if 'app' in request.GET:
         # Redirect permanent to preferred url
@@ -199,9 +199,9 @@ def genera(request, app=None):
 
     alpha = request.GET.get('alpha','')
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/?alpha={alpha}')
+        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/?alpha={alpha}').replace('www.orchidroots.com', 'orchidroots.com')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/')
+        canonical_url = request.build_absolute_uri(f'/common/genera/{app}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     if 'app' in request.GET:
         # Non canonical_url. redirect to canonical
@@ -258,9 +258,9 @@ def species(request, app=None):
     # Build canonical url
     alpha = request.GET.get('alpha', '')
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type={req_type}')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type={req_type}').replace('www.orchidroots.com', 'orchidroots.com')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type={req_type}')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type={req_type}').replace('www.orchidroots.com', 'orchidroots.com')
 
     #  Permanently redirect noncanonical to canonical url
     if 'app' in request.GET:
@@ -359,9 +359,9 @@ def hybrid(request, app):
     alpha = request.GET.get('alpha', '')
     req_genus = request.GET.get('genus', '')
     if alpha and alpha != 'All':
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type=hybrid')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&alpha={alpha}&type=hybrid').replace('www.orchidroots.com', 'orchidroots.com')
     else:
-        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type=hybrid')
+        canonical_url = request.build_absolute_uri(f'/common/species/{app}/?genus={req_genus}&type=hybrid').replace('www.orchidroots.com', 'orchidroots.com')
 
     #  Permanently redirect noncanonical to canonical url
     return HttpResponsePermanentRedirect(canonical_url)
@@ -382,7 +382,7 @@ def infraspecific(request, app, pid):
     # Infraspecifics exists only for species and natural hybrids
     infraspecific_list = species.get_infraspecifics()
     if len(infraspecific_list) > 0:
-        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{species.pid}/')
+        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{species.pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'infraspecific_list': infraspecific_list, 'species': species,
                'tab': 'infra', 'infra': 'active',

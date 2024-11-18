@@ -62,7 +62,7 @@ def summary(request, app=None, pid=None):
         return HttpResponsePermanentRedirect(reverse('display:summary', args=[app, pid]))
 
     # Construct the canonical URL
-    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     Species = apps.get_model(app, 'Species')
     try:
@@ -319,7 +319,7 @@ def photos(request, app=None, pid=None):
             quality_update(quality, orid, SpcImages)
 
     # Build canonical url
-    canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/')
+    canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
     # For synonym species, just render only synonym images
     if species.status == 'synonym':
@@ -414,7 +414,7 @@ def videos(request, pid):
         else:
             video_list = Video.objects.filter(pid=accpid)
 
-    canonical_url = request.build_absolute_uri(f'/display/video/{pid}/?app={app}')
+    canonical_url = request.build_absolute_uri(f'/display/video/{pid}/?app={app}').replace('www.orchidroots.com', 'orchidroots.com')
 
     write_output(request, str(family))
     context = {'species': species, 'author': author,
