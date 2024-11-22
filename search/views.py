@@ -406,14 +406,10 @@ def search_name(request, app=None):
         search_string = request.GET.get('search_string', '').strip()
 
     Species = apps.get_model(app, 'Species')
-    Accepted = apps.get_model(app, 'Accepted')
     if app == 'orchidaceae':
-        # Treat grex name as a search_string
-        pid_list = Species.objects.filter(species__icontains=search_string).values_list('pid', flat=True)
+        species_list = Species.objects.filter(species__icontains=search_string)
     else:
-        pid_list = Accepted.objects.filter(Q(common_name__icontains=search_string) | Q(common_name_search__icontains=search_string_clean)).values_list('pid', flat=True)
-    if pid_list:
-        species_list = Species.objects.filter(pid__in=pid_list)
+        species_list = Species.objects.filter(Q(accepted__common_name__icontains=search_string) | Q(accepted__common_name_search__icontains=search_string_clean))
 
     context = {'species_list': species_list,
                'search_string': req_search_string, 'app': app, 'role': role,}
