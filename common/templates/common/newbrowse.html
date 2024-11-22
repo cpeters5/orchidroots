@@ -277,12 +277,14 @@ img{
                         <form action="?" id="fam" style="display:inline-block">
 <!--                            <input form="fam" type="hidden" name="app" value="{{app}}" >-->
                             <input form="fam" type="hidden" name="alpha" value="{{alpha}}" >
+                            <input form="fam" type="hidden" name="type" value="{{type}}" >
                             <input form="fam" type="hidden" name="app" value="{{app}}" >
                             <input form="fam" type="text" class="btn-custom" name="family" value="{{family|default:''}}" placeholder="family" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>
                         <form action="?" id="gen" style="display:inline-block">
                             <input form="gen" type="hidden" name="app" value="{{app}}" >
-                            <input type="hidden" name="family" value="{{family}}" >
+                            <input form="gen" type="hidden" name="family" value="{{family}}" >
+                            <input form="gen" type="hidden" name="type" value="{{type}}" >
                             <input form="gen" type="hidden" name="alpha" value="{{alpha}}" >
                             <input form="gen" type="text" class="btn-custom" name="genus" value="{{genus|default:''}}" placeholder="genus" onchange="this.form.submit()" style="margin-left:1px;">
                         </form>

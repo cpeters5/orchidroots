@@ -482,7 +482,7 @@ def newbrowse(request, app=None):
             if fam.get_best_img():
                 family_list = family_list + [fam.get_best_img()]
         context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, 'role': role,
-                   'display': display}
+                   'display': display, 'type': type, }
         return render(request, 'common/newbrowse.html', context)
 
     elif genus:
@@ -517,7 +517,7 @@ def newbrowse(request, app=None):
                 spcimage = x.get_best_img()
                 if spcimage:
                     species_list = species_list + [spcimage]
-            context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list,}
+            context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list, 'type': type, }
             return render(request, 'common/newbrowse.html', context)
 
     elif family:
@@ -543,7 +543,7 @@ def newbrowse(request, app=None):
             for gen in genlist:
                 genus_list = genus_list + [gen.get_best_img()]
             context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
-                       'alpha_list': alpha_list, 'app': app,}
+                       'alpha_list': alpha_list, 'app': app, 'type': type, }
             return render(request, 'common/newbrowse.html', context)
 
 
