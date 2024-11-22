@@ -320,13 +320,25 @@ def photos(request, app=None, pid=None):
 
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
+    upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
+    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
+    try:
+        this_species = Species.objects.filter(binomial=this_species_name)[0]
+    except Species.DoesNotExist:
+        # Something's wrong
+        this_species = species
+
+    # Get infraspecific flag
+    infra = len(this_species.get_infraspecifics())
+    # get synonyms flag
+    syn_list = list(species.get_synonyms().values_list('spid', flat=True))
+    synonyms = len(syn_list)
 
     # For synonym species, just render only synonym images
     if species.status == 'synonym':
-        public_list = SpcImages.objects.filter(pid=pid).exclude(status='synonym')  # public photos
+        public_list = SpcImages.objects.filter(pid=pid, status='synonym')  # public photos
         # synonym_pid_list = public_list.values_list('pid', flat=True)
         private_list = public_list.filter(rank=0)  # rejected photos
-        upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
         context = {'species': species, 'author': author, 'family': family,
                    'pho': 'active', 'tab': 'pho', 'app': app,
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
@@ -334,24 +346,27 @@ def photos(request, app=None, pid=None):
                    'role': role,
                    }
         return render(request, 'display/photos.html', context)
+    if species.infraspe:
+        public_list = SpcImages.objects.filter(pid=pid).exclude(status='synonym')  # public photos
+        private_list = public_list.filter(rank=0)  # rejected photos
+        context = {'species': species, 'author': author, 'family': family,
+                   'pho': 'active', 'tab': 'pho', 'app': app,
+                   'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
+                   'canonical_url': canonical_url,
+                   'infra': infra, 'synonyms': synonyms,
+                   'role': role,
+                   }
+        return render(request, 'display/photos.html', context)
 
-    # Get infraspecific flag
-    infra = species.get_infraspecifics()
-    infra = len(infra)
-
-    # get synonyms flag
-    syn_list = list(species.get_synonyms().values_list('spid', flat=True))
-    synonyms = len(syn_list)
-    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
     if syn == 'Y':
         public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name) | Q(pid__in=syn_list))
     else:
         public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name))
 
     # Get upload list, public list and private list
-    upload_list, private_list = [], []
+    private_list = []
     if request.user.is_authenticated:
-        upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
+        # upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
         if owner == 'Y':
             if isinstance(author, Photographer):
                 public_list = public_list.filter(author=request.user.photographer.author_id)
