@@ -346,6 +346,8 @@ def photos(request, app=None, pid=None):
                    'role': role,
                    }
         return render(request, 'display/photos.html', context)
+
+    # if requested species is already an infraspecific
     if species.infraspe:
         public_list = SpcImages.objects.filter(pid=pid).exclude(status='synonym')  # public photos
         private_list = public_list.filter(rank=0)  # rejected photos
@@ -358,10 +360,11 @@ def photos(request, app=None, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
+    # Otherwise, get everything: requested species, all synonym, all infraspecifics (if requested)
     if syn == 'Y':
-        public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name) | Q(pid__in=syn_list))
+        public_list = SpcImages.objects.filter(Q(binomial__startswith=this_species_name) | Q(pid__in=syn_list))
     else:
-        public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name))
+        public_list = SpcImages.objects.filter(Q(binomial__startswith=this_species_name))
 
     # Get upload list, public list and private list
     private_list = []

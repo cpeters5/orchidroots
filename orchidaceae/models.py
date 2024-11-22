@@ -565,7 +565,7 @@ class Species(models.Model):
             if not self.infraspe:
                 this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
                 main_species = Species.objects.filter(binomial=this_species_name)
-                infraspecific_list = Species.objects.filter(binomial__istartswith=this_species_name)
+                infraspecific_list = Species.objects.filter(binomial__startswith=this_species_name)
 
         return infraspecific_list
 
