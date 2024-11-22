@@ -248,7 +248,7 @@ def photos(request, app=None, pid=None):
         app = None
     query_app = request.GET.get('app', None)
     query_pid = request.GET.get('pid', None)
-
+    syn = request.GET.get('syn', '')
     family = request.GET.get('family', None)
 
     app = app or query_app
@@ -335,26 +335,19 @@ def photos(request, app=None, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
-    # Get infraspecific list for species
-    pid_list = [pid]
+    # Get infraspecific flag
     infra = species.get_infraspecifics()
-    if infra:
-        pid_list = list(infra.values_list('pid', flat=True).values_list('pid', flat=True))
     infra = len(infra)
 
-    #  For typical photos request (e.g. from navigation tab), include ALL photos, including infraspecifics and synonyms.
-    syn = request.GET.get('syn', '')
-
+    # get synonyms flag
     syn_list = list(species.get_synonyms().values_list('spid', flat=True))
     synonyms = len(syn_list)
-    print("synonyms", syn_list)
+    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
     if syn == 'Y':
-        # get list of all synonyms of requested species
-        if syn_list:
-            pid_list = pid_list + syn_list
-    pid_list = list(set(pid_list))
+        public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name) | Q(pid__in=syn_list))
+    else:
+        public_list = SpcImages.objects.filter(Q(binomial__istartswith=this_species_name))
 
-    public_list = SpcImages.objects.filter(pid__in=pid_list)
     # Get upload list, public list and private list
     upload_list, private_list = [], []
     if request.user.is_authenticated:
