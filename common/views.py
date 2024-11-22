@@ -417,14 +417,32 @@ def newbrowse(request, app=None):
     # 1. Browse sample images by families.  Non orchidaceae only
     # 2. Browse sample images of genera in a selected family
     # 3. Browse sample images of species in requested genus
-    write_output(request, str(app))
+    type = request.GET.get('type','species')
+    family = request.GET.get('family', '')
+    genus = request.GET.get('genus', '')
+    display = request.GET.get('display', 'checked')
+    alpha = request.GET.get('alpha','')
+    role = request.GET.get('role', '')
+    if alpha == 'ALL':
+        alpha = ''
+
     if app == None:
         #  Will redirect this to canonical
         app = request.GET.get('app', 'orchidaceae')
+        if alpha and alpha != 'All':
+            canonical_url = request.build_absolute_uri(f'/common/newbrowse/{app}/?genus={genus}&family={family}&alpha={alpha}&type={type}').replace('www.orchidroots.com', 'orchidroots.com')
+        else:
+            canonical_url = request.build_absolute_uri(f'/common/newbrowse/{app}/?genus={genus}&family={family}&type={type}').replace('www.orchidroots.com', 'orchidroots.com')
+
+        #  Permanently redirect noncanonical to canonical url
+        return HttpResponsePermanentRedirect(canonical_url)
+
+
+
 
     # handle request
+    write_output(request, str(app))
     Family = apps.get_model('common', 'Family')
-    family = request.GET.get('family', '')
     if family:
         print("family", family)
         try:
@@ -434,7 +452,6 @@ def newbrowse(request, app=None):
 
     # requested genus?
     Genus = apps.get_model(app, 'Genus')
-    genus = request.GET.get('genus', '')
     if genus:
         try:
             genus = Genus.objects.get(genus=genus)
@@ -445,12 +462,6 @@ def newbrowse(request, app=None):
     if app == 'orchidaceae' and not family and not genus:
         family = 'Orchidaceae'
 
-    type = request.GET.get('type','species')
-    display = request.GET.get('display', 'checked')
-    alpha = request.GET.get('alpha','')
-    role = request.GET.get('role', '')
-    if alpha == 'ALL':
-        alpha = ''
 
     #  No family/genus requested, browse image sample of each Family (non-orchidaceae only)
     if not family and not genus:
