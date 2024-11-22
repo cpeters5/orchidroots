@@ -369,7 +369,7 @@ def hybrid(request, app):
 
 def infraspecific(request, app, pid):
     role = getRole(request)
-
+    canonical_url = ''
     Species = apps.get_model(app, 'Species')
     try:
         species = Species.objects.get(pk=pid)
@@ -380,7 +380,14 @@ def infraspecific(request, app, pid):
     write_output(request, species.binomial)
 
     # Infraspecifics exists only for species and natural hybrids
-    infraspecific_list = species.get_infraspecifics()
+    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
+    try:
+        this_species = Species.objects.filter(binomial=this_species_name)[0]
+    except Species.DoesNotExist:
+        # Something's wrong
+        this_species = species
+
+    infraspecific_list = this_species.get_infraspecifics()
     if len(infraspecific_list) > 0:
         canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{species.pid}/').replace('www.orchidroots.com', 'orchidroots.com')
 
