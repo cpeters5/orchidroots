@@ -204,7 +204,7 @@ class Command(BaseCommand):
                 priority = 0.5
             else:
                 priority = 0.4
-            species_url = f"{settings.SITE_URL}/display/summary/orchidaceae/{species.pid}"
+            species_url = f"{settings.SITE_URL}/display/summary/orchidaceae/{species.pid}/"
             SitemapEntry.objects.update_or_create(
                 url=species_url,
                 section="orchidaceae",
