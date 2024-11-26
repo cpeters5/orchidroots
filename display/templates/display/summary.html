@@ -365,7 +365,7 @@ seedparent, pollparent {
                     <ul>
                         {% for item in ancspc_list|slice:":3" %}
                             <li>
-                                {{item.aid.binomial}} ({{item.pct}}%)
+                                {{item.aid.binomial}} ({{item.pct|floatformat:2 }}%)
                                 {% if item.aid.accepted.subgenus %}
                                     &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&subgenus={{item.aid.accepted.subgenus}}&alpha=All">{{item.aid.accepted.subgenus}}</a>
                                 {% endif %}
