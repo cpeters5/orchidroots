@@ -322,10 +322,10 @@ def photos(request, app=None, pid=None):
     canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
     this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-    try:
-        this_species = Species.objects.filter(binomial=this_species_name)[0]
-    except Species.DoesNotExist:
-        # Something's wrong
+    this_species = Species.objects.filter(binomial=this_species_name)
+    if this_species:
+        this_species = this_species[0]
+    else:
         this_species = species
 
     # Get infraspecific flag
