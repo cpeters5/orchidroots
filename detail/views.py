@@ -718,10 +718,6 @@ def uploadweb(request, pid, orid=None):
 
 @login_required
 def uploadfile(request, pid):
-    # Called from orchidaceae upload file only. All other application use their own uploadfile
-    # TODO ocnsolidate with other application uploadfile.
-    app = 'orchidaceae'
-
     role = getRole(request)
     species = Species.objects.get(pk=pid)
     if request.user.tier.tier < 2 or not request.user.photographer.author_id:
@@ -745,7 +741,9 @@ def uploadfile(request, pid):
         synonym = Synonym.objects.get(pk=pid)
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role, 'binomial': species.binomial})
+
+    name_message = 'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)'
+    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role })
 
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -754,7 +752,9 @@ def uploadfile(request, pid):
             spc = form.save(commit=False)
             if isinstance(species, Species):
                 spc.pid = species
-            if species.binomial != spc.binomial:
+            if not spc.binomial:
+                spc.binomial = species.binomial
+            else:
                 spc.pid = None
             spc.author = request.user.photographer
             spc.type = species.type

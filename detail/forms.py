@@ -247,14 +247,14 @@ class UploadFileForm(forms.ModelForm):
         labels = {
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
-            'binomial': 'Scientific name',
+            'binomial':'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)',
             'name': 'Clonal name',
             'awards': 'Awards',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'Credit allocation name',
             'description': 'Tags. Comma separated keywords to help in searching',
-            'text_data': 'Comment',
+            'text_data': 'Please share any details about this photo, e.g. its parentage, common name, or anything else to help us organize it properly.',
             'location': 'Location',
         }
         widgets = {

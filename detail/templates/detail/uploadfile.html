@@ -29,18 +29,11 @@
                         <input type="hidden" name="role" value="{{role}}" >
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' app species.pid %}?role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
-                     <div class="form-row">
-                         <div class="form-group col-md-6 mb-0">
-                            <h6><br>Author: {{request.user}}</h6>
-                         </div>
-                         <div class="form-group col-md-6 mb-0">
-                            {{form.credit_to|as_crispy_field}}
-                         </div>
-                     </div>
-                    <hr>
+                        {{form.credit_to|as_crispy_field}}
+                        {{form.binomial|as_crispy_field}}
+                        <hr>
         <!--                <hr  class="my-4">-->
                         {{form.image_file_path|as_crispy_field}}
-                        {{form.binomial|as_crispy_field}}
                         {{form.source_url|as_crispy_field}}
 
                         <div class="form-row">
