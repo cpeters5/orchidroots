@@ -511,7 +511,7 @@ class UploadVidForm(forms.ModelForm):
         return source_url
 
 
-class UploadFileForm(forms.ModelForm):
+class xUploadFileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UploadFileForm, self).__init__(*args, **kwargs)
         # Making UploadForm required
@@ -569,3 +569,64 @@ class UploadFileForm(forms.ModelForm):
         if not image_file_path:
             raise forms.ValidationError('You must select a valid image file')
         return image_file_path
+class UploadFileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(UploadFileForm, self).__init__(*args, **kwargs)
+        # Making UploadForm required
+        # self.fields['image_file_path'].required = True
+        # role = forms.CharField(required=True)
+
+    class Meta:
+        model = UploadFile
+        fields = (
+        'image_file_path', 'source_url', 'name', 'variation', 'forma', 'credit_to', 'description',
+        'text_data', 'location', 'binomial',)
+
+        labels = {
+            'source_url': 'Link to source',
+            'image_file_path': 'Select image file',
+            'binomial':'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)',
+            'name': 'Common names or local names',
+            'variation': 'Varieties',
+            'forma': 'Form',
+            'credit_to': 'credit allocation name',
+            'description': 'Tags. Comma separated keywords to help in searching',
+            'text_data': 'Please share any details about this photo, e.g. its parentage, or anything else to help us organize it properly.',
+            'location': 'Location',
+        }
+        widgets = {
+            # 'role': forms.HiddenInput(),
+            'source_url': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', 'autocomplete': 'off', }),
+            'name': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'variation': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'forma': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'credit_to': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'description': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'text_data': Textarea(attrs={'cols': 37, 'rows': 4, 'style': 'font-size: 13px', }),
+            'location': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+            'binomial': TextInput(attrs={'size': 35, 'style': 'font-size: 13px', }),
+        }
+        help_texts = {
+                # 'name': 'Common name or local name',
+            #     'variation': 'Informal variations (unpublished), or infra specific of synonym.',
+            #     'forma': 'E.g. color forms, peloric, region...',
+            #     'credit_to': 'e.g. hybridizer, cultivator, vender',
+            #     'description': 'Comma separated terms used for search',
+            #     'text_data': 'Any comment you may have about this photo. When, where or month it was taken, history of this plant, etc.',
+            #     'location': 'Geolocation where this plant was originated from',
+            #     'image_file_path': _('Only JPG files are accepted, and file name MUST not have a leading undescore.'),
+        }
+        error_messages = {
+            'image_file_path': {
+                'required': _("Please select a file to upload."),
+            },
+        }
+
+    def clean_image_file_path(self):
+        image_file = self.cleaned_data.get('image_file_path')
+        if not image_file:
+            raise forms.ValidationError('You must select a valid image file')
+        # else:
+        #     if len(image_file.name) > 100:
+        #         raise ValidationError(_("The image file name is too long. It should be 100 characters or less." + str(len(image_file.name)) + ' ' + image_file.name))
+        return image_file

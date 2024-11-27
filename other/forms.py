@@ -476,12 +476,12 @@ class UploadFileForm(forms.ModelForm):
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
             'name': 'Common names or local names',
-            'binomial': 'Scientific name',
+            'binomial':'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)',
             'variation': 'Varieties',
             'forma': 'Form',
             'credit_to': 'or a name for credit attribution',
             'description': 'Tags. Comma separated keywords to help in searching',
-            'text_data': 'Comment',
+            'text_data': 'Please share any details about this photo, e.g. its parentage, or anything else to help us organize it properly.',
             'location': 'Location',
         }
         widgets = {
