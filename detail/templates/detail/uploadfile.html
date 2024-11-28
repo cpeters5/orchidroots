@@ -14,6 +14,13 @@
 <div style="width:95%;margin:0 auto;padding:0;">
              <!--main section-->
     {% include 'common/detail-nav.html' %}
+    <div style="width:80%; margin: 0 auto;">
+        Before uploading a photo, please search for the orchid name first. You can then either:
+        Go to the orchid's detail page and use the upload tab to add your photo, or if the orchid isn't found,
+        use the 'Upload File' option from any detail page and provide the name to the best of you knowledge in the name text box.
+        <b>The name text box is to be used for new orchids only. Otherwise, the photo will not be processed.</b>
+    </div>
+
     <br>
     {% if myphotos > user.tier.max_upload %}
         <div class="container">
@@ -29,11 +36,17 @@
                         <input type="hidden" name="role" value="{{role}}" >
                         <button type="submit" class="btn btn-primary btn-sm"  style="width:80px">Save</button>
                         <a href="{% url 'display:photos' app species.pid %}?role={{role}}"> &nbsp;&nbsp;&nbsp;Cancel</a>
-                        {{form.credit_to|as_crispy_field}}
-                        {{form.binomial|as_crispy_field}}
-                        <hr>
-        <!--                <hr  class="my-4">-->
+                     <div class="form-row">
+                         <div class="form-group col-md-6 mb-0">
+                            {{form.credit_to|as_crispy_field}}
+                         </div>
+                         <div class="form-group col-md-6 mb-0">
                         {{form.image_file_path|as_crispy_field}}
+                         </div>
+                     </div>
+                    {{form.binomial|as_crispy_field}}
+<!--                    <hr>-->
+        <!--                <hr  class="my-4">-->
                         {{form.source_url|as_crispy_field}}
 
                         <div class="form-row">

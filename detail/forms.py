@@ -248,6 +248,7 @@ class UploadFileForm(forms.ModelForm):
             'source_url': 'Link to source',
             'image_file_path': 'Select image file',
             'binomial':'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)',
+            'binomial':'Scientific or registered name (for new orchids only). Leave blank if the orchid already exists in OrchidRoots, or your submission will be rejected.',
             'name': 'Clonal name',
             'awards': 'Awards',
             'variation': 'Varieties',
