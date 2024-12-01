@@ -1,41 +1,6 @@
 <!--Title-->
 
 <style>
-.nav2 {
-    font-size: 13px;
-}
-   h1 {
-        font-size: 24px;
-    }
-
-@media only screen and (max-width: 600px) {
-    h1 {
-        font-size: 18px;
-
-    }
-    .nav2 {
-        font-size: 11px;
-        font-weight: bold;
-        /*height: 20px;*/
-        /*margin-bottom:30px;*/
-    }
-}
-.btn-custom {
-    width: 120px;
-}
-.btn-current {
-    background-color: blue;
-    color: white;
-}
-.hidden {
-    display: none;
-}
-.adcaption {
-    font-size: 12px;
-    text-align: left;
-    height:70px;
-    /*overflow: hidden;*/
-}
 
   .form-inline {
     display: flex;
@@ -58,6 +23,13 @@
     border-color: #007bff; /* Change border color when focused */
     outline: none; /* Remove default outline */
   }
+    .info {
+        font-size: 16px;
+        width: 90%;
+        padding: 20px;
+        margin: 0 auto;
+        text-align: left;
+    }
 
   .form-inline button {
     background-color: #007bff;
@@ -73,76 +45,158 @@
   .form-inline button:hover {
     background-color: #0056b3; /* Darker blue on hover */
   }
+
+  @media only screen and (max-width: 830px) {
+      .info {
+          font-size: 12px;
+
+      }
+  }
+.info-collapse {
+    text-align: left;
+    padding-left: 15px;
+    width: 200px;
+}
+
+
 </style>
 <br>
-    <div class="row">
-        <div class="col">
-            <div class="nav2 detail-title" style="text-align:center">
-                <div>
-                    {% if app == 'aves' %}
-                    <form class="form-inline" id="displaysearch1" action="/search/search_name/aves/" style="margin-top: 5px;">
-                        <input type="hidden" form="displaysearch1" name="role" value="{{ role }}">
+        <div class="nav2 detail-title" style="text-align:center">
+            <div>
+                {% if app == 'aves' %}
+                <form class="form-inline" id="displaysearch1" action="/search/search_name/aves/" style="margin-top: 5px;">
+                    <input type="hidden" form="displaysearch1" name="role" value="{{ role }}">
 
-                        <input class="searchbox" form="displaysearch1" value="{{search_string}}"
-                               type="text" name="search_string" pattern=".{3,}"
-                               placeholder="Search..."
-                               style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
+                    <input class="searchbox" form="displaysearch1" value="{{search_string}}"
+                           type="text" name="search_string" pattern=".{3,}"
+                           placeholder="Search..."
+                           style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
 
-                        <button form="displaysearch1" type="submit" style="display:none;"></button>
-                    </form>
-                    {% else %}
-                    <form class="form-inline" id="displaysearch" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
-                        <input type="hidden" form="displaysearch" name="role" value="{{ role }}">
-
-                        <input class="searchbox" form="displaysearch" value="{{search_string}}"
-                               type="text" name="search_string" pattern=".{3,}"
-                               placeholder="Search..."
-                               style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
-
-                        <button form="displaysearch" type="submit" style="display:none;"></button>
-                    </form>
-                    {% endif %}
-
-                </div>
-                {% if species.status == 'synonym' %}
-                    <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
-                {% elif species.type == 'hybrid' %}
-                    <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
+                    <button form="displaysearch1" type="submit" style="display:none;"></button>
+                </form>
                 {% else %}
-                    <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+                <form class="form-inline" id="displaysearch" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
+                    <input type="hidden" form="displaysearch" name="role" value="{{ role }}">
+
+                    <input class="searchbox" form="displaysearch" value="{{search_string}}"
+                           type="text" name="search_string" pattern=".{3,}"
+                           placeholder="Search..."
+                           style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
+
+                    <button form="displaysearch" type="submit" style="display:none;"></button>
+                </form>
                 {% endif %}
-                <h4>
-                    {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},
-                    {{species.author|default:""}} {{species.year|default:''}}
-                    {% if species.sourceurl != None %}
-                        <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
-                    {% else %}
-                        ({{species.source}})
-                    {% endif %}
-                </h4>
-                <div style="font-size: 16px;">
+
+            </div>
+            {% if species.status == 'synonym' %}
+            <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
+            {% elif species.type == 'hybrid' %}
+            <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
+            {% else %}
+            <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+            {% endif %}
+            <h4>
+                {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},
+                {{species.author|default:""}} {{species.year|default:''}}
+                {% if species.sourceurl != None %}
+                <a href="{{species.sourceurl}}" target="_blank"><normal>({{species.source}})</normal></a>
+                {% else %}
+                ({{species.source}})
+                {% endif %}
+            </h4>
+            <div class="info">
+                {% if species.type == 'species' %}
+                    {{species.binomial}} is a species in the {{ species.genus }} genus.
+                    {% if species.accepted.common_name %}It is commonly know as {{species.accepted.common_name}}{% endif %}
+                    {% if species.accepted.local_name %} and locally called {{species.accepted.local_name }}{%endif %}.
+
                     {% if species.status == 'synonym' %}
-                        syn. <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}</a>
-                        {{species.getAccepted.accepted.common_name|default:''}}
-                        {{species.getAccepted.accepted.local_name|default:''}}
-                        <br>
-                    {% elif species.type == 'hybrid' %}
-                        {{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}}
-                        <br>
+                        This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}</a>
                     {% else %}
-                        {{species.accepted.common_name|default:''}}
-                        {{species.accepted.local_name|default:''}}
+                        This name is {{species.status}} name for the {{species.type}} in
+                        the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}">{{species.gen.family}}</a>
+                        {% if species.gen.subfamily %}
+                            subfamily <a href="{% url 'common:genera' app %}?subfamily={{species.gen.subfamily}}&role={{role}}">{{species.gen.subfamily}}</a>,
+                        {% endif %}
+                        {% if species.gen.tribe %}
+                            tribe <a href="{% url 'common:genera' app %}?tribe={{species.gen.tribe}}&role={{role}}">{{species.gen.tribe}}</a>,
+                        {% endif %}
+                        {% if species.gen.subtribe %}
+                            subtribe <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>,
+                        {% endif %}
+                        {% if species.accepted.subgenus or species.accepted.section or species.accepted.subsection or species.accepted.series %}
+                            and under infraspecific classification, it is in the
+                            {% if species.accepted.subgenus %}
+                                subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
+                            {% endif %}
+                            {% if species.accepted.section %}
+                                section: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>
+                            {% endif %}
+                            {% if species.accepted.subsection %}
+                                subsection: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>
+                            {% endif %}
+                            {% if species.accepted.series %}
+                                series: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>
+                            {% endif %}
+                        {% endif %}
+                        {% if species.accepted.distribution %}. This species is found in {{species.accepted.distribution }}.{% endif %}
                     {% endif %}
-                    {% if species.accepted.comment %}
-                        <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
-                            {{species.accepted.comment|safe}}
-                        </div>
+                {% else %}
+                    The orchid {{species.binomial}} is a {{species.genus}} hybrid.
+                    {% if species.status == 'synonym' %}
+                        This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}.</a>
+                    {% else %}
+                        {% if species.source == 'RHS' %}registered with the Royal Horticultural Society
+                            {% if species.author == 'na' or species.author == '' %} registrant is unknown{% else %} by {{species.author}} in {{species.year}}.{% endif %}
+                            {% if species.originator == 'na' or species.originator == '' %} Its originator is unknown.{% elif species.originator != species.author %} It is originated by {{species.originator}}{% endif %}
+                        {% elif  species.source == 'INT' %}.
+                            This orchid hybrid lacks official registration. The name is an internal designation created within the orchidroots system.
+                        {% endif %}
+                        Registered parents are
+                        {% if species.hybrid.seed_id %}
+                            <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?role={{role}}">{{species.hybrid.registered_seed_name_long|default:'na'|safe}}</a>
+                        {% else %}
+                            unknown
+                        {% endif %}
+                        ×
+                        {% if species.hybrid.pollen_id %}
+                            <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}?role={{role}}">{{species.hybrid.registered_pollen_name_long|default:'na'|safe}}.</a>
+                        {% else %}
+                            unknown
+                        {% endif %}
+                        {% if app == 'orchidaceae' and species.status != 'synonym' %}
+                        The key influencing species of this hybrid are
+                            {% for item in ancspc_list|slice:":3" %}
+                                {{item.aid.binomial}} ({{item.pct|floatformat:2 }}%
+                                {% if item.aid.accepted.subgenus %}
+                                subgenus <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&subgenus={{item.aid.accepted.subgenus}}&alpha=All">{{item.aid.accepted.subgenus}}</a>
+                                {% endif %}
+                                {% if item.aid.accepted.section %}
+                                section: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&section={{item.aid.accepted.section}}&alpha=All">{{item.aid.accepted.section}}</a>
+                                {% endif %}
+                                {% if item.aid.accepted.subsection %}
+                                subsection: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&subsection={{item.aid.accepted.subsection}}&alpha=All">{{item.aid.accepted.subsection}}</a>
+                                {% endif %}
+                                {% if item.aid.accepted.series %}
+                                series: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&series={{item.aid.accepted.series}}&alpha=All">{{item.aid.accepted.series}}</a>
+                                {% endif %}
+                                )
+                            {% empty %}
+                                No items in the list.
+                            {% endfor %}
+                        listed in order of their genetic contribution.
                     {% endif %}
+                    {% endif %}
+                {% endif %}
+                {% if species.accepted.comment %}
+                <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
+                    {{species.accepted.comment|safe}}
                 </div>
+                {% endif %}
+
                 <br>
             </div>
         </div>
-</div>
 
 <script>
 function showMore(id){
