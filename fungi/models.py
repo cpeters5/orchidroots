@@ -381,16 +381,8 @@ class Species(models.Model):
         return len(img) + len(upl)
 
     def get_infraspecifics(self):
-        infraspecific_list = []
-        if self.type != 'hybrid' and self.source != 'RHS':
-            # Unless the requested species is already an infraspecific
-            # get the list of all infraspecifics (regardless of status)
-            if not self.infraspe:
-                this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
-                main_species = Species.objects.filter(binomial=this_species_name)
-                infraspecific_list = Species.objects.filter(binomial__startswith=this_species_name)
-
-        return infraspecific_list
+        this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
+        return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
 
     def get_synonyms(self):
         synonym_list = Synonym.objects.filter(acc_id=self.pid)

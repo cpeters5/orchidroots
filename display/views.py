@@ -81,7 +81,6 @@ def summary(request, app=None, pid=None):
 
     Synonym = apps.get_model(app, 'Synonym')
     Hybrid = apps.get_model(app, 'hybrid')
-    AncestorDescendant = apps.get_model(app, 'AncestorDescendant')
 
     SpcImages = apps.get_model(app, 'SpcImages')
     if app == 'orchidaceae':
@@ -90,7 +89,6 @@ def summary(request, app=None, pid=None):
         HybImages = apps.get_model(app, 'SpcImages')
 
     ps_list = pp_list = ss_list = sp_list = ()
-    ancspc_list = []
     seedimg_list = []
     pollimg_list = []
 
@@ -199,12 +197,6 @@ def summary(request, app=None, pid=None):
                     pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif pp_type == 'hybrid':
                     pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-
-        if species.status == 'synonym':
-            accid = species.getAcc()
-            ancspc_list = AncestorDescendant.objects.filter(did=accid).filter(anctype='species').order_by('-pct')
-        else:
-            ancspc_list = AncestorDescendant.objects.filter(did=species.pid).filter(anctype='species').order_by('-pct')
     if req_species.status == 'synonym':
         # if request pid is a synopnym, return the synonym instance
         species = req_species
@@ -215,6 +207,7 @@ def summary(request, app=None, pid=None):
 
     role = get_role(request)
     write_output(request, str(family) + ' ' + species.binomial)
+    ancspc_list = get_anc_list(app, species)
     context = {'pid': species.pid, 'species': species,
                'tax': 'active', 'q': species.name, 'type': 'species', 'genus': genus,
                'display_items': display_items, 'family': family,
@@ -226,6 +219,18 @@ def summary(request, app=None, pid=None):
                }
     response = render(request, 'display/summary.html', context)
     return response
+
+
+def get_anc_list(app, species):
+    if species.type != 'hybrid':
+        return []
+    AncestorDescendant = apps.get_model(app, 'AncestorDescendant')
+    if species.status == 'synonym':
+        accid = species.getAcc()
+        ancspc_list = AncestorDescendant.objects.filter(did=accid, anctype='species').order_by('-pct')
+    else:
+        ancspc_list = AncestorDescendant.objects.filter(did=species.pid, anctype='species').order_by('-pct')
+    return ancspc_list
 
 
 def get_role(request):
@@ -362,9 +367,9 @@ def photos(request, app=None, pid=None):
 
     # Otherwise, get everything: requested species, all synonym, all infraspecifics (if requested)
     if syn == 'Y':
-        public_list = SpcImages.objects.filter(Q(binomial__startswith=this_species_name) | Q(pid__in=syn_list))
+        public_list = SpcImages.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} ") | Q(pid__in=syn_list))
     else:
-        public_list = SpcImages.objects.filter(Q(binomial__startswith=this_species_name))
+        public_list = SpcImages.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
 
     # Get upload list, public list and private list
     private_list = []
@@ -389,8 +394,9 @@ def photos(request, app=None, pid=None):
     # for img in public_list:
     #     print("img", img.id, img.pid, img.get_displayname())
     write_output(request, str(family) + ' ' + species.binomial)
+    ancspc_list = get_anc_list(app, species)
     context = {'species': species, 'author': author,
-               'family': family,
+               'family': family, 'ancspc_list': ancspc_list,
                'pho': 'active', 'tab': 'pho', 'app': app,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
