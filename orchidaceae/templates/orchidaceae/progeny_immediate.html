@@ -1,11 +1,10 @@
 {% load static %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
-    <title>List of {{species.binomial}} immediate offsprings</title>
-    <meta name='description' content='Immediate offsprings of {{species.binomial}}'>
+    <title>List of {{species.binomial}} immediate offspring</title>
+    <meta name='description' content='Immediate offspring of {{species.binomial}}'>
 </head>
 {% include "base.html" %}
-{% include 'detail-title.html' %}
 {% block body %}
 
 <style>
@@ -16,11 +15,18 @@
     font-size: 14px;
 }
 
+td {
+    font-size: 14px;
 
+}
 @media only screen and (max-width: 700px){
     .progen {
         width:95%;
         font-size: 10px;
+    }
+    td {
+        font-size: 11px;
+
     }
 }
 
@@ -28,20 +34,23 @@
 </style>
 
 
-    <div class="progen">
-        <!--main section-->
-    {% include "common/detail-nav.html" %}
+<div class="progen">
+    <!--main section-->
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Immediate Offspring of {{species.binomial}}</h4>
+        <br>
+    </div>
+    {% include 'common/detail-nav.html' %}
     <div class="tab-content clearfix">
         <br>
-        <h1 class="hidden-h1">Immediate Offsprings of {{species.binomial}}</h1>
-        <h5>Immediate Offsprings of {{species.binomial}}</h5>
-        <br>
+        <h1 class="hidden-h1">Immediate Offspring of {{species.binomial}}</h1>
         <table id="sortTable" class="table table-condensed table-sm table-hover">
             <thead style="background-color: #e3e3e3">
                 <th>Descendants</th>
                 <th>Seed Parent</th>
                 <th>Pollen Parent</th>
-                <th class="text-left d-sm-table-cell"># images</th>
+                <th class="text-left d-sm-table-cell">#img</th>
             </thead>
             <div style="display:block; margin: 0; width: 100%; font-size:13px">
                 {% for hybrid in prim_list %}

@@ -5,7 +5,6 @@
     <meta name='description' content='Ancestry tree of {{species.binomial}}'>
 </head>
 {% include "base.html" %}
-{% include "detail-title.html" %}
 {% block body %}
 <style>
 
@@ -193,19 +192,18 @@ a {
 
 
 <div style="margin:0 auto;padding:0;width:100%;">
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Family tree of {{species.binomial}}</h4>
+        <br>
+    </div>
         <!--main section-->
     <br>
     {% include 'common/detail-nav.html' %}
-    <div class="tab-content clearfix" style="min-width:2000px;overflow-x:auto;padding:0;background-color:white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey;">
+    <div class="tab-content clearfix" style="width:100%;overflow-x:auto;padding:0;background-color:white; margin:0 auto;">
         {% if species.type == 'hybrid' %}
         <br>
         <div class="card m-2" style="margin:100px;">
-            <div class="card-header">
-                <div style="margin-left:200px;">
-                    <h5>Family Tree of {{species.binomial}}</h5>
-                </div>
-            </div>
-            <br>
             <div class="card-body" style="margin:0; text-align:center">
 
     <!--        Tree here-->

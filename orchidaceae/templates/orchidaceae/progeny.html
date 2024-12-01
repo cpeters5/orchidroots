@@ -5,7 +5,6 @@
     <meta name='description' content='Offsprings of {{species.binomial}}'>
 </head>
 {% include "base.html" %}
-{% include 'detail-title.html' %}
 {% block body %}
 
 <style>
@@ -23,13 +22,17 @@
 }
 </style>
 
-    <div class="progen">
+<div class="progen">
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Progeny of {{species.binomial}}</h4>
+        <br>
+    </div>
         <!--main section-->
     {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0;">
         <br>
         <h1 class="hidden-h1">Progenies of {{species.binomial}}</h1>
-        <h5>Progenies of {{species.binomial}}</h5>
         <br>
         <table id="sortTable" class="table table-condensed table-sm table-hover" style="font-size:13px;">
             <thead style="background-color: #e3e3e3">
@@ -37,7 +40,7 @@
                 <th>Seed Parent</th>
                 <th>Pollen Parent</th>
                 <th class="text-center d-none d-sm-table-cell" >pct</th>
-                <th class="text-left d-sm-table-cell"># images</th>
+                <th class="text-left d-none d-sm-table-cell">#img</th>
             </thead>
             {% for hybrid in result_list %}
             <tr style="text-align: left">
@@ -59,7 +62,7 @@
                         na
                     {% endif %}
                 </td>
-                <td class="text-center d-none d-sm-block">
+                <td class="text-center d-none d-sm-table-cell">
                     {{hybrid.pct|floatformat:0}}%
                 </td>
                 <td class="text-left d-none d-sm-table-cell" valign="middle">

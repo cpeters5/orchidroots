@@ -2,7 +2,6 @@
 {% include "base.html" %}
 {% load crispy_forms_tags %}
 {% block body %}
-{% include "detail-title.html" %}
 {{ form.media.css }}
 {{ form.media.js }}
 <style>
@@ -12,6 +11,11 @@
 </style>
 
 <div style="width:95%;margin:0 auto;padding:0;">
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>{{species.binomial}}</h4>
+        <br>
+    </div>
         <!--main section-->
     {% include 'common/detail-nav.html' %}
     {% if myphotos > user.tier.max_upload %}

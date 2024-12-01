@@ -1,10 +1,9 @@
 {% load static %}
 <head>
-    <title>Sample images of {{species.binomial}} offsprings</title>
+    <title>Images of {{species.binomial}} offsprings</title>
     <meta name='description' content='Sample images of all progeny of {{species.binomial}}'>
 </head>
 {% include "base.html" %}
-{% include 'detail-title.html' %}
 {% block body %}
 
 <style>
@@ -102,7 +101,12 @@ img{
 }
 
 </style>
-        <!--main section-->
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Images of {{species.binomial}} Progeny</h4>
+        <br>
+    </div>
+<!--main section-->
     {% include "common/detail-nav.html" %}
     <div class="tab-content clearfix" style="background:white; margin:0 auto;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
     {% if img_list %}

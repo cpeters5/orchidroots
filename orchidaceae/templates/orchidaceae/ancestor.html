@@ -5,7 +5,6 @@
     <meta name='description' content='Ancestors of {{species.binomial}}'>
 </head>
 {% include "base.html" %}
-{% include "detail-title.html" %}
 {% block body %}
 
 <style>
@@ -36,13 +35,16 @@
 
 
 <div class="progen">
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Ancestors of {{species.binomial}}</h4>
+        <br>
+    </div>
         <!--main section-->
      {% include 'common/detail-nav.html' %}
     <div class="tab-content clearfix">
         <br>
         <h1 class="hidden-h1">Ancestors of {{species.binomial}}</h1>
-        <h5>Ancestors of {{species.binomial}}</h5>
-        <br>
         {% if species.type == 'hybrid' %}
             {% if anc_list %}
                <table id="myTable"  class="table table-condensed table-sm table-hover">
