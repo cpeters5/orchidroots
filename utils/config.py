@@ -6,7 +6,7 @@ app_descriptions = {
     'animalia': 'Animalia',
     'fungi': 'Fungi',
     'orchidaceae': 'Orchids',
-    'other': 'Other Plants',
+    'other': 'Plants',
 }
 
 big_genera = [
