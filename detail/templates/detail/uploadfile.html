@@ -1,7 +1,6 @@
 {% load static %}
 {% include "base.html" %}
 {% load crispy_forms_tags %}
-{% include "detail-title.html" %}
 {% block body %}
 {{ form.media.css }}
 {{ form.media.js }}
@@ -12,13 +11,18 @@
     }
 </style>
 <div style="width:95%;margin:0 auto;padding:0;">
+   <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>{{species.binomial}}</h4>
+        <br>
+    </div>
              <!--main section-->
     {% include 'common/detail-nav.html' %}
     <div style="width:80%; margin: 0 auto;">
         Before uploading a photo, please search for the orchid name first. You can then either:
         Go to the orchid's detail page and use the upload tab to add your photo, or if the orchid isn't found,
         use the 'Upload File' option from any detail page and provide the name to the best of you knowledge in the name text box.
-        <b>The name text box is to be used for new orchids only. Otherwise, the photo will not be processed.</b>
+        <b>The "Scientific or registered name" text box is to be used for new orchids only. Otherwise, the photo will not be processed.</b>
     </div>
 
     <br>
