@@ -381,8 +381,10 @@ class Species(models.Model):
         return len(img) + len(upl)
 
     def get_infraspecifics(self):
-        this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
-        return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+        if self.type == 'species':
+            this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
+            return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+        return []
 
     def get_synonyms(self):
         synonym_list = Synonym.objects.filter(acc_id=self.pid)

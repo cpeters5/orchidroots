@@ -45,7 +45,6 @@ class Family(models.Model):
         return None
 
 
-
 class Subfamily(models.Model):
     family = models.ForeignKey(Family, null=True, blank=True, db_column='family', on_delete=models.DO_NOTHING)
     subfamily = models.CharField(primary_key=True, max_length=50, default='', db_column='subfamily')
