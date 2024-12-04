@@ -1,13 +1,15 @@
 {% load static %}
-{% include "base.html" %}
-
-{% block extra-head %}
+<head>
     <title>Donation</title>
     <meta name='description' content='Donation form'>
-   <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+</head>
+
+{% include "base.html" %}
+{% block body %}
     <style>
        #donateamt{
-            width:80px;
+            width:100px;
             align:center;
            border: 0;
         }
@@ -81,7 +83,7 @@
         }
         .amt {
             margin: 1px !important;
-            /*width: 33px !important;*/
+            width: 33px !important;
             height:33px;
             border: 1px solid #c9c9ff;
             text-align:center;
@@ -92,9 +94,6 @@
             background-color: #007bff!important;
         }
 </style>
-{% endblock %}
-
-{% block body %}
     <br>
 
 <div class="container-fluid" style="min-height:200px;">
