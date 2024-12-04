@@ -107,8 +107,8 @@
             <div class="info">
                 {% if species.type == 'species' %}
                     {{species.binomial}} is a species in the {{ species.genus }} genus.
-                    {% if species.accepted.common_name %}It is commonly know as {{species.accepted.common_name}}{% endif %}
-                    {% if species.accepted.local_name %} and locally called {{species.accepted.local_name }}{%endif %}.
+                {% if species.accepted.common_name %}It is commonly known as <b>{{species.accepted.common_name}}</b>{% endif %}
+                {% if species.accepted.local_name %} and known locally as <b>{{species.accepted.local_name }}</b>{%endif %}.
 
                     {% if species.status == 'synonym' %}
                         This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}</a>
