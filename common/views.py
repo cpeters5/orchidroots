@@ -907,7 +907,7 @@ def approve_mediaphoto(request, app, pid, orid):
             #                      action='approve file')
             new_path = os.path.join(settings.STATIC_ROOT, "utils/images/species")
         else:
-            spc = HybImages(pid=species.hybrid, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
+            spc = HybImages(pid=species, author=upl.author, user_id=upl.user_id, name=upl.name, awards=upl.awards,
                             credit_to=upl.credit_to, source_file_name=upl.source_file_name, variation=upl.variation, form=upl.forma, rank=0,
                             description=upl.description, location=upl.location, created_date=upl.created_date,
                             source_url=upl.source_url, text_data=upl.text_data)

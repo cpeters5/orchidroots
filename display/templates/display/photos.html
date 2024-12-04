@@ -364,7 +364,7 @@ a:hover {
                         <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
                                 {{image.id}}:  Uploaded since {{image.created_date}} by {{image.get_displayname}}<br>
                                 <br>{{image.text_data|default:''|safe}}">
-                                    <img class="thumbnails" alt="{{image.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
+                                    <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                     <div class="text text-br">{{image.id}}</div>
                         </a>
                     </div>
@@ -396,7 +396,7 @@ a:hover {
                                     {{image.id}}:  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     {{image.text_data|default:''|safe}} </small></h6>">
-                                        <img class="thumbnails" alt="{{image.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                 </a>
                             </div>
@@ -404,7 +404,7 @@ a:hover {
                         {% else %}
                             <div class="box">
                                 <a href="#">
-                                    <img class="thumbnails" alt="{{image.binomial}}" src="{{image.image_url}}" class="img-fluid">
+                                    <img class="thumbnails" alt="{{image.pid.binomial}}" src="{{image.image_url}}" class="img-fluid">
                                     <div class="text text-br">{{image.id}}
                                     </div>
                                 </a>

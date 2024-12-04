@@ -114,16 +114,12 @@ img{
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.pid %}
-                                        {% if image.binomial == image.pid.binomial %}
-                                            <a href="{% url 'display:photos' app image.pid_id %}?id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
-                                        {% else %}
-                                            {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
-                                        <br>
-<!--                                            <a href="{% url 'common:deletephoto' image.id %}?app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">Delete file</a>-->
-                                        {% endif %}
+                                        <a href="{% url 'display:photos' app image.pid_id %}?id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}">{{image.pid|safe}}</a>
                                     {% else %}
-                                        {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
+                                        {{image.id }} - {{image.pid.binomial|safe}} (NEW) {{image.modified_date.date}}
                                     {% endif %}
+                                        <br>
+                                    {{image.author}}
 <!--                                    <a href="{% url 'common:deletephoto' image.id %}?app={{app}}&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}" rel="nofollow noreferrer noopener">Delete file</a>-->
                                 </div>
                             </div>

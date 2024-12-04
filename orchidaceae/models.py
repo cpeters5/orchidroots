@@ -954,7 +954,7 @@ class UploadFile(models.Model):
 
 
 class SpcImages(models.Model):
-    binomial = models.CharField(max_length=200, null=True, blank=True)
+    # binomial = models.CharField(max_length=200, null=True, blank=True)
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -1082,7 +1082,7 @@ class SpcImages(models.Model):
 
 
 class HybImages(models.Model):
-    binomial = models.CharField(max_length=200, null=True, blank=True)
+    # binomial = models.CharField(max_length=200, null=True, blank=True)
     form = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
@@ -1111,7 +1111,7 @@ class HybImages(models.Model):
     image_file = models.CharField(max_length=100, null=True, blank=True)
     image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
     download_date = models.DateField(null=True, blank=True)
-    pid = models.ForeignKey(Hybrid, db_column='pid', related_name='orpid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    pid = models.ForeignKey(Species, db_column='pid', related_name='hybimgpid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     spid = models.IntegerField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='or14gen', null=True, blank=True,on_delete=models.DO_NOTHING)
     is_private = models.BooleanField(null=True, default=False)
@@ -1123,7 +1123,7 @@ class HybImages(models.Model):
     # upload_by = models.ForeignKey(User, db_column='upload_by', null=True, blank=True,on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        name = self.pid.pid.name()
+        name = self.pid.name()
         if self.variation:
             name = name + ' ' + self.variation
         if self.form:
@@ -1153,7 +1153,7 @@ class HybImages(models.Model):
         if self.source_file_name:
             myname = self.source_file_name
         else:
-            myname = self.pid.pid.abrevname()
+            myname = self.pid.abrevname()
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -1170,7 +1170,7 @@ class HybImages(models.Model):
         if self.source_file_name:
             myname = self.source_file_name
         else:
-            myname = self.pid.pid
+            myname = self.pid
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
@@ -1209,7 +1209,7 @@ class HybImages(models.Model):
             return None
 
     def binomial_it(self):
-        return self.pid.pid.binomial_it()
+        return self.pid.binomial_it()
 
 
 class Video(models.Model):

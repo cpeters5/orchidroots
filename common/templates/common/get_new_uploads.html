@@ -26,16 +26,13 @@
                                 </a>
                                 <div style="font-size:12px">
                                     {% if image.pid %}
-                                        {% if image.binomial == image.pid.binomial %}
-
-                                            <a href="{% url 'display:photos' 'orchidaceae' image.pid_id %}?role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
-                                        {% else %}
-                                            {{image.id }} - {{image.binomial|safe}} (NEW) {{image.modified_date.date}}
-                                        {% endif %}
+                                        <a href="{% url 'display:photos' 'orchidaceae' image.pid_id %}?role=cur" rel="nofollow noreferrer noopener">{{image.pid.binomial|safe}}</a>
                                     {% else %}
-                                            {{image.id }} (NEW) {{image.modified_date.date}}
+                                        {{image.id }} (NEW) {{image.modified_date.date}}
                                     {% endif %}
-                                    <a href="{% url 'common:deletephoto' image.id %}?app=orchidaceae&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}" rel="nofollow noreferrer noopener">Delete file</a>
+                                    <br>
+<!--                                    <a href="{% url 'common:deletephoto' image.id %}?app=orchidaceae&id={{image.id}}&gen={{species.gen.pid}}&action=file&role={{role}}" rel="nofollow noreferrer noopener">Delete file</a>-->
+                                    {{image.author}}
                                 </div>
                             </div>
         {% endfor %}

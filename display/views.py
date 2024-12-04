@@ -367,9 +367,11 @@ def photos(request, app=None, pid=None):
 
     # Otherwise, get everything: requested species, all synonym, all infraspecifics (if requested)
     if syn == 'Y':
-        public_list = SpcImages.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} ") | Q(pid__in=syn_list))
+        pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} ") | Q(pid__in=syn_list))
     else:
-        public_list = SpcImages.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+        pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+    pid_list = pid_list.values_list('pid', flat=True)
+    public_list = SpcImages.objects.filter(pid__in=pid_list)
 
     # Get upload list, public list and private list
     private_list = []
