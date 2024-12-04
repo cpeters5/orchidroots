@@ -1,17 +1,25 @@
 {% load static %}
 <head>
-    <title>Home page of orchidroots.com</title>
+    <title>Home page of Orchidroots, home of orchids and selected plants and animals.</title>
     <meta name='description' content='Home page'>
 </head>
 {% include "base.html" %}
 {% block body %}
 <style>
 
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px;
+    justify-content: center;
+}
+
 .imageitem {
-    display:inline-block;
+    display:flex;
+    flex-direction: column;
     border:1px solid red;
-    margin:10px 20px;
-    width : 18vw;
+    /*margin:0;*/
+    width : 200px;
     background-color: #f7f7f7;
     border:1px solid lightgrey;
     text-align:center;
@@ -33,8 +41,8 @@
 .thumbnails {
    object-fit: cover;
    overflow: hidden;
-   height: 16vw;
-   width : 16vw;
+   height: 180px;
+   width : 180px;
    padding:2px;
     margin:0 auto;
 }
@@ -46,6 +54,7 @@
     padding:0 10px;
     width: 100%;
     color: #0a6aa1;
+    min-height: 3em;
 }
 
 .imgtitle {
@@ -60,11 +69,11 @@
 }
 
 
-div.text-br {
-    position: absolute;
-    bottom: 5px;
-    right: 15px;
-}
+/*div.text-br {*/
+/*    position: absolute;*/
+/*    bottom: 5px;*/
+/*    right: 15px;*/
+/*}*/
 
 .box {
     position: relative;
@@ -75,9 +84,13 @@ div.text-br {
     font-size:12px;
 }
 
-
-
 @media only screen and (max-width: 800px){
+    .container {
+        grid-template-columns: repeat(auto-fill, 200px);
+    }
+    .imgtitle {
+        font-size: 16px;
+    }
    .imageitem {
         width: 30vw;
         /*height : 250px;*/
@@ -101,21 +114,29 @@ div.text-br {
 }
 
 @media only screen and (max-width: 600px){
+    .container {
+        grid-template-columns: repeat(auto-fill, 120px);
+        gap: 20px;
+    }
+    .imgtitle {
+        font-size: 14px;
+    }
     .imageitem {
-        width: 36vw;
+        width: 120px;
     }
     .box {
-        width: 35vw;
+        width: 100px;
+        width: 100px;
         font-size: 10px;
-        margin-left:-3px;
+        /*margin-left:-3px;*/
     }
     .thumbnails {
-       height: 110px !important;
-       width : 95% !important;
+       height: 90px !important;
+       width : 90px !important;
     }
 
     .imgcaption {
-       width : 34vw;
+       width : 100%;
         font-size: 11px;
         height: 59px;
     }
@@ -162,12 +183,27 @@ img{
                     </form>
                 </div>
                 <h6 class="card-title d-inline-block">Welcome! to OrchidRoots</h6>
-                <div class="d-inline-block p-1" style="font-size:16px">
-                    We at OrchidRoots are committed to serving you for many years to come.
-                    To make this possible, we are asking for your support.
-                    You can explore orchids and other life forms on orchidroots.com.
-                    Any amount you are able to contribute would be greatly appreciated.
-                    <a class="btn btn-primary border" style="width: 120px;" href="{% url 'donation:donateapp' %}">Donate</a>
+                <div class="d-inline-block p-1 border message" style="font-size:16px; background-color: #dcefee">
+<!--                    We at OrchidRoots are committed to serving you for many years to come.-->
+<!--                    To make this possible, we are asking for your support.-->
+<!--                    You can explore orchids and other life forms on orchidroots.com.-->
+<!--                    Any amount you are able to contribute would be greatly appreciated.-->
+
+                    For several years, OrchidRoots has been your trusted resource for comprehensive orchid information.
+                    We need your support to continue our mission.
+                    Operating entirely on user donations without any federal funding, we aim to raise $5,000 this year to maintain our database,
+                    develop new features, and keep our platform freely accessible to all.
+                    As you reflect on how OrchidRoots has supported your orchid journey,
+                    please consider making a tax-deductible contribution.
+                    You can support us either through the donation button
+                    <br>
+                    <a class="btn btn-primary border" style="width: 120px;" href="{% url 'donation:donateapp' %}">Donate</a> or at
+
+                    <a class="btn btn-primary border" style="width: 120px;" href="https://gofund.me/bed3aea9">GoFundMe</a>
+                    <br>
+                    Your generosity will ensure that OrchidRoots remains a valuable resource for orchid enthusiasts worldwide.
+
+
 <!--                    <a class="btn btn-primary border" href="{% url 'documents:list' %}">Documents</a>-->
 
                     <br>
@@ -185,28 +221,32 @@ img{
                     <div class="d-flex justify-content-center">
                         <h5>Orchids</h5>
                      </div>
+                    <div class="container">
                     {% for image in orcimage %}
                         <div class="imageitem">
                             <div class="imgtitle">
                                 <a href="{% url 'common:newbrowse' 'orchidaceae' %}?genus={{image.gen.genus}}&role={{role}}">{{image.pid.genus}}</a></div>
                                 <a href="{% url 'display:summary' 'orchidaceae' image.pid_id %}?family={{image.gen.family}}&role={{role}}">
                                     <div class="box">
-                                        <img class="thumbnails" alt="{{image.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
                                     </div>
                                 </a>
                             <div class="imgcaption">
                                 <a href="{% url 'display:summary' 'orchidaceae' image.pid_id %}?family={{image.gen.family}}&role={{role}}">
-                                    {{image.pid.name|safe}} {% if cacfamily.application == 'other' %}({{image.gen.family}}){% endif %}
+                                    {{image.pid.name|safe}}
                                 </a>
-                                <br><a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}},</a>
+<!--                                <br><a href="{{image.source_url}}" target="_blank" >{{image.get_displayname}},</a>-->
                             </div>
                         </div>
                     {% endfor %}
+                    </div>
                     <hr>
                     <br>
                     <div class="d-flex justify-content-center">
                         <h5>Other Families <span style="color:blue;"><b>(NEW!)</b></span></h5>
                     </div>
+
+                    <div class="container">
                      {% for othimage in all_list %}
                         {% if othimage.1 %}
                         <div class="imageitem">
@@ -216,25 +256,26 @@ img{
                                 <a href="{% url 'common:newbrowse' othimage.1.family.application %}?family={{othimage.1.gen.family}}&role={{role}}">{{othimage.1.pid.gen.family}}</a></div>
                                 <a href="{% url 'common:newbrowse' othimage.1.family.application %}?role={{role}}">
                                     <div class="box">
-                                        <img class="thumbnails" alt="{{othimage.1.binomial}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
+                                        <img class="thumbnails" alt="{{othimage.1.pid.binomial}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
                                     </div>
                                 </a>
                                 {% else %}
                                     {{othimage.1.pid.gen.family}}
                                     <div class="box">
-                                        <img class="thumbnails" alt="{{othimage.1.binomial}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
+                                        <img class="thumbnails" alt="{{othimage.1.pid.binomial}}" src="{% static othimage.1.thumb_dir %}{{othimage.1.image_file}}">
                                     </div>
 
                             `   {% endif %}
                             <div class="imgcaption">
                                 <a href="{% url 'display:summary' othimage.1.family.application othimage.1.pid_id %}?family={{othimage.1.gen.family}}&role={{role}}">
-                                    {{othimage.1.pid.name|safe}} {% if cacfamily.application == 'other' %}({{othimage.1.gen.family}}){% endif %}
+                                    {{othimage.1.pid.name|safe}}
                                 </a>
-                                <br><a href="{{othimage.1.source_url}}" target="_blank" >{{othimage.1.get_displayname}},</a>
+<!--                                <br><a href="{{othimage.1.source_url}}" target="_blank" >{{othimage.1.get_displayname}},</a>-->
                             </div>
                         </div>
                         {% endif %}
                     {% endfor %}
+                    </div>
                 </div>
 <!--                <div class="card-body" style="text-align: left;font-size: 13px;">-->
 <!--                   <p>-->
