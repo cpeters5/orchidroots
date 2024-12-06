@@ -339,22 +339,9 @@ def photos(request, app=None, pid=None):
     syn_list = list(species.get_synonyms().values_list('spid', flat=True))
     synonyms = len(syn_list)
 
-    # For synonym species, just render only synonym images
-    if species.status == 'synonym':
-        public_list = SpcImages.objects.filter(pid=pid, status='synonym')  # public photos
-        # synonym_pid_list = public_list.values_list('pid', flat=True)
-        private_list = public_list.filter(rank=0)  # rejected photos
-        context = {'species': species, 'author': author, 'family': family,
-                   'pho': 'active', 'tab': 'pho', 'app': app,
-                   'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
-                   'canonical_url': canonical_url,
-                   'role': role,
-                   }
-        return render(request, 'display/photos.html', context)
-
     # if requested species is already an infraspecific
     if species.infraspe:
-        public_list = SpcImages.objects.filter(pid=pid).exclude(status='synonym')  # public photos
+        public_list = SpcImages.objects.filter(pid=pid) # public photos
         private_list = public_list.filter(rank=0)  # rejected photos
         context = {'species': species, 'author': author, 'family': family,
                    'pho': 'active', 'tab': 'pho', 'app': app,
@@ -390,7 +377,7 @@ def photos(request, app=None, pid=None):
 
     if public_list:
         public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?')  # public photos
-    if private_list:
+    if private_li
         private_list = private_list.order_by('created_date')
 
     # for img in public_list:
