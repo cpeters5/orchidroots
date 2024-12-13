@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db import connection
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -238,15 +238,7 @@ def getPartialPid(reqgenus, type, status):
     else:
         return '', pid_list, intragen_list
 
-
-def getPrev(request,arg, prev):
-    arg = request.GET.get('arc', '')
-    arg = arg.strip()
-    prev = request.GET.get('prev', '')
-    prev = prev.strip()
-    return arg, prev
-
-
+@login_required
 def species(request):
     author = ''
     role = getRole(request)
@@ -324,7 +316,7 @@ def species(request):
                }
     return render(request, 'orchidaceae/species.html', context)
 
-
+@login_required
 def hybrid(request):
     # Initialization
     author = request.GET.get('author', '')
@@ -379,37 +371,19 @@ def hybrid(request):
     # First matching genus, with wild card
     crit = 1 #???
     if crit :
-        # reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
-        this_species_list = Hybrid.objects.all()
-        if reqgenus:
-            this_species_list = this_species_list.filter(genus=reqgenus)
+        reqgenus, this_species_list, intragen_list = getPartialPid(reqgenus, 'hybrid', status)
     else:
         # If crit = 0 (no filter criteria), ignore request
         return render(request, 'orchidaceae/hybrid.html', {})
     write_output(request, str(reqgenus))
 
-    # Genus unchanged, see if seed/pollen are requested
-    if this_species_list:
-        if (reqgenus and (reqgenus == prev_genus)):
-            seed_binomial, prev_seed_binomial = getPrev(request,'seed_binomial', 'prev_seed_binomial')
-            pollen_binomial, prevpollen_binomial = getPrev(request,'pollen_binomial', 'prev_pollen_binomial')
-
-        if len(seed_binomial) > 0:
-            seed_pids = Species.objects.extra(where=["MATCH(binomial) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[seed_binomial]).values_list('pid', flat=True)
-            # seed_pids = Species.objects.filter(Q(binomial__istartswith=seed_binomial) | Q(species__istartswith=seed_binomial)).values_list('pid', flat=True)
-            this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=seed_pids) | Q(hybrid__pollen_id__in=seed_pids))
-
-        if len(pollen_binomial) > 0:
-            poll_pids = Species.objects.extra(where=["MATCH(binomial) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[pollen_binomial]).values_list('pid', flat=True)
-            # poll_pids = Species.objects.filter(Q(binomial__istartswith=pollen_binomial) | Q(species__istartswith=pollen_binomial)).values_list('pid', flat=True)
-            this_species_list = this_species_list.filter(Q(hybrid__seed_id__in=poll_pids) | Q(hybrid__pollen_id__in=poll_pids))
-
     if crit and this_species_list:
         if spc:
             this_species_list = this_species_list.extra(where=["MATCH(species) AGAINST (%s IN NATURAL LANGUAGE MODE)"], params=[spc])
-            # TODO: User django.mysql.SearchQuery instead.
-            # Need to fix import error though.
-            # this_species_list = this_species_list.filter(species__search=SearchQuery(spc))
+            # if len(spc) >= 2:
+            #     this_species_list = this_species_list.filter(species__icontains=spc)
+            # else:
+            #     this_species_list = this_species_list.filter(species__istartswith=spc)
 
         elif alpha:
             if len(alpha) == 1:
@@ -435,7 +409,7 @@ def hybrid(request):
                }
     return render(request, 'orchidaceae/hybrid.html', context)
 
-
+@login_required
 def ancestor(request, pid=None):
     if not pid:
         pid = request.GET.get('pid', '')
@@ -549,7 +523,7 @@ def get_pollen_parent(child):
         parent = ''
     return parent
 
-
+@login_required
 def ancestrytree(request, pid=None):
     if not pid:
         pid = request.GET.get('pid', '')
@@ -601,14 +575,6 @@ from django.db import connection
 from django.db.models import Subquery, OuterRef, Value, IntegerField, Q
 from django.db.models.functions import Greatest
 
-def get_des_list(pid, syn_list):
-    base_query = AncestorDescendant.objects.filter(pct__gt=30)
-
-    if not syn_list:
-        return list(base_query.filter(aid=pid))
-
-    return list(base_query.filter(Q(aid=pid) | Q(aid__in=syn_list)))
-
 
 def synonym(request, pid):
     role = getRole(request)
@@ -635,7 +601,7 @@ def synonym(request, pid):
                }
     return render(request, 'orchidaceae/synonym.html', context)
 
-
+@login_required
 def progeny(request, pid):
     role = getRole(request)
     try:
@@ -646,16 +612,15 @@ def progeny(request, pid):
         return HttpResponse(message)
     write_output(request, species.binomial)
 
-    syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True)
-
+    syn_list = Species.objects.filter(accid=pid).values_list('pid', flat=True)
     # Request immediate offsprings?
     prim = request.GET.get('prim', None)
     if prim:
         prim_list = Hybrid.objects.filter(
             Q(seed_id=pid) |
             Q(pollen_id=pid) |
-            Q(seed_id__in=syn_list) |
-            Q(pollen_id__in=syn_list)
+            Q(seed_id__in=Subquery(syn_list)) |
+            Q(pollen_id__in=Subquery(syn_list))
         )
         canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
         context = {'prim_list': prim_list, 'species': species,
@@ -666,8 +631,7 @@ def progeny(request, pid):
         return render(request, 'orchidaceae/progeny_immediate.html', context)
 
     #Request all offsprings
-    # des_list = get_des_list(pid, syn_list)
-    des_list =  list(AncestorDescendant.objects.filter(pct__gt=30, aid=pid))
+    des_list =  list(AncestorDescendant.objects.filter(pct__gt=20, aid=pid))
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     context = {'result_list': des_list, 'species': species,
@@ -678,7 +642,7 @@ def progeny(request, pid):
 
     return render(request, 'orchidaceae/progeny.html', context)
 
-
+@login_required
 def progenyimg(request, pid):
     num_show = 5
     page_length = 30
