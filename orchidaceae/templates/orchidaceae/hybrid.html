@@ -110,17 +110,17 @@ option {
                 <input class="btn btn-custom p-1 m-1" form="hybrid" name="originator" value='{{originator}}' placeholder="Originator" onfocus="this.select()" data-toggle="tooltip"  data-placement="bottom"  title="Originator name match string">
                 <button form="hybrid" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
             </form>
-            <form action="?" id="parents">
-                <input form="parents" type="hidden" name="family" value="{{family.family}}" >
-                <input form="parents" type="hidden" name="alpha" value="{{alpha}}" >
-                <input form="parents" type="hidden" name="genus" value="{{genus}}" >
-                <input form="parents" type="hidden" name="spc" value="" >
-                <input form="parents" type="hidden" name="author" value="" >
-                <input form="parents" type="hidden" name="originator" value="" >
-                <input form="parents" class="btn btn-custom p-1 m-1" form="parents" name="seed_binomial" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_binomial}}" class="custom-select" placeholder="Select a parent" style="text-align:center; background-image: none" data-toggle="tooltip"  data-placement="bottom"  title="Select parent #1">
-                <input form="parents"  class="btn btn-custom p-1 m-1" form="parents" name="pollen_binomial" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_binomial}}" class="custom-select" placeholder="Select another parent" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select parent #2">
-                <button form="parents" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>
-            </form>
+<!--            <form action="?" id="parents">-->
+<!--                <input form="parents" type="hidden" name="family" value="{{family.family}}" >-->
+<!--                <input form="parents" type="hidden" name="alpha" value="{{alpha}}" >-->
+<!--                <input form="parents" type="hidden" name="genus" value="{{genus}}" >-->
+<!--                <input form="parents" type="hidden" name="spc" value="" >-->
+<!--                <input form="parents" type="hidden" name="author" value="" >-->
+<!--                <input form="parents" type="hidden" name="originator" value="" >-->
+<!--                <input form="parents" class="btn btn-custom p-1 m-1" form="parents" name="seed_binomial" onClick="this.setSelectionRange(0, this.value.length)" value="{{seed_binomial}}" class="custom-select" placeholder="Select a parent" style="text-align:center; background-image: none" data-toggle="tooltip"  data-placement="bottom"  title="Select parent #1">-->
+<!--                <input form="parents"  class="btn btn-custom p-1 m-1" form="parents" name="pollen_binomial" onClick="this.setSelectionRange(0, this.value.length)" value="{{pollen_binomial}}" class="custom-select" placeholder="Select another parent" style="text-align:center" data-toggle="tooltip"  data-placement="bottom"  title="Select parent #2">-->
+<!--                <button form="parents" type="submit" class="btn btn-primary btn-sm p-1 m-1" style="padding:0 5px; margin:0; width: 32px; height: 32px;">Go</button>-->
+<!--            </form>-->
              <span style="color: red;">{{msg|default:''}}</span>
 
             {% if subtotal == 0 %}
