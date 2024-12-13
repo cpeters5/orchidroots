@@ -36,7 +36,7 @@
         <ul class="nav nav-tabs navbar-expand-lg" >
             {% if species %}
                 <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' app species.pid %}?role={{role}}" data-nosnippet>Summary<br></a></li>
-                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' app species.pid %}?role={{role}}&syn=Y&ifs=N" data-nosnippet>Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' app species.pid %}?role={{role}}&ifs=N" data-nosnippet>Photos<br></a></li>
                 {% if app == 'aves' or app == 'animalia' %}
                     <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>Videos<br></a></li>
                 {% endif %}
@@ -82,7 +82,7 @@
                 {% if synonyms > 0 %}
                     <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
                 {% endif %}
-                {% if infra > 1 %}
+                {% if infra > 0 %}
                     <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
                 {% endif %}
 
