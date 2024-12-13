@@ -1086,7 +1086,7 @@ def myphoto_browse_spc(request):
                    'myhyb': 'active', 'owner': owner,
                    }
         return render(request, 'common/myphoto_browse_hyb.html', context)
-    img_list = SpcImages.objects.filter(author=author).order_by('binomial')
+    img_list = SpcImages.objects.filter(author=author).order_by('pid__binomial')
     if owner == 'Y':
         img_list = img_list.filter(credit_to__isnull=True)
 
