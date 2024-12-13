@@ -52,13 +52,13 @@ td {
                     {% for species in result_list %}
                         <tr>
                             <td style="width:20%;">
-                                <a href="{% url 'display:summary' species.match.family.application species.match.pid %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                                <a href="{% url 'display:summary' species.match.family.application species.match.pid %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}">
                                     {{species.match.binomial}}</a>  {{species.match.author|default:''}} {{species.match.year|default:''}}
                             </td>
                             <td style="width:10%;">
                                 {% if species.match.status == 'synonym' %}<br> syn.
                                     {% if species.match.getAcc %}
-                                        <a href="{% url 'display:summary' species.match.family.application species.match.getAcc %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                                        <a href="{% url 'display:summary' species.match.family.application species.match.getAcc %}?family={{species.match.family|default:'Orchidaceae'}}&role={{role}}">
                                             {{species.match.getAccepted.binomial}}
                                         </a>
                                     {% else %}
