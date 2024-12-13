@@ -2,7 +2,6 @@
 {% load static %}
 {% include "base.html" %}
 {% block body %}
-{% load testtags %}
 <style>
 table {
     padding: 100px;
@@ -45,7 +44,7 @@ td {
 
             <input class="searchbox" form="displaysearch" value="{{search_string}}"
                    type="text" name="search_string" pattern=".{3,}"
-                   placeholder="Search scientific name"
+                   placeholder="Search scientific name" title="The search string must be at least 3 characters long"
                    style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;margin:0 auto">
 
             <button form="displaysearch" type="submit" style="display:none;"></button>
@@ -103,13 +102,13 @@ td {
                         <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                     </td>
                     <td style="width:20%;">
-                        <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                        <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
                             {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
                     </td>
                     <td style="width:10%;">
                         {% if species.status == 'synonym' %} syn.
                             {% if species.getAcc %}
-                                <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}&syn=N">
+                                <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
                                     {{species.getAccepted.binomial}}
                                 </a>
                             {% else %}
