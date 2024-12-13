@@ -20,8 +20,9 @@
 
     <!-- favicons -->
     <link rel="shortcut icon" type="image/png" href="{% static 'utils/images/favicon.ico' %}"/>
-    <link rel="apple-touch-icon" type="image/png" href="{% static 'utils/images/apple-touch-icon.png' %}"/>
-    <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'utils/images/apple-touch-icon-precomposed.png' %}"/>
+<!--    Handle apple-touch-icon in nginx location blocks-->
+<!--    <link rel="apple-touch-icon" type="image/png" href="{% static 'apple-touch-icon.png' %}"/>-->
+<!--    <link rel="apple-touch-icon-precomposed" type="image/png" href="{% static 'apple-touch-icon-precomposed.png' %}"/>-->
 
     <!-- navbar jQuery -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -622,13 +623,13 @@ nav .search-container button:hover {
             <form class="form-inline" id="search" action="/search/search_name/aves/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input type="hidden" form="search" name="app" value="{{ app }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
             </form>
             {% else %}
             <form class="form-inline" id="search1" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
                 <input type="hidden" form="search1" name="role" value="{{ role }}" >
                 <input type="hidden" form="search1" name="app" value="{{ app }}" >
-                <input class="searchbox" form="search1" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search1" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
             </form>
             {% endif %}
             <ul class="navbar-nav " style="line-height:25px !important;">
@@ -645,39 +646,33 @@ nav .search-container button:hover {
                                     <li><a class="dropdown-item" href="{% url 'admin:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Admin</a></li>
                                     <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
                                     <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
-                                    {% if species %}
-                                        <li><a class="dropdown-item" href="{% url 'display:photos' app species.pid %}?role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
-                                    {% else %}
-                                        <li><a class="dropdown-item" href="{% url 'common:newbrowse' aves %}?role=cur&family={{family.family|default:'Orchidaceae'}}&alpha=A" rel="nofollow noreferrer noopener" data-nosnippet>Browse</a></li>
-                                    {% endif %}
                                 {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" rel="nofollow noreferrer noopener" data-nosnippet>View new uploads</a></li>
+                                <li><a class="dropdown-item" href="{% url 'common:get_new_uploads' %}?role=cur" rel="nofollow noreferrer noopener" data-nosnippet>View new uploads</a></li>
+                                <li><a class="dropdown-item " href="{% url 'documents:termsofuse' %}?next=/" data-nosnippet>Terms of use</a></li>
+                                <li><a class="dropdown-item " href="{% url 'documents:bylaws' %}?next=/" data-nosnippet>Bylaws</a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:species' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" rel="nofollow noreferrer noopener" data-nosnippet>Orchid Species</a></li>
-                            <li><a class="dropdown-item" href="{% url 'orchidaceae:hybrid' %}?family=Orchidaceae&role={{role}}&alpha={{alpha}}&genus={{genus|default:''}}&status={{status}}" rel="nofollow noreferrer noopener" data-nosnippet>Orchid Hybrids</a></li>
                             <li><a class="dropdown-item" href="{% url 'common:myphoto_browse_spc' %}?family={{family.family|default:'Orchidaceae'}}&role=pri" rel="nofollow noreferrer noopener" data-nosnippet>My Collection</a></li>
 <!--                            <hr style="margin:0;padding:0;">-->
                             <li><a class="dropdown-item" href="{% url 'update_profile' %}?next=/" rel="nofollow noreferrer noopener" data-nosnippet>Update profile</a></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}?next=/" rel="nofollow noreferrer noopener" data-nosnippet>Logout</a></li>
                             {% if user.tier.tier > 1 %}
-                            <li>Role</li>
-                            <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
-                            <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri" rel="nofollow noreferrer noopener" data-nosnippet>Private</a></li>
+                                <li>Role</li>
+                                <li><a class="dropdown-item {% if role == 'pub' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pub" rel="nofollow noreferrer noopener" data-nosnippet>Public</a></li>
+                                <li><a class="dropdown-item {% if role == 'pri' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=pri" rel="nofollow noreferrer noopener" data-nosnippet>Private</a></li>
                                 {% if user.tier.tier > 2 %}
-                                <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur" rel="nofollow noreferrer noopener" data-nosnippet>Curate</a></li>
+                                    <li><a class="dropdown-item {% if role == 'cur' %}active{% endif %}" href="?family={{family.family|default:'Orchidaceae'}}&role=cur" rel="nofollow noreferrer noopener" data-nosnippet>Curate</a></li>
                                 {% endif %}
+                                <li style="margin-top:8px;"><a class="dropdown-item " href="{% url 'documents:termsofuse' %}?next=/" data-nosnippet><span style="color:white">Terms of use</span></a></li>
                             {% endif %}
+
                         </ul>
                     </div>
                 </li>
                 {% else %}
-                    <li class="nav-item" style="margin-top:8px;">
-                        <a class="nav-link custom-find" href="{% url 'register' %}?next=/login" data-nosnippet><span style="color:white">Register</span></a>
-                    </li>
-                    <li class="nav-item" style="margin-top:8px;">
-                        <a class="nav-link custom-find" href="{% url 'login' %}?next=/" data-nosnippet><span style="color:white">Login</span></a>
-                    </li>
+                    <li class="nav-item" style="margin-top:8px;"><a class="nav-link custom-find" href="{% url 'register' %}?next=/login" data-nosnippet><span style="color:white">Register</span></a></li>
+                    <li class="nav-item" style="margin-top:8px;"><a class="nav-link custom-find" href="{% url 'login' %}?next=/" data-nosnippet><span style="color:white">Login</span></a></li>
                 {% endif %}
+
             </ul>
         </div>
   </div>
