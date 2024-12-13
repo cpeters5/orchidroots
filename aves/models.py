@@ -197,6 +197,8 @@ class Species(models.Model):
     #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
     orig_pid = models.CharField(max_length=20, null=True, blank=True)
+    accid = models.CharField(max_length=20, null=True)
+    base_pid = models.CharField(max_length=20, null=True)
     source = models.CharField(max_length=10, blank=True)
     genus = models.CharField(max_length=50, null=True, blank=True)
     is_hybrid = models.CharField(max_length=1, null=True)
@@ -383,10 +385,20 @@ class Species(models.Model):
         upl = UploadFile.objects.filter(pid=self.pid).filter(author=author)
         return len(img) + len(upl)
 
-    def get_infraspecifics(self):
+    def xget_infraspecifics(self):
         if self.type == 'species':
             this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
             return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+        return []
+    def get_infraspecifics(self):
+        if self.type == 'species' or (self.type == 'hybrid' and self.source != 'RHS'):
+            this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
+            # pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q( binomial__regex=f"{this_species_name} ($|\s[a-z])"))
+            pid_list = Species.objects.filter(type=self.type).filter(
+                Q(binomial=this_species_name) |
+                Q(binomial__regex=f"{this_species_name}[[:space:]]+[a-z]")
+            )
+            return pid_list
         return []
 
     def get_synonyms(self):
@@ -500,6 +512,7 @@ class Hybrid(models.Model):
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='aveseed_id', null=True, blank=True,
                                 on_delete=models.DO_NOTHING)
+    seed_accid = models.ForeignKey(Species, db_column='seed_accid', related_name='aveseed_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     # pollen_gen = models.BigIntegerField(null=True, blank=True)
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='avepollgen', null=True,
                                    on_delete=models.DO_NOTHING)
@@ -508,6 +521,7 @@ class Hybrid(models.Model):
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='avepollen_id', null=True, blank=True,
                                   on_delete=models.DO_NOTHING)
+    pollen_accid = models.ForeignKey(Species, db_column='pollen_accid', related_name='avepollen_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
@@ -642,6 +656,8 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='avespcimgpid',on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='aveimgaccid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='aveimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='avespcimgauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)

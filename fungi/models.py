@@ -196,6 +196,8 @@ class Species(models.Model):
     # class Meta:
     #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
+    accid = models.CharField(max_length=20, null=True)
+    base_pid = models.CharField(max_length=20, null=True)
     orig_pid = models.CharField(max_length=20, null=True, blank=True)
     source = models.CharField(max_length=10, blank=True)
     genus = models.CharField(max_length=50, null=True, blank=True)
@@ -383,7 +385,7 @@ class Species(models.Model):
     def get_infraspecifics(self):
         if self.type == 'species':
             this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
-            return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+            return Species.objects.filter(Q(binomial__exact=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
         return []
 
     def get_synonyms(self):
@@ -491,6 +493,7 @@ class Hybrid(models.Model):
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='funseed_id', null=True, blank=True,
                                 on_delete=models.DO_NOTHING)
+    seed_accid = models.ForeignKey(Species, db_column='seed_accid', related_name='funseed_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     # pollen_gen = models.BigIntegerField(null=True, blank=True)
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='funpollgen', null=True,
                                    on_delete=models.DO_NOTHING)
@@ -499,6 +502,7 @@ class Hybrid(models.Model):
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='funpollen_id', null=True, blank=True,
                                   on_delete=models.DO_NOTHING)
+    pollen_accid = models.ForeignKey(Species, db_column='pollen_accid', related_name='funpollen_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
@@ -633,6 +637,8 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='funspcimgpid',on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='funimgaccid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='funimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='funspcimgauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)

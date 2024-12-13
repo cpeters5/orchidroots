@@ -182,6 +182,8 @@ class Species(models.Model):
     # class Meta:
     #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
+    accid = models.CharField(max_length=20, null=True)
+    base_pid = models.CharField(max_length=20, null=True)
     orig_pid = models.CharField(max_length=20, null=True, blank=True)
     source = models.CharField(max_length=10, blank=True)
     genus = models.CharField(max_length=50, null=True, blank=True)
@@ -461,6 +463,7 @@ class Hybrid(models.Model):
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='othseed_id', null=True, blank=True,
                                 on_delete=models.DO_NOTHING)
+    seed_accid = models.ForeignKey(Species, db_column='seed_accid', related_name='othseed_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     # pollen_gen = models.BigIntegerField(null=True, blank=True)
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='othpollgen', null=True,
                                    on_delete=models.DO_NOTHING)
@@ -469,6 +472,7 @@ class Hybrid(models.Model):
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='othpollen_id', null=True, blank=True,
                                   on_delete=models.DO_NOTHING)
+    pollen_accid = models.ForeignKey(Species, db_column='pollen_accid', related_name='othpollen_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
@@ -603,6 +607,8 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='poolpid',on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='othimgaccid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='othimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     binomial = models.CharField(max_length=500, null=True, blank=True)
     # pid = models.BigIntegerField(null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='poolspcauthor', on_delete=models.DO_NOTHING)
@@ -626,11 +632,8 @@ class SpcImages(models.Model):
     image_file = models.CharField(max_length=100, null=True, blank=True)
     image_file_path = models.ImageField(upload_to='utils/images/photos', max_length=255, null=True, blank=True)
     family = models.ForeignKey(Family, db_column='family', related_name='poolspcfamily', on_delete=models.DO_NOTHING)
-    download_date = models.DateField(null=True, blank=True)
     genus = models.CharField(max_length=50)
-    species = models.CharField(max_length=50, null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='poolspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    block_id = models.IntegerField(null=True, blank=True)
     user_id = models.ForeignKey(User, db_column='user_id',related_name='pooluser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     approved_by = models.ForeignKey(User, db_column='approved_by', related_name='poolapproved_by', null=True, blank=True,on_delete=models.DO_NOTHING)
     created_date = models.DateTimeField(auto_now_add=True, null=True)

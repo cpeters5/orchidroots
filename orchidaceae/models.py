@@ -336,6 +336,8 @@ class SpeciesManager(Manager):
 class Species(models.Model):
     pid = models.BigAutoField(primary_key=True)
     orig_pid = models.CharField(max_length=20, null=True)
+    accid = models.CharField(max_length=20, null=True)
+    base_pid = models.CharField(max_length=20, null=True)
     source = models.CharField(max_length=10)
     genus = models.CharField(max_length=50)
     is_hybrid = models.CharField(max_length=1, null=True)
@@ -558,9 +560,20 @@ class Species(models.Model):
         return len(img) + len(upl)
 
     def get_infraspecifics(self):
-        if self.type == 'species':
+        if self.type == 'species' or (self.type == 'hybrid' and self.source != 'RHS'):
             this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
-            return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+            # pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q( binomial__regex=f"{this_species_name} ($|\s[a-z])"))
+            exact_match = Species.objects.filter(binomial__exact=this_species_name).first()
+            # pid_list = Species.objects.filter(type=self.type).filter(binomial__regex=f"{this_species_name}[[:space:]](f|var|subsp|forma|ssp|subvar|subf|cv)\.")
+            pid_list = Species.objects.filter(base_pid=self.pid)
+            # exact_matchQS = Species.objects.filter(pk=exact_match.pk)
+            # if pid_list:
+                # pid_list = pid_list.values_list('pid', flat=True)
+                # pid_list.union(exact_matchQS)
+            # else:
+            #     pid_list = exact_matchQS
+            print("model", pid_list)
+            return pid_list
         return []
 
     def get_synonyms(self):
@@ -730,12 +743,14 @@ class Hybrid(models.Model):
     seed_species = models.CharField(max_length=50, null=True, blank=True)
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species,db_column='seed_id',related_name='orseed_id',null=True, blank=True,on_delete=models.DO_NOTHING)
+    seed_accid = models.ForeignKey(Species, db_column='seed_accid', related_name='orseed_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     seed_binomial = models.CharField(max_length=200, blank=True)
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='orpollgen',null=True, on_delete=models.DO_NOTHING)
     pollen_genus = models.CharField(max_length=50, null=True, blank=True)
     pollen_species = models.CharField(max_length=50, null=True, blank=True)
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species,db_column='pollen_id',related_name='orpollen_id',null=True, blank=True,on_delete=models.DO_NOTHING)
+    pollen_accid = models.ForeignKey(Species, db_column='pollen_accid', related_name='orpollen_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     pollen_binomial = models.CharField(max_length=200, blank=True)
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
@@ -954,8 +969,10 @@ class UploadFile(models.Model):
 
 
 class SpcImages(models.Model):
-    # binomial = models.CharField(max_length=200, null=True, blank=True)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orpid', on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='spcimgaccid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='spcimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     author = models.ForeignKey(Photographer, db_column='author', related_name='orauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=10, default='TBD')
@@ -972,7 +989,6 @@ class SpcImages(models.Model):
     zoom = models.IntegerField(default=0)
     form = models.CharField(max_length=50, null=True, blank=True)
     source_file_name = models.CharField(max_length=100, null=True, blank=True)
-    spid = models.IntegerField(null=True, blank=True)
     awards = models.CharField(max_length=200, null=True, blank=True)
     description = models.CharField(max_length=100, null=True, blank=True)
     variation = models.CharField(max_length=50, null=True, blank=True)
@@ -1082,7 +1098,10 @@ class SpcImages(models.Model):
 
 
 class HybImages(models.Model):
-    # binomial = models.CharField(max_length=200, null=True, blank=True)
+    binomial = models.CharField(max_length=200, null=True, blank=True)
+    pid = models.ForeignKey(Species, db_column='pid', related_name='hybimgpid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='hybimgaccid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='hybimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     form = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     rank = models.IntegerField(choices=RANK_CHOICES,default=5)
@@ -1111,8 +1130,6 @@ class HybImages(models.Model):
     image_file = models.CharField(max_length=100, null=True, blank=True)
     image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
     download_date = models.DateField(null=True, blank=True)
-    pid = models.ForeignKey(Species, db_column='pid', related_name='hybimgpid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
-    spid = models.IntegerField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='or14gen', null=True, blank=True,on_delete=models.DO_NOTHING)
     is_private = models.BooleanField(null=True, default=False)
     block_id = models.IntegerField(null=True, blank=True)
@@ -1373,6 +1390,7 @@ class Donation(models.Model):
     source_id = models.CharField(max_length=255, blank=True, null=True)
     donor_name = models.CharField(max_length=255, blank=True, null=True)
     donor_display_name = models.CharField(max_length=255, blank=True, null=True)
+    donor_email = models.EmailField(blank=True)
     status = models.CharField(max_length=255, choices=Statuses.CHOICES, default=Statuses.UNVERIFIED)
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     country_code = models.CharField(max_length=2, null=True, blank=True)

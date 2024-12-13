@@ -197,6 +197,8 @@ class Species(models.Model):
     #     unique_together = (("source", "orig_pid"),)
     pid = models.BigAutoField(primary_key=True)
     orig_pid = models.CharField(max_length=20, null=True, blank=True)
+    accid = models.CharField(max_length=20, null=True)
+    base_pid = models.CharField(max_length=20, null=True)
     source = models.CharField(max_length=10, blank=True)
     genus = models.CharField(max_length=50, null=True, blank=True)
     is_hybrid = models.CharField(max_length=1, null=True)
@@ -217,17 +219,17 @@ class Species(models.Model):
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='')
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True)
-    distribution = models.TextField(blank=True)
-    physiology = models.CharField(max_length=200, blank=True)
-    url = models.CharField(max_length=200, blank=True)
-    url_name = models.CharField(max_length=100, blank=True)
-    num_image = models.IntegerField(blank=True)
-    num_ancestor = models.IntegerField(null=True, blank=True)
-    num_species_ancestor = models.IntegerField(null=True, blank=True)
-    num_descendant = models.IntegerField(null=True, blank=True)
-    num_dir_descendant = models.IntegerField(null=True, blank=True)
+    # distribution = models.TextField(blank=True)
+    # physiology = models.CharField(max_length=200, blank=True)
+    # url = models.CharField(max_length=200, blank=True)
+    # url_name = models.CharField(max_length=100, blank=True)
+    # num_image = models.IntegerField(blank=True)
+    # num_ancestor = models.IntegerField(null=True, blank=True)
+    # num_species_ancestor = models.IntegerField(null=True, blank=True)
+    # num_descendant = models.IntegerField(null=True, blank=True)
+    # num_dir_descendant = models.IntegerField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='anipoolgen', default=0, on_delete=models.DO_NOTHING)
-    notepad = models.CharField(max_length=500, default='')
+    # notepad = models.CharField(max_length=500, default='')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     modified_date = models.DateTimeField(auto_now=True, null=True)
     description = models.TextField(null=True, blank=True)
@@ -383,9 +385,14 @@ class Species(models.Model):
         return len(img) + len(upl)
 
     def get_infraspecifics(self):
-        if self.type == 'species':
+        if self.type == 'species' or (self.type == 'hybrid' and self.source != 'RHS'):
             this_species_name = self.genus + ' ' + self.species  # ignore infraspecific names
-            return Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
+            # pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q( binomial__regex=f"{this_species_name} ($|\s[a-z])"))
+            pid_list = Species.objects.filter(type=self.type).filter(
+                Q(binomial__exact=this_species_name) |
+                Q(binomial__regex=f"{this_species_name}[[:space:]]+[a-z]")
+            )
+            return pid_list
         return []
 
     def get_synonyms(self):
@@ -499,6 +506,7 @@ class Hybrid(models.Model):
     seed_type = models.CharField(max_length=10, null=True, blank=True)
     seed_id = models.ForeignKey(Species, db_column='seed_id', related_name='aniseed_id', null=True, blank=True,
                                 on_delete=models.DO_NOTHING)
+    seed_accid = models.ForeignKey(Species, db_column='seed_accid', related_name='aniseed_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     # pollen_gen = models.BigIntegerField(null=True, blank=True)
     pollen_gen = models.ForeignKey(Genus, db_column='pollgen', related_name='anipollgen', null=True,
                                    on_delete=models.DO_NOTHING)
@@ -507,6 +515,7 @@ class Hybrid(models.Model):
     pollen_type = models.CharField(max_length=10, null=True, blank=True)
     pollen_id = models.ForeignKey(Species, db_column='pollen_id', related_name='anipollen_id', null=True, blank=True,
                                   on_delete=models.DO_NOTHING)
+    pollen_accid = models.ForeignKey(Species, db_column='pollen_accid', related_name='anipollen_accid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
     year = models.IntegerField(null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
@@ -641,6 +650,8 @@ class Synonym(models.Model):
 
 class SpcImages(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='anispcimgpid',on_delete=models.DO_NOTHING)
+    accid = models.ForeignKey(Species, db_column='accid', related_name='aniimgaccid', verbose_name='grex', null=True, blank=True,on_delete=models.DO_NOTHING)
+    base_pid = models.ForeignKey(Species, db_column='base_pid', related_name='aniimgbase_pid', verbose_name='grex', null=True, blank=True, on_delete=models.DO_NOTHING)
     binomial = models.CharField(max_length=500, null=True, blank=True)
     author = models.ForeignKey(Photographer, db_column='author', related_name='anispcimgauthor', on_delete=models.DO_NOTHING)
     credit_to = models.CharField(max_length=100, null=True, blank=True)
@@ -662,10 +673,10 @@ class SpcImages(models.Model):
     image_file_path = models.ImageField(upload_to='utils/images/photos', max_length=255, null=True, blank=True)
     family = models.ForeignKey(Family, db_column='family', related_name='anipoolspcfamily', on_delete=models.DO_NOTHING)
     genus = models.CharField(max_length=50)
-    species = models.CharField(max_length=50, null=True, blank=True)
+    # species = models.CharField(max_length=50, null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='poolspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
-    download_date = models.DateField(null=True, blank=True)
-    block_id = models.IntegerField(null=True, blank=True)
+    # download_date = models.DateField(null=True, blank=True)
+    # block_id = models.IntegerField(null=True, blank=True)
     user_id = models.ForeignKey(User, db_column='user_id',related_name='anipooluser_id', null=True, blank=True,on_delete=models.DO_NOTHING)
     approved_by = models.ForeignKey(User, db_column='approved_by', related_name='anipoolapproved_by', null=True, blank=True,on_delete=models.DO_NOTHING)
     created_date = models.DateTimeField(auto_now_add=True, null=True)
