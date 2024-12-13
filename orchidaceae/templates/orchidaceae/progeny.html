@@ -40,7 +40,7 @@
                 <th>Seed Parent</th>
                 <th>Pollen Parent</th>
                 <th class="text-center d-none d-sm-table-cell" >pct</th>
-                <th class="text-left d-none d-sm-table-cell">#img</th>
+                <th class="text-left">#img</th>
             </thead>
             {% for hybrid in result_list %}
             <tr style="text-align: left">
@@ -65,7 +65,7 @@
                 <td class="text-center d-none d-sm-table-cell">
                     {{hybrid.pct|floatformat:0}}%
                 </td>
-                <td class="text-left d-none d-sm-table-cell" valign="middle">
+                <td class="text-left" valign="middle">
                     {% if hybrid.did.pid.speciesstat.num_image %}{{hybrid.did.pid.speciesstat.num_image}} {% endif %}
                 </td>
             </tr>
