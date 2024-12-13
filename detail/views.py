@@ -642,7 +642,7 @@ def uploadweb(request, pid, orid=None):
 
     if request.method == 'POST':
         if species.type == 'hybrid':
-            accepted = species.hybrid
+            accepted = species
             form = UploadHybWebForm(request.POST)
         elif species.type == 'species':
             accepted = species
@@ -794,6 +794,7 @@ def photos(request):
         # If pid is not found or not an integer, send to summary to handle missing pid
         return HttpResponsePermanentRedirect('/')
 
+@login_required
 def ancestrytree(request):
     pid = request.GET.get('pid')
     try:
@@ -805,6 +806,7 @@ def ancestrytree(request):
         # If pid is not found or not an integer, send to summary to handle missing pid
         return HttpResponsePermanentRedirect('/')
 
+@login_required
 def ancestor(request):
     pid = request.GET.get('pid')
     try:
