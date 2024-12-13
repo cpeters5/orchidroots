@@ -1,5 +1,5 @@
 <!--Title-->
-
+{% load custom_filters %}
 <style>
 
   .form-inline {
@@ -69,7 +69,7 @@
 
                     <input class="searchbox" form="displaysearch1" value="{{search_string}}"
                            type="text" name="search_string" pattern=".{3,}"
-                           placeholder="Search..."
+                           placeholder="Search..." title="The search string must be at least 3 characters long"
                            style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
 
                     <button form="displaysearch1" type="submit" style="display:none;"></button>
@@ -80,7 +80,7 @@
 
                     <input class="searchbox" form="displaysearch" value="{{search_string}}"
                            type="text" name="search_string" pattern=".{3,}"
-                           placeholder="Search..."
+                           placeholder="Search..." title="The search string must be at least 3 characters long"
                            style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;">
 
                     <button form="displaysearch" type="submit" style="display:none;"></button>
@@ -106,9 +106,9 @@
             </h4>
             <div class="info">
                 {% if species.type == 'species' %}
-                    {{species.binomial}} is a species in the {{ species.genus }} genus.
-                {% if species.accepted.common_name %}It is commonly known as <b>{{species.accepted.common_name}}</b>{% endif %}
-                {% if species.accepted.local_name %} and known locally as <b>{{species.accepted.local_name }}</b>{%endif %}.
+                    {{species.binomial}} is a species in the <a href="{% url 'common:species' app %}?genus={{species.genus}}&type={{species.type}}&alpha={{species.species|firstletter|upper}}">{{ species.genus }}</a> genus.
+                    {% if species.accepted.common_name %}It is commonly known as <b>{{species.accepted.common_name}}</b>{% endif %}
+                    {% if species.accepted.local_name %} and known locally as <b>{{species.accepted.local_name }}</b>{%endif %}.
 
                     {% if species.status == 'synonym' %}
                         This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}</a>
@@ -142,7 +142,8 @@
                         {% if species.accepted.distribution %}. This species is found in {{species.accepted.distribution }}.{% endif %}
                     {% endif %}
                 {% else %}
-                    The orchid {{species.binomial}} is a {{species.genus}} hybrid.
+                    The orchid {{species.binomial}} is a hybrid in the
+                    <a href="{% url 'common:species' app %}?genus={{species.genus}}&type={{species.type}}&alpha={{species.species|firstletter|upper}}">{{species.genus}}</a> genus.
                     {% if species.status == 'synonym' %}
                         This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}.</a>
                     {% else %}
