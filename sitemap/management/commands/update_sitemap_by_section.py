@@ -12,12 +12,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('section', type=str,
-                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "taxnomy", "species", "hybrid", "orchidaceae")')
+                            help='The section to update (e.g., "animalia", "aves", "fungi", "other", "taxnomy", "orchidaceae")')
 
     def handle(self, *args, **options):
         section = options['section']
 
-        if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'species', 'hybrid', 'orchidaceae']:
+        if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'orchidaceae']:
+        # if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'species', 'hybrid', 'orchidaceae']:
             self.stdout.write(self.style.ERROR(f'Invalid section: {section}'))
             return
 
@@ -44,17 +45,17 @@ class Command(BaseCommand):
                 change_frequency='monthly',
                 priority=0.2
             )
-        for genus in Genus.objects.all():
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
-            SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section= app,
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
+        # for genus in Genus.objects.all():
+        #     query_params = urlencode({'genus': genus.genus,})
+        #     genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
+        #     SitemapEntry.objects.update_or_create(
+        #         url=genus_url,
+        #         section= app,
+        #         defaults={
+        #             'change_frequency': 'monthly',
+        #             'priority': 0.7  # Higher priority for genus pages
+        #         }
+        #     )
             # if genus.genus in priority_genera:
 
 
@@ -69,17 +70,17 @@ class Command(BaseCommand):
                 change_frequency='monthly',
                 priority=0.2
             )
-        for genus in Genus.objects.all():
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
-            SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section=app,
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
+        # for genus in Genus.objects.all():
+        #     query_params = urlencode({'genus': genus.genus,})
+        #     genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
+        #     SitemapEntry.objects.update_or_create(
+        #         url=genus_url,
+        #         section=app,
+        #         defaults={
+        #             'change_frequency': 'monthly',
+        #             'priority': 0.7  # Higher priority for genus pages
+        #         }
+        #     )
 
     def update_fungi(self):
         from fungi.models import Species, Genus
@@ -92,17 +93,17 @@ class Command(BaseCommand):
                 change_frequency='monthly',
                 priority=0.2
             )
-        for genus in Genus.objects.all():
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
-            SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section=app,
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
+        # for genus in Genus.objects.all():
+        #     query_params = urlencode({'genus': genus.genus,})
+        #     genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
+        #     SitemapEntry.objects.update_or_create(
+        #         url=genus_url,
+        #         section=app,
+        #         defaults={
+        #             'change_frequency': 'monthly',
+        #             'priority': 0.7  # Higher priority for genus pages
+        #         }
+        #     )
 
     def update_other(self):
         from other.models import Species, Genus
@@ -115,17 +116,17 @@ class Command(BaseCommand):
                 change_frequency='monthly',
                 priority=0.2
             )
-        for genus in Genus.objects.all():
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
-            SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section=app,
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
+        # for genus in Genus.objects.all():
+        #     query_params = urlencode({'genus': genus.genus,})
+        #     genus_url = f"{settings.SITE_URL}/common/species/{app}/?{query_params}"
+        #     SitemapEntry.objects.update_or_create(
+        #         url=genus_url,
+        #         section=app,
+        #         defaults={
+        #             'change_frequency': 'monthly',
+        #             'priority': 0.7  # Higher priority for genus pages
+        #         }
+        #     )
 
     def update_taxonomy(self):
         # query_params = urlencode({'family': 'Orchidaceae'})
@@ -156,7 +157,8 @@ class Command(BaseCommand):
 
 
 # Orchid only sections
-    def update_species(self):
+#     Removed from sitemap.
+    def xxupdate_species(self):
         from orchidaceae.models import Species, Genus
         print("Get genus with species - Counting species")
         for genus in Genus.objects.filter(genusstat__num_species__gt=0):
@@ -173,7 +175,8 @@ class Command(BaseCommand):
             # if genus.genus in priority_genera:
             #     print(f"{'Added' if created else 'Updated'} species page: {genus_url}")
 
-    def update_hybrid(self):
+    #     Removed from sitemap.
+    def xxupdate_hybrid(self):
         from orchidaceae.models import Species, Genus
         print("Get genus with hybrid - Counting hybrids")
         genera_with_hybrids = Genus.objects.filter(genusstat__num_hybrid__gt=0)
