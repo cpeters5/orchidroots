@@ -1,7 +1,7 @@
 import string
 alpha_list = string.ascii_uppercase
 applications = ['orchidaceae', 'other', 'fungi', 'aves', 'animalia']
-app_descriptions = {
+app_names = {
     'aves': 'Birds',
     'animalia': 'Animalia',
     'fungi': 'Fungi',

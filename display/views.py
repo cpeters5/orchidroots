@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 import utils.config
 
 applications = utils.config.applications
-
+app_names = utils.config.app_names
 epoch = 1740
 logger = logging.getLogger(__name__)
 GenusRelation = []
@@ -60,6 +60,7 @@ def summary(request, app=None, pid=None):
     if query_pid != None or app == None:
         app = None or 'orchidaceae'
         return HttpResponsePermanentRedirect(reverse('display:summary', args=[app, pid]))
+    app_name = app_names[app]
 
     # Construct the canonical URL
     canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
@@ -71,14 +72,6 @@ def summary(request, app=None, pid=None):
         return HttpResponseRedirect('/')
 
     family = species.family
-
-    # If requested species is a synonym, convert it to accepted species
-    req_species = species #(could be synonym of accepted)
-    req_pid = pid
-    if species.status == 'synonym':
-        species =species.getAccepted()
-        pid = species.pid
-
     Synonym = apps.get_model(app, 'Synonym')
     Hybrid = apps.get_model(app, 'hybrid')
 
@@ -94,16 +87,14 @@ def summary(request, app=None, pid=None):
 
     # If pid is a synonym, convert to accept
     genus = species.gen
+    acc_id = species.accid      # if synonym, acc_id yields the accepted species
     display_items = []
     syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid')
-
+    print("pid", pid)
     if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
-        images_list = HybImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
+        images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
     else:
-        if req_species.status == 'synonym':
-            images_list = SpcImages.objects.filter(pid=req_pid).order_by('-rank', 'quality', '?')
-        else:
-            images_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__in=syn_list)).order_by('-rank', 'quality', '?')
+        images_list = SpcImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
 
     # Build display in main table
     if images_list:
@@ -132,10 +123,14 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
 
     # get infraspecific list if exists
-    infra = len(species.get_infraspecifics())
+    infra = len(Species.objects.filter(base_pid=pid))
 
     # If hybrid, find its parents
     if species.type == 'hybrid':
+        tmpspecies = species
+        if species.status == 'synonym':
+            species = species.getAccepted()
+
         if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
             try:
                 seed_obj = Species.objects.get(pk=species.hybrid.seed_id.pid)
@@ -197,9 +192,8 @@ def summary(request, app=None, pid=None):
                     pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif pp_type == 'hybrid':
                     pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-    if req_species.status == 'synonym':
-        # if request pid is a synopnym, return the synonym instance
-        species = req_species
+
+        species = tmpspecies
 
     # determine if synonyms tab is needed
     syn_list = species.get_synonyms()
@@ -213,7 +207,7 @@ def summary(request, app=None, pid=None):
                'display_items': display_items, 'family': family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
+               'app': app, 'app_name': app_name, 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
                'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
@@ -284,6 +278,8 @@ def photos(request, app=None, pid=None):
 
     #  Logic starts here
     #  Get author (to enable private photos display)
+    # Family and app should be correctly identified
+    app_name = app_names[app]
     author = ''
     if request.user.is_authenticated:
         author = Photographer.objects.filter(user_id=request.user.id)
@@ -295,7 +291,7 @@ def photos(request, app=None, pid=None):
 
     # Get models
     Species = apps.get_model(app, 'Species')
-    Synonym = apps.get_model(app, 'Synonym')
+    # Synonym = apps.get_model(app, 'Synonym')
     UploadFile = apps.get_model(app, 'UploadFile')
     try:
         species = Species.objects.get(pk=pid)
@@ -326,25 +322,23 @@ def photos(request, app=None, pid=None):
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
-    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-    this_species = Species.objects.filter(binomial=this_species_name)
-    if this_species:
-        this_species = this_species[0]
-    else:
-        this_species = species
 
     # Get infraspecific flag
-    infra = len(this_species.get_infraspecifics())
     # get synonyms flag
-    syn_list = list(species.get_synonyms().values_list('spid', flat=True))
-    synonyms = len(syn_list)
+    acc_pids = list(species.get_synonyms().values_list('spid', flat=True))
+    synonyms = len(acc_pids)
 
-    # if requested species is already an infraspecific
+    # Query for all pids with exact binomial and all subspecifics
+    print("species", species.type, species.genus, species.species)
+    pid_set1 = Species.objects.filter(base_pid=pid)
+    infra = len(pid_set1)
+
+    # Stop here if requested speciews is already a subspecific
     if species.infraspe:
         public_list = SpcImages.objects.filter(pid=pid) # public photos
         private_list = public_list.filter(rank=0)  # rejected photos
         context = {'species': species, 'author': author, 'family': family,
-                   'pho': 'active', 'tab': 'pho', 'app': app,
+                   'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_name,
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'canonical_url': canonical_url,
                    'infra': infra, 'synonyms': synonyms,
@@ -352,13 +346,13 @@ def photos(request, app=None, pid=None):
                    }
         return render(request, 'display/photos.html', context)
 
-    # Otherwise, get everything: requested species, all synonym, all infraspecifics (if requested)
+    # Continue for the main species request
+    # If synonym is requested, add them as well
+    pid_set2 = []
     if syn == 'Y':
-        pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} ") | Q(pid__in=syn_list))
+        public_list = SpcImages.objects.filter(Q(pid__accid=pid) | Q(pid__base_pid=pid))
     else:
-        pid_list = Species.objects.filter(Q(binomial=this_species_name) | Q(binomial__startswith=f"{this_species_name} "))
-    pid_list = pid_list.values_list('pid', flat=True)
-    public_list = SpcImages.objects.filter(pid__in=pid_list)
+        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__base_pid=pid))
 
     # Get upload list, public list and private list
     private_list = []
@@ -377,7 +371,7 @@ def photos(request, app=None, pid=None):
 
     if public_list:
         public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?')  # public photos
-    if private_li
+    if private_list:
         private_list = private_list.order_by('created_date')
 
     # for img in public_list:
@@ -386,7 +380,7 @@ def photos(request, app=None, pid=None):
     ancspc_list = get_anc_list(app, species)
     context = {'species': species, 'author': author,
                'family': family, 'ancspc_list': ancspc_list,
-               'pho': 'active', 'tab': 'pho', 'app': app,
+               'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_name,
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
                'infra': infra, 'synonyms': synonyms,

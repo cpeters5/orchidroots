@@ -358,48 +358,48 @@ def getSuperGeneric(request):
 
 
 # Used in myphotos views only
-def getmyphotos(author, app):
-    # Get species and hybrid lists that the user has at least one photo
-    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
-    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+# def getmyphotos(author, app):
+#     # Get species and hybrid lists that the user has at least one photo
+#     myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
+#     myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+#
+#     my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
+#     my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+#     if app == 'orchidaceae':
+#         my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
+#     else:
+#         my_hyb_list = []
+#     # list for dropdown select
+#     myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
+#     myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
+#
+#     return myspecies_list, myhybrid_list
 
-    my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    if app == 'orchidaceae':
-        my_hyb_list = list(HybImages.objects.filter(author=author).values_list('pid', flat=True).distinct())
-    else:
-        my_hyb_list = []
-    # list for dropdown select
-    myspecies_list = myspecies_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_spc_list)).order_by('genus', 'species')
-    myhybrid_list = myhybrid_list.filter(Q(pid__in=my_upl_list) | Q(pid__in=my_hyb_list)).order_by('genus', 'species')
 
-    return myspecies_list, myhybrid_list
-
-
-def getphotos(author, app, species=None):
-    # Get list for display
-    if species:
-        syn_list = Synonym.objects.filter(acc_id=species.pid).values_list('spid')
-        if app == 'orchidaceae' and species.type == 'hybrid':
-            if species.status == 'synonym':      # input pid is a synonym, just get images of the requested synonym
-                public_list = HybImages.objects.filter(pid=species.pid)  # public photos
-            else:                   # input pid is an accepted species, include images of its synonyms
-                public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
-        else:
-            if species.status == 'synonym':
-                public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
-            else:
-                public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
-        upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
-        private_list = public_list.filter(rank=0)  # rejected photos
-        if role == 'pri':
-            upload_list = upload_list.filter(author=author) # Private photos
-            private_list = private_list.filter(author=author) # Private photos
-
-    else:
-        private_list = public_list = upload_list = []
-
-    return private_list, public_list, upload_list
+# def getphotos(author, app, species=None):
+#     # Get list for display
+#     if species:
+#         syn_list = Synonym.objects.filter(acc_id=species.pid).values_list('spid')
+#         if app == 'orchidaceae' and species.type == 'hybrid':
+#             if species.status == 'synonym':      # input pid is a synonym, just get images of the requested synonym
+#                 public_list = HybImages.objects.filter(pid=species.pid)  # public photos
+#             else:                   # input pid is an accepted species, include images of its synonyms
+#                 public_list = HybImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+#         else:
+#             if species.status == 'synonym':
+#                 public_list = SpcImages.objects.filter(pid=species.pid)  # public photos
+#             else:
+#                 public_list = SpcImages.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # public photos
+#         upload_list = UploadFile.objects.filter(Q(pid=species.pid) | Q(pid__in=syn_list))  # All upload photos
+#         private_list = public_list.filter(rank=0)  # rejected photos
+#         if role == 'pri':
+#             upload_list = upload_list.filter(author=author) # Private photos
+#             private_list = private_list.filter(author=author) # Private photos
+#
+#     else:
+#         private_list = public_list = upload_list = []
+#
+#     return private_list, public_list, upload_list
 
 
 #  Enhance SQL queries

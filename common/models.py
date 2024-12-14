@@ -3,6 +3,8 @@ from django.apps import apps
 from accounts.models import User, Photographer
 from mptt.models import MPTTModel, TreeForeignKey
 from random import randint
+from utils import config
+app_names =config.app_names
 
 RANK_CHOICES = [(i, str(i)) for i in range(0, 10)]
 
@@ -44,6 +46,8 @@ class Family(models.Model):
             return img
         return None
 
+    def get_app_names(self):
+        return app_names[self.application]
 
 class Subfamily(models.Model):
     family = models.ForeignKey(Family, null=True, blank=True, db_column='family', on_delete=models.DO_NOTHING)
