@@ -171,18 +171,20 @@
                         <h4 align="center">Thank you for your $<span id="selected-amount">0</span> contribution
                         </h4>
 
-                       <form align="middle" action="{% url 'donation:donate' donateamt %}" method="post" id="stripe-form">
-                            {% csrf_token %}
-                <!--            <input type="hidden" name="donateamt" value="{{donateamt}}" >-->
-                           <input type="hidden" name="donor_display_name" id="added-donor-name">
-                            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                data-key="{{ key }}"
-                                data-description="Donation Charge"
-                                data-amount="{{donateamt}}"
-                                data-locale="auto">
-                            </script>
+                            <form align="middle" action="{% url 'donation:donate' donateamt %}" method="post" id="stripe-form">
+                                {% csrf_token %}
+                                <!-- Input for Donor's Display Name -->
+                                <input type="hidden" name="donor_display_name" id="added-donor-name">
+                                <!-- Stripe Checkout Button -->
+                                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                    data-key="{{ key }}"
+                                    data-description="Donation Charge"
+                                    data-amount="{{donateamt}}"
+                                    data-locale="auto">
+                                </script>
+                            <!--    <input type="email" name="donor_email" placeholder="Your Email">-->
+                            </form>
 
-                        </form>
                         <div id="paypal-button" class="paypal-buttons">
 
                         </div>
