@@ -13,6 +13,7 @@ from PIL import Image, ExifTags
 from io import BytesIO
 from django.db.models import Q
 from django.core.files import File
+from django.core.mail import send_mail
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse, reverse_lazy
 from django.template import RequestContext
@@ -59,14 +60,19 @@ class PaymentView(TemplateView):
         return context
 
 
+
 def charge(request): # new
     if request.method == 'POST':
-        charge = stripe.Charge.create(
-            amount=amount,
-            currency='usd',
-            description='Donation Charge',
-            source=request.POST['stripeToken']
-        )
+        try:
+            charge = stripe.Charge.create(
+                amount=amount,
+                currency='usd',
+                description='Donation Charge',
+                source=request.POST['stripeToken']
+            )
+        except Exception as e:
+            messages.error(request, 'An error occurred while charging your card, Please try again!!')
+            return redirect(reverse_lazy('donation:donate', kwargs={'donateamt': donateamt}))
         context = {'amount_display':amount_display}
         return render(request, 'donation/charge.html',context)
 
@@ -77,7 +83,6 @@ class DonateView(TemplateView):
     template_name = 'donation/donateapp.html'
     donateamt = 1000
     donateamt_display = f'{donateamt / 100:.2f}'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
@@ -134,6 +139,7 @@ def donate(request,donateamt=None): # new
     if request.method == 'POST':
         try:
             donor_display_name = request.POST.get('donor_display_name', '')
+            donor_email = request.POST.get('stripeEmail', '')
             donor_name = ''
 
             charge = stripe.Charge.create(
@@ -142,23 +148,43 @@ def donate(request,donateamt=None): # new
                 description='Donation',
                 source=request.POST['stripeToken']
             )
-
             if charge.get('customer', None):
                 donor_name = charge['customer'].get('name', '')
 
             payload = {
                 'donor_display_name': donor_display_name,
                 'donor_name': donor_name,
+                'donor_email': donor_email,  # Include the email
                 'source': Donation.Sources.STRIPE,
                 'source_id': charge['id'],
                 'status': Donation.Statuses.ACCEPTED if charge['paid'] else Donation.Statuses.UNVERIFIED,
                 'amount': Decimal(f'{charge["amount"] / 100:.2f}'),
                 'country_code': charge['billing_details']['address']['country']
             }
+
             Donation.objects.create(**payload)
+
+            # Send confirmation email
+            if donor_email:  # Ensure email exists before sending
+                send_mail(
+                    subject="Thank you for your donation!",
+                    message=(
+                        f"Dear {donor_display_name},\n\n"
+                        f"Thank you for your generous donation of ${donateamt / 100:.2f}. "
+                        f"Your support helps us continue our mission.\n\n"
+                        "Best regards,\nThe Team"
+                    ),
+                    from_email='noreply@orchidroots.com',  # Replace with your sender email
+                    recipient_list=[donor_email],
+                    fail_silently=False,
+                )
+
+
+
+
             return redirect(reverse_lazy('donation:thankyou', kwargs={'donateamt': int(donateamt)}))
+
         except Exception as e:
-            print(e)
             messages.error(request, 'An error occurred while charging your card, Please try again!!')
             return redirect(reverse_lazy('donation:donate', kwargs={'donateamt': donateamt}))
     return render(request, 'donation/donate.html',{})
