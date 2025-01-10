@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'animalia',
     'utils',
     'sitemap',
+    'gallery',
 
     # Third Party
     'allauth',
