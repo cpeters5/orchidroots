@@ -73,7 +73,8 @@ td {
                         {% endif %}
                     </td>
                     <td class="text-left d-sm-table-cell">
-                        {% if hybrid.pid.num_image %}{{hybrid.pid.speciesstat.num_image}} {% endif %}
+                        {{hybrid.pid.speciesstat.num_image|default:''}}
+<!--                        {% if hybrid.pid.num_image %}{{hybrid.pid.speciesstat.num_image}} {% endif %}-->
                     </td>
                 </tr>
                 {% endfor %}
