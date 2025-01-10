@@ -33,6 +33,7 @@ urlpatterns = [
     path('set_email/', SetEmailView.as_view(), name='set_email'),
     path('change_email/', ChangeEmailView.as_view(), name='change_email'),
     path('update_profile/', UpdateProfileView.as_view(), name='update_profile'),
+    path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),
     path('logout/', LogoutView.as_view(), {'next_page': '//'}, name='logout'),
     path('accounts/', include('allauth.urls')),
     path('accounts/password/change/', PasswordChangeRedirect.as_view(), name="account_password_change"),
