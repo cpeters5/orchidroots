@@ -590,7 +590,7 @@ def reidentify(request, orid, pid):
             write_output(request, old_species.textname() + " ==> " + new_species.textname())
             url = "%s?role=%s" % (reverse('display:photos', args=(app, new_species.pid,)), role)
             return HttpResponseRedirect(url)
-    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': family}
+    context = {'form': form, 'species': old_species, 'img': old_img, 'role': 'cur', 'family': family, 'app': app,}
     return render(request, 'detail/reidentify.html', context)
 
 
@@ -626,17 +626,13 @@ def uploadweb(request, pid, orid=None):
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
 
-    author = request.POST.get('author','')
-    try:
-        author = Photographer.objects.get(pk=author)
-    except Photographer.DoesNotExist:
-        author = ''
+    author = request.user.photographer
 
     # The photo
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
+    # if species.status == 'synonym':
+    #     synonym = Synonym.objects.get(pk=pid)
+    #     pid = synonym.acc_id
+    #     species = Species.objects.get(pk=pid)
 
     role = getRole(request)
 
@@ -737,10 +733,10 @@ def uploadfile(request, pid):
         return HttpResponse(message)
     # Orchid is a speciel case
     family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
+    # if species.status == 'synonym':
+    #     synonym = Synonym.objects.get(pk=pid)
+    #     pid = synonym.acc_id
+    #     species = Species.objects.get(pk=pid)
 
     name_message = 'Scientific name or registered hybrid name (if different from the title, otherwise, leave it blank)'
     form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role })
