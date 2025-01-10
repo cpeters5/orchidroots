@@ -17,10 +17,11 @@ from common.models import Family, Subfamily, Tribe, Subtribe
 from orchidaceae.models import Intragen, HybImages
 from accounts.models import User, Photographer
 from urllib.parse import urlencode
-import utils.config
+from utils import config
 
-applications = utils.config.applications
-app_names = utils.config.app_names
+# TODO: move thapp_name and applications to common.model
+applications = config.applications
+app_names = config.app_names
 epoch = 1740
 logger = logging.getLogger(__name__)
 GenusRelation = []
@@ -36,6 +37,14 @@ def is_crawler(request: HttpRequest) -> bool:
         'yahoo', 'slurp', 'msnbot', 'facebookexternalhit', 'twitterbot'
     ]
     return any(bot in user_agent for bot in crawler_patterns)
+
+
+
+def getSpcImages(app, type):
+    if app == 'orchidaceae' and type == 'hybrid':
+        return apps.get_model(app, 'HybImages')
+    else:
+        return apps.get_model(app, 'SpcImages')
 
 
 def summary(request, app=None, pid=None):
@@ -60,7 +69,6 @@ def summary(request, app=None, pid=None):
     if query_pid != None or app == None:
         app = None or 'orchidaceae'
         return HttpResponsePermanentRedirect(reverse('display:summary', args=[app, pid]))
-    app_name = app_names[app]
 
     # Construct the canonical URL
     canonical_url = request.build_absolute_uri(f'/display/summary/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
@@ -74,12 +82,7 @@ def summary(request, app=None, pid=None):
     family = species.family
     Synonym = apps.get_model(app, 'Synonym')
     Hybrid = apps.get_model(app, 'hybrid')
-
-    SpcImages = apps.get_model(app, 'SpcImages')
-    if app == 'orchidaceae':
-        HybImages = apps.get_model(app, 'HybImages')
-    else:
-        HybImages = apps.get_model(app, 'SpcImages')
+    SpcImages = getSpcImages(app, species.type)
 
     ps_list = pp_list = ss_list = sp_list = ()
     seedimg_list = []
@@ -87,15 +90,15 @@ def summary(request, app=None, pid=None):
 
     # If pid is a synonym, convert to accept
     genus = species.gen
-    acc_id = species.accid      # if synonym, acc_id yields the accepted species
     display_items = []
-    syn_list = Synonym.objects.filter(acc_id=pid).values_list('spid')
-    print("pid", pid)
-    if species.gen.family.family == 'Orchidaceae' and species.type == 'hybrid':
-        images_list = HybImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
+
+    syn = request.GET.get('syn', '')
+    images_list = SpcImages.objects.filter(pid=pid)
+
+    if syn == 'Y':
+        images_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid)).order_by('-rank', 'quality', '?')
     else:
         images_list = SpcImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
-
     # Build display in main table
     if images_list:
         i_1, i_2, i_3, i_4, i_5, i_7, i_8 = 0, 0, 0, 0, 0, 0, 0
@@ -136,6 +139,7 @@ def summary(request, app=None, pid=None):
                 seed_obj = Species.objects.get(pk=species.hybrid.seed_id.pid)
             except Species.DoesNotExist:
                 seed_obj = ''
+            SpcImages = getSpcImages(app, 'species')
             seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
             try:
@@ -148,26 +152,32 @@ def summary(request, app=None, pid=None):
                     seed_obj = ''
 
             if seed_obj:
-                seedimg_list = HybImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+                SpcImages = getSpcImages(app, 'hybrid')
+                seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
                 assert isinstance(seed_obj, object)
                 if seed_obj.seed_id:
                     ss_type = seed_obj.seed_id.type
                     if ss_type == 'species':
+                        SpcImages = getSpcImages(app, 'species')
                         ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                     elif ss_type == 'hybrid':
-                        ss_list = HybImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                        SpcImages = getSpcImages(app, 'hybrid')
+                        ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 if seed_obj.pollen_id:
                     sp_type = seed_obj.pollen_id.type
                     if sp_type == 'species':
+                        SpcImages = getSpcImages(app, 'species')
                         sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
                     elif sp_type == 'hybrid':
-                        sp_list = HybImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+                        SpcImages = getSpcImages(app, 'hybrid')
+                        sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
         # Pollen
         if species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'species':
             try:
                 pollen_obj = Species.objects.get(pk=species.hybrid.pollen_id.pid)
             except Species.DoesNotExist:
                 pollen_obj = ''
+            SpcImages = getSpcImages(app, 'species')
             pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
         elif species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'hybrid':
             try:
@@ -179,19 +189,24 @@ def summary(request, app=None, pid=None):
                 except Synonym.DoesNotExist:
                     pollen_obj = ''
 
-            pollimg_list = HybImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+            SpcImages = getSpcImages(app, 'hybrid')
+            pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
             if pollen_obj.seed_id:
                 ps_type = pollen_obj.seed_id.type
                 if ps_type == 'species':
+                    SpcImages = getSpcImages(app, 'species')
                     ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif ps_type == 'hybrid':
-                    ps_list = HybImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                    SpcImages = getSpcImages(app, 'hybrid')
+                    ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
             if pollen_obj.pollen_id:
                 pp_type = pollen_obj.pollen_id.type
                 if pp_type == 'species':
+                    SpcImages = getSpcImages(app, 'species')
                     pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                 elif pp_type == 'hybrid':
-                    pp_list = HybImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                    SpcImages = getSpcImages(app, 'hybrid')
+                    pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
 
         species = tmpspecies
 
@@ -207,7 +222,8 @@ def summary(request, app=None, pid=None):
                'display_items': display_items, 'family': family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'app_name': app_name, 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
+               'app': app, 'app_name': app_names[app], 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
+               'syn': syn,
                'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
@@ -279,7 +295,6 @@ def photos(request, app=None, pid=None):
     #  Logic starts here
     #  Get author (to enable private photos display)
     # Family and app should be correctly identified
-    app_name = app_names[app]
     author = ''
     if request.user.is_authenticated:
         author = Photographer.objects.filter(user_id=request.user.id)
@@ -329,30 +344,30 @@ def photos(request, app=None, pid=None):
     synonyms = len(acc_pids)
 
     # Query for all pids with exact binomial and all subspecifics
-    print("species", species.type, species.genus, species.species)
     pid_set1 = Species.objects.filter(base_pid=pid)
     infra = len(pid_set1)
 
     # Stop here if requested speciews is already a subspecific
     if species.infraspe:
-        public_list = SpcImages.objects.filter(pid=pid) # public photos
-        private_list = public_list.filter(rank=0)  # rejected photos
+        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
+        private_list = public_list.filter(rank=0).order_by('created_date')  # rejected photos
+        public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?') # public photos
         context = {'species': species, 'author': author, 'family': family,
-                   'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_name,
+                   'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'canonical_url': canonical_url,
                    'infra': infra, 'synonyms': synonyms,
                    'role': role,
+                   'syn': syn,
                    }
         return render(request, 'display/photos.html', context)
 
     # Continue for the main species request
-    # If synonym is requested, add them as well
-    pid_set2 = []
-    if syn == 'Y':
-        public_list = SpcImages.objects.filter(Q(pid__accid=pid) | Q(pid__base_pid=pid))
+    # If synonym is requested, add them as well. strike that. Always add both infra and syn to main page
+    if syn:
+        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
     else:
-        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(pid__base_pid=pid))
+        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid))
 
     # Get upload list, public list and private list
     private_list = []
@@ -380,7 +395,7 @@ def photos(request, app=None, pid=None):
     ancspc_list = get_anc_list(app, species)
     context = {'species': species, 'author': author,
                'family': family, 'ancspc_list': ancspc_list,
-               'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_name,
+               'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
                'infra': infra, 'synonyms': synonyms,
