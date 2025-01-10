@@ -414,14 +414,6 @@ class Species(models.Model):
             spc = '%s %s' % (self.is_hybrid, spc)
         return spc
 
-    def textspeciesnamefull(self):
-        spc = self.species.rstrip()
-        if self.infraspr:
-            spc = '%s %s %s' % (self.species, self.infraspr, self.infraspe)
-        if self.is_hybrid:
-            spc = '%s %s' % (self.is_hybrid, spc)
-        return spc
-
     def shortspeciesname(self):
         return '%s %s' % (self.genus, self.species)
 
@@ -776,40 +768,24 @@ class Hybrid(models.Model):
     def registered_seed_name(self):
         if self.seed_id:
             name = self.seed_id.name()
-            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+            if self.seed_id.binomial != self.seed_genus + ' ' + self.seed_species:
                 name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
             return name
         return None
 
-    def registered_seed_name_short(self):
-        if self.seed_id:
-            name = self.seed_id.abrevname()
-            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
-                name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn)'
-            return name
-        return None
-
-    # Used in hybrid-detail parents
     def registered_pollen_name(self):
         if self.pollen_id:
             name = self.pollen_id.name()
-            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+            if self.pollen_id.binomial != self.pollen_genus + ' ' + self.pollen_species:
                 name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
             return name
         return None
 
-    def registered_pollen_name_short(self):
-        if self.pollen_id:
-            name = self.pollen_id.abrevname()
-            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
-                name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn)'
-            return name
-        return None
 
     def registered_seed_name_long(self):
         if self.seed_id:
             name = self.seed_id.name()
-            if self.seed_id.textspeciesnamefull() != self.seed_species or self.seed_id.genus != self.seed_genus:
+            if self.seed_id.binomial != self.seed_genus + ' ' + self.seed_species:
                 name = self.seed_genus + ' ' + self.seed_species + ' ' + '(syn ' + self.seed_id.textname() + ')'
             return name
         return None
@@ -817,7 +793,7 @@ class Hybrid(models.Model):
     def registered_pollen_name_long(self):
         if self.pollen_id:
             name = self.pollen_id.name()
-            if self.pollen_id.textspeciesnamefull() != self.pollen_species or self.pollen_id.genus != self.pollen_genus:
+            if self.pollen_id.binomial != self.pollen_genus + ' ' + self.pollen_species:
                 name = self.pollen_genus + ' ' + self.pollen_species + ' ' + '(syn ' + self.pollen_id.textname() + ')'
             return name
         return None
