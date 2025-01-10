@@ -19,7 +19,7 @@ CHOICES = (
 )
 
 QUALITY = (
-    (1, 'Top'),
+    # (1, 'Top'),
     (2, 'High'),
     (3, 'Average'),
     (4, 'Low'),
