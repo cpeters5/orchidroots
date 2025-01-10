@@ -50,14 +50,20 @@ def browse_gallery(request):
     genre = ''
     medium = ''
     if 'genre' in request.POST:
-        genre = request.POST['genre']
-        if genre and genre != '':
-            try:
-                genre = Genre.objects.get(genre=genre)
-            except Genre.DoesNotExist:
-                genre = ''
+        genre = request.POST.get('genre', '')
+    if not genre or genre == '':
+        genre = request.GET.get('genre', '')
+
+    print("genre", genre)
+    if genre and genre != '':
+        try:
+            genre = Genre.objects.get(genre=genre)
+        except Genre.DoesNotExist:
+            genre = ''
     if 'medium' in request.POST:
-        medium = request.POST['medium']
+        medium = request.POST.get('medium', '')
+        if not medium:
+            medium = request.GET.get('medium', '')
         if medium and medium != '':
             try:
                 medium = Medium.objects.get(medium=medium)
@@ -65,13 +71,15 @@ def browse_gallery(request):
                 medium = ''
 
     # Get a sample image of orchids
-    artwork_list = Artwork.objects.filter(rank__lt=7).filter(rank__gt=0).exclude(artist='test')
-    if genre and genre != 'NA':
+    artwork_list = Artwork.objects.filter(rank__lt=7, rank__gt=0).exclude(artist='test')
+    print("genre", genre)
+    if genre and genre != '':
         artwork_list = artwork_list.filter(genre=genre)
+
     if medium and medium != 'NA':
         artwork_list = artwork_list.filter(medium=medium)
     artwork_list = artwork_list.order_by('-rank', '?')[0:6]
-    # print("artwork_list = ", len(artwork_list))
+    print("artwork_list = ", len(artwork_list))
     context = {'artwork_list': artwork_list, 'genre': genre, 'medium': medium,
                'genre_list': genre_list, 'medium_list': medium_list,
                }

@@ -30,6 +30,20 @@
       background-color: #f8f9fa;
       padding: 10px;
 }
+
+/*Lightbox tweaking. Do not remove.*/
+.lb-dataContainer {
+    background-color:white;
+    /*min-height:400px;*/
+}
+    .lb-caption {
+
+        color:black;
+    }
+    .lb-closeContainer {
+        color: black;
+    }
+
 </style>
 <div class="container-fluid" style="min-height:200px;border:0 solid grey">
     <div style="margin-top:8px;">
@@ -39,9 +53,12 @@
                 {% for x in artwork_list %}
               <div class="col-md-3 border m-1">
                 <div class="image">
-                    <a href="{% url 'gallery:my_gallery' %}?artist={{x.artist}}">
+                    <a target="_blank" href="{% static 'media/' %}{{x.image_file}}" data-lightbox="media" data-title="
+                                  {{image.id}}: {{image.artist}} <br>{{image.name}}">
                         <img src="{{x.image_dir}}{{x.image_file}}" class="img-fluid image">
                     </a>
+
+
                   <div class="image-info">
                     <p>Artist: {{x.artist}}</p>
                     {% if x.title %}<p>Title: {{x.title}}</p>{% endif %}

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +9,11 @@
   <link rel="shortcut icon" type="image/png" href="/static/utils/images/favicon.ico"/>
   <title>McGivens Gallery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'utils/css/lightbox.css' %}">
 </head>
 <style>
 .image-nav {
-    max-width: 5000px;
+    max-width: 300px;
 
 }
 .dropdown-toggle::after {
@@ -67,6 +69,7 @@
             <option value="">Select a category</option>
             {% endif %}
             <option value="">all category</option>
+              <option value="Givens" {% if x == genre %}active{% endif %}><b>Givens Events</b></option>
             {% for x in genre_list %}
               <option value="{{x}}" {% if x == genre %}active{% endif %}>{{x}}</option>
             {% endfor %}

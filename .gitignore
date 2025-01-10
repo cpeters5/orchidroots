@@ -22,3 +22,4 @@ scripts/
 testfiles/
 testdata_media/
 gallery/
+myproject/templates/robots.txt
