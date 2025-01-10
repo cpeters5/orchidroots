@@ -362,7 +362,7 @@ a:hover {
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                     <div class="box">
                         <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
-                                {{image.id}}:  Uploaded since {{image.created_date}} by {{image.get_displayname}}<br>
+                                {{image.id}}:{{image.pid_id}}  Uploaded since {{image.created_date}} by {{image.get_displayname}}<br>
                                 <br>{{image.text_data|default:''|safe}}">
                                     <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                     <div class="text text-br">{{image.id}}</div>
@@ -393,7 +393,7 @@ a:hover {
                             <div class="box" style="background-color: #f19292">
                                 <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
                                     <h6><small>
-                                    {{image.id}}:  Uploaded since {{image.created_date}}<br>
+                                    {{image.id}}:{{image.pid_id}}  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     {{image.text_data|default:''|safe}} </small></h6>">
                                         <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
