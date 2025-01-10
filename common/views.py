@@ -23,6 +23,7 @@ from utils.views import write_output, getRole, get_author, get_reqauthor, getSup
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
 from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
 from accounts.models import User, Photographer
+# import utils.config
 
 epoch = 1740
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ Accepted = []
 Synonym = []
 alpha_list = config.alpha_list
 applications = config.applications
+app_names = config.app_names
 default_genus = config.default_genus
 
 # Note:  common.views applied to all domains (animalia, aves, fungi, orchidaceae and other)
@@ -134,9 +136,11 @@ def home(request):
         all_list = all_list + [["Aves", animalia_obj]]
 
     random.shuffle(all_list)
+    canonical_url = request.build_absolute_uri(f'/home/').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
                'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj, 'role': role,
+               'canonical_url': canonical_url,
                }
     return render(request, 'home.html', context)
 
@@ -1096,7 +1100,7 @@ def myphoto_browse_spc(request):
         request, img_list, page_length, num_show)
 
     context = {'my_list': page_list, 'type': 'species', 'family': family, 'app': app,
-               'role': role, 'brwspc': 'active', 'author': author,
+               'role': role, 'brwspc': 'active', 'author': author, 'app_name': app_names[app],
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'myspc': 'active', 'owner': owner,
@@ -1136,7 +1140,7 @@ def myphoto_browse_hyb(request):
         request, img_list, page_length, num_show)
 
     context = {'my_list': page_list, 'type': 'species', 'family': family, 'app': app,
-               'role': role, 'brwhyb': 'active', 'author': author,
+               'role': role, 'brwhyb': 'active', 'author': author, 'app_name': app_names[app],
                'page_range': page_range, 'last_page': last_page, 'num_show': num_show, 'page_length': page_length,
                'page': page, 'first': first_item, 'last': last_item, 'next_page': next_page, 'prev_page': prev_page,
                'myhyb': 'active', 'owner': owner,
@@ -1448,7 +1452,7 @@ def get_new_uploads(request):
 
     return render(request, 'common/get_new_uploads.html', context)
 
-
+# TODO: Let user enter the entire binomial string instead of parsing them.
 def compare(request, pid):
     # TODO:  Use Species form instead
     role = getRole(request)
