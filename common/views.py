@@ -136,7 +136,7 @@ def home(request):
         all_list = all_list + [["Aves", animalia_obj]]
 
     random.shuffle(all_list)
-    canonical_url = request.build_absolute_uri(f'/home/').replace('www.orchidroots.com', 'orchidroots.com')
+    canonical_url = request.build_absolute_uri(f'/').replace('www.orchidroots.com', 'orchidroots.com')
 
     context = {'orcimage': orcimage, 'all_list': all_list, 'succulent_obj': succulent_obj,
                'carnivorous_obj': carnivorous_obj, 'parasitic_obj': parasitic_obj, 'role': role,
@@ -928,6 +928,7 @@ def approve_mediaphoto(request, app, pid, orid):
     unique_filename = regenerate_file(old_name, new_path)
 
     spc.approved_by = request.user
+    spc.user_id = request.user
     spc.image_file = unique_filename
     status = spc.save()
     upl.approved = True
@@ -1254,7 +1255,7 @@ def curate_newapproved(request):
         species = Species.objects.get(pk=image.pid_id)
 
     days = int(request.GET.get('days', 3))
-    file_list = SpcImages.objects.filter(rank__gt=0)
+    file_list = SpcImages.objects.filter(rank__gt=0, pid__isnull=False)
     file_list = file_list.filter(modified_date__gte=timezone.now() - timedelta(days=days))
     if days == 7:
         file_list = file_list.exclude(modified_date__gt=timezone.now() - timedelta(days=3))
