@@ -272,6 +272,22 @@ a:hover {
     visibility: visible;
 }
 
+
+@media (max-aspect-ratio: 1/1) {
+    .lightbox img {
+        max-width: 70vw; /* Limit the width to the viewport width */
+        height: auto; /* Maintain aspect ratio */
+    }
+}
+
+/* Portrait or Square (aspect ratio <= 1) */
+@media (min-aspect-ratio: 1/1) {
+    .lightbox img {
+        max-height: 70vh; /* Limit the height to the viewport height */
+        width: auto; /* Maintain aspect ratio */
+    }
+}
+
 </style>
 
 <div style="width:95%;margin:0 auto;padding:0;">
