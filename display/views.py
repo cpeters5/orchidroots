@@ -380,7 +380,7 @@ def photos(request, app=None, pid=None):
         private_list = public_list.filter(rank=0)  # rejected photos
         if role == 'pri':
             # This shouldn't happen. Need to change the design: make sure user.role and photographer instance is insync.
-            if isinstance(request.user.photographer, Photographer):
+            if request.user.photographer and isinstance(request.user.photographer, Photographer):
                 upload_list = upload_list.filter(author=request.user.photographer.author_id)  # Private photos
                 private_list = private_list.filter(author=request.user.photographer.author_id)  # Private photos
 
