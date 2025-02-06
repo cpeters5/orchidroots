@@ -12,7 +12,7 @@ urlpatterns = [
     path('search_name/<str:app>/', views.search_name, name='search_name'),
     # path('search_test/', views.search_test, name='search_test'),
     # path('search_orchidaceae/', views.search_orchidaceae, name='search_orchidaceae'),
-
+    path('autocomplete/', views.autocomplete_species, name='autocomplete_species'),
     # If neither family nor application, nor genus is given, then search across all tables for matching species
 
 ]
