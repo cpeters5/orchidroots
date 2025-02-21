@@ -82,13 +82,7 @@ option {
                     <input form="display" type="hidden" name="subgenus" value="{{subgenus}}" >
                     <input form="display" type="hidden" name="section" value="{{section}}" >
                     <input form="display" type="hidden" name="subsection" value="{{subsection}}" >
-                    {% if syn == 'N' %}
-                        <input form="display" type="checkbox" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin:10px 0 0 0;">
-                        <span style="margin:0 10px;font-size:13px;">exclude synonyms</span>
-                    {% else %}
-                        <input form="display" type="checkbox" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin:10px 0 0 0;">
-                        <span style="margin:0 10px;font-size:13px;">exclude synonyms</span>
-                    {% endif %}
+                    <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" onchange="this.form.submit()" {% if syn == 'Y' %}checked{% endif %} style="margin-left:25px;"> <span style="margin-left:50px;font-size:13px;">Include synonyms</span>
                 </form>
 <!--                <form action="?" id="myspecies" style="display:inline-block">-->
 <!--                    <input form="myspecies" type="hidden" name="genus" value="{{genus}}" >-->

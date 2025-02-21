@@ -201,7 +201,7 @@ def getPartialPid(reqgenus, type, status):
     if status == 'synonym':
         pid_list = Species.objects.filter(type__iexact=type).filter(status='synonym')
     else:
-        pid_list = Species.objects.filter(type__iexact=type).exclude(status='synonym')
+        pid_list = Species.objects.filter(type__iexact=type)
 
     if reqgenus:
         if reqgenus[0] != '*' and reqgenus[-1] != '*':
@@ -243,7 +243,7 @@ def species(request):
     author = ''
     role = getRole(request)
     spc = request.GET.get('spc', '')
-    syn = request.GET.get('syn', '')
+    syn = request.GET.get('syn', 'N')
     msg = ''
     type = 'species'
     alpha = ''
@@ -262,7 +262,6 @@ def species(request):
         alpha = 'A'
     # if alpha == 'ALL':
     #     alpha = ''
-    syn = request.GET.get('syn', '')
 
     if alpha == '' and reqgenus in config.big_genera:
         alpha = 'A'
@@ -288,8 +287,6 @@ def species(request):
             if this_species_list:
                 if syn == 'N':
                     this_species_list = this_species_list.exclude(status='synonym')
-                else:
-                    syn = 'Y'
                 if spc:
                     this_species_list = this_species_list.filter(species__istartswith=spc)
                 elif alpha:

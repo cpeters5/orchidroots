@@ -253,7 +253,7 @@ def species(request, app=None):
             #  Default to orchid
             app = 'orchidaceae'
 
-    syn = request.GET.get('syn', '')
+    syn = request.GET.get('syn', 'N')
     req_genus = request.GET.get('genus', '')
     req_type = request.GET.get('type', 'species')
     if not req_genus:
@@ -314,9 +314,6 @@ def species(request, app=None):
         species_list = species_list.filter(species__istartswith=alpha)
     if syn == 'N':
         species_list = species_list.exclude(status='synonym')
-        syn = 'N'
-    else:
-        syn = 'Y'
 
     #  If user request one of the subgeneric ranks (by clicking on a link in the subgeneric column)
     # Orchid only

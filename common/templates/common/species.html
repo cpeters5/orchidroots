@@ -61,11 +61,7 @@
                             <input type="hidden" form="display" name="type" value="{{type}}" >
                             <input type="hidden" form="display" name="family" value="{{family.family}}" >
                             <input type="hidden" form="display" name="genus" value="{{genus}}" >
-                            {% if syn == 'N' %}
-                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" checked onchange="this.form.submit()" style="margin-left:25px;"> <span style="margin-left:2px;font-size:13px;">Hide synonyms</span>
-                            {% else %}
-                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="N" onchange="this.form.submit()" style="margin-left:15px;"> <span style="margin-left:10px;font-size:13px;">Hide synonyms</span>
-                            {% endif %}
+                            <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" onchange="this.form.submit()" {% if syn == 'Y' %}checked{% endif %} style="margin-left:25px;"> <span style="margin-left:50px;font-size:13px;">Include synonyms</span>
                         </form>
                         <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
@@ -78,7 +74,7 @@
                                                 {% if type == 'hybrid' %}
                                                     <th class="d-none d-md-table-cell">parents</th>
                                                 {% else %}
-                                                    <th class="d-none d-md-table-cell">Higher taxonomic levels</th>
+                                                    <th class="d-none d-md-table-cell">Classification</th>
                                                 {% endif %}
                                             {% endif %}
                                             {% if app == 'aves' %}
@@ -104,6 +100,7 @@
                                                 {% endif %}
                                                 {{species.author|default:""}}
                                             </td>
+
                                             {% if app == 'orchidaceae' %}
                                                 <td class="d-none d-md-table-cell">
                                                 {% if species.status == 'synonym' %}
