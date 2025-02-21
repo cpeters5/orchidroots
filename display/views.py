@@ -126,7 +126,9 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
 
     # get infraspecific list if exists
-    infra = len(Species.objects.filter(base_pid=pid))
+    infra = 0
+    if species.type == 'species':
+        infra = len(Species.objects.filter(base_pid=pid))
 
     # If hybrid, find its parents
     if species.type == 'hybrid':
@@ -344,8 +346,9 @@ def photos(request, app=None, pid=None):
     synonyms = len(acc_pids)
 
     # Query for all pids with exact binomial and all subspecifics
-    pid_set1 = Species.objects.filter(base_pid=pid)
-    infra = len(pid_set1)
+    infra = 0
+    if species.type == 'species' or (species.type == 'hybrid' and species.source != 'RHS'):
+        infra = len(Species.objects.filter(Q(base_pid=pid) | Q(pid=pid)))
 
     # Stop here if requested speciews is already a subspecific
     if species.infraspe:
@@ -364,10 +367,14 @@ def photos(request, app=None, pid=None):
 
     # Continue for the main species request
     # If synonym is requested, add them as well. strike that. Always add both infra and syn to main page
-    if syn:
+    if species.type == 'species':
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
     else:
-        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid))
+        public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
+    # if syn:
+    #     public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
+    # else:
+    #     public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid))
 
     # Get upload list, public list and private list
     private_list = []
