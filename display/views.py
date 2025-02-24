@@ -129,6 +129,8 @@ def summary(request, app=None, pid=None):
     infra = 0
     if species.type == 'species':
         infra = len(Species.objects.filter(base_pid=pid))
+        if infra == 1 and not species.infraspe:
+            infra = 0
 
     # If hybrid, find its parents
     if species.type == 'hybrid':
@@ -265,6 +267,7 @@ def photos(request, app=None, pid=None):
         app = None
     query_app = request.GET.get('app', None)
     query_pid = request.GET.get('pid', None)
+    # Queries including synonyms is very slow.  Ignore it.
     syn = request.GET.get('syn', '')
     family = request.GET.get('family', None)
 
@@ -296,7 +299,6 @@ def photos(request, app=None, pid=None):
 
     #  Logic starts here
     #  Get author (to enable private photos display)
-    # Family and app should be correctly identified
     author = ''
     if request.user.is_authenticated:
         author = Photographer.objects.filter(user_id=request.user.id)
@@ -308,7 +310,7 @@ def photos(request, app=None, pid=None):
 
     # Get models
     Species = apps.get_model(app, 'Species')
-    # Synonym = apps.get_model(app, 'Synonym')
+    Synonym = apps.get_model(app, 'Synonym')
     UploadFile = apps.get_model(app, 'UploadFile')
     try:
         species = Species.objects.get(pk=pid)
@@ -339,7 +341,6 @@ def photos(request, app=None, pid=None):
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/display/photos/{app}/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     upload_list = UploadFile.objects.filter(pid=pid)  # All upload photos
-
     # Get infraspecific flag
     # get synonyms flag
     acc_pids = list(species.get_synonyms().values_list('spid', flat=True))
@@ -349,6 +350,8 @@ def photos(request, app=None, pid=None):
     infra = 0
     if species.type == 'species' or (species.type == 'hybrid' and species.source != 'RHS'):
         infra = len(Species.objects.filter(Q(base_pid=pid) | Q(pid=pid)))
+        if infra == 1 and not species.infraspe:
+            infra = 0
 
     # Stop here if requested speciews is already a subspecific
     if species.infraspe:
@@ -362,15 +365,17 @@ def photos(request, app=None, pid=None):
                    'infra': infra, 'synonyms': synonyms,
                    'role': role,
                    'syn': syn,
+
                    }
         return render(request, 'display/photos.html', context)
 
     # Continue for the main species request
-    # If synonym is requested, add them as well. strike that. Always add both infra and syn to main page
+    # If synonym is requested, add them as well
     if species.type == 'species':
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
     else:
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
+
     # if syn:
     #     public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
     # else:
