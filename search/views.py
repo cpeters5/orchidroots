@@ -82,15 +82,18 @@ def search(request, app=None):
             return render(request, "search/search_results.html", context)
 
     # Search string more than one word
-    match_spc_list = Species.objects.filter(binomial__icontains=search_string)
-    # If no match found (probably wrong genus), drop the first word (genus) and match again
-    if not match_spc_list:
-        words = search_string.split()
-        species_name = ' '.join(words[1:]) if len(words) > 1 else '' # Must already be > 1
-        if species_name:
-            match_spc_list = Species.objects.filter(binomial__icontains=species_name)
-
-
+    words = search_string.split()
+    words_tail = words[1:]
+    search_species = ' '.join(words_tail)
+    match_spc_list = []
+    #  Reject species string < 3
+    if len(search_species) > 2:
+        match_spc_list = Species.objects.filter(binomial__icontains=search_string)
+        # If no match found (probably wrong genus), drop the first word (genus) and match again
+        if not match_spc_list:
+            match_spc_list = Species.objects.filter(binomial__icontains=search_species)
+    if match_spc_list:
+        match_spc_list = match_spc_list.order_by('binomial')
     write_output(request, search_string)
     context = {'search_string': search_string, 'genus_list': genus_list, 'match_spc_list': match_spc_list,
                'genus_total': len(genus_list), 'app': app,
