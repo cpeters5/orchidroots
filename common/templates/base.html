@@ -623,13 +623,13 @@ nav .search-container button:hover {
             <form class="form-inline" id="search" action="/search/search_name/aves/" style="margin-top: 5px;">
                 <input type="hidden" form="search" name="role" value="{{ role }}" >
                 <input type="hidden" form="search" name="app" value="{{ app }}" >
-                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search" value="{{search_string}}" type="text" name="search_string" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
             </form>
             {% else %}
             <form class="form-inline" id="search1" action="/search/search/{{app|default:'orchidaceae'}}/" style="margin-top: 5px;">
                 <input type="hidden" form="search1" name="role" value="{{ role }}" >
                 <input type="hidden" form="search1" name="app" value="{{ app }}" >
-                <input class="searchbox" form="search1" value="{{search_string}}" type="text" name="search_string"  pattern=".{3,}" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
+                <input class="searchbox" form="search1" value="{{search_string}}" type="text" name="search_string" placeholder="Search" title="The search string must be at least 3 characters long" style="border:1px solid #ccc; border-right: 0">
             </form>
             {% endif %}
             <ul class="navbar-nav " style="line-height:25px !important;">
