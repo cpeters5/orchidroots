@@ -111,19 +111,9 @@ td {
                     Please submit a common name to search in the {{app|title}} domain
                 {% endif %}
             </h5>
+            To search scientific name, try: <a class="btn btn-primary" href="{% url 'search:search' app %}?role={{role}}&search_string={{search_string}}">Search by scientific name</a>
         </div>
     </div>
-    {% if not species_list %}
-        <div>
-            <ul  style="text-align:left;font-size:16px;margin-left:100px;">
-                <li>If not found, you might be in the wrong domain (see navbar).
-                Try selecting a different domain in the nav bar</li>
-                <li>The name might be a scientific or registered name, try&nbsp;&nbsp;
-                <a class="btn btn-primary" href="{% url 'search:search' app %}?role={{role}}&search_string={{search_string}}">Search by scientific name</a>
-                </li>
-            </ul>
-        </div>
-    {% endif %}
     <br>
     <div>
         {% if species_list %}
@@ -135,13 +125,15 @@ td {
                     <tr >
                         <td style="width:20%;">
                             {% if species.get_best_img.image_file %}
-                            <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family}}&role={{role}}">
+                            <a href="{% url 'display:summary' species.family.application species.pid %}">
                              <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
                             </a>
                             {% endif %}
                         </td>
                         <td style="text-align: left;">
+                            <a href="{% url 'display:summary' species.family.application species.pid %}">
                             {{species.binomial|safe}}
+                            </a>
                             {% if app != 'orchidaceae' %}
                                 ({{species.family.family}})
                             {% endif %}

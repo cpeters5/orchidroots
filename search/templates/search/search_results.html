@@ -21,14 +21,6 @@ td {
     margin:5px auto;
 }
 
-.column-3 {
-    display: table-cell;
-}
-.column-2 {
-    display: none;
-}
-
-
 @media only screen and (max-width: 600px) {
     table {
         width: 100%;
@@ -42,12 +34,6 @@ td {
         border: 1px solid lightgrey;
         padding-left: 10px;
     }
-    .column-3 {
-        display: none;
-    }
-    .column-2 {
-        display: table-cell;
-    }
 
 }
 </style>
@@ -58,7 +44,7 @@ td {
 
             <input class="searchbox" form="displaysearch" value="{{search_string}}"
                    type="text" name="search_string"
-                   placeholder="Search scientific name" title="The search string must be at least 3 characters long"
+                   placeholder="Search scientific name" title="search"
                    style="border: 1px solid #ccc; border-right: 0; padding: 8px 12px; width: 300px; border-radius: 4px 0 0 4px;margin:0 auto">
 
             <button form="displaysearch" type="submit" style="display:none;"></button>
@@ -87,10 +73,10 @@ td {
                 {% for match in matched_genus %}
                 <td>
                     {% if not match.type == 'species' %}
-                        <a href="{% url 'common:species' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                        <a href="{% url 'common:species' %}?type=species&app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                         {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
-                         <a href="{% url 'common:species' %}?app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                         <a href="{% url 'common:species' %}?type=hybrid&app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                     {% endif %}
                     {% if user.tier.tier > 3 %}
                     {{match.pid|default:''}}
@@ -118,52 +104,13 @@ td {
                             {% endif %}
                         </td>
                         <td style="width:20%;">
-                            <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
-                                {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
-                        </td>
-                        <td class="column-2" style="width:10%;">
-                            {% if species.status == 'synonym' %}
-                                Synonym
-                            {% elif species.type == 'hybrid' %}
-                                hybrid
-                            {% else %}
-                                accepted
-                            {% endif %}
-                        </td>
-                        <td class="column-3" style="width:10%;">
-                            {% if species.status == 'synonym' %} syn.
-                                {% if species.getAcc %}
-                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
-                                        {{species.getAccepted.binomial}}
-                                    </a>
-                                {% else %}
-                                    {{species.getAccepted.binomial}} (syn)
-                                {% endif %}
-                            {% elif species.type == 'hybrid' %}
-                                {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
-                            {% else %}
-                                accepted species
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-<!--                <tr style="background-color: #918f8f"><td></td></tr>-->
-            {% endif %}
-            {% if found_species %}
-                {% for species in found_species %}
-                    <tr>
-                        <td>{% if species.get_best_img %}
-                            <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
-                            {% endif %}
-                        </td>
-                        <td style="width:20%;">
-                            <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
+                            <a href="{% url 'display:summary' species.family.application species.pid %}">
                                 {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
                         </td>
                         <td style="width:10%;">
                             {% if species.status == 'synonym' %} syn.
                                 {% if species.getAcc %}
-                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
+                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}">
                                         {{species.getAccepted.binomial}}
                                     </a>
                                 {% else %}
@@ -174,7 +121,34 @@ td {
                         </td>
                     </tr>
                 {% endfor %}
-<!--                <tr style="background-color: #918f8f"><td></td></tr>-->
+                <tr style="background-color: #918f8f"><td></td></tr>
+            {% endif %}
+            {% if found_species %}
+                {% for species in found_species %}
+                    <tr>
+                        <td>{% if species.get_best_img %}
+                            <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                            {% endif %}
+                        </td>
+                        <td style="width:20%;">
+                            <a href="{% url 'display:summary' species.family.application species.pid %}">
+                                {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                        </td>
+                        <td style="width:10%;">
+                            {% if species.status == 'synonym' %} syn.
+                                {% if species.getAcc %}
+                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}">
+                                        {{species.getAccepted.binomial}}
+                                    </a>
+                                {% else %}
+                                    {{species.getAccepted.binomial}} (syn)
+                                {% endif %}
+                            {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr style="background-color: #918f8f"><td></td></tr>
             {% endif %}
             {% if matched_species %}
                 {% for species in matched_species %}
@@ -184,13 +158,13 @@ td {
                             {% endif %}
                         </td>
                         <td style="width:20%;">
-                            <a href="{% url 'display:summary' species.family.application species.pid %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
+                            <a href="{% url 'display:summary' species.family.application species.pid %}">
                                 {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
                         </td>
                         <td style="width:10%;">
                             {% if species.status == 'synonym' %} syn.
                                 {% if species.getAcc %}
-                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}?family={{species.family|default:'Orchidaceae'}}&role={{role}}">
+                                    <a href="{% url 'display:summary' species.family.application species.getAcc %}">
                                         {{species.getAccepted.binomial}}
                                     </a>
                                 {% else %}

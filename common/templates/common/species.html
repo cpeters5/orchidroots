@@ -25,7 +25,7 @@
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
                             List of {{app|title}}
                                <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
-                                    <input type="hidden" form="type" name="family" value="{{family}}" >
+                                    <input type="hidden" form="type" name="family" value="{{genus.family}}" >
                                     <input type="hidden" form="type" name="genus" value="{{genus}}" >
                                     <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
                                 </form>
@@ -33,7 +33,7 @@
                                 in the family
                                 <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="family" name="type" value="{{type}}" >
-                                    <input class="searchbox border" form="family" value="{{family|default:''}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
+                                    <input class="searchbox border" form="family" value="{{genus.family|default:''}}" type="text" name="family"  pattern=".{3,}" placeholder="family" style="font-size: 16px;width:150px;text-align: center">
                                 genus
                                     <input class="searchbox border" form="family" value="{{genus|default:''}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="card-body border-top"  style="display:inline-block; padding-top: 0;">
-                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{genus}}&type={{type}}">Browse images</a>
+                        <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'common:newbrowse' app %}?genus={{genus}}&type={{type}}">Browse images</a>
                         {% if type == 'species' %}
                             <a class="btn border btn-primary" style="height: 30px; font-size:13px;" href="{% url 'orchidaceae:species' %}?alpha={{alpha}}&role={{role}}">View more detail</a>
                         {% else %}
@@ -59,7 +59,8 @@
                         {% endif %}
                         <form action="?" id="display" style="display:inline-block; margin-top: 5px;">
                             <input type="hidden" form="display" name="type" value="{{type}}" >
-                            <input type="hidden" form="display" name="family" value="{{family.family}}" >
+                            <input type="hidden" form="display" name="alpha" value="{{alpha}}" >
+                            <input type="hidden" form="display" name="family" value="{{genus.family}}" >
                             <input type="hidden" form="display" name="genus" value="{{genus}}" >
                             <input type="checkbox" form="display" class="form-check-input" name="syn" value="Y" onchange="this.form.submit()" {% if syn == 'Y' %}checked{% endif %} style="margin-left:25px;"> <span style="margin-left:50px;font-size:13px;">Include synonyms</span>
                         </form>
@@ -88,14 +89,14 @@
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
-                                                        <a href="/display/summary/{{app}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y">{{species.binomial_it|safe}}</a>
+                                                        <a href="/display/summary/{{app}}/{{species.pid}}/">{{species.binomial_it|safe}}</a>
                                                         (syn.)
                                                         {% if user.tier.tier > 3 %} {{species.getAcc}} {% endif %}
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
                                                 {% else %}
-                                                    <a href="/display/summary/{{app}}/{{species.pid}}/?family={{species.gen.family}}&role={{role}}&related=ALL&syn=Y"><i>{{species.binomial_it|safe}}</i></a>
+                                                    <a href="/display/summary/{{app}}/{{species.pid}}/"><i>{{species.binomial_it|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
@@ -104,16 +105,16 @@
                                             {% if app == 'orchidaceae' %}
                                                 <td class="d-none d-md-table-cell">
                                                 {% if species.status == 'synonym' %}
-                                                    <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/?family={{species.gen.family}}"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
+                                                    <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
                                                 {% elif species.type == 'hybrid' %}
                                                     {% if species.hybrid.seed_id.pid %}
-                                                        <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}?role={{role}}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>
+                                                        <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>
                                                     {% else %}
                                                         na
                                                     {% endif %}
                                                     x
                                                     {% if species.hybrid.pollen_id.pid %}
-                                                        <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}?role={{role}}">{{species.hybrid.pollen_id.name|default:'na'|safe}}</a>
+                                                        <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}">{{species.hybrid.pollen_id.name|default:'na'|safe}}</a>
                                                     {% else %}
                                                         na
                                                     {% endif %}

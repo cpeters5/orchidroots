@@ -207,7 +207,7 @@ input[type=text] {
                             {% else %}
                             temporarily created:
                             {% endif %}
-                            <a href="{% url 'display:summary' species.family.application cross.pid.pid %}?family={{species.gen.family}}&role={{role}}">{{cross.pid.binomial_it|safe}}</a>
+                            <a href="{% url 'display:summary' species.family.application cross.pid.pid %}">{{cross.pid.binomial_it|safe}}</a>
                         {% else %}
                             {% if pid and pid2 and pid != pid2 %}
                                 This cross "{{species.binomial}} × {{species2.binomial}}" has not been registered. <br>
