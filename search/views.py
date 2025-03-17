@@ -35,71 +35,6 @@ def autocomplete_species(request):
 
 
 # Search scientific name
-def xsearch(request, app=None):
-    if not app:
-        # Legacy case, app may be given in query string
-        app = request.GET.get('app', 'orchidaceae')  # handle legacy case
-    Genus = apps.get_model(app, 'Genus')
-    Species = apps.get_model(app, 'Species')
-
-    # Search scientific name only
-    # Get genus from the first word in search string.
-    # If found, get family and application
-    # From list of genera, find matching species from the rest of search string.
-    # if no results, redirect to common name search
-    role = getRole(request)
-    search_list = []
-    genus_list = []
-    matched_species = []
-    full_path = request.path
-    path = 'summary'
-    full_search_string = ''
-    other_genus_spc = ''
-    if request.user.is_authenticated and request.user.tier.tier > 2:
-        path = 'photos'
-
-    # Get search string
-    search_string = request.GET.get('search_string', '').strip()
-
-    if not search_string:
-        context = {'search_string': search_string,'app': app, 'role': role}
-        return render(request, "search/search_results.html", context)
-
-    # abrev. only applied to orchids
-    if app == 'orchidaceae':
-        genus_name, search_string = expand_genus_name(search_string)
-
-    search_string = clean_search_string(search_string)
-    if ' ' not in search_string:
-        # single word could be genus
-        matched_genus = Genus.objects.filter(Q(genus__istartswith=search_string) | Q(abrev__istartswith=search_string))
-        if matched_genus:
-            #  Done if found a matching genus.
-            context = {'search_string': search_string, 'matched_genus': matched_genus,
-                       # 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-                       'role': role, 'path': path, 'full_path': full_path,
-                       'app': app,}
-            return render(request, "search/search_results.html", context)
-        else:
-            matched_species = Species.objects.filter(species__istartswith=search_string)
-    else:
-        # Search string more than one word
-        words = search_string.split()
-        words_tail = words[1:]
-        search_species = ' '.join(words_tail)
-        #  Reject species string < 3
-        if len(search_species) > 2:
-            print(len(search_species), search_species)
-            matched_species = Species.objects.filter(binomial__icontains=search_string)
-            print(len(matched_species))
-    if matched_species:
-        matched_species = matched_species.order_by('binomial')
-    write_output(request, search_string)
-    context = {'search_string': search_string, 'genus_list': genus_list, 'matched_species': matched_species,
-               'genus_total': len(genus_list), 'app': app,
-               # 'family': family, 'subfamily': subfamily, 'tribe': tribe, 'subtribe': subtribe,
-               'role': role, 'path': path, 'full_path': full_path}
-    return render(request, "search/search_results.html", context)
 def search(request, app=None):
     if not app:
         # Legacy case, app may be given in query string
@@ -136,8 +71,10 @@ def search(request, app=None):
         #  Get exact matched species
         found_species = Species.objects.filter(species=search_string).order_by('binomial')
         # Get partial matched species (only if lenght > 2)
-        if len(search_string) > 1:
+        if len(search_string) < 4:
             matched_species = Species.objects.filter(species__istartswith=search_string).exclude(species=search_string).order_by('binomial')
+        elif len(search_string) > 3:
+            matched_species = Species.objects.filter(species__icontains=search_string).exclude(species=search_string).order_by('binomial')
         context = {'search_string': search_string, 'matched_genus': matched_genus,
                    'matched_species': matched_species, 'found_species': found_species,
                    'role': role, 'path': path, 'full_path': full_path,
@@ -153,9 +90,10 @@ def search(request, app=None):
     #  Reject species string < 3
     if len(search_species) > 1:
         found_species = Species.objects.filter(species=search_species).exclude(binomial=search_string).order_by('binomial')
-        matched_species = Species.objects.filter(species__istartswith=search_species).exclude(species=search_species).exclude(binomial=search_string).order_by('binomial')
-        if not matched_species:
-            matched_species = Species.objects.filter(binomial__icontains=search_species).exclude(species=search_species).exclude(binomial=search_string).order_by('binomial')
+        if len(search_species) < 4:
+            matched_species = Species.objects.filter(species__istartswith=search_species).exclude(species=search_species).exclude(binomial=search_string).order_by('binomial')
+        elif len(search_species) > 3:
+            matched_species = Species.objects.filter(species__icontains=search_species).exclude(species=search_species).exclude(binomial=search_string).order_by('binomial')
 
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_species': matched_species, 'found_species': found_species,
