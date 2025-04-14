@@ -35,12 +35,12 @@
     <div class="nav3">
         <ul class="nav nav-tabs navbar-expand-lg" >
             {% if species %}
-                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' app species.pid %}?role={{role}}" data-nosnippet>Summary<br></a></li>
-                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' app species.pid %}?role={{role}}&ifs=N" data-nosnippet>Photos<br></a></li>
+                <li class="nav-item"><a class="nav-link {{tax}}" href="{% url 'display:summary' app species.pid %}?role={{role}}&syn={{syn}}" data-nosnippet rel="nofollow noreferrer noopener">Summary<br></a></li>
+                <li class="nav-item"><a class="nav-link {{pho}}" href="{% url 'display:photos' app species.pid %}?role={{role}}&ifs=N&syn={{syn}}" data-nosnippet rel="nofollow noreferrer noopener">Photos<br></a></li>
                 {% if app == 'aves' or app == 'animalia' %}
-                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>Videos<br></a></li>
+                    <li class="nav-item"><a class="nav-link {{vid}}" href="{% url 'display:videos' species.pid %}?app={{app}}&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Videos<br></a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>Compare<br></a></li>
+                <li class="nav-item"><a class="nav-link {{sbs}}" href="{% url 'common:compare' species.pid %}?app={{app}}&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Compare<br></a></li>
 
                     {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
@@ -49,30 +49,30 @@
                     </a>
                     <div class="nav2 dropdown-menu">
                     {% if family.family == 'Orchidaceae' %}
-                        <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet>upload file</a>
                         {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload file</a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload url</a>
                         {% endif %}
                     {% else %}
-                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&role={{role}}" data-nosnippet>upload file</a>
+                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload file</a>
                         <!--                        Fix common.uploadfile to use family specific form -->
                         {% if app == 'animalia' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'animalia:uploadweb' species.pid %}?role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'animalia:uploadweb' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload url</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'animalia:uploadvid' species.pid %}?role={{role}}" data-nosnippet>upload video</a>
+                            <a class="dropdown-item" href="{% url 'animalia:uploadvid' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload video</a>
                         {% elif app == 'aves' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadweb' species.pid %}?role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'aves:uploadweb' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload url</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?role={{role}}" data-nosnippet>upload video</a>
+                            <a class="dropdown-item" href="{% url 'aves:uploadvid' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload video</a>
                         {% elif app == 'fungi' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'fungi:uploadweb' species.pid %}?role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'fungi:uploadweb' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload url</a>
                             {% endif %}
                         {% elif app == 'other' %}
                             {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'other:uploadweb' species.pid %}?role={{role}}" data-nosnippet>upload url</a>
+                            <a class="dropdown-item" href="{% url 'other:uploadweb' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload url</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -80,10 +80,10 @@
                 </li>
                     {% endif %}
                 {% if synonyms > 0 %}
-                    <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet>Synonyms</a></li>
+                    <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Synonyms</a></li>
                 {% endif %}
                 {% if infra > 0 %}
-                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet>Infraspecific</a></li>
+                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Infraspecific</a></li>
                 {% endif %}
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
