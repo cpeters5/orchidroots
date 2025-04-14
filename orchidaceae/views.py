@@ -45,6 +45,7 @@ family = 'Orchidaceae'
 # orchidaceae application is specificly for Orchidaceae family only.
 
 # List genera
+@login_required
 def genera(request):
     write_output(request)
     st_obj = ''
