@@ -162,6 +162,7 @@ class GenusStat(models.Model):
     num_hybimage = models.IntegerField(null=True,default=0)
     num_hyb_with_image = models.IntegerField(null=True,default=0)
     pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
+    best_image = models.CharField(max_length=200, null=True, blank=True)
 
 
 class GenusRelation(models.Model):
@@ -585,6 +586,7 @@ class SpeciesStat(models.Model):
     num_species_ancestor = models.IntegerField(null=True, blank=True)
     num_descendant = models.IntegerField(null=True, blank=True)
     num_dir_descendant = models.IntegerField(null=True, blank=True)
+    best_image = models.CharField(max_length=200, null=True, blank=True)
 
 
 class Specieshistory(models.Model):
@@ -973,7 +975,6 @@ class SpcImages(models.Model):
     # width = models.FloatField(default=1)
     # height = models.FloatField(default=1)
     image_file = models.CharField(max_length=100, null=True, blank=True)
-    image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
     download_date = models.DateField(null=True, blank=True)
     # gen = models.ForeignKey(Genus, null=True, blank=True, db_column='gen', related_name='orgen',on_delete=models.DO_NOTHING)
     # gen = models.IntegerField(null=True, blank=True)
@@ -1104,7 +1105,6 @@ class HybImages(models.Model):
     # width = models.FloatField(default=1)
     # height = models.FloatField(default=1)
     image_file = models.CharField(max_length=100, null=True, blank=True)
-    image_file_path = models.ImageField(upload_to='utils/images/photos', null=True, blank=True)
     download_date = models.DateField(null=True, blank=True)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='or14gen', null=True, blank=True,on_delete=models.DO_NOTHING)
     is_private = models.BooleanField(null=True, default=False)
@@ -1233,10 +1233,6 @@ class Video(models.Model):
     def video_dir(self):
         return 'utils/images/' + self.family.family + '/'
         # return 'utils/images/hybrid/' + block_id + '/'
-
-    # def get_image_file_path(self):
-    #     return 'utils/images/' + self.family.family + '/' + self.image_file
-    #
 
     def get_displayname(self):
         if self.credit_to:

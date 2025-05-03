@@ -630,7 +630,6 @@ class SpcImages(models.Model):
     # width = models.FloatField(default=1)
     # height = models.FloatField(default=1)
     image_file = models.CharField(max_length=100, null=True, blank=True)
-    image_file_path = models.ImageField(upload_to='utils/images/photos', max_length=255, null=True, blank=True)
     family = models.ForeignKey(Family, db_column='family', related_name='poolspcfamily', on_delete=models.DO_NOTHING)
     genus = models.CharField(max_length=50)
     gen = models.ForeignKey(Genus, db_column='gen', related_name='poolspcgen', null=True, blank=True,on_delete=models.DO_NOTHING)
@@ -749,10 +748,6 @@ class Video(models.Model):
     def video_dir(self):
         return 'utils/images/' + self.family.family + '/'
         # return 'utils/images/hybrid/' + block_id + '/'
-
-    # def get_image_file_path(self):
-    #     return 'utils/images/' + self.family.family + '/' + self.image_file
-    #
 
     def get_displayname(self):
         if self.credit_to:
