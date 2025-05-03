@@ -574,6 +574,7 @@ from django.db.models import Subquery, OuterRef, Value, IntegerField, Q
 from django.db.models.functions import Greatest
 
 
+@login_required
 def synonym(request, pid):
     role = getRole(request)
 
@@ -767,6 +768,7 @@ def get_distlist():
 
     return mydist_list
 
+@login_required
 def browsedist(request):
     dist_list = get_distlist()
     context = {'dist_list': dist_list,  'app': 'orchidaceae',}
