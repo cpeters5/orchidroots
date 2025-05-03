@@ -7,7 +7,31 @@
 </head>
 {% include "base.html" %}
 {% block body %}
+<style>
+.thumbnails {
+    object-fit: cover;
+    overflow: hidden;
+    height: 80px;
+    width : 80px;
+    margin:5px auto;
+}
+@media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+        font-size:12px;
+    }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
+    }
+    td {
+        border: 1px solid lightgrey;
+        padding-left: 10px;
+    }
 
+}
+
+</style>
 <div style="min-height:200px;background-color:white;width: 90%; margin: 0 auto;">
    <div style="clear:both"></div>
 <!--Main table       -->
@@ -41,28 +65,33 @@
                         {% if genus_list %}
                             <div style="clear: both"></div>
                             <div class="flex">
-                                <table id="sortTable" class="table table-striped table-condensed table-sm  table-bordered table-hover">
+                                <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
+                                        <th></th>
                                         <th>Genus</th>
                                         {% if app == 'aves' %}
                                         <th>Common name</th>
                                         {% endif %}
                                         <th class="d-none d-lg-table-cell hidden-xs">suprageneric ranks</th>
-                                        <th>#images</th>
                                     </thead>
                                         {% for genus in genus_list %}
                                         <tr>
-                                            <td>
+                                            <td class="align-center">
+                                                {% if genus.get_best_img %}
+                                                <img class="thumbnails" alt="{{genus.get_best_img}}" src="{% static genus.get_best_img.thumb_dir %}{{genus.get_best_img.image_file}}">
+                                                {% endif %}
+                                            </td>
+                                            <td style=" vertical-align: middle;">
                                                 <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
                                             {% if app == 'aves' %}
-                                            <td>
+                                            <td style=" vertical-align: middle;">
                                                 {{genus.common_name| default:''}}
                                             </td>
                                             {% endif %}
 
-                                            <td class="d-none d-lg-table-cell hidden-xs">
+                                            <td class="d-none d-lg-table-cell hidden-xs" style=" vertical-align: middle;">
                                                 {% if genus.subtribe %}subfamily
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subfamily={{genus.subfamily}}"><i>{{genus.subfamily|title}}</i></a>
                                                 {% endif %}
@@ -73,7 +102,6 @@
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subtribe={{genus.subtribe}}"><i>{{genus.subtribe|title}}</i></a>
                                                 {% endif %}
                                             </td>
-                                            <td class="align-center">{% if genus.genusstat.num_spcimage > 0 or genus.genusstat.num_hybimage > 0 %}{%  add genus.genusstat.num_spcimage genus.genusstat.num_hybimage %}{% endif %}</td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
                                         {% endfor %}

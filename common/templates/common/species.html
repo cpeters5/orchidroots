@@ -11,6 +11,28 @@
     .table {
         font-size: 14px;
     }
+.thumbnails {
+    object-fit: cover;
+    overflow: hidden;
+    height: 70px;
+    width : 70px;
+    margin:5px auto;
+}
+@media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+        font-size:12px;
+    }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
+    }
+    td {
+        border: 1px solid lightgrey;
+        padding-left: 10px;
+    }
+
+}
 
 </style>
 <div style="min-height:200px;background-color:white;width: 100%;">
@@ -67,25 +89,28 @@
                         <div style="clear:left">{% include "common/alpha_list_common.html" %}</div>
                             <!--main table-->
                         {% if species_list %}
+                        <div>
                             <table id="sortTable" class="table table-condensed table-sm  table-bordered table-hover">
                                     <thead>
                                         <tr style="background-color: #e3e3e3">
+                                            <th>sample img</th>
                                             <th class="spc_column">Species</th>
                                             {% if app == 'orchidaceae' %}
                                                 {% if type == 'hybrid' %}
                                                     <th class="d-none d-md-table-cell">parents</th>
-                                                {% else %}
-                                                    <th class="d-none d-md-table-cell">Classification</th>
                                                 {% endif %}
                                             {% endif %}
                                             {% if app == 'aves' %}
                                                 <th>Common Name</th>
                                             {% endif %}
-                                            <th>#images</th>
                                         </tr>
                                     </thead>
                                         {% for species in species_list %}
                                         <tr>
+                                            <td>{% if species.get_best_img %}
+                                                <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                                                {% endif %}
+                                            </td>
                                             <td>
                                                 {% if species.status == 'synonym' %}
                                                     {% if species.getAcc %}
@@ -102,7 +127,7 @@
                                                 {{species.author|default:""}}
                                             </td>
 
-                                            {% if app == 'orchidaceae' %}
+                                            {% if app == 'orchidaceae' and species.type == 'hybrid' %}
                                                 <td class="d-none d-md-table-cell">
                                                 {% if species.status == 'synonym' %}
                                                     <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
@@ -118,26 +143,13 @@
                                                     {% else %}
                                                         na
                                                     {% endif %}
-                                                {% else %}
-                                                    {% if species.accepted.subgenus %}
-                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&subgenus={{species.accepted.subgenus}}&syn={{syn}}"><span style="color:#918f8f">subgenus:</span> {{species.accepted.subgenus|default:''}}</a>
-                                                    {% endif %}
-                                                    {% if species.accepted.section %}
-                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&section={{species.accepted.section}}&syn={{syn}}"><span style="color:#918f8f">section:</span> {{species.accepted.section|default:''}}</a>
-                                                    {% endif %}
-                                                    {% if species.accepted.subsection %}
-                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&subsection={{species.accepted.subsection}}&syn={{syn}}"><span style="color:#918f8f">subsection:</span> {{species.accepted.subsection|default:''}}</a>
-                                                    {% endif %}
-                                                    {% if species.accepted.series %}
-                                                       <a href="{% url 'common:species' app %}?role={{role}}&genus={{genus}}&series={{species.accepted.series}}&syn={{syn}}"><span style="color:#918f8f">series:</span> {{species.accepted.series|default:''}}</a>
-                                                    {% endif %}
                                                 {% endif %}
                                                 </td>
                                             {% endif %}
                                             {% if app == 'aves' %}
                                                 <td>{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
                                             {% endif %}
-                                            <td style="text-align:center">{{species.speciesstat.num_image|default:""}}</td>
+<!--                                            <td style="text-align:center">{{species.speciesstat.num_image|default:""}}</td>-->
 <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
                                         </tr>
                                         {% endfor %}
@@ -145,7 +157,7 @@
                         {% else %}
                             <br><br>No <i>{{genus}}</i> {{type}} {% if alpha %} begins with {{alpha}}{% endif %} found.
                         {% endif %}
-
+                        </div>
                     </div>
                 </div>
         </div>
@@ -167,7 +179,7 @@ $(document).ready(function() {
 
         "LengthMenu": [[50,100,150,200,250,300,-1], [50,100,150,200,250,300,"All"]],
         "lengthChange": false,
-        "order": [[0,'asc'],],
+        "order": [[1,'asc'],],
         "bPaginate": true,
  	    "fnPreDrawCallback": function( oSettings ) {
             $('.dataTables_filter input').attr({'name':'','placeholder': 'Filter species list'});//tips
