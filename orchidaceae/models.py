@@ -163,6 +163,7 @@ class GenusStat(models.Model):
     num_hyb_with_image = models.IntegerField(null=True,default=0)
     pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
     best_image = models.CharField(max_length=200, null=True, blank=True)
+    best_image_pid = models.IntegerField(null=True,default=0)
 
 
 class GenusRelation(models.Model):

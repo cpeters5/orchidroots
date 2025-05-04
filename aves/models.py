@@ -150,18 +150,9 @@ class GenusStat(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     num_species = models.IntegerField(null=True,default=0)
-    num_species_synonym = models.IntegerField(null=True,default=0)
-    num_species_total = models.IntegerField(null=True,default=0)
-    num_hybrid  = models.IntegerField(null=True,default=0)
-    num_hybrid_synonym  = models.IntegerField(null=True, default=0)
-    num_hybrid_total  = models.IntegerField(null=True,default=0)
-    num_synonym  = models.IntegerField(null=True,default=0)
     num_spcimage = models.IntegerField(null=True,default=0)
-    num_spc_with_image = models.IntegerField(null=True,default=0)
-    pct_spc_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
-    num_hybimage = models.IntegerField(null=True,default=0)
-    num_hyb_with_image = models.IntegerField(null=True,default=0)
-    pct_hyb_with_image = models.DecimalField(decimal_places=2, max_digits=7,null=True,default=0)
+    best_image = models.CharField(max_length=200, null=True, blank=True)
+    best_image_pid = models.BigIntegerField(null=True, default=0)
 
 
 class Gensyn(models.Model):
@@ -414,10 +405,7 @@ class SpeciesStat(models.Model):
         on_delete=models.CASCADE,
         primary_key=True)
     num_image = models.IntegerField(blank=True)
-    num_ancestor = models.IntegerField(null=True, blank=True)
-    num_species_ancestor = models.IntegerField(null=True, blank=True)
-    num_descendant = models.IntegerField(null=True, blank=True)
-    num_dir_descendant = models.IntegerField(null=True, blank=True)
+    best_image = models.CharField(max_length=200, null=True, blank=True)
 
 
 class AcceptedManager(Manager):
