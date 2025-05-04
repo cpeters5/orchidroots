@@ -13,6 +13,7 @@
     overflow: hidden;
     height: 80px;
     width : 80px;
+    min_width : 80px;
     margin:5px auto;
 }
 @media only screen and (max-width: 600px) {
@@ -72,17 +73,19 @@
                                         {% if app == 'aves' %}
                                         <th>Common name</th>
                                         {% endif %}
-                                        <th class="d-none d-lg-table-cell hidden-xs">suprageneric ranks</th>
+                                        <th class="d-none d-lg-table-cell hidden-xs">ranks</th>
                                     </thead>
                                         {% for genus in genus_list %}
                                         <tr>
                                             <td class="align-center">
-                                                {% if genus.get_best_img %}
-                                                <img class="thumbnails" alt="{{genus.get_best_img}}" src="{% static genus.get_best_img.thumb_dir %}{{genus.get_best_img.image_file}}">
+                                                {% if genus.genusstat.best_image %}
+                                                <a href="/display/summary/{{app}}/{{genus.genusstat.best_image_pid}}/">
+                                                <img class="thumbnails" alt="{{genus.genusstat.best_image}}" src="{% static genus.genusstat.best_image %}">
+                                                </a>
                                                 {% endif %}
                                             </td>
                                             <td style=" vertical-align: middle;">
-                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N&type={{genus.type}}"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
                                             {% if app == 'aves' %}
@@ -98,7 +101,7 @@
                                                 {% if genus.tribe %}tribe
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&tribe={{genus.tribe}}"><i>{{genus.tribe|title}}</i></a>
                                                 {% endif %}
-                                                {% if genus.subtribe %}subfamily
+                                                {% if genus.subtribe %}subtribe
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subtribe={{genus.subtribe}}"><i>{{genus.subtribe|title}}</i></a>
                                                 {% endif %}
                                             </td>
@@ -132,7 +135,7 @@ $(document).ready(function() {
         "pageLength": 100,
         "aLengthMenu": [[50,100,150,200,-1], [50,100,150,200,"All"]],
         "lengthChange": false,
-        "order": [[0,'asc'],],
+        "order": [[1,'asc'],],
         "bPaginate": true,
         "pagingType": "simple",
  	    "fnPreDrawCallback": function( oSettings ) {
