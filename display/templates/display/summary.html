@@ -610,10 +610,10 @@ seedparent, pollparent {
                 {% if ancspc_list %}
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
-                            {% if p.aid.get_best_img %}
-                                <a href="/static/utils/images/species/{{p.aid.get_best_img.image_file}}" data-lightbox="anc"
+                            {% if p.aid.speciesstat.best_image %}
+                                <a href="{% static p.aid.best_image %}" data-lightbox="anc"
                                    data-title="No: {{p.id}}: {{p.aid.abrevname|safe}} - {% if p.text_data %}{{p.text_data|safe}}{% endif %}">
-                                   <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="/static/utils/thumbs/species/{{p.aid.get_best_img.image_file}}">
+                                   <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="{% static p.aid.speciesstat.best_image %}">
                                 </a>
                             {% else %}
                                 <img class="thumbnails thumbnails3"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>

@@ -174,8 +174,8 @@ td {
                     {% endif %}
                 </td>
                 <td style="text-align: center; border-bottom:0">
-                    {% if species.get_best_img %}
-                     <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                    {% if species.speciesstat.best_image %}
+                     <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.speciesstat.best_image %}">
                     {% endif %}
                 </td>
             </tr>
@@ -188,8 +188,8 @@ td {
         {% for species in other_genus_spc %}
             <tr style="background-color: white;">
                 <td style="min-width:100px; text-align: center">
-                    {% if species.get_best_img %}
-                     <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                    {% if species.speciesstat.best_image %}
+                     <img class="thumbnails" alt="{{species.name|safe}}" src="{% static species.speciesstat.best_image}}">
                     {% endif %}
                 </td>
                 <td>

@@ -85,7 +85,7 @@
                                                 {% endif %}
                                             </td>
                                             <td style=" vertical-align: middle;">
-                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N&type={{genus.type}}"><i>{{genus.genus}}</i></a>
+                                                <a href="{% url 'common:species' app %}?genus={{genus.genus}}&syn=N&type={{genus.type|default:'species'}}"><i>{{genus.genus}}</i></a>
                                                 {{genus.author|default:""}}
                                             </td>
                                             {% if app == 'aves' %}

@@ -107,8 +107,8 @@
                                     </thead>
                                         {% for species in species_list %}
                                         <tr>
-                                            <td>{% if species.get_best_img %}
-                                                <img class="thumbnails" alt="{{species.get_best_img}}" src="{% static species.get_best_img.thumb_dir %}{{species.get_best_img.image_file}}">
+                                            <td>{% if species.speciesstat.best_image %}
+                                                <img class="thumbnails" alt="{{species.speciesstat.best_image}}" src="{% static species.speciesstat.best_image %}">
                                                 {% endif %}
                                             </td>
                                             <td>
