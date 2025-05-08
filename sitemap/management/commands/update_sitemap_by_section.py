@@ -40,7 +40,7 @@ class Command(BaseCommand):
         from animalia.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/",
                 section=app,
                 change_frequency='monthly',
                 priority=0.2
@@ -65,7 +65,7 @@ class Command(BaseCommand):
         from aves.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/",
                 section=app,
                 change_frequency='monthly',
                 priority=0.2
@@ -88,7 +88,7 @@ class Command(BaseCommand):
         from fungi.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/",
                 section=app,
                 change_frequency='monthly',
                 priority=0.2
@@ -111,7 +111,7 @@ class Command(BaseCommand):
         from other.models import Species
         for item in Species.objects.all():
             SitemapEntry.objects.create(
-                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/?family={item.family}",
+                url=f"{settings.SITE_URL}/display/summary/{app}/{item.pid}/",
                 section=app,
                 change_frequency='monthly',
                 priority=0.2
