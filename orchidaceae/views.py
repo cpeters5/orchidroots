@@ -15,7 +15,7 @@ from urllib.parse import urlparse, urlencode
 from itertools import chain
 from fuzzywuzzy import fuzz, process
 from utils import config
-from utils.views import handle_bad_request, write_output, getRole, get_random_img, thumbdir, redirect_to_referrer
+from utils.views import handle_bad_request, write_output, getRole, thumbdir, redirect_to_referrer
 # from myproject import config
 import logging
 import random
@@ -461,7 +461,7 @@ def get_seed_parent(child):
         parent.type = parent.pid.type
         parent.parent = 'seed'
         parent.year = parent.pid.year
-        parent.img = spcdir + get_random_img(parent)
+        parent.img = parent.pid.speciesstat.best_image
     elif child.seed_id and child.seed_id.type == 'hybrid':
         if child.seed_id.status == 'synonym':
             try:
@@ -477,7 +477,7 @@ def get_seed_parent(child):
         parent.type = parent.pid.type
         parent.parent = 'seed'
         parent.year = parent.pid.year
-        parent.img = hybdir + get_random_img(parent)
+        parent.img = parent.pid.speciesstat.best_image
     else:
         parent = ''
     return parent
@@ -501,7 +501,7 @@ def get_pollen_parent(child):
         parent.type = parent.pid.type
         parent.parent = 'pollen'
         parent.year = parent.pid.year
-        parent.img = spcdir + get_random_img(parent)
+        parent.img = parent.pid.speciesstat.best_image
     elif child.pollen_id and child.pollen_id.type == 'hybrid':
         if child.pollen_id.status == 'synonym':
             try:
@@ -516,7 +516,7 @@ def get_pollen_parent(child):
         parent.type = parent.pid.type
         parent.parent = 'pollen'
         parent.year = parent.pid.year
-        parent.img = hybdir + get_random_img(parent)
+        parent.img = parent.pid.speciesstat.best_image
     else:
         parent = ''
     return parent
@@ -558,7 +558,7 @@ def ancestrytree(request, pid=None):
         psp = get_pollen_parent(ps)
         pps = get_seed_parent(pp)
         ppp = get_pollen_parent(pp)
-        species.img = hybdir + get_random_img(species)
+        species.img = species.speciesstat.best_image
     canonical_url = request.build_absolute_uri(f'/orchidaceae/ancestrytree/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     context = {'species': species,
                'spc': spc, 'tree': 'lineage', 'tab': 'lineage', 'lineage': 'active',

@@ -304,15 +304,6 @@ def thumbdir():
     return imgdir, hybdir, spcdir
 
 
-# Return best image file for a species object
-def get_random_img(spcobj):
-    if spcobj.get_best_img():
-        spcobj.img = spcobj.get_best_img().image_file
-    else:
-        spcobj.img = 'noimage_light.jpg'
-    return spcobj.img
-
-
 def getRole(request):
     role = request.GET.get('role', '')
     if not role and 'role' in request.POST:
