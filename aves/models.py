@@ -404,7 +404,7 @@ class SpeciesStat(models.Model):
         related_name='speciesstat',
         on_delete=models.CASCADE,
         primary_key=True)
-    num_image = models.IntegerField(blank=True)
+    num_image = models.IntegerField(blank=True, null=True)
     best_image = models.CharField(max_length=200, null=True, blank=True)
 
 

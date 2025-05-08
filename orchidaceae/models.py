@@ -582,7 +582,7 @@ class SpeciesStat(models.Model):
         related_name='speciesstat',
         on_delete=models.CASCADE,
         primary_key=True)
-    num_image = models.IntegerField(blank=True)
+    num_image = models.IntegerField(blank=True, null=True)
     num_ancestor = models.IntegerField(null=True, blank=True)
     num_species_ancestor = models.IntegerField(null=True, blank=True)
     num_descendant = models.IntegerField(null=True, blank=True)
