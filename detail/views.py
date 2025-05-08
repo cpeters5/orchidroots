@@ -539,7 +539,7 @@ def reidentify(request, orid, pid):
                     new_img.pid = new_species
                 else:
                     new_img = HybImages.objects.get(pk=old_img.id)
-                    new_img.pid = new_species.hybrid
+                    new_img.pid = new_species
                 hist = ReidentifyHistory(from_id=old_img.id, from_pid=old_species, to_pid=new_species,
                                          user_id=request.user, created_date=old_img.created_date)
                 if source_file_name:
