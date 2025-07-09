@@ -35,7 +35,7 @@ Tribe = apps.get_model('common', 'Tribe')
 Subtribe = apps.get_model('common', 'Subtribe')
 Region = apps.get_model('common', 'Region')
 Subregion = apps.get_model('common', 'Subregion')
-Localregion = apps.get_model('common', 'Localregion')
+# Localregion = apps.get_model('common', 'Localregion')
 imgdir, hybdir, spcdir = thumbdir()
 
 alpha_list = config.alpha_list
@@ -752,127 +752,127 @@ def infraspecific(request, pid):
 
 # in progress
 # Ditribution (start with orchid only)
-def get_distlist():
-    dist_list = Localregion.objects.exclude(id=0).order_by('continent_name', 'region_name', 'name')
-    prevcon = ''
-    prevreg = ''
-    mydist_list = dist_list
-    for x in mydist_list:
-        x.concard = x.continent_name.replace(" ", "")
-        x.regcard = x.region_name.replace(" ", "")
-        x.prevcon = prevcon
-        x.prevreg = prevreg
-        # mydist_list.append([x, prevcon, prevreg,card] )
-        prevcon = x.continent_name
-        prevreg = x.region_name
+# def get_distlist():
+#     dist_list = Localregion.objects.exclude(id=0).order_by('continent_name', 'region_name', 'name')
+#     prevcon = ''
+#     prevreg = ''
+#     mydist_list = dist_list
+#     for x in mydist_list:
+#         x.concard = x.continent_name.replace(" ", "")
+#         x.regcard = x.region_name.replace(" ", "")
+#         x.prevcon = prevcon
+#         x.prevreg = prevreg
+#         # mydist_list.append([x, prevcon, prevreg,card] )
+#         prevcon = x.continent_name
+#         prevreg = x.region_name
+#
+#     return mydist_list
 
-    return mydist_list
-
-@login_required
-def browsedist(request):
-    dist_list = get_distlist()
-    context = {'dist_list': dist_list,  'app': 'orchidaceae',}
-    return render(request, 'orchidaceae/browsedist.html', context)
+# @login_required
+# def browsedist(request):
+#     dist_list = get_distlist()
+#     context = {'dist_list': dist_list,  'app': 'orchidaceae',}
+#     return render(request, 'orchidaceae/browsedist.html', context)
 
 # in progress
 # Serverside processing for large datatable responses
 # Common query function
 # Ajax view
-from django.http import JsonResponse
-from utils.json_encoder import LazyEncoder
+# from django.http import JsonResponse
+# from utils.json_encoder import LazyEncoder
 
-def get_filtered_data_spc(start, length, search_value=None, order_column='id', order_dir='asc'):
-    query = Employee.objects.all()
-    if search_value:
-        query = query.filter(name__icontains=search_escape(search_value))  # search_escape should sanitize input
+# def get_filtered_data_spc(start, length, search_value=None, order_column='id', order_dir='asc'):
+#     query = Employee.objects.all()
+#     if search_value:
+#         query = query.filter(name__icontains=search_escape(search_value))  # search_escape should sanitize input
+#
+#     # Ordering
+#     if order_dir == 'desc':
+#         order_column = f'-{order_column}'
+#     query = query.order_by(order_column)
+#
+#     total_count = query.count()
+#     query = query[start:start + length]
+#     return query, total_count
 
-    # Ordering
-    if order_dir == 'desc':
-        order_column = f'-{order_column}'
-    query = query.order_by(order_column)
-
-    total_count = query.count()
-    query = query[start:start + length]
-    return query, total_count
-
-def server_processing_spc(request):
-    start = int(request.GET.get('start', 0))
-    length = int(request.GET.get('length', 10))
-    search_value = request.GET.get('search[value]', '')
-    order = int(request.GET.get('order[0][column]', 0))
-    order_dir = request.GET.get('order[0][dir]', 'asc')
-
-    columns = ['name', 'position', 'office', 'age', 'start_date', 'salary']
-    order_column = columns[order]
-
-    employees, total_records = get_filtered_data_spc(start, length, search_value, order_column, order_dim)
-
-    data = list(employees.values('name', 'position', 'office', 'age', 'start_date', 'salary'))
-
-    response = {
-        'draw': int(request.GET.get('draw', 1)),
-        'recordsTotal': total_records,
-        'recordsFiltered': total_records,
-        'data': data
-    }
-    return JsonResponse(response, encoder=LazyEncoder)
+# def server_processing_spc(request):
+#     start = int(request.GET.get('start', 0))
+#     length = int(request.GET.get('length', 10))
+#     search_value = request.GET.get('search[value]', '')
+#     order = int(request.GET.get('order[0][column]', 0))
+#     order_dir = request.GET.get('order[0][dir]', 'asc')
+#
+#     columns = ['name', 'position', 'office', 'age', 'start_date', 'salary']
+#     order_column = columns[order]
+#
+#     employees, total_records = get_filtered_data_spc(start, length, search_value, order_column, order_dim)
+#
+#     data = list(employees.values('name', 'position', 'office', 'age', 'start_date', 'salary'))
+#
+#     response = {
+#         'draw': int(request.GET.get('draw', 1)),
+#         'recordsTotal': total_records,
+#         'recordsFiltered': total_records,
+#         'data': data
+#     }
+#     return JsonResponse(response, encoder=LazyEncoder)
 
 # Implementing serverside datatable (in progress)
-def datatable_hybrid(request):
-    # Get start and length parameters
-    start = int(request.GET.get('start', 0))
-    length = int(request.GET.get('length', 10))
-
-    # Get search value
-    search_value = request.GET.get('search[value]', '')
-
-    # Get order column and direction
-    order_column = request.GET.get('order[0][column]', 0)
-    order_dir = request.GET.get('order[0][dir]', 'asc')
-
-    # Define column list
-    columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]
-
-    # Construct queryset
-    queryset = YourModel.objects.all()
-
-    # Apply search
-    if search_value:
-        queryset = queryset.filter(
-            Q(name__icontains=search_value) |
-            Q(email__icontains=search_value)
-        )
-
-    # Get total record count
-    total_records = queryset.count()
-
-    # Apply ordering
-    if order_dir == 'asc':
-        queryset = queryset.order_by(columns[int(order_column)])
-    else:
-        queryset = queryset.order_by(f'-{columns[int(order_column)]}')
-
-    # Apply pagination
-    queryset = queryset[start:start + length]
-
-    # Prepare data for response
-    data = []
-    for item in queryset:
-        data.append([
-            item.id,
-            item.name,
-            item.email,
-            # Add more fields as needed
-        ])
-
-    # Prepare response
-    response = {
-        'draw': int(request.GET.get('draw', 1)),
-        'recordsTotal': total_records,
-        'recordsFiltered': total_records,
-        'data': data,
-    }
-
-    return JsonResponse(response)
+# def datatable_hybrid(request):
+#     # Get start and length parameters
+#     start = int(request.GET.get('start', 0))
+#     length = int(request.GET.get('length', 10))
+#
+#     # Get search value
+#     search_value = request.GET.get('search[value]', '')
+#
+#     # Get order column and direction
+#     order_column = request.GET.get('order[0][column]', 0)
+#     order_dir = request.GET.get('order[0][dir]', 'asc')
+#
+#     # Define column list
+#     columns = ['binomial', 'parentage', 'registrant', 'originator', 'year', '#ancestors', '#descendants', '#images' ]
+#
+#     # Construct queryset
+#     queryset = YourModel.objects.all()
+#
+#     # Apply search
+#     if search_value:
+#         queryset = queryset.filter(
+#             Q(name__icontains=search_value) |
+#             Q(email__icontains=search_value)
+#         )
+#
+#     # Get total record count
+#     total_records = queryset.count()
+#
+#     # Apply ordering
+#     if order_dir == 'asc':
+#         queryset = queryset.order_by(columns[int(order_column)])
+#     else:
+#         queryset = queryset.order_by(f'-{columns[int(order_column)]}')
+#
+#     # Apply pagination
+#     queryset = queryset[start:start + length]
+#
+#     # Prepare data for response
+#     data = []
+#     for item in queryset:
+#         data.append([
+#             item.id,
+#             item.name,
+#             item.email,
+#             # Add more fields as needed
+#         ])
+#
+#     # Prepare response
+#     response = {
+#         'draw': int(request.GET.get('draw', 1)),
+#         'recordsTotal': total_records,
+#         'recordsFiltered': total_records,
+#         'data': data,
+#     }
+#
+#     return JsonResponse(response)
 
 
