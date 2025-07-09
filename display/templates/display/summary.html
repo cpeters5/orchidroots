@@ -611,7 +611,7 @@ seedparent, pollparent {
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
                             {% if p.aid.speciesstat.best_image %}
-                                <a href="{% static p.aid.best_image %}" data-lightbox="anc"
+                                <a href="{% static p.aid.speciesstat.best_image %}" data-lightbox="anc"
                                    data-title="No: {{p.id}}: {{p.aid.abrevname|safe}} - {% if p.text_data %}{{p.text_data|safe}}{% endif %}">
                                    <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="{% static p.aid.speciesstat.best_image %}">
                                 </a>
