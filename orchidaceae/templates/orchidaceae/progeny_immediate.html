@@ -19,6 +19,14 @@ td {
     font-size: 14px;
 
 }
+.thumbnails {
+    object-fit: cover;
+    overflow: hidden;
+    height: 70px;
+    width : 70px;
+    margin:5px auto;
+}
+
 @media only screen and (max-width: 700px){
     .progen {
         width:95%;
@@ -27,6 +35,10 @@ td {
     td {
         font-size: 11px;
 
+    }
+    .thumbnails {
+       height: 80px;
+       width: 80px;
     }
 }
 
@@ -73,8 +85,10 @@ td {
                         {% endif %}
                     </td>
                     <td class="text-left d-sm-table-cell">
-                        {{hybrid.pid.speciesstat.num_image|default:''}}
-<!--                        {% if hybrid.pid.num_image %}{{hybrid.pid.speciesstat.num_image}} {% endif %}-->
+                        {% if hybrid.pid.speciesstat.best_image %}
+                         <img class="thumbnails" alt="{{hybrid.pid.name|safe}}" src="{% static hybrid.pid.speciesstat.best_image %}">
+                        {% endif %}
+<!--                        {{hybrid.pid.speciesstat.num_image|default:''}}-->
                     </td>
                 </tr>
                 {% endfor %}
