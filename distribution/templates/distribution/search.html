@@ -1,0 +1,220 @@
+{% load static %}
+{% include "base.html" %}
+{% block body %}
+<style>
+
+/* Style the pagination buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.5; /* Ensures text is centered */
+    padding: 0 15px 0 10px;
+    margin: 2px;
+    font-size: 14px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333 !important;
+    box-sizing: border-box;
+}
+
+/* Active page button */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #007bff;
+    color: white !important;
+    border-color: #007bff;
+}
+
+/* Hover effect */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e2e6ea;
+    color: black !important;
+    border-color: #ccc;
+}
+.thumbnail-box {
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    background-color: #f9f9f9;
+}
+
+.thumbnail-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+td.image-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+.datatable-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.control-pair {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 160px;
+}
+
+.control-pair select {
+  max-width: 200px;
+}
+
+/*.datatable-controls label {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  font-size: 0.9rem;*/
+/*  min-width: 150px;*/
+/*}*/
+
+</style>
+
+<div style="width: 80%; margin: 0 auto">
+    <br>
+    <h3>Filter Species by Region</h3>
+    <br>
+    <div class="datatable-controls">
+        <div class="control-pair">
+            <select id="region-filter">
+                {% for r in regions %}
+                    <option value="{{ r.id }}" {% if r.id == region_id %}selected{% endif %}>{{ r.name }}</option>
+                {% endfor %}
+            </select>
+            <label>Region:</label>
+        </div>
+
+        <div class="control-pair">
+            <select id="subregion-filter">
+                <option value="">All</option>
+                {% for s in subregions %}
+                    {% if subregion_id|add:"" == s.code %}
+                        <option value="{{ s.code }}" selected>{{ s.name }}</option>
+                    {% else %}
+                        <option value="{{ s.code }}">{{ s.name }} {{s.code}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <label>Subregion:</label>
+        </div>
+        <div class="control-pair">
+            <select id="genus-filter">
+                <option value="">All</option>
+                {% for g in genera %}
+                    <option value="{{ g.genus }}" {% if g.genus == genus %}selected{% endif %}>{{ g.genus }}</option>
+                {% endfor %}
+            </select>
+            <label for="genus-filter">Genus:</label>
+        </div>
+    </div>
+    <div style="text-align: left;">
+        <table id="species-table" class="display" style="margin: 0 auto;">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">image</th>
+                    <th>Species</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    if ($.fn.DataTable.isDataTable('#species-table')) {
+        $('#species-table').DataTable().destroy();
+    }
+    $('#species-table').empty();
+    const table = $('#species-table').DataTable({
+        autoWidth: false,
+        processing: true,
+        serverSide: true,
+        paging: true,
+        ordering: true,
+        order: [[1, 'asc']],
+        dom: 'lfrtip',
+        ajax: {
+            url: "{% url 'distribution:search_distribution' %}",
+            dataSrc: 'data',
+            data: function (d) {
+                d.region = $('#region-filter').val() || '';
+                d.subregion = $('#subregion-filter').val() || '';
+                d.genus = $('#genus-filter').val() || '';
+            }
+        },
+        columns: [
+            {
+                data: 'image',
+                width: '15%',
+                className: 'image-cell',
+                orderable: false,
+                render: function (data, type, row) {
+                    if (!data) return '';
+                    return `
+                        <div class="thumbnail-box">
+                            <img src="${data}" alt="${row.species || 'image'}">
+                        </div>
+                    `;
+                }
+            },
+            {
+                data: 'species',
+                width: '85%',
+                render: function (data, type, row) {
+                    console.log("Row content:", row);
+                    return `<a href="/display/summary/${row.pid}/">${data}</a>`;
+                }
+            }
+        ]
+    });
+
+    $('#region-filter').on('change', function () {
+        const regionId = $(this).val();
+
+        $.get("{% url 'distribution:get_subregions' %}", { region_id: regionId }, function (data) {
+            const $subregion = $('#subregion-filter');
+            $subregion.empty().append('<option value="">All</option>');  // Add "All" option explicitly
+
+            $.each(data.subregions, function (_, item) {
+                $subregion.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+
+            // Reset subregion to blank, and reload page with new region only
+            const genus = $('#genus-filter').val() || '';
+            const newUrl = `?region=${regionId}&subregion=&genus=${genus}`;
+            window.location.href = newUrl;
+        });
+    });
+
+    $('#subregion-filter').on('change', function () {
+        const regionId = $('#region-filter').val();
+        const subregionId = $(this).val();
+
+        // Force a page reload with both parameters in the URL
+        const url = new URL(window.location.href);
+        url.searchParams.set('region', regionId);
+        url.searchParams.set('subregion', subregionId);
+        window.location.href = url.toString();
+
+        // table.ajax.reload();
+    });
+
+    $('#genus-filter').on('change', function () {
+        table.ajax.reload();
+    });
+});
+</script>
+
+
+{% endblock %}

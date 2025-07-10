@@ -1285,33 +1285,32 @@ class ReidentifyHistory(models.Model):
 
 class Distribution(models.Model):
     id              = models.AutoField(primary_key=True, default=10)
-    pid          = models.ForeignKey(Species, on_delete=models.DO_NOTHING,db_column='pid',related_name='ordist_pid')
+    pid          = models.ForeignKey(Species, on_delete=models.DO_NOTHING,db_column='pid',related_name='distributions')
     gen          = models.ForeignKey(Genus, on_delete=models.DO_NOTHING,db_column='gen',related_name='ordist_gen',null=True, blank=True)
-    source       = models.CharField(max_length=10, blank=True)
     continent_id = models.ForeignKey(Continent, db_column='continent_id', related_name='orcontinent_id',null=True, blank=True,on_delete=models.DO_NOTHING)
     region_id    = models.ForeignKey(Region, db_column='region_id',null=True, related_name='orregion_id', on_delete=models.DO_NOTHING)
-    subregion_code = models.ForeignKey(SubRegion, db_column='subregion_code', related_name='orsubregion_code',null=True, on_delete=models.DO_NOTHING)
-    dist_code = models.CharField(max_length=10, null=True)
-    localregion_code = models.CharField(max_length=10, null=True)
-    localregion_id = models.ForeignKey(LocalRegion, db_column='localregion_id', related_name='orlocalregion_id',null=True, blank=True,on_delete=models.DO_NOTHING)
-    orig_code = models.CharField(max_length=100,blank=True)
-    dist_status = models.CharField(max_length=10,blank=True)
+    subregion_id = models.ForeignKey(SubRegion, db_column='subregion_id', related_name='orsubregion_id',null=True, on_delete=models.DO_NOTHING)
+    # dist_code = models.CharField(max_length=10, null=True)
+    # localregion_code = models.CharField(max_length=10, null=True)
+    # localregion_id = models.ForeignKey(LocalRegion, db_column='localregion_id', related_name='orlocalregion_id',null=True, blank=True,on_delete=models.DO_NOTHING)
+    # orig_code = models.CharField(max_length=100,blank=True)
+    # dist_status = models.CharField(max_length=10,blank=True)
     confidence  = models.CharField(max_length=10,blank=True)
     comment = models.CharField(max_length=500,blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
+    source       = models.CharField(max_length=10, blank=True)
+    # created_date = models.DateTimeField(auto_now_add=True, null=True)
+    # modified_date = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
-        unique_together = (("pid", "region_id","subregion_code","localregion_id"),)
+        unique_together = (("pid", "region_id","subregion_id"),)
+        # unique_together = (("pid", "region_id","subregion_id","localregion_id"),)
 
     def name(self):
         name = ''
-        if self.localregion_id and self.localregion_id.id > 0 and self.localregion_id.code != 'OO':
-            name = name + self.localregion_id.name
-            if self.subregion_code:
-                name = name + ', ' + self.subregion_code.name + ', ' + self.continent_id.name
-        elif self.subregion_code:
-            name = name + self.subregion_code.name + ', ' + self.continent_id.name
+        # if self.localregion_id and self.localregion_id.id > 0 and self.localregion_id.code != 'OO':
+        #     name = name + self.localregion_id.name
+        if self.subregion_id:
+            name = name + self.subregion_id.name + ', ' + self.continent_id.name
         elif self.region_id:
             name = name + self.region_id.name
         elif self.continent_id:
@@ -1320,18 +1319,6 @@ class Distribution(models.Model):
 
     def __str__(self):
         return self.name()
-
-    def subname(self):
-        return self.subregion_code.name
-
-    def regname(self):
-        return self.region_id.name
-
-    def locname(self):
-        return self.localregion_id.name
-
-    def conname(self):
-        return self.continent_id.name
 
 
 class Donation(models.Model):

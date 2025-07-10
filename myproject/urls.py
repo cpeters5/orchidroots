@@ -52,6 +52,7 @@ urlpatterns = [
     path('search/', include(('search.urls', 'search'), namespace='search')),
     path('common/', include(('common.urls', 'common'), namespace='common')),
     path('display/', include(('display.urls', 'display'), namespace='display')),
+    path('distribution/', include(('distribution.urls', 'distribution'), namespace='distribution')),
 
     # Family specific
     path('animalia/', include(('animalia.urls', 'animalia'), namespace='animalia')),
