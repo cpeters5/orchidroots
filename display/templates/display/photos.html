@@ -1,11 +1,10 @@
-{% load static %}
+{% extends "base.html" %}
 <head>
     <link rel="shortcut icon" type="image/png" href="/static/utils/images/favicon.ico"/>
     <link rel="canonical" href="{{ canonical_url }}">
-    <title>{{species.binomial}} orchid photo gallery</title>
+    <title>{{species.binomial}} photo gallery</title>
     <meta name='description' content="Browse the photo gallery of {{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} x {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})">.
 </head>
-{% include "base.html" %}
 {% include "detail-title.html" %}
 {% block body %}
 <style>
@@ -291,6 +290,7 @@ a:hover {
 </style>
 
 <div style="width:95%;margin:0 auto;padding:0;">
+    <br>
     {% include 'common/detail-nav.html' %}
 
     <!-- Main -->
@@ -332,11 +332,11 @@ a:hover {
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %} p-1 justify-content-center align-items-center">
                      {% if image.image_file_path %}
                          <div class="box" style="background-color: #f19292">
-                             <a target="_blank" href="{% static 'media/' %}{{image.image_file_path}}" data-lightbox="media" data-title="
+                             <a target="_blank" href="/static/media/{{image.image_file_path}}" data-lightbox="media" data-title="
                                   {{image.id}}: {{image.imgname}}
                                   <br>{{image.get_displayname}}
                                   <br>{{image.text_data|default:''|safe}}" rel="nofollow noreferrer noopener">
-                                  <img class="thumbnails" alt="{{image.get_displayname}}" src="{% static 'media/' %}{{image.image_file_path}}">
+                                  <img class="thumbnails" alt="{{image.get_displayname}}" src="/static/media/{{image.image_file_path}}">
                                   <div class="text text-br">{{image.id}}
                                   </div>
                              </a>
@@ -377,10 +377,10 @@ a:hover {
             {% for image in public_list %}
                 <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                     <div class="box">
-                        <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="public" data-title="
+                        <a href="/static/{{image.image_dir}}{{image.image_file}}" data-lightbox="public" data-title="
                                 {{image.id}}:{{image.pid_id}}  Uploaded since {{image.created_date}} by {{image.get_displayname}}<br>
                                 <br>{{image.text_data|default:''|safe}}">
-                                    <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
+                                    <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% if image.image_file %}/static/{{image.thumb_dir}}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                     <div class="text text-br">{{image.id}}</div>
                         </a>
                     </div>
@@ -407,12 +407,12 @@ a:hover {
                     <div class="{% if role == 'cur' %}imageitem-cur{% else %}imageitem{% endif %}">
                         {% if image.image_file %}
                             <div class="box" style="background-color: #f19292">
-                                <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="private" data-title="
+                                <a href="/static/{{image.image_dir}}{{image.image_file}}" data-lightbox="private" data-title="
                                     <h6><small>
                                     {{image.id}}:{{image.pid_id}}  Uploaded since {{image.created_date}}<br>
                                     {{image.get_displayname}}
                                     {{image.text_data|default:''|safe}} </small></h6>">
-                                        <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
+                                        <img class="thumbnails" alt="{{image.pid.binomial}}" src="/static/{{image.thumb_dir}}{{image.image_file}}">
                                         <div class="text text-br">{{image.id}}</div>
                                 </a>
                             </div>

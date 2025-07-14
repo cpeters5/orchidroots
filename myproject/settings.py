@@ -66,9 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'session_cleanup',
     'django_crontab',
-    # 'django_tables2',
     'imagekit',
-    # 'rest_framework',
 
     #local
     'myproject',

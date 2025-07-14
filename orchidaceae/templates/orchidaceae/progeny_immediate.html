@@ -1,10 +1,10 @@
-{% load static %}
+{% extends "base.html" %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{species.binomial}} immediate offspring</title>
     <meta name='description' content='Immediate offspring of {{species.binomial}}'>
 </head>
-{% include "base.html" %}
+{% include 'detail-title.html' %}
 {% block body %}
 
 <style>
@@ -86,7 +86,7 @@ td {
                     </td>
                     <td class="text-left d-sm-table-cell">
                         {% if hybrid.pid.speciesstat.best_image %}
-                         <img class="thumbnails" alt="{{hybrid.pid.name|safe}}" src="{% static hybrid.pid.speciesstat.best_image %}">
+                         <img class="thumbnails" alt="{{hybrid.pid.name|safe}}" src="/static/{{hybrid.pid.speciesstat.best_image}}">
                         {% endif %}
 <!--                        {{hybrid.pid.speciesstat.num_image|default:''}}-->
                     </td>

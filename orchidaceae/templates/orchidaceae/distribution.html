@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+<head>
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>Distribution: {{species.binomial}}</title>
+    <meta name='description' content='The list of areas synonyms of the orchid {{species.binomial}}'>
+</head>
+{% include 'detail-title.html' %}
+{% block body %}
+
+<style>
+
+.progen {
+    margin: 0 auto;
+    width:90%;
+    font-size: 14px;
+}
+
+
+@media only screen and (max-width: 700px){
+    .progen {
+        width:95%;
+        font-size: 10px;
+    }
+}
+
+
+</style>
+
+
+    <div class="progen">
+    <div style="width: 80%; margin:0 auto; text-align: center;">
+        <br>
+        <h4>Distribution of {{species.binomial}}</h4>
+        <br>
+    </div>
+        <!--main section-->
+    {% include "common/detail-nav.html" %}
+    <div class="tab-content clearfix" style="width: 60%; background:white; margin:0 auto;">
+        <br>
+        <table id="sortTable" class="table table-condensed table-sm table-hover">
+            {% for key, values in grouped %}
+            <tr style="text-align: left">
+                <td>{{ key }}</td>
+                <td>{{ values|join:", " }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+</div>
+
+{% endblock %}

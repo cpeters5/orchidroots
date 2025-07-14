@@ -603,7 +603,7 @@ def distribution(request):
                 dist_list = []
                 subreg_list = SubRegion.objects.filter(name__icontains=distribution).values_list('code', flat=True)
                 if len(subreg_list) > 0:
-                    dist_list = Distribution.objects.filter(subregion_code__in=subreg_list).values_list('pid', flat=True)
+                    dist_list = Distribution.objects.filter(subregion_id__in=subreg_list).values_list('pid', flat=True)
                 # requested distribution could elther be region or subregion
                 reg_list = Region.objects.filter(name__icontains=distribution).values_list('id', flat=True)
                 if len(reg_list) > 0:

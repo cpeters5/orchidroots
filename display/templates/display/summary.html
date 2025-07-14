@@ -1,4 +1,4 @@
-{% load static %}
+{% include "base.html" %}
 <head>
     <link rel="shortcut icon" type="image/png" href="/static/utils/images/favicon.ico"/>
     <link rel="canonical" href="{{ canonical_url }}">
@@ -9,7 +9,6 @@
         <meta name='description' content="Explore the lineage, ancestors and their genetic contribution of the {{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} x {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})">.
     {% endif %}
 </head>
-{% include "base.html" %}
 {% include 'detail-title.html' %}
 {% block body %}
 
@@ -310,82 +309,6 @@ seedparent, pollparent {
     {% include 'common/detail-nav.html' %}
     <!-- body -->
     <div style="background:white; margin:0 auto;background:white;border-left:1px solid lightgrey;border-right:1px solid lightgrey;border-bottom:1px solid lightgrey">
-<!--        <div class="info">-->
-<!--            {% if species.type == 'species' %}-->
-<!--                {{species.binomial}} is {% if species.status != 'synonym' %} {{species.status}}{% endif %} {{species.type}} in-->
-<!--                &nbsp;the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}">{{species.gen.family}}</a>&nbsp;-->
-<!--                {% if species.gen.subfamily %}-->
-<!--                subfamily: <a href="{% url 'common:genera' app %}?subfamily={{species.gen.subfamily}}&role={{role}}">{{species.gen.subfamily}}</a>, {% endif %}-->
-<!--                {% if species.gen.tribe %}-->
-<!--                tribe: <a href="{% url 'common:genera' app %}?tribe={{species.gen.tribe}}&role={{role}}">{{species.gen.tribe}}</a>, {% endif %}-->
-<!--                {% if species.gen.subtribe %}-->
-<!--                subtribe: <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>, {% endif %}-->
-<!--                Genus <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}&genus={{species.genus}}">{{species.genus}}</a>&nbsp-->
-<!--                {% if app == 'orchidaceae' %}-->
-<!--                    {% if species.accepted.subgenus %}-->
-<!--                        &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>-->
-<!--                    {% endif %}-->
-<!--                    {% if species.accepted.section %}-->
-<!--                        &nbsp;section: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>&nbsp;-->
-<!--                    {% endif %}-->
-<!--                    {% if species.accepted.subsection %}-->
-<!--                        &nbsp;subsection: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>&nbsp;-->
-<!--                    {% endif %}-->
-<!--                    {% if species.accepted.series %}-->
-<!--                        &nbsp;series: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>&nbsp;-->
-<!--                    {% endif %}-->
-<!--                {% endif %}-->
-
-<!--                {% if species.status == 'synonym' %}-->
-<!--                    This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted }}</a>-->
-<!--                {% endif %}-->
-
-<!--                {% if infraspecifics %}-->
-<!--                    <br>-->
-<!--                    Infraspecific taxa recognized within {{species.main_species_name}}:-->
-<!--                    <a href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecific taxa</a>-->
-
-<!--                {% endif %}-->
-
-
-<!--                {% if species.accepted.distribution %}<br>This species is found in {{species.accepted.distribution }}.{% endif %}-->
-<!--            {% else %}-->
-<!--                The orchid {{species.binomial}} is a {{species.genus}} hybrid-->
-<!--                {% if species.source == 'RHS' %}registered with the Royal Horticultural Society-->
-<!--                    {% if species.author == 'na' or species.author == '' %} registrant is unknown{% else %} by {{species.author}} in {{species.year}}.{% endif %}-->
-<!--                    {% if species.originator == 'na' or species.originator == '' %} Its originator is unknown.{% elif species.originator != species.author %} It is originated by {{species.originator}}{% endif %}-->
-<!--                {% elif  species.source == 'INT' %}.-->
-<!--                    This orchid hybrid lacks official registration. The name is an internal designation created within the orchidroots system.-->
-<!--                {% endif %}-->
-<!--                <br>-->
-<!--                {% if app == 'orchidaceae' %}-->
-<!--                    Top three species ancestors and their influences are-->
-<!--                    <ul>-->
-<!--                        {% for item in ancspc_list|slice:":3" %}-->
-<!--                            <li>-->
-<!--                                {{item.aid.binomial}} ({{item.pct|floatformat:2 }}%)-->
-<!--                                {% if item.aid.accepted.subgenus %}-->
-<!--                                    &nbsp;subgenus <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&subgenus={{item.aid.accepted.subgenus}}&alpha=All">{{item.aid.accepted.subgenus}}</a>-->
-<!--                                {% endif %}-->
-<!--                                {% if item.aid.accepted.section %}-->
-<!--                                    &nbsp;section: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&section={{item.aid.accepted.section}}&alpha=All">{{item.aid.accepted.section}}</a>&nbsp;-->
-<!--                                {% endif %}-->
-<!--                                {% if item.aid.accepted.subsection %}-->
-<!--                                    &nbsp;subsection: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&subsection={{item.aid.accepted.subsection}}&alpha=All">{{item.aid.accepted.subsection}}</a>&nbsp;-->
-<!--                                {% endif %}-->
-<!--                                {% if item.aid.accepted.series %}-->
-<!--                                    &nbsp;series: <a href="{% url 'orchidaceae:species' %}?genus={{item.aid.genus}}&role={{role}}&series={{item.aid.accepted.series}}&alpha=All">{{item.aid.accepted.series}}</a>&nbsp;-->
-<!--                                {% endif %}-->
-<!--                            </li>-->
-<!--                        {% empty %}-->
-<!--                            No items in the list.-->
-<!--                        {% endfor %}-->
-
-<!--                    </ul>-->
-<!--                {% endif %}-->
-<!--            {% endif %}-->
-<!--            <br>-->
-<!--        </div>-->
         <div class="d-flex p-1 justify-content-center" style="width:100%; margin:0 auto;">
             <div class="p-1 flex-fill list-group" style="">
                 {% if display_items %}
@@ -393,8 +316,8 @@ seedparent, pollparent {
                         {% for image in display_items %}
                             <div class="imageitem justify-content-center" style="margin:2px;">
                                 <div class="box">
-                                    <a href="{% static image.image_dir %}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
-                                        <img  class="thumbnails" alt="{{image.binomial}}" src="{% if image.image_file %}{% static image.thumb_dir %}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
+                                    <a href="/static/{{image.image_dir }}{{image.image_file}}" data-lightbox="gallery" data-title="<h6><small>{{image.id}}: {{image.imgname}} <br> {{image.get_displayname}} <br>{{image.text_data|default:''|safe}}</small></h6>">
+                                        <img  class="thumbnails" alt="{{image.binomial}}" src="{% if image.image_file %}/static/{{image.thumb_dir}}{{image.image_file}}{% else %}{{image.image_url}}{% endif %}">
                                         <div class="text text-br" ><span style="color:white">{{image.id}}</span></div>
                                     </a>
                                 </div>
@@ -434,13 +357,13 @@ seedparent, pollparent {
                         <div class="d-flex flex-wrap justify-content-center" >
                             {% if seedimg_list %}
                                 {% for seed in seedimg_list %}
-                                    <a href="{% static seed.image_dir %}{{seed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
+                                    <a href="/static/{{ seed.image_dir }}{{seed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seed" data-title="<h6><small>{{seed.id}}: {{seed.imgname}}
                                         {% if seed.text_data %}{{seed.text_data|safe}}{% endif %}</small></h6>">
-                                            <img  class="thumbnails thumbnails2" alt="{{seed.binomial}}" src="{% if seed.image_file %}{% static seed.thumb_dir %}{{seed.image_file}}{% else %}{{seed.image_url}}{% endif %}">
+                                            <img  class="thumbnails thumbnails2" alt="{{seed.binomial}}" src="{% if seed.image_file %}/static/{{seed.thumb_dir}}{{seed.image_file}}{% else %}{{seed.image_url}}{% endif %}">
                                     </a>
                                 {% endfor %}
                             {% else %}
-                                <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                <img class="thumbnails thumbnails2" alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                             {% endif %}
                         </div>
                         <div class="parent-text " style="text-align:center; margin-bottom:10px;">
@@ -465,13 +388,13 @@ seedparent, pollparent {
                         <div class="d-flex flex-wrap justify-content-center">
                             {% if pollimg_list %}
                                 {% for pol in pollimg_list %}
-                                    <a href="{% static pol.image_dir %}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
+                                    <a href="/static/{{ pol.image_dir }}{{pol.image_file}}" data-lightbox="pol" data-title="<h6><small>{{pol.id}}: {{pol.imgname}}
                                                 {% if pol.text_data %}{{pol.text_data|safe}}{% endif %}</small></h6>">
-                                        <img  class="thumbnails thumbnails2" alt="{{pol.binomial}}" src="{% if pol.image_file %}{% static pol.thumb_dir %}{{pol.image_file}}{% else %}{{pol.image_url}}{% endif %}">
+                                        <img  class="thumbnails thumbnails2" alt="{{pol.binomial}}" src="{% if pol.image_file %}/static/{{pol.thumb_dir }}{{pol.image_file}}{% else %}{{pol.image_url}}{% endif %}">
                                     </a>
                                 {% endfor %}
                             {% else %}
-                            <img class="thumbnails thumbnails2"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                            <img class="thumbnails thumbnails2"  alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                             {% endif %}
                         </div>
                         <div class="parent-text" style="text-align:center;">
@@ -500,14 +423,14 @@ seedparent, pollparent {
                                  <div class="d-flex flex-wrap justify-content-center">
                                    {% if ss_list %}
                                         {% for seedseed in ss_list %}
-                                                <a href="{% static seedseed.image_dir %}{{seedseed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seedseed" data-title="
+                                                <a href="/static/{{seedseed.image_dir }}{{seedseed.image_file}}" rel="nofollow noreferrer noopener" data-lightbox="seedseed" data-title="
                                                     <h6><small>{{seedseed.id}}: {{seedseed.imgname}}
                                                     {% if seedseed.text_data %}{{seedseed.text_data|safe}}{% endif %}</small></h6>">
-                                                    <img  class="thumbnails thumbnails2" alt="{{seedseed.binomial}}" src="{% static seedseed.thumb_dir %}{{seedseed.image_file}}">
+                                                    <img  class="thumbnails thumbnails2" alt="{{seedseed.binomial}}" src="/static/{{seedseed.thumb_dir }}{{seedseed.image_file}}">
                                                 </a>
                                         {% endfor %}
                                     {% else %}
-                                            <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                            <img class="thumbnails thumbnails2" alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
@@ -522,14 +445,14 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if sp_list %}
                                         {% for seedpol in sp_list %}
-                                            <a href="{% static seedpol.image_dir %}{{seedpol.image_file}}" data-lightbox="seedpol" data-title="
+                                            <a href="/static/{{ seedpol.image_dir }}{{seedpol.image_file}}" data-lightbox="seedpol" data-title="
                                                 <h6><small>{{seedpol.id}}: {{seedpol.imgname}}
                                                 {% if seedpol.text_data %}{{seedpol.text_data|safe}}{% endif %}</small</h6>">
-                                                <img  class="thumbnails thumbnails2" alt="{{seedpol.binomial}}" src="{% static seedpol.thumb_dir %}{{seedpol.image_file}}">
+                                                <img  class="thumbnails thumbnails2" alt="{{seedpol.binomial}}" src="/static/{{ seedpol.thumb_dir }}{{seedpol.image_file}}">
                                             </a>
                                         {% endfor %}
                                     {% else %}
-                                            <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                            <img class="thumbnails thumbnails2" alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
                                 <div class="parent-text" style="text-align:center; margin-bottom:10px;">
@@ -553,15 +476,15 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if ps_list %}
                                         {% for polseed in ps_list %}
-                                        <a href="{% static polseed.image_dir %}{{polseed.image_file}}" data-lightbox="polseed"
+                                        <a href="/static/{{ polseed.image_dir }}{{polseed.image_file}}" data-lightbox="polseed"
                                            data-title="seed: {{polseed.id}}: {{polseed.imgname}}
                                             {% if polseed.text_data %}{{polseed.text_data|safe}}{% endif %}
                                             ">
-                                            <img class="thumbnails thumbnails2"  alt="{{polseed.binomial}}" src="{% static polseed.thumb_dir %}{{polseed.image_file}}">
+                                            <img class="thumbnails thumbnails2"  alt="{{polseed.binomial}}" src="/static/{{ polseed.thumb_dir }}{{polseed.image_file}}">
                                         </a>
                                         {% endfor %}
                                     {% else %} <!-- if seed_list -->
-                                        <img class="thumbnails thumbnails2" alt="no image" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                        <img class="thumbnails thumbnails2" alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
                                <div class="parent-text" style="text-align:center; margin-bottom:10px;">
@@ -576,15 +499,15 @@ seedparent, pollparent {
                                 <div class="d-flex flex-wrap justify-content-center">
                                     {% if pp_list %}
                                         {% for polpol in pp_list %}
-                                            <a href="{% static polpol.image_dir %}{{polpol.image_file}}" data-lightbox="polpol" data-title="
+                                            <a href="/static/{{ polpol.image_dir }}{{polpol.image_file}}" data-lightbox="polpol" data-title="
                                                 <h6><small>{{polpol.id}}: {{polpol.imgname}}
                                                 {% if polpol.text_data %}{{polpol.text_data|safe}}{% endif %}
                                                 </small></h6>">
-                                                    <img class="thumbnails thumbnails2" alt="{{polpol.binomial}}" src="{% static polpol.thumb_dir %}{{polpol.image_file}}">
+                                                    <img class="thumbnails thumbnails2" alt="{{polpol.binomial}}" src="/static/{{ polpol.thumb_dir }}{{polpol.image_file}}">
                                             </a>
                                         {% endfor %}
                                     {% else %} <!-- if seed_list -->
-                                        <img class="thumbnails thumbnails2"  alt="no image" src="{% static 'utils/images/' %}noimage_light.jpg" style="border:0"/>
+                                        <img class="thumbnails thumbnails2"  alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                                     {% endif %}
                                 </div>
 
@@ -611,12 +534,12 @@ seedparent, pollparent {
                     {% for p in ancspc_list %}
                         <div style="display:inline-block;">
                             {% if p.aid.speciesstat.best_image %}
-                                <a href="{% static p.aid.speciesstat.best_image %}" data-lightbox="anc"
+                                <a href="/static/{{ p.aid.speciesstat.best_image }}" data-lightbox="anc"
                                    data-title="No: {{p.id}}: {{p.aid.abrevname|safe}} - {% if p.text_data %}{{p.text_data|safe}}{% endif %}">
-                                   <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="{% static p.aid.speciesstat.best_image %}">
+                                   <img class="thumbnails thumbnails3"  alt="{{p.aid.binomial}}" src="/static/{{ p.aid.speciesstat.best_image }}">
                                 </a>
                             {% else %}
-                                <img class="thumbnails thumbnails3"  alt="no image" src="{% static 'utils/images/noimage_light.jpg' %}" style="border:0"/>
+                                <img class="thumbnails thumbnails3"  alt="no image" src="/static/utils/images/noimage_light.jpg" style="border:0"/>
                             {% endif %}
                             <div style="clear:left;font-size:9px;line-height:10px; height:40px"><br>
                                    <br>
@@ -625,7 +548,7 @@ seedparent, pollparent {
                                 {% else %}
                                     <a href="{% url 'display:summary' app p.aid.pid %}?role={{role}}">{{p.aid.abrevname|safe}}</a>
                                 {% endif %}
-                                    {{p.pct|default:0|floatformat:2}}%
+                                    {{p.pct|default:0|floatformat:0}}%
                                 <br>
                             </div>
                         </div>

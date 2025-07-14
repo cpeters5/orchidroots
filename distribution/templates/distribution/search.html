@@ -1,5 +1,5 @@
+{% extends "base.html" %}
 {% load static %}
-{% include "base.html" %}
 {% block body %}
 <style>
 
@@ -92,7 +92,7 @@ td.image-cell {
                     <option value="{{ r.id }}" {% if r.id == region_id %}selected{% endif %}>{{ r.name }}</option>
                 {% endfor %}
             </select>
-            <label>Region:</label>
+            <label>Region</label>
         </div>
 
         <div class="control-pair">
@@ -106,7 +106,7 @@ td.image-cell {
                     {% endif %}
                 {% endfor %}
             </select>
-            <label>Subregion:</label>
+            <label>Subregion</label>
         </div>
         <div class="control-pair">
             <select id="genus-filter">
@@ -115,7 +115,7 @@ td.image-cell {
                     <option value="{{ g.genus }}" {% if g.genus == genus %}selected{% endif %}>{{ g.genus }}</option>
                 {% endfor %}
             </select>
-            <label for="genus-filter">Genus:</label>
+            <label for="genus-filter">Genus</label>
         </div>
     </div>
     <div style="text-align: left;">
@@ -129,7 +129,9 @@ td.image-cell {
         </table>
     </div>
 </div>
+{% endblock %}
 
+{% block extra-scripts %}
 <script>
 $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#species-table')) {
@@ -145,7 +147,7 @@ $(document).ready(function () {
         order: [[1, 'asc']],
         dom: 'lfrtip',
         ajax: {
-            url: "{% url 'distribution:search_distribution' %}",
+            url: "{% url 'distribution:search' %}",
             dataSrc: 'data',
             data: function (d) {
                 d.region = $('#region-filter').val() || '';

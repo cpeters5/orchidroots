@@ -1,10 +1,9 @@
-{% load static %}
+{% extends "base.html" %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>The list of infraspecific taxa of {{species.binomial}}</title>
     <meta name='description' content='Infraspecific taxa of {{species.binomial}}'>
 </head>
-{% include "base.html" %}
 {% include 'detail-title.html' %}
 {% block body %}
 

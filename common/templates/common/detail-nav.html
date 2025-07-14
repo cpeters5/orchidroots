@@ -87,25 +87,24 @@
                 {% endif %}
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link {{lineage}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
-                        Lineage
-                    </a>
-                    <div class="nav3 dropdown-menu">
-                            <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
-                            <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?role={{role}}" data-nosnippet>Progeny</a>
-                            <a class="dropdown-item" href="/{{app}}/progenyimg/{{species.pid}}/?role={{role}}" data-nosnippet>Progeny images</a>
-                            {% if species.type == 'hybrid' %}
-                                <a class="dropdown-item" href="/{{app}}/ancestor/{{species.pid}}/?role={{role}}" data-nosnippet>Ancestry list</a>
-                                <a class="dropdown-item" href="/{{app}}/ancestrytree/{{species.pid}}/?role={{role}}" data-nosnippet>Ancestry tree</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{lineage}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
+                            Lineage
+                        </a>
+                        <div class="nav3 dropdown-menu">
+                                <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?role={{role}}&prim=1" data-nosnippet>Immediate offspring</a>
+                                <a class="dropdown-item" href="/{{app}}/progeny/{{species.pid}}/?role={{role}}" data-nosnippet>Progeny</a>
+                                <a class="dropdown-item" href="/{{app}}/progenyimg/{{species.pid}}/?role={{role}}" data-nosnippet>Progeny images</a>
+                                {% if species.type == 'hybrid' %}
+                                    <a class="dropdown-item" href="/{{app}}/ancestor/{{species.pid}}/?role={{role}}" data-nosnippet>Ancestry list</a>
+                                    <a class="dropdown-item" href="/{{app}}/ancestrytree/{{species.pid}}/?role={{role}}" data-nosnippet>Ancestry tree</a>
 
-                            {% endif %}
-                    </div>
-                </li>
-
-                    {% if user.tier.tier > 2 %}
+                                {% endif %}
+                        </div>
+                    </li>
+                    {% if species.source != 'RHS' %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'common:curate_newupload' %}?family={{family}}&gen=&type={{species.type}}" data-nosnippet>New uploads</a>
+                            <a class="nav-link {{dist}}" href="/{{app}}/distribution/{{species.pid}}/?role={{role}}" data-nosnippet>Distribution</a>
                         </li>
                     {% endif %}
                 {% endif %}

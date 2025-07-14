@@ -89,11 +89,11 @@
 
             </div>
             {% if species.status == 'synonym' %}
-            <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
+                <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
             {% elif species.type == 'hybrid' %}
-            <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
+                <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
             {% else %}
-            <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+                <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
             {% endif %}
             <h4>
                 {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},

@@ -19,6 +19,7 @@ urlpatterns = [
     path('ancestrytree/<int:pid>/', login_required(views.ancestrytree), name='ancestrytree'),
     path('ancestrytree/', login_required(views.ancestrytree), name='ancestrytree'),
     path('synonym/<int:pid>/', views.synonym, name='synonym'),
+    path('distribution/<int:pid>/', views.distribution, name='distribution'),
     path('progeny/<int:pid>/', login_required(views.progeny), name='progeny'),
     path('progenyimg/<int:pid>/', login_required(views.progenyimg), name='progenyimg'),
     path('progenyimg/', login_required(views.progenyimg), name='progenyimg'),
