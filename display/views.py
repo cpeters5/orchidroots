@@ -104,6 +104,11 @@ def summary(request, app=None, pid=None):
         images_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid)).order_by('-rank', 'quality', '?')
     else:
         images_list = SpcImages.objects.filter(pid=pid).order_by('-rank', 'quality', '?')
+    if not images_list:
+        # Pick up images from synonyms if exist.
+        syn_ids = Synonym.objects.filter(acc_id=pid).values_list('spid', flat=True)
+        images_list = SpcImages.objects.filter(pid__in=syn_ids).order_by('-rank', 'quality', '?')
+
     # Build display in main table
     if images_list:
         i_1, i_2, i_3, i_4, i_5, i_7, i_8 = 0, 0, 0, 0, 0, 0, 0
@@ -129,7 +134,6 @@ def summary(request, app=None, pid=None):
             elif x.rank == 8 and i_8 < 2:
                 i_8 += 1
                 display_items.append(x)
-
     # get infraspecific list if exists.  Ignore natural hybrid to improve performance.
     # TODO: Remove Species query by adding has_infra field to Species. use trigger to update has_infra field.
     infra = 0
