@@ -54,7 +54,7 @@ td {
     <div style="text-align: center;">
         <h5>
             {% if search_string %}
-                Scientific name in teh {{app|title}} domain matching "{{search_string}}"
+                Scientific name in the {{app|title}} domain matching "{{search_string}}"
             {% else %}
                 Please submit a scientific name (genus species) to search in the {{app|title}} domain
             {% endif %}
@@ -72,7 +72,7 @@ td {
             <tr>
                 {% for match in matched_genus %}
                 <td>
-                    {% if not match.type == 'species' %}
+                    {% if match.type == 'species' %}
                         <a href="{% url 'common:species' %}?type=species&app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                         {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
