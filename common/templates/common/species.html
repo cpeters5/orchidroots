@@ -1,10 +1,10 @@
+{% extends "base.html" %}
 {% load static %}
 <head>
     <link rel="canonical" href="{{ canonical_url }}">
     <title>List of {{family}} species</title>
     <meta name='description' content='Species of the genus {{genus}}'>
 </head>
-{% include "base.html" %}
 {% block body %}
 <style>
     .form-inline .my-hidden { display: none; }
@@ -98,6 +98,8 @@
                                             {% if app == 'orchidaceae' %}
                                                 {% if type == 'hybrid' %}
                                                     <th class="d-none d-md-table-cell">parents</th>
+                                                {% else %}
+                                                    <th class="d-none d-md-table-cell">Regions</th>
                                                 {% endif %}
                                             {% endif %}
                                             {% if app == 'aves' %}
@@ -120,32 +122,41 @@
                                                     {% else %}
                                                         {{species.binomial_it|safe}} (syn.)
                                                     {% endif %}
+                                                    {% if species.year %} ({{species.year}}) {% endif %}
                                                 {% else %}
                                                     <a href="/display/summary/{{app}}/{{species.pid}}/"><i>{{species.binomial_it|safe}}</i></a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
+                                                {% if species.year %}({{species.year}}){% endif %}
                                             </td>
 
-                                            {% if app == 'orchidaceae' and species.type == 'hybrid' %}
-                                                <td class="d-none d-md-table-cell">
-                                                {% if species.status == 'synonym' %}
-                                                    <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
-                                                {% elif species.type == 'hybrid' %}
-                                                    {% if species.hybrid.seed_id.pid %}
-                                                        <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>
-                                                    {% else %}
-                                                        na
+                                            {% if app == 'orchidaceae' %}
+                                                {% if species.type == 'hybrid' %}
+                                                    <td class="d-none d-md-table-cell">
+                                                    {% if species.status == 'synonym' %}
+                                                        <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
+                                                    {% elif species.type == 'hybrid' %}
+                                                        {% if species.hybrid.seed_id.pid %}
+                                                            <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>
+                                                        {% else %}
+                                                            na
+                                                        {% endif %}
+                                                        x
+                                                        {% if species.hybrid.pollen_id.pid %}
+                                                            <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}">{{species.hybrid.pollen_id.name|default:'na'|safe}}</a>
+                                                        {% else %}
+                                                            na
+                                                        {% endif %}
                                                     {% endif %}
-                                                    x
-                                                    {% if species.hybrid.pollen_id.pid %}
-                                                        <a href="{% url 'display:summary' app species.hybrid.pollen_id.pid %}">{{species.hybrid.pollen_id.name|default:'na'|safe}}</a>
-                                                    {% else %}
-                                                        na
-                                                    {% endif %}
+                                                    </td>
+                                                {% elif species.type == 'species' %}
+                                                    <td class="d-none d-md-table-cell">
+                                                        {{species.accepted.regions|default:''}}
+                                                    </td>
                                                 {% endif %}
-                                                </td>
                                             {% endif %}
+
                                             {% if app == 'aves' %}
                                                 <td>{% if species.accepted.common_name %}{{species.accepted.common_name}}{% endif %}</td>
                                             {% endif %}

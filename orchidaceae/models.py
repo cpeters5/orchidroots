@@ -646,6 +646,7 @@ class Accepted(models.Model):
     infraspe = models.CharField(max_length=50, null=True)
     is_hybrid = models.CharField(max_length=1, null=True)
     distribution = models.TextField(blank=True)
+    regions = models.CharField(max_length=500, null=True)
     # is_type = models.BooleanField(null=True, default=False)
     physiology = models.CharField(max_length=200, null=True, blank=True)
     url = models.CharField(max_length=200, null=True, blank=True)

@@ -244,6 +244,11 @@ def genera(request, app=None):
     }
     return render(request, "common/genera.html", context)
 
+def get_regions(pid):
+    region_ids = Distribution.objects.filter(pid=pid).values_list('region_id', flat=True)
+    regions = Region.objects.filter(id__in=region_ids).values_list('name', flat=True)
+    return ', '.join(regions)
+
 
 def species(request, app=None):
     # Determine application if not given
@@ -741,32 +746,6 @@ def delete_bad_image_files(orid, app):
 
 
 @login_required
-def xdeletephoto(request, orid, pid=None):
-    app = request.GET.get('app', '')
-
-    # Something wrong here. All delete request mush have app
-    if not app:
-        return HttpResponseRedirect('/')
-
-    Species = apps.get_model(app, 'Species')
-    if pid:
-        try:
-            species = Species.objects.get(pk=pid)
-            st = delete_image(app, orid, species)
-        except Species.DoesNotExist:
-            st = True
-    else:
-        st = True
-
-    if st:
-        delete_file(app, orid)
-    write_output(request, str(app))
-
-    if pid:
-        url = "%s?role=cur" % (reverse('display:photos', args=(app, species.pid,)))
-    else:
-        url = "%s?app=%s&role=cur" % (reverse('common:curate_newupload'), app)
-    return HttpResponseRedirect(url)
 def deletephoto(request, orid, pid=None):
     app = request.GET.get('app', '')
     st = False
@@ -1289,70 +1268,6 @@ def curate_newapproved(request):
 
 
 @login_required
-def xuploadfile(request, pid):
-    app, family = get_application(request)
-    Species = apps.get_model(app, 'Species')
-    Synonym = apps.get_model(app, 'Synonym')
-    role = getRole(request)
-    if not request.user.is_authenticated  or not request.user.photographer.author_id:
-        message = 'You dont have access to upload files. Please update your profile to gain access. ' \
-                  'Or contact admin@bluenanta.com'
-        return HttpResponse(message)
-    species = Species.objects.get(pk=pid)
-    if species.get_num_img_by_author(request.user.photographer.get_authid()) > 2:
-        message = 'Each user may upload at most 3 private photos for each species/hybrid. ' \
-                'Please delete one or more of your photos before uploading a new one.'
-        return HttpResponse(message)
-
-    author = get_reqauthor(request)
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This name does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-    family = species.gen.family
-    if species.status == 'synonym':
-        synonym = Synonym.objects.get(pk=pid)
-        pid = synonym.acc_id
-        species = Species.objects.get(pk=pid)
-    if app == 'animalia':
-        from animalia.forms import UploadFileForm
-    elif app == 'aves':
-        from aves.forms import UploadFileForm
-    elif app == 'fungi':
-        from fungi.forms import UploadFileForm
-    elif app == 'other':
-        from other.forms import UploadFileForm
-    elif app == 'orchidaceae':
-        from detail.forms import UploadFileForm
-
-    form = UploadFileForm(initial={'author': request.user.photographer.author_id, 'role': role, 'binomial': species.binomial})
-
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            write_output(request, app)
-            spc = form.save(commit=False)
-            if isinstance(species, Species):
-                spc.pid = species
-            if species.binomial != spc.binomial:
-                spc.pid = None
-            spc.author = request.user.photographer
-            spc.type = species.type
-            spc.user_id = request.user
-            spc.text_data = spc.text_data.replace("\"", "\'\'")
-            spc.save()
-            url = "%s?role=%s&author=%s" % (reverse('display:photos', args=(app, species.pid,)), role,
-                                                request.user.photographer.author_id)
-            return HttpResponseRedirect(url)
-
-    context = {'form': form, 'species': species, 'web': 'active',
-               'author': author, 'family': family,
-               'role': role, 'app': app, 'title': 'uploadfile'}
-    if app == 'orchidaceae':
-        return render(request, 'detail/uploadfile.html', context)
-    else:
-        return render(request, app + '/uploadfile.html', context)
 def uploadfile(request, pid):
     app, family = get_application(request)
     Species = apps.get_model(app, 'Species')
