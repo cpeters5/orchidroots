@@ -291,6 +291,8 @@ a:hover {
 
 <div style="width:95%;margin:0 auto;padding:0;">
     <br>
+    <h4>{% if species.type == 'species' %} <i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %}, {{species.author}} {% if species.year %}({{species.year}}){% endif %}</h4>
+    <br>
     {% include 'common/detail-nav.html' %}
 
     <!-- Main -->
