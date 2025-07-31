@@ -97,6 +97,7 @@
                             Cultivars
                         </a>
                         <div class="nav3 dropdown-menu">
+                            <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/" data-nosnippet>---</a>
                             {% for clone in clones %}
                                 <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/?clone={{clone|default:''}}" data-nosnippet>{{clone|default:'---'}}</a>
                             {% endfor %}

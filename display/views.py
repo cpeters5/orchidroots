@@ -84,7 +84,7 @@ def summary(request, app=None, pid=None):
     Hybrid = apps.get_model(app, 'hybrid')
 
     SpcImages = getSpcImages(app, species.type)
-    clones = SpcImages.objects.filter(pid=pid).values_list('name', flat=True).distinct().order_by('name')
+    clones = SpcImages.objects.filter(pid=pid).exclude(name__isnull=True).values_list('name', flat=True).distinct().order_by('name')
 
     # if app == 'orchidaceae' and species.type == 'hybrid':
     #     SpcImages = apps.get_model(app, 'HybImages')
@@ -406,7 +406,7 @@ def photos(request, app=None, pid=None):
     if private_list:
         private_list = private_list.order_by('created_date')
 
-    clones = SpcImages.objects.filter(pid=pid).values_list('name', flat=True).distinct().order_by('name')
+    clones = SpcImages.objects.filter(pid=pid).exclude(name__isnull=True).values_list('name', flat=True).distinct().order_by('name')
     # for img in public_list:
     #     print("img", img.id, img.pid, img.get_displayname())
     write_output(request, str(family) + ' ' + species.binomial)
