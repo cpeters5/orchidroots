@@ -84,6 +84,8 @@ def summary(request, app=None, pid=None):
     Hybrid = apps.get_model(app, 'hybrid')
 
     SpcImages = getSpcImages(app, species.type)
+    clones = SpcImages.objects.filter(pid=pid).values_list('name', flat=True).distinct().order_by('name')
+
     # if app == 'orchidaceae' and species.type == 'hybrid':
     #     SpcImages = apps.get_model(app, 'HybImages')
     # else:
@@ -237,7 +239,7 @@ def summary(request, app=None, pid=None):
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
                'app': app, 'app_name': app_names[app], 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
-               'syn': syn,
+               'syn': syn, 'clones': clones,
                'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
                }
@@ -327,12 +329,7 @@ def photos(request, app=None, pid=None):
     except Species.DoesNotExist:
         return HttpResponsePermanentRedirect(reverse('home'))
 
-    # For Orchid, image classes could be species or hybrid depending on species.type
-    if app == 'orchidaceae' and species.type == 'hybrid':
-        SpcImages = apps.get_model(app, 'HybImages')
-    else:
-        SpcImages = apps.get_model(app, 'SpcImages')
-
+    SpcImages = getSpcImages(app, species.type)
     # get family
     # for non-orchid request, family is identified by pid.
     family = species.family
