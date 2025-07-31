@@ -18,7 +18,6 @@ urlpatterns = [
     path('ancestor/<int:pid>/', login_required(views.ancestor), name='ancestor'),
     path('ancestrytree/<int:pid>/', login_required(views.ancestrytree), name='ancestrytree'),
     path('ancestrytree/', login_required(views.ancestrytree), name='ancestrytree'),
-    path('synonym/<int:pid>/', views.synonym, name='synonym'),
     path('distribution/<int:pid>/', views.distribution, name='distribution'),
     path('progeny/<int:pid>/', login_required(views.progeny), name='progeny'),
     path('progenyimg/<int:pid>/', login_required(views.progenyimg), name='progenyimg'),
@@ -27,6 +26,7 @@ urlpatterns = [
     path('section/', views.section, name='section'),
     path('subsection/', views.subsection, name='subsection'),
     path('series/', views.series, name='series'),
+    path('synonym/<int:pid>/', views.synonym, name='synonym'),
     # path('browsegen/', views.browsegen, name='browsegen'),
 
     # Redirect to detail
