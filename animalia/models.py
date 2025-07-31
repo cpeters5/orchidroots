@@ -199,6 +199,7 @@ class Species(models.Model):
     author = models.CharField(max_length=200, blank=True)
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=500, blank=True)
+    common_name = models.CharField(max_length=200, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='spcanifamily', on_delete=models.DO_NOTHING)
     # citation = models.CharField(max_length=200)
     is_poisonous = models.BooleanField(null=True, default=False)

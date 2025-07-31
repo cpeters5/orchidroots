@@ -349,6 +349,7 @@ class Species(models.Model):
     author = models.CharField(max_length=200)
     originator = models.CharField(max_length=100, blank=True)
     binomial = models.CharField(max_length=200, blank=True)
+    common_name = models.CharField(max_length=200, blank=True)
     family = models.ForeignKey(Family, null=True, db_column='family', related_name='sportfamily', on_delete=models.DO_NOTHING)
     is_succulent = models.BooleanField(null=True, default=False)
     is_carnivorous = models.BooleanField(null=True, default=False)
@@ -514,6 +515,14 @@ class Species(models.Model):
             return "http://www.theplantlist.org/tpl1.1/record/" + self.orig_pid
         elif self.source == 'IPNI' and self.orig_pid:
             return "https://www.ipni.org/n/" + self.orig_pid
+        elif self.source == 'GBIF' and self.orig_pid:
+            return "https://www.gbif.org/species/" + self.orig_pid
+        elif self.source == 'ONG' and self.orig_pid:
+            return "https://www.orchidsnewguinea.com/orchid-information/species/speciescode/" + self.orig_pid
+        elif self.source == 'COL' and self.orig_pid:
+            return "https://www.catalogueoflife.org/data/taxon/" + self.orig_pid
+        elif self.source == 'IOSPE' and self.orig_pid:
+            return "https://www.orchidspecies.com/" + self.orig_pid
         else:
             return None
 
