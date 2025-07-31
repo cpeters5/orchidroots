@@ -386,12 +386,10 @@ def photos(request, app=None, pid=None):
     else:
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
 
-    # if syn:
-    #     public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid) | Q(accid=pid))
-    # else:
-    #     public_list = SpcImages.objects.filter(Q(pid=pid) | Q(base_pid=pid))
+    clone = request.GET.get('clone', '')
+    if clone:
+        public_list = public_list.filter(name__istartswith=clone)
 
-    # Get upload list, public list and private list
     private_list = []
     if request.user.is_authenticated:
         # upload_list = UploadFile.objects.filter(pid=species.pid)  # All upload photos
@@ -411,6 +409,7 @@ def photos(request, app=None, pid=None):
     if private_list:
         private_list = private_list.order_by('created_date')
 
+    clones = SpcImages.objects.filter(pid=pid).values_list('name', flat=True).distinct().order_by('name')
     # for img in public_list:
     #     print("img", img.id, img.pid, img.get_displayname())
     write_output(request, str(family) + ' ' + species.binomial)
@@ -420,7 +419,7 @@ def photos(request, app=None, pid=None):
                'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
-               'infra': infra, 'synonyms': synonyms,
+               'infra': infra, 'synonyms': synonyms, 'clones': clones,
                'owner': owner,
                }
     return render(request, 'display/photos.html', context)

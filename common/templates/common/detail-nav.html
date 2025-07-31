@@ -82,8 +82,25 @@
                 {% if synonyms > 0 %}
                     <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Synonyms</a></li>
                 {% endif %}
+
+
                 {% if infra > 0 %}
                     <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Infraspecific</a></li>
+                {% endif %}
+
+
+
+                {% if clones %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{clone}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
+                            Clones
+                        </a>
+                        <div class="nav3 dropdown-menu">
+                            {% for clone in clones %}
+                                <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/?clone={{clone|default:''}}" data-nosnippet>{{clone|default:'---'}}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
                 {% endif %}
 
                 {% if species.gen.family.family == 'Orchidaceae' %}
