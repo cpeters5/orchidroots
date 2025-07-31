@@ -1019,14 +1019,14 @@ class SpcImages(models.Model):
 
     def imginfo(self):
         myname = ''
+        if self.name:
+            myname = "%s '%s' " % (myname, self.name)
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
             myname = '%s %s form ' % (myname, self.form)
         if self.certainty:
             myname = '%s %s ' % (myname, self.certainty)
-        if self.name:
-            myname = "%s '%s' " % (myname, self.name)
         if self.awards:
             myname = '%s %s' % (myname, self.awards)
         return myname
@@ -1141,14 +1141,14 @@ class HybImages(models.Model):
 
     def imginfo(self):
         myname = ''
+        if self.name:
+            myname = "%s '%s' " % (myname, self.name)
         if self.variation:
             myname = '%s %s ' % (myname, self.variation)
         if self.form:
             myname = '%s %s form ' % (myname, self.form)
         if self.certainty:
             myname = '%s %s ' % (myname, self.certainty)
-        if self.name:
-            myname = "%s '%s' " % (myname, self.name)
         if self.awards:
             myname = '%s %s' % (myname, self.awards)
         return myname
