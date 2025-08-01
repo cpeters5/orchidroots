@@ -41,8 +41,4 @@ urlpatterns = [
     path('compare/<int:pid>/', detail_compare, name='compare'),
     path('createhybrid/', login_required(detail_createhybrid), name='createhybrid'),
 
-
-    # Transferredf to common
-    path('infraspecific/<int:pid>/', views.infraspecific, name='infraspecific'),
-
 ]

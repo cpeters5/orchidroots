@@ -138,11 +138,10 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
     # get infraspecific list if exists.  Ignore natural hybrid to improve performance.
     # TODO: Remove Species query by adding has_infra field to Species. use trigger to update has_infra field.
-    infra = 0
+    infras = []
     if species.type == 'species':
-        infra = len(Species.objects.filter(Q(base_pid=pid) | Q(pid=pid)))
-        if infra == 1 and not species.infraspr:
-            infra = 0
+        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
+
     # If hybrid, find its parents
     if species.type == 'hybrid':
         tmpspecies = species
@@ -238,7 +237,7 @@ def summary(request, app=None, pid=None):
                'display_items': display_items, 'family': family,
                'seedimg_list': seedimg_list, 'pollimg_list': pollimg_list, 'role': role,
                'ss_list': ss_list, 'sp_list': sp_list, 'ps_list': ps_list, 'pp_list': pp_list,
-               'app': app, 'app_name': app_names[app], 'ancspc_list': ancspc_list, 'infra': infra, 'synonyms': synonyms,
+               'app': app, 'app_name': app_names[app], 'ancspc_list': ancspc_list, 'infras': infras, 'synonyms': synonyms,
                'syn': syn, 'clones': clones,
                'canonical_url': canonical_url,
                'tab': 'rel', 'view': 'information',
@@ -353,14 +352,12 @@ def photos(request, app=None, pid=None):
     acc_pids = list(species.get_synonyms().values_list('spid', flat=True))
     synonyms = len(acc_pids)
 
-    # Query for all pids with exact binomial and all subspecifics
-    infra = 0
+    # get infras list for dropdown. Only for species or natural hybrids.
+    infras = []
     if species.type == 'species' or (species.type == 'hybrid' and species.source != 'RHS'):
-        infra = len(Species.objects.filter(Q(base_pid=pid) | Q(pid=pid)))
-        if infra == 1 and not species.infraspe:
-            infra = 0
+        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
 
-    # Stop here if requested speciews is already a subspecific
+    # Done if requested species is already a subspecific, only show infra species.
     if species.infraspe:
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
         private_list = public_list.filter(rank=0).order_by('created_date')  # rejected photos
@@ -369,7 +366,7 @@ def photos(request, app=None, pid=None):
                    'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'canonical_url': canonical_url,
-                   'infra': infra, 'synonyms': synonyms,
+                   'infras': infras, 'synonyms': synonyms,
                    'role': role,
                    'syn': syn,
 
@@ -416,7 +413,7 @@ def photos(request, app=None, pid=None):
                'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list, 'role': role,
                'canonical_url': canonical_url,
-               'infra': infra, 'synonyms': synonyms, 'clones': clones,
+               'infras': infras, 'synonyms': synonyms, 'clones': clones,
                'owner': owner,
                }
     return render(request, 'display/photos.html', context)

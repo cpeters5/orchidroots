@@ -373,38 +373,6 @@ def hybrid(request, app):
     return HttpResponsePermanentRedirect(canonical_url)
 
 
-def infraspecific(request, app, pid):
-    role = getRole(request)
-    canonical_url = ''
-    Species = apps.get_model(app, 'Species')
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    write_output(request, species.binomial)
-
-    # Infraspecifics exists only for species and natural hybrids
-    this_species_name = species.genus + ' ' + species.species  # ignore infraspecific names
-    try:
-        this_species = Species.objects.filter(binomial=this_species_name)[0]
-    except Species.DoesNotExist:
-        # Something's wrong
-        this_species = species
-
-    infraspecific_list = this_species.get_infraspecifics()
-    if len(infraspecific_list) > 0:
-        canonical_url = request.build_absolute_uri(f'/common/infraspecifics/{app}/{species.pid}/').replace('www.orchidroots.com', 'orchidroots.com')
-
-    context = {'infraspecific_list': infraspecific_list, 'species': species,
-               'tab': 'infra', 'infra': 'active',
-               'role': role, 'app': app,
-               'canonical_url': canonical_url,
-               }
-    return render(request, 'common/infraspecific.html', context)
-
-
 def rank_update(rank, orid, SpcImages):
     try:
         image = SpcImages.objects.get(pk=orid)

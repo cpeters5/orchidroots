@@ -84,9 +84,17 @@
                     <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Synonyms</a></li>
                 {% endif %}
 
-
-                {% if infra > 0 %}
-                    <li class="nav-item"><a class="nav-link {{infra}}" href="{% url 'common:infraspecific' app species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Infraspecific</a></li>
+                {% if infras %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link {{infra}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
+                            Infraspecifics
+                        </a>
+                        <div class="nav3 dropdown-menu">
+                            {% for inf in infras %}
+                                <a class="dropdown-item" href="/display/photos/{{app}}/{{inf.pid}}" data-nosnippet>{{inf}}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
                 {% endif %}
 
 
@@ -99,7 +107,7 @@
                         <div class="nav3 dropdown-menu">
                             <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/" data-nosnippet>---</a>
                             {% for clone in clones %}
-                                <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/?clone={{clone|default:''}}" data-nosnippet>{{clone|default:'---'}}</a>
+                                <a class="dropdown-item" href="/display/photos/{{app}}/{{species.pid}}/?clone={{clone}}" data-nosnippet>{{clone}}</a>
                             {% endfor %}
                         </div>
                     </li>
