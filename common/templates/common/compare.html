@@ -138,41 +138,27 @@ input[type=text] {
 <!--Title-->
 <div class="detail-title" style="text-align:center">
      <h1 class="hidden-h1">
-<!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
-        {% if pid and pid2 %}
+        {% if pid2 %}
             {% if pid != pid2 %}
-                {{species.binomial|safe}} V.S. {{species2.binomial|safe}}
+                {{species.name|safe}} V.S. {{species2.name|safe}}
             {% else %}
                 The two orchids are the identical or synonymous!
             {% endif %}
         {% else %}
-            {% if pid %}
-                Comparing {{species.name|safe}} with ?
-            {% elif pid2 %}
-                Comparing ? with {{species2.name|safe}}
-            {% else %}
-                Comparing two Orchids
-            {% endif %}
+            Comparing {{species.name|safe}} with ?
         {% endif %}
     </h1>
-    <h6>
-<!--        pid = {{pid}} pid = {{pid}}  pid2 = {{pid2}} cross = {{cross}} species = {{species.name|safe}} species2 = {{species2.name|safe}}<br>-->
-        {% if pid and pid2 %}
+    <h5>
+        {% if pid2 %}
             {% if pid != pid2 %}
-                {{species.binomial|safe}} V.S. {{species2.binomial|safe}}
+                {{species.name|safe}} v.s. {{species2.name|safe}}
             {% else %}
                 The two orchids are the identical or synonymous!
             {% endif %}
         {% else %}
-            {% if pid %}
-                Comparing {{species.name|safe}} with ?
-            {% elif pid2 %}
-                Comparing ? with {{species2.name|safe}}
-            {% else %}
-                Comparing two Orchids
-            {% endif %}
+            Comparing {{species.name|safe}} with ?
         {% endif %}
-    </h6>
+    </h5>
 </div>
 
 <!--Instruction-->
@@ -210,17 +196,20 @@ input[type=text] {
                             <a href="{% url 'display:summary' species.family.application cross.pid.pid %}">{{cross.pid.binomial_it|safe}}</a>
                         {% else %}
                             {% if pid and pid2 and pid != pid2 %}
-                                This cross "{{species.binomial}} × {{species2.binomial}}" has not been registered. <br>
-                                {% if role == 'cur' %}
-                                    {% if msgnogenus %}
-                                        <b>Oops! {{msgnogenus}} : Nothogenus of type {{genus}} x {{genus2}} does not exist!  Please contact admin to create one.</b>
+                                {% if synonym_message %}
+                                    {% if species.status == 'synonym' and species2.status == 'synonym' %}
+                                        This cross doesn't exist, but it cannot be created. {{species.name|safe}} and {{species2.name|safe}} {{synonym_message}}
                                     {% else %}
-                                        <a class="btn btn-primary btn-xs" href="#">
-                                            Create a new grex - {{species.binomial}} × {{species2.binomial}}
-                                        </a>
+                                        This cross doesn't exist, but it cannot be created. {{species.name|safe}} and {{species2.name|safe}} are synonymous
                                     {% endif %}
+                                {% elif failmsg %}
+                                    <span style="color:red">{{message3}} : Nothogenus of type <b>{{species.genus}} x {{genus2}}</b> does not exist!  Please send request to: admin@bluensnts.com.</span>
+                                    <br>
                                 {% else %}
-                                    Please contact Bluenanta admins to create one.
+                                    This cross "{{species.name|safe}} × {{species2.name|safe}}" has not been registered. <br>
+                                    <a class="btn btn-primary btn-xs" href="{% url 'common:newcross' pid pid2 %}">
+                                        Create {{genus}} {{species.species}}-{{species2.species}}
+                                    </a>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
@@ -307,15 +296,15 @@ input[type=text] {
                             <input type="hidden" name="pid" value="{{species.pid}}">
                             <input type="hidden" name="family" value="{{species.gen.family}}">
                             <input form="compare" type="text" class="form-control form-control-sm"  name="genus2" onfocus="this.select()" {% if genus2 %}value="{{genus2}}"{% else %} placeholder="Genus" {% endif %}>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" {% if genus2 %}value="{{species2}}"{% else %} placeholder="Species"{% endif %}>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" {% if infraspr2 %}value="{{infraspr2|default_if_none:' '}}"{% else %} placeholder="infraspecific rank" {% endif %}>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" {% if infraspe2 %}value="{{infraspe2|default_if_none:' '}}"{% else %} placeholder="infraspecific" {% endif %}>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="author2" onfocus="this.select()" {% if author2 %}value="{{author2|default_if_none:' '}}"{% else %} placeholder="Author" {% endif %}>
-                            <input form="compare" type="text" class="form-control form-control-sm"  name="year2" onfocus="this.select()" {% if year2 %}value="{{year2|default_if_none:' '}}"{% else %} placeholder="year" {% endif %}>
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="species2" onfocus="this.select()" {% if genus2 %}value="{{species2.species}}"{% else %} placeholder="Species"{% endif %}>
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspr2" onfocus="this.select()" {% if genus2 %}value="{{infraspr2|default_if_none:' '}}"{% else %} placeholder="infraspecific rank" {% endif %}>
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="infraspe2" onfocus="this.select()" {% if genus2 %}value="{{infraspe2|default_if_none:' '}}"{% else %} placeholder="infraspecific" {% endif %}>
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="author2" onfocus="this.select()" {% if genus2 %}value="{{author2|default_if_none:' '}}"{% else %} placeholder="Author" {% endif %}>
+                            <input form="compare" type="text" class="form-control form-control-sm"  name="year2" onfocus="this.select()" {% if genus2 %}value="{{year2|default_if_none:' '}}"{% else %} placeholder="year" {% endif %}>
                             </form>
                         </div>
                         <div class="d-flex justify-content-center" style="display:inline-block;text-align:center">
-                            {% if species2 and not spcimg2_list %}
+                            {% if spc2 and not spcimg2_list %}
                                 <div class="subtitle">
                                     No image available
                                 </div>

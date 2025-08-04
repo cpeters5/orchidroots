@@ -305,16 +305,6 @@ a:hover {
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_pending' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">All pending photos</a>
             <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:curate_newupload' %}?app={{app}}&gen=&type={{species.type}}" rel="nofollow noreferrer noopener">New uploaded photos</a>
         {% endif %}
-        {% if species.type == 'species' and infraspecifics %}
-            {% if app == 'orchidaceae' or app == 'aves' %}
-                <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:infraspecific' app species.pid %}" rel="nofollow noreferrer noopener">infraspecies list</a>
-            {% endif %}
-        {% endif %}
-<!--        {% if user.tier.tier > 1 %}-->
-<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_spc' %}?family={{species.gen.family}}&role={{role}}">My Species Photos</a>-->
-<!--            <a class="btn btn-xs mybtn btn-outline-primary" href="{% url 'common:myphoto_browse_hyb' %}?family={{species.gen.family}}&role={{role}}">My Hybrid Photos</a>-->
-<!--        {% endif %}-->
-            &nbsp;&nbsp;
         {% if user.is_authenticated %}
             {% if owner == 'Y' %}
                 <a href="{% url 'display:photos' app species.pid %}?role={{role}}&owner=N" rel="nofollow noreferrer noopener">Click to view all {{species.binomial_it|safe}} photos</a>
@@ -323,8 +313,6 @@ a:hover {
             {% endif %}
         {% endif %}
         </div>
-
-
 
         <!--            Main section-->
             <div class="d-flex flex-wrap justify-content-center align-items-center p-2">

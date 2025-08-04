@@ -15,6 +15,7 @@ urlpatterns = [
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
     path('compare/<int:pid>/', views.compare, name='compare'),
+    path('newcross/<int:pid1>/<int:pid2>/', views.newcross, name='newcross'),
 
     # Redirect to canonicalurl
     path('hybrid/<str:app>/', views.hybrid, name='hybrid'),

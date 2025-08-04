@@ -1334,7 +1334,7 @@ def get_new_uploads(request):
     return render(request, 'common/get_new_uploads.html', context)
 
 # TODO: Let user enter the entire binomial string instead of parsing them.
-def compare(request, pid):
+def xcompare(request, pid):
     # TODO:  Use Species form instead
     role = getRole(request)
     pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
@@ -1449,5 +1449,205 @@ def compare(request, pid):
                'genus2': gen2, 'species2': species2, 'spcimg2_list': spcimg2_list,
                'cross': cross, 'family': family, 'binomial2': binomial2,
                'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
+               'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
+    return render(request, 'common/compare.html', context)
+
+def newcross(request, pid1, pid2):
+    # Create a new hybrid (pid x pid2)
+    # The cross doesn't exist.
+    # Need to identify nothogenus
+    import datetime
+    # Assume both pids are accepted
+    # Assume cross does not exist
+    role = getRole(request)
+    app, family = get_application(request)
+    GenusRelation = apps.get_model(app, 'GenusRelation')
+    Species = apps.get_model(app, 'Species')
+    Hybrid = apps.get_model(app, 'Hybrid')
+    species1 = Species.objects.get(pk=pid1)
+    species2 = Species.objects.get(pk=pid2)
+    if app == 'orchidaceae' and species1.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+    spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    if app == 'orchidaceae' and species2.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+    spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    #  Find if Nothogenus (genus1 x genus2) has been defined by checking in existing hybrids with same genus cross.
+    #  If not, the cross cannot be created
+    genus1 = species1.genus
+    genus2 = species2.genus
+    spc2 =species2.species
+
+    # Find nothogenus that have already been defined
+    genus = Hybrid.objects.filter(Q(seed_genus=genus1, pollen_genus=genus2) | Q(seed_genus=genus2, pollen_genus=genus1))
+    genus = genus.exclude(pid__status='synonym').filter(pid__source='RHS').first()
+    if genus:
+        # Create new cross here
+        # ------------------------------------------------
+        spcobj = Species()
+        spcobj.genus = genus.pid.genus
+        spcobj.species = species1.species + '-' + species2.species
+        spcobj.pid = Hybrid.objects.filter(pid__gt=900000000).filter(pid__lt=999999999).order_by('-pid')[0].pid_id + 1
+        spcobj.source = 'INT'
+        spcobj.type = 'hybrid'
+        spcobj.status = 'nonregistered'
+        datetime_obj = datetime.datetime.now()
+        spcobj.year = datetime_obj.year
+        spcobj.save()
+        # spcobj = Species.objects.get(pk=spcobj.pid)
+        newspecies = Species.objects.get(pk=spcobj.pid)
+
+        # Now create Hybrid instance
+        hybobj = Hybrid()
+        hybobj.pid = spcobj
+        hybobj.seed_genus = species1.genus
+        hybobj.pollen_genus = species2.genus
+        hybobj.seed_species = species1.species
+        hybobj.pollen_species = species2.species
+        hybobj.seed_id = species1
+        hybobj.pollen_id = species2
+        hybobj.save()
+
+        return HttpResponseRedirect("/display/summary/orchidaceae/" + str(spcobj.pid) + "/")
+
+        # ---------------------------------------------
+    else:
+        # Nothogenus has not been defined. No can do.
+        genus = ''
+        # Orthogenus not found
+        message = 'The nothogenus (' + genus1 + ' x ' + genus2 + ') is not defined'
+        pid2 = None
+        # context = {'species': species1, 'pid': pid1, 'family': family,
+        #            'spcimg1_list': spcimg1_list,
+        #            'species2': species2,
+        #            'message3': message,
+        #            'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
+        return HttpResponseRedirect("/common/compare/" + str(pid1) + "/?app=orchidaceae&pid=" + str(pid2) + "&failmsg=FAILGENUS&genus2=" + genus2 + "&species2=" + spc2)
+        # return render(request, 'common/compare.html', context)
+
+
+    # Check if nothogenus has already been created, otherwise, cannot create new cross.
+    #  Create new hybrid
+
+    # context = {'pid': pid1, 'genus': species1.genus, 'species': species1, 'species2': species2,
+    #            'pid2': pid2,  # Valid pid of second species
+    #            'spcimg1_list': spcimg1_list,
+    #            'spcimg2_list': spcimg2_list,
+    #            'nothogenus': nothogenus, 'family': family,
+    #            'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
+    # return HttpResponseRedirect("/common/compare/" + pid1 + "/?app=orchidaceae&pid=" + pid2)
+    # return render(request, 'common/compare.html', context)
+
+
+
+def compare(request, pid):
+    # TODO:  Use Species form instead
+    role = getRole(request)
+    app, family = get_application(request)
+
+    # get Species, Genus, classes
+    Species = apps.get_model(app, 'Species')
+    Hybrid = apps.get_model(app, 'Hybrid')
+
+    species = Species.objects.get(pk=pid)
+    if app == 'orchidaceae' and species.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+
+    # Images shown for species 1
+    spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+    family = species.gen.family
+    genus = species.genus
+
+    # Handle comparison request. Should use SpcForm instead.
+    spcimg2_list = []
+
+    spc2 = request.GET.get('species2', '').strip()
+    gen2 = request.GET.get('genus2', '').strip()
+    infraspe2 = request.GET.get('infraspe2', '').strip()
+    infraspr2 = request.GET.get('infraspr2', '').strip()
+    author2 = request.GET.get('author2', '').strip()
+    year2 = request.GET.get('year2', '').strip()
+    binomial2 = ' '.join((gen2, spc2, infraspr2, infraspe2 ))
+    failmsg = request.GET.get('failmsg', None)
+    message = ''
+    if binomial2:
+        species2 = Species.objects.filter(binomial__exact=binomial2)
+        if len(species2) == 0:
+            message = binomial2 + ' species does not exist. Cannot compare'
+            pid2 = None
+        elif len(species2) > 1:
+            if year2:
+                species2 = species2.filter(year=year2)
+            if author2:
+                species2 = species2.filter(author=author2)
+            if len(species2) == 1:  # Found unique species
+                species2 = species2[0]
+                pid2 = species2.pid
+            elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
+                pid2 = None
+                message = "Multiple" + ' '.join((species2[0].binomial, author2, year2)) + ' found. Try adding author or year'
+            else:  # No match found
+                pid2 = None
+                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
+        else:
+            species2 = species2[0]
+            pid2 = species2.pid
+    else:
+        # No binomial found,  This is the initial request
+        message = None
+        pid2 = None
+    if not pid2:
+        # Could be initial launch, or fail nothogenus
+        context = {'species': species, 'genus': genus, 'pid': pid, 'family': family, 'species2': species2,
+                   'spcimg1_list': spcimg1_list,
+                   'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
+                   'author2': author2, 'year2': year2,
+                   'message2': message, 'failmsg': failmsg,
+                   'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
+        return render(request, 'common/compare.html', context)
+
+    # Before allowing new hybrid, Check if pid and pid2 are the same or are synonym.
+    from orchidaceae.models import Synonym
+    # If one is a synonym of the other
+    synonym = Synonym.objects.filter(Q(spid=pid, acc_id=pid2) | Q(spid=pid2, acc_id=pid))
+    synonym_message = None
+    if synonym:
+         synonym_message = " are synopnymous"
+    # In case both are synonymn to the same accepted species
+    if species.status == 'synonym' and species2.status == 'synonym':
+        if species.synonym.acc_id == species2.synonym.acc_id:
+            accepted = Species.objects.get(pk=species2.synonym.acc_id)
+            synonym_message = " are synonym of " + accepted.binomial
+
+
+
+
+    if species2.type == 'hybrid':
+        SpcImages = apps.get_model(app, 'HybImages')
+    else:
+        SpcImages = apps.get_model(app, 'SpcImages')
+
+    # Determine cross
+    cross = Hybrid.objects.filter(Q(seed_id=pid, pollen_id=pid2) | Q(seed_id=pid2, pollen_id=pid)).first()
+    spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
+
+    # msgnogenus = request.GET.get('msgnogenus', '')
+    write_output(request, str(species.binomial) + " vs " + str(species2.binomial))
+    context = {'pid': pid, 'genus': species.genus, 'species': species, 'species2': species2,
+               'pid2': pid2,  # Valid pid of second species
+               'genus2': species2.genus, 'spc2': species2.species, 'infraspr2': species2.infraspr, 'infraspe2': species2.infraspe,
+               'author2': species2.author, 'year2': species2.year,
+               'spcimg1_list': spcimg1_list,
+               'spcimg2_list': spcimg2_list,
+               'message3': message, 'synonym_message': synonym_message,
+               'cross': cross, 'family': family, 'failmsg': failmsg,
                'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
     return render(request, 'common/compare.html', context)
