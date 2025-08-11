@@ -508,6 +508,9 @@ def newbrowse(request, app=None):
             context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
                        'alpha_list': alpha_list, 'app': app, 'type': type,}
             return render(request, 'common/newbrowse.html', context)
+    context = {'genus_list': '', 'family': family, 'app': app, 'alpha': alpha,
+               'alpha_list': alpha_list, 'type': type,}
+    return render(request, 'common/newbrowse.html', context)
 
 
 def distribution(request):
@@ -1333,125 +1336,7 @@ def get_new_uploads(request):
 
     return render(request, 'common/get_new_uploads.html', context)
 
-# TODO: Let user enter the entire binomial string instead of parsing them.
-def xcompare(request, pid):
-    # TODO:  Use Species form instead
-    role = getRole(request)
-    pid2 = species2 = genus2 = infraspr2 = infraspe2 = author2 = year2 = spc2 = gen2 = ''
-    app, family = get_application(request)
-
-    # get Species, Genus, classes
-    Species = apps.get_model(app, 'Species')
-    Hybrid = apps.get_model(app, 'Hybrid')
-
-
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        return HttpResponseRedirect('/')
-    if app == 'orchidaceae' and species.type == 'hybrid':
-        SpcImages = apps.get_model(app, 'HybImages')
-    else:
-        SpcImages = apps.get_model(app, 'SpcImages')
-
-
-    spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-    family = species.gen.family
-    genus = species.genus
-
-    # Handle comparison request. Should use SpcForm instead.
-    spcimg2_list = []
-
-    spc2 = request.GET.get('species2', '').strip()
-    gen2 = request.GET.get('genus2', '').strip()
-    infraspe2 = request.GET.get('infraspe2', '').strip()
-    infraspr2 = request.GET.get('infraspr2', '').strip()
-    author2 = request.GET.get('author2', '').strip()
-    year2 = request.GET.get('year2', '').strip()
-    binomial2 = gen2 + ' ' + spc2
-    if infraspr2:
-        binomial2 = binomial2 + ' ' + infraspr2
-    if infraspe2:
-        binomial2 = binomial2 + ' ' + infraspe2
-    if binomial2:
-        species2 = Species.objects.filter(binomial__iexact=binomial2)
-        if len(species2) == 0:
-            message = binomial2 + ' does not exist in ' + family.family + ' family'
-            context = {'species': species, 'genus': genus, 'pid': pid, 'family': family,
-                       'spcimg1_list': spcimg1_list,
-                       'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                       'message2': message,
-                       'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
-            return render(request, 'common/compare.html', context)
-        elif len(species2) > 1:
-            if year2:
-                species2 = species2.filter(year=year2)
-            if author2:
-                species2 = species2.filter(author=author2)
-
-            if len(species2) == 1:  # Found unique species
-                species2 = species2[0]
-                pid2 = species2.pid
-            elif len(species2) > 1:  # MULTIPLE SPECIES RETURNED
-                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returns more than one value. Please specify author name or year to narrow the search.'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message2': message, 'family': family,
-                           'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
-                return render(request,  'common/compare.html', context)
-            else:  # No match found
-                message = "species, <b>" + str(gen2) + ' ' + spc2 + '</b> returned none'
-                context = {'species': species, 'genus': genus, 'pid': pid,  # original
-                           'genus2': gen2, 'species2': spc2, 'infraspr2': infraspr2, 'infraspe2': infraspe2,
-                           'message1': message, 'family': family,
-                           'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app,}
-                return render(request, 'common/compare.html', context)
-        else:
-            species2 = species2[0]
-            pid2 = species2.pid
-    else:
-        # No binomial found,  This is the initial request
-        pid2 = ''
-
-    cross = ''
-    message1 = message2 = accepted2 = ''
-
-    # Convert synonym to accepted
-    if species2 and species2.status == 'synonym':
-        pid2 = species2.getAcc()
-        accepted2 = species2.getAccepted()
-
-    # Choose correct image class based on type.
-    if species2.type == 'hybrid':
-        SpcImages = apps.get_model(app, 'HybImages')
-    else:
-        SpcImages = apps.get_model(app, 'SpcImages')
-
-    # A second species is found
-    if pid2:
-        cross = Hybrid.objects.filter(seed_id=pid).filter(pollen_id=pid2)
-        if not cross:
-            cross = Hybrid.objects.filter(seed_id=pid2).filter(pollen_id=pid)
-        if cross:
-            cross = cross[0]
-        else:
-            cross = ''
-            spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-
-    msgnogenus = ''
-    if 'msgnogenus' in request.GET:
-        msgnogenus = request.GET['msgnogenus']
-
-    write_output(request, str(species.binomial) + " vs " + str(species2.binomial))
-    context = {'pid': pid, 'genus': genus, 'species': species,
-               'pid2': pid2, 'accepted2': accepted2,  # pid of accepted species
-               'spcimg1_list': spcimg1_list,
-               'genus2': gen2, 'species2': species2, 'spcimg2_list': spcimg2_list,
-               'cross': cross, 'family': family, 'binomial2': binomial2,
-               'msgnogenus': msgnogenus, 'message1': message1, 'message2': message2,
-               'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
-    return render(request, 'common/compare.html', context)
-
+@login_required
 def newcross(request, pid1, pid2):
     # Create a new hybrid (pid x pid2)
     # The cross doesn't exist.
@@ -1493,6 +1378,8 @@ def newcross(request, pid1, pid2):
         spcobj = Species()
         spcobj.genus = genus.pid.genus
         spcobj.species = species1.species + '-' + species2.species
+        if species2.infraspe:
+            spcobj.species = spcobj.species + '-' + species2.infraspe
         spcobj.pid = Hybrid.objects.filter(pid__gt=900000000).filter(pid__lt=999999999).order_by('-pid')[0].pid_id + 1
         spcobj.source = 'INT'
         spcobj.type = 'hybrid'
@@ -1514,8 +1401,8 @@ def newcross(request, pid1, pid2):
         hybobj.pollen_id = species2
         hybobj.save()
 
+        write_output(request, str(species1.binomial) + " vs " + str(species2.binomial))
         return HttpResponseRedirect("/display/summary/orchidaceae/" + str(spcobj.pid) + "/")
-
         # ---------------------------------------------
     else:
         # Nothogenus has not been defined. No can do.
@@ -1523,27 +1410,7 @@ def newcross(request, pid1, pid2):
         # Orthogenus not found
         message = 'The nothogenus (' + genus1 + ' x ' + genus2 + ') is not defined'
         pid2 = None
-        # context = {'species': species1, 'pid': pid1, 'family': family,
-        #            'spcimg1_list': spcimg1_list,
-        #            'species2': species2,
-        #            'message3': message,
-        #            'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app}
         return HttpResponseRedirect("/common/compare/" + str(pid1) + "/?app=orchidaceae&pid=" + str(pid2) + "&failmsg=FAILGENUS&genus2=" + genus2 + "&species2=" + spc2)
-        # return render(request, 'common/compare.html', context)
-
-
-    # Check if nothogenus has already been created, otherwise, cannot create new cross.
-    #  Create new hybrid
-
-    # context = {'pid': pid1, 'genus': species1.genus, 'species': species1, 'species2': species2,
-    #            'pid2': pid2,  # Valid pid of second species
-    #            'spcimg1_list': spcimg1_list,
-    #            'spcimg2_list': spcimg2_list,
-    #            'nothogenus': nothogenus, 'family': family,
-    #            'tab': 'sbs', 'sbs': 'active', 'role': role, 'app': app, }
-    # return HttpResponseRedirect("/common/compare/" + pid1 + "/?app=orchidaceae&pid=" + pid2)
-    # return render(request, 'common/compare.html', context)
-
 
 
 def compare(request, pid):
@@ -1554,8 +1421,12 @@ def compare(request, pid):
     # get Species, Genus, classes
     Species = apps.get_model(app, 'Species')
     Hybrid = apps.get_model(app, 'Hybrid')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'Pid does not exist.'
+        return HttpResponse(message)
 
-    species = Species.objects.get(pk=pid)
     if app == 'orchidaceae' and species.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
     else:
@@ -1565,10 +1436,6 @@ def compare(request, pid):
     spcimg1_list = SpcImages.objects.filter(pid=pid).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
     family = species.gen.family
     genus = species.genus
-
-    # Handle comparison request. Should use SpcForm instead.
-    spcimg2_list = []
-
     spc2 = request.GET.get('species2', '').strip()
     gen2 = request.GET.get('genus2', '').strip()
     infraspe2 = request.GET.get('infraspe2', '').strip()
@@ -1626,9 +1493,6 @@ def compare(request, pid):
         if species.synonym.acc_id == species2.synonym.acc_id:
             accepted = Species.objects.get(pk=species2.synonym.acc_id)
             synonym_message = " are synonym of " + accepted.binomial
-
-
-
 
     if species2.type == 'hybrid':
         SpcImages = apps.get_model(app, 'HybImages')
