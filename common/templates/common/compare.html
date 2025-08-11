@@ -198,15 +198,20 @@ input[type=text] {
                             {% if pid and pid2 and pid != pid2 %}
                                 {% if synonym_message %}
                                     {% if species.status == 'synonym' and species2.status == 'synonym' %}
-                                        This cross doesn't exist, but it cannot be created. {{species.name|safe}} and {{species2.name|safe}} {{synonym_message}}
+                                        This cross cannot be created. {{species.name|safe}} and {{species2.name|safe}} {{synonym_message}}
                                     {% else %}
-                                        This cross doesn't exist, but it cannot be created. {{species.name|safe}} and {{species2.name|safe}} are synonymous
+                                        This cross cannot be created. {{species.name|safe}} and {{species2.name|safe}} are synonymous
                                     {% endif %}
                                 {% elif failmsg %}
-                                    <span style="color:red">{{message3}} : Nothogenus of type <b>{{species.genus}} x {{genus2}}</b> does not exist!  Please send request to: admin@bluensnts.com.</span>
+                                    <span style="color:red">{{message3}} : Nothogenus of type <b>{{species.genus}} x {{genus2}}</b> does not exist! Emial request to
+                                        admin@bluenanta.com.</span>
                                     <br>
                                 {% else %}
                                     This cross "{{species.name|safe}} × {{species2.name|safe}}" has not been registered. <br>
+                                    Click on the blue button below to create one in OrchidRoots.
+                                    Please only create it if you have photos ready to upload and share.
+                                    To maintain the quality and usefulness of the OrchidRoots database,
+                                    any new hybrids without associated photos or offspring will be removed.<br>
                                     <a class="btn btn-primary btn-xs" href="{% url 'common:newcross' pid pid2 %}">
                                         Create {{genus}} {{species.species}}-{{species2.species}}
                                     </a>
