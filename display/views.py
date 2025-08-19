@@ -50,6 +50,11 @@ def get_clones(pid, SpcImages):
     return SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid) | Q(base_pid=pid)).exclude(
         name__isnull=True).values_list('name', flat=True).distinct().order_by('name')
 
+def get_infraspecifics(species, Species):
+    infras = []
+    if species.type == 'species' or (species.type == 'hybrid' and species.source in ('POWO', 'Kew')):
+        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
+    return infras
 
 def summary(request, app=None, pid=None):
     if isinstance(app, int):
@@ -141,9 +146,7 @@ def summary(request, app=None, pid=None):
                 display_items.append(x)
     # get infraspecific list if exists.  Ignore natural hybrid to improve performance.
     # TODO: Remove Species query by adding has_infra field to Species. use trigger to update has_infra field.
-    infras = []
-    if species.type == 'species':
-        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
+    infras = get_infraspecifics(species, Species)
 
     # If hybrid, find its parents
     if species.type == 'hybrid':
@@ -284,6 +287,7 @@ def photos(request, app=None, pid=None):
     # Queries including synonyms is very slow.  Ignore it.
     syn = request.GET.get('syn', '')
     family = request.GET.get('family', None)
+    clone = request.GET.get('clone', '')
 
     app = app or query_app
     pid = pid or query_pid
@@ -356,20 +360,21 @@ def photos(request, app=None, pid=None):
     synonyms = len(acc_pids)
 
     # get infras list for dropdown. Only for species or natural hybrids.
-    infras = []
-    if species.type == 'species' or (species.type == 'hybrid' and species.source != 'RHS'):
-        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
+    infras = get_infraspecifics(species, Species)
+    clones = get_clones(pid, SpcImages)
 
     # Done if requested species is already a subspecific, only show infra species.
     if species.infraspe:
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
+        if clone:
+            public_list = public_list.filter(name__istartswith=clone)
         private_list = public_list.filter(rank=0).order_by('created_date')  # rejected photos
         public_list = public_list.exclude(rank=0).order_by('-rank', 'quality', '?') # public photos
         context = {'species': species, 'author': author, 'family': family,
                    'pho': 'active', 'tab': 'pho', 'app': app, 'app_name': app_names[app],
                    'public_list': public_list, 'private_list': private_list, 'upload_list': upload_list,
                    'canonical_url': canonical_url,
-                   'infras': infras, 'synonyms': synonyms,
+                   'infras': infras, 'synonyms': synonyms, 'clones': clones,
                    'role': role,
                    'syn': syn,
 
@@ -383,7 +388,6 @@ def photos(request, app=None, pid=None):
     else:
         public_list = SpcImages.objects.filter(Q(pid=pid) | Q(accid=pid))
 
-    clone = request.GET.get('clone', '')
     if clone:
         public_list = public_list.filter(name__istartswith=clone)
 
