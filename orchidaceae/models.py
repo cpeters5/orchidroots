@@ -375,12 +375,15 @@ class Species(models.Model):
 
     def binomial_it(self):
         if self.type == 'species' or self.is_hybrid:
+            name = '<i>%s %s</i>' % (self.genus, self.species)
+            if self.infraspr:
+                name = name + '%s' % (self.infraspr)
             if self.infraspe:
-                return '<i>%s %s</i> %s <i>%s</i>' % (self.genus, self.species, self.infraspr, self.infraspe)
-            else:
-                return '<i>%s %s</i>' % (self.genus, self.species)
+                name = name + ' <i>%s</i>' % (self.infraspe)
         else:
-            return '<i>%s</i> %s' % (self.genus, self.species)
+            name = '<i>%s</i> %s' % (self.genus, self.species)
+            # Artficial hybrid
+        return name
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
@@ -575,7 +578,6 @@ class Species(models.Model):
                 # pid_list.union(exact_matchQS)
             # else:
             #     pid_list = exact_matchQS
-            print("model", pid_list)
             return pid_list
         return []
 

@@ -105,13 +105,15 @@ td {
                         </td>
                         <td style="width:20%;">
                             <a href="{% url 'display:summary' species.family.application species.pid %}">
-                                {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                                {{species.binomial_it|safe}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                               {% if user.tier.tier > 3 %} {{species.pid|default:''}} {% endif %}
+
                         </td>
                         <td style="width:10%;">
                             {% if species.status == 'synonym' %} syn.
                                 {% if species.getAcc %}
                                     <a href="{% url 'display:summary' species.family.application species.getAcc %}">
-                                        {{species.getAccepted.binomial}}
+                                        {{species.getAccepted.binomial_it|safe}}
                                     </a>
                                 {% else %}
                                     {{species.getAccepted.binomial}} (syn)
@@ -132,16 +134,17 @@ td {
                         </td>
                         <td style="width:20%;">
                             <a href="{% url 'display:summary' species.family.application species.pid %}">
-                                {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                                {{species.binomial_it|safe}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                               {% if user.tier.tier > 3 %} {{species.pid|default:''}} {% endif %}
                         </td>
                         <td style="width:10%;">
                             {% if species.status == 'synonym' %} syn.
                                 {% if species.getAcc %}
                                     <a href="{% url 'display:summary' species.family.application species.getAcc %}">
-                                        {{species.getAccepted.binomial}}
+                                        {{species.getAccepted.binomial_it|safe}}
                                     </a>
                                 {% else %}
-                                    {{species.getAccepted.binomial}} (syn)
+                                    {{species.getAccepted.binomial_it|safe}} (syn)
                                 {% endif %}
                             {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
                             {% endif %}
@@ -159,16 +162,17 @@ td {
                         </td>
                         <td style="width:20%;">
                             <a href="{% url 'display:summary' species.family.application species.pid %}">
-                                {{species.binomial}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                                {{species.binomial_it|safe}}</a>  {{species.author|default:''}} {{species.year|default:''}}
+                               {% if user.tier.tier > 3 %} {{species.pid|default:''}} {% endif %}
                         </td>
                         <td style="width:10%;">
                             {% if species.status == 'synonym' %} syn.
                                 {% if species.getAcc %}
                                     <a href="{% url 'display:summary' species.family.application species.getAcc %}">
-                                        {{species.getAccepted.binomial}}
+                                        {{species.getAccepted.binomial_it|safe}}
                                     </a>
                                 {% else %}
-                                    {{species.getAccepted.binomial}} (syn)
+                                    {{species.getAccepted.binomial_it|safe}} (syn)
                                 {% endif %}
                             {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
                             {% endif %}
