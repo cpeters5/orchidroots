@@ -89,11 +89,11 @@
 
             </div>
             {% if species.status == 'synonym' %}
-                <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
+            <h1 class="hidden-h1">{{species.binomial}} (synonym of {{species.getAccepted.name|safe}})</h1>
             {% elif species.type == 'hybrid' %}
-                <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
+            <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
             {% else %}
-                <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+            <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
             {% endif %}
             <h4>
                 {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},
@@ -107,11 +107,11 @@
             <div class="info">
                 {% if species.type == 'species' %}
                     {{species.binomial}} is a species in the <a href="{% url 'common:species' app %}?genus={{species.genus}}&type={{species.type}}&alpha={{species.species|firstletter|upper}}">{{ species.genus }}</a> genus.
-                    {% if species.accepted.common_name %}It is commonly known as <b>{{species.accepted.common_name}}</b>{% endif %}
-                    {% if species.accepted.local_name %} and known locally as <b>{{species.accepted.local_name }}</b>{%endif %}.
-
+                    {% if species.accepted.common_name or species.common_name %}
+                        It is commonly known as <b>{% if species.accepted.common_name %}{{species.accepted.common_name}} {% elif species.common_name %}{{species.common_name}} {% endif %}</b>
+                    {% endif %}
                     {% if species.status == 'synonym' %}
-                        This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}">{{species.getAccepted.name|safe}}</a>
+                        This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>
                     {% else %}
                         This name is {{species.status}} name for the {{species.type}} in
                         the family <a href="{% url 'common:newbrowse' app %}?family={{species.gen.family}}">{{species.gen.family}}</a>
@@ -123,9 +123,9 @@
                         {% endif %}
                         {% if species.gen.subtribe %}
                             subtribe <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>,
-                        {% endif %}
+                        {% endif %}.
                         {% if species.accepted.subgenus or species.accepted.section or species.accepted.subsection or species.accepted.series %}
-                            and under infraspecific classification, it is in the
+                            It is in the
                             {% if species.accepted.subgenus %}
                                 subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
                             {% endif %}
@@ -188,6 +188,8 @@
                         listed in order of their genetic contribution.
                     {% endif %}
                     {% endif %}
+                {% if species.hybrid.comment %}<br><b>NOTE:</b> {{species.hybrid.comment}} {% endif %}
+
                 {% endif %}
                 {% if species.accepted.comment %}
                 <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
