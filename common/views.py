@@ -474,11 +474,12 @@ def newbrowse(request, app=None):
             species = species.order_by('species')
             if len(species) > 500:
                 species = species[0: 500]
-            species_list = []
-            for x in species:
-                spcimage = x.get_best_img()
-                if spcimage:
-                    species_list = species_list + [spcimage]
+            species_list = species
+            # species_list = []
+            # for x in species:
+            #     spcimage = x.get_best_img()
+            #     if spcimage:
+            #         species_list = species_list + [spcimage]
             context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list, 'type': type,}
             return render(request, 'common/newbrowse.html', context)
 

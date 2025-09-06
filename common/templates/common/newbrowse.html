@@ -346,21 +346,27 @@ img{
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in species_list %}
+                            {% if x.speciesstat.best_image %}
                             <div class="imageitem border ">
-                                    <a href="{% url 'display:summary' app x.pid_id %}">
-                                        <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.image_file}}" >
+                                    <a href="{% url 'display:summary' app x.pid %}">
+                                        <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.speciesstat.best_image}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <p>{{x.pid.accepted.common_name|default:x.pid.binomial_it|safe}}</p>
+                                        <p>{{x.pid.accepted.common_name|default:x.binomial_it|safe}}</p>
                                     </div>
                             </div>
+                            {% endif %}
                         {% endfor %}
                         </div>
                     {% else %}
                         <div class="container justify-content-left align-items-center" style="clear:left;margin:0 auto; padding:0; text-align: left;">
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         <div style="margin:0 auto; text-align: center; min-height:200px;">
-                        <h7>No images available</h7>
+                            {% if genus and not species_list %}
+                                <h7>{{genus}} genus has no image images in our system</h7>
+                            {% elif not genus_list %}
+                                <h7>{{family}} family has no image in our system</h7>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
