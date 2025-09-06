@@ -189,11 +189,11 @@ input[type=text] {
                         {% if cross %}
                             This cross has already been
                             {% if cross.pid.source == 'RHS' %}
-                            registered at <a href="{{cross.pid.sourceurl}}" target="_blank">({{cross.pid.source}}</a>):
+                            registered at <a href="{{cross.pid.sourceurl}}" target="_blank">({{cross.pid.source}}</a>) -
                             {% else %}
-                            temporarily created:
+                            temporarily created -
                             {% endif %}
-                            <a href="{% url 'display:summary' species.family.application cross.pid.pid %}">{{cross.pid.binomial_it|safe}}</a>
+                            <a href="{% url 'display:summary' species.family.application cross.pid_id %}">{{cross.binomial_it|safe}}</a>
                         {% else %}
                             {% if pid and pid2 and pid != pid2 %}
                                 {% if synonym_message %}
@@ -208,8 +208,8 @@ input[type=text] {
                                     <br>
                                 {% else %}
                                     This cross "{{species.name|safe}} × {{species2.name|safe}}" has not been registered. <br>
-                                    Click on the blue button below to create one in OrchidRoots.
-                                    Please only create it if you have photos ready to upload and share.
+                                    Click on the blue button below to create this cross in OrchidRoots.
+                                    Please only create it if you have photos ready to upload and share.<br>
                                     To maintain the quality and usefulness of the OrchidRoots database,
                                     any new hybrids without associated photos or offspring will be removed.<br>
                                     <a class="btn btn-primary btn-xs" href="{% url 'common:newcross' pid pid2 %}">
@@ -262,7 +262,7 @@ input[type=text] {
                                                 {% else %}
                                                     {{image.get_displayname}}
                                                 {% endif %}
-                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo|safe}}{% endif %}
                                             </div>
                                        </div>
                                     {% else %}
@@ -279,7 +279,7 @@ input[type=text] {
                                                 {% else %}
                                                     {{image.get_displayname}}
                                                 {% endif %}
-                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo|safe}}{% endif %}
                                             </div>
                                         </div>
                                     {% endif %}
@@ -329,7 +329,7 @@ input[type=text] {
                                                 {% else %}
                                                     {{image.get_displayname}}
                                                 {% endif %}
-                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo|safe}}{% endif %}
                                             </div>
                                         </div>
                                     {% else %}
@@ -346,7 +346,7 @@ input[type=text] {
                                                 {% else %}
                                                     {{image.get_displayname}}
                                                 {% endif %}
-                                                {% if image.imginfo %}<br>{{image.imginfo}}{% endif %}
+                                                {% if image.imginfo %}<br>{{image.imginfo|safe}}{% endif %}
                                             </div>
                                         </div>
                                    {% endif %}

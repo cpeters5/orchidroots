@@ -377,7 +377,7 @@ class Species(models.Model):
         if self.type == 'species' or self.is_hybrid:
             name = '<i>%s %s</i>' % (self.genus, self.species)
             if self.infraspr:
-                name = name + '%s' % (self.infraspr)
+                name = name + ' %s' % (self.infraspr)
             if self.infraspe:
                 name = name + ' <i>%s</i>' % (self.infraspe)
         else:
@@ -387,7 +387,11 @@ class Species(models.Model):
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
-            spc = '<i>%s</i>' % self.species
+            spc = '<i>%s</i>' % (self.species)
+            if self.infraspr:
+                spc = '%s %s' % (spc, self.infraspr)
+            if self.infraspe:
+                spc = '%s <i>%s</i>' % (spc, self.infraspe)
             if self.is_hybrid:
                 spc = '%s %s' % (self.is_hybrid, spc)
         elif self.type == 'hybrid':
@@ -395,8 +399,6 @@ class Species(models.Model):
         else:
             spc = '<i>%s</i>' % self.species
 
-        if self.infraspr:
-            spc = '%s %s <i>%s</i>' % (spc, self.infraspr, self.infraspe)
         return spc
 
     def fullspeciesname(self):
@@ -1020,7 +1022,7 @@ class SpcImages(models.Model):
         return myname
 
     def imginfo(self):
-        myname = ''
+        myname = self.pid.abrevname()
         if self.name:
             myname = "%s '%s' " % (myname, self.name)
         if self.variation:
@@ -1142,7 +1144,10 @@ class HybImages(models.Model):
         return name
 
     def imginfo(self):
-        myname = ''
+        if self.source_file_name:
+            myname = self.source_file_name
+        else:
+            myname = self.pid.abrevname()
         if self.name:
             myname = "%s '%s' " % (myname, self.name)
         if self.variation:
