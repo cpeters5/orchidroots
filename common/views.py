@@ -402,7 +402,8 @@ def newbrowse(request, app=None):
     if app == None:
         #  Will redirect this to canonical
         app = request.GET.get('app', 'orchidaceae')
-
+    if not app:
+        app = 'orchidaceae'
     # handle request
     Family = apps.get_model('common', 'Family')
     family = request.GET.get('family', '')
