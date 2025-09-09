@@ -17,8 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         section = options['section']
 
-        if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'orchidaceae']:
-        # if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'species', 'hybrid', 'orchidaceae']:
+        if section not in ['animalia', 'aves', 'fungi', 'other', 'taxonomy', 'orchidaceaeSPC', 'orchidaceaeHYB', 'orchidaceae']:
             self.stdout.write(self.style.ERROR(f'Invalid section: {section}'))
             return
 
@@ -157,50 +156,48 @@ class Command(BaseCommand):
 
 
 # Orchid only sections
-#     Removed from sitemap.
-    def xxupdate_species(self):
-        from orchidaceae.models import Species, Genus
-        print("Get genus with species - Counting species")
-        for genus in Genus.objects.filter(genusstat__num_species__gt=0):
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/species/orchidaceae/?{query_params}"
-            entry, created = SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section="species",
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
-            # if genus.genus in priority_genera:
-            #     print(f"{'Added' if created else 'Updated'} species page: {genus_url}")
+#     def update_species(self):
+#         from orchidaceae.models import Species, Genus
+#         print("Get genus with species - Counting species")
+#         for genus in Genus.objects.filter(genusstat__num_species__gt=0):
+#             query_params = urlencode({'genus': genus.genus,})
+#             genus_url = f"{settings.SITE_URL}/common/species/orchidaceae/?{query_params}"
+#             entry, created = SitemapEntry.objects.update_or_create(
+#                 url=genus_url,
+#                 section="species",
+#                 defaults={
+#                     'change_frequency': 'monthly',
+#                     'priority': 0.7  # Higher priority for genus pages
+#                 }
+#             )
+#             # if genus.genus in priority_genera:
+#             #     print(f"{'Added' if created else 'Updated'} species page: {genus_url}")
+#
+#     def update_hybrid(self):
+#         from orchidaceae.models import Species, Genus
+#         print("Get genus with hybrid - Counting hybrids")
+#         genera_with_hybrids = Genus.objects.filter(genusstat__num_hybrid__gt=0)
+#         # genera_with_hybrids = Genus.objects.annotate(hybrid_count=Count('or7gen')).filter(hybrid_count__gt=0)
+#         for genus in genera_with_hybrids:
+#             query_params = urlencode({'genus': genus.genus,})
+#             genus_url = f"{settings.SITE_URL}/common/hybrid/orchidaceae/?{query_params}"
+#             SitemapEntry.objects.update_or_create(
+#                 url=genus_url,
+#                 section="hybrid",
+#                 defaults={
+#                     'change_frequency': 'monthly',
+#                     'priority': 0.7  # Higher priority for genus pages
+#                 }
+#             )
 
-    #     Removed from sitemap.
-    def xxupdate_hybrid(self):
+    def update_orchidaceaeSPC(self):
         from orchidaceae.models import Species, Genus
-        print("Get genus with hybrid - Counting hybrids")
-        genera_with_hybrids = Genus.objects.filter(genusstat__num_hybrid__gt=0)
-        # genera_with_hybrids = Genus.objects.annotate(hybrid_count=Count('or7gen')).filter(hybrid_count__gt=0)
-        for genus in genera_with_hybrids:
-            query_params = urlencode({'genus': genus.genus,})
-            genus_url = f"{settings.SITE_URL}/common/hybrid/orchidaceae/?{query_params}"
-            SitemapEntry.objects.update_or_create(
-                url=genus_url,
-                section="hybrid",
-                defaults={
-                    'change_frequency': 'monthly',
-                    'priority': 0.7  # Higher priority for genus pages
-                }
-            )
-
-    def update_orchidaceae(self):
-        from orchidaceae.models import Species, Genus
-        # Only for orchids
-        print("Get info pages for species/hybrids")
+        section = 'orchidaceaeSPC'
+        print("Get info pages for orchidacea species")
         priority_genera = ['Cattleya', 'Dendrobium', 'Phalaenopsis', 'Paphiopedilum', 'Cymbidium', 'Rhyncholaeliocattleya',
                            'Oncidium', 'Vanda', 'Rhyncattleanthe', 'Cattlianthe', 'Miltoniopsis', 'Masdevallia', 'Tolumnia', 'Phragmipedium']
 
-        for species in Species.objects.all():
+        for species in Species.objects.filter(type='species'):
             if species.status == 'synonym':
                 priority = 0.3
             elif species.genus in priority_genera:
@@ -210,7 +207,33 @@ class Command(BaseCommand):
             species_url = f"{settings.SITE_URL}/display/summary/orchidaceae/{species.pid}/"
             SitemapEntry.objects.update_or_create(
                 url=species_url,
-                section="orchidaceae",
+                section=section,
+                defaults={
+                    'change_frequency': 'monthly',
+                    'priority': priority
+                }
+            )
+
+
+    def update_orchidaceaeHYB(self):
+        from orchidaceae.models import Species, Genus
+        section = 'orchidaceaeHYB'
+        # Only for orchids
+        print("Get info pages for orchidaceae hybrids")
+        priority_genera = ['Cattleya', 'Dendrobium', 'Phalaenopsis', 'Paphiopedilum', 'Cymbidium', 'Rhyncholaeliocattleya',
+                           'Oncidium', 'Vanda', 'Rhyncattleanthe', 'Cattlianthe', 'Miltoniopsis', 'Masdevallia', 'Tolumnia', 'Phragmipedium']
+
+        for species in Species.objects.filter(type='hybrid'):
+            if species.status == 'synonym':
+                priority = 0.3
+            elif species.genus in priority_genera:
+                priority = 0.5
+            else:
+                priority = 0.4
+            species_url = f"{settings.SITE_URL}/display/summary/orchidaceae/{species.pid}/"
+            SitemapEntry.objects.update_or_create(
+                url=species_url,
+                section=section,
                 defaults={
                     'change_frequency': 'monthly',
                     'priority': priority
