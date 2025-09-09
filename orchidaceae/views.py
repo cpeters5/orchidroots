@@ -633,7 +633,7 @@ def progeny(request, pid):
         return render(request, 'orchidaceae/progeny_immediate.html', context)
 
     #Request all offsprings
-    des_list =  list(AncestorDescendant.objects.filter(pct__gt=20, aid=pid))
+    des_list =  list(AncestorDescendant.objects.filter(pct__gt=2, aid=pid))
     # Build canonical url
     canonical_url = request.build_absolute_uri(f'/orchidaceae/progeny/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
     context = {'result_list': des_list, 'species': species,
@@ -645,11 +645,19 @@ def progeny(request, pid):
     return render(request, 'orchidaceae/progeny.html', context)
 
 @login_required
-def progenyimg(request, pid):
+def progenyimg(request, pid=None):
     num_show = 5
     page_length = 30
     min_pct = 30
     role = getRole(request)
+
+    if not pid:
+        pid = request.GET.get('pid', None)
+
+    if not pid or not str(pid).isnumeric():
+        handle_bad_request(request)
+        return HttpResponseRedirect('/')
+
     try:
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
@@ -657,9 +665,8 @@ def progenyimg(request, pid):
         return HttpResponse(message)
     write_output(request, species.binomial)
     genus = species.genus
-
     des_list = AncestorDescendant.objects.filter(aid=pid).filter(pct__gt= min_pct)
-    des_list = des_list.order_by('-pct')
+    # des_list = des_list.order_by('-pct')
 
     img_list = []
     for x in des_list:
@@ -685,10 +692,10 @@ def progenyimg(request, pid):
             request, img_list, page_length, num_show)
 
     context = {'img_list': page_list, 'species': species, 'tab': 'lineage', 'lineage': 'active',
-               'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,
+               'num_show': num_show, 'first': first_item, 'last': last_item, 'role': role,  'app': 'orchidaceae',
                'genus': genus, 'page': page,
                'page_range': page_range, 'last_page': last_page, 'next_page': next_page, 'prev_page': prev_page,
-               'title': 'progenyimg', 'section': 'Public Area', 'app': 'orchidaceae',
+               'title': 'progenyimg', 'section': 'Public Area',
                }
     return render(request, 'orchidaceae/progenyimg.html', context)
 
@@ -709,8 +716,15 @@ def distribution(request, pid):
     dist_list = Distribution.objects.filter(pid=accid)
     tuples = []
     for x in dist_list:
-        tupl = (x.region_id.name, x.subregion_id.name)
-        tuples.append(tupl)
+        region_name = ''
+        subregion_name = ''
+        if x.region_id:
+            region_name = x.region_id.name
+        if x.subregion_id:
+            subregion_name = x.subregion_id.name
+        if region_name or subregion_name:
+            tupl = (region_name, subregion_name)
+            tuples.append(tupl)
 
     grouped = defaultdict(list)
     for key, value in tuples:
