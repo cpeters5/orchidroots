@@ -162,33 +162,31 @@ def summary(request, app=None, pid=None):
         if species.status == 'synonym':
             species = species.getAccepted()
 
-        if species.hybrid.seed_id and species.hybrid.seed_id.type == 'species':
-            SpcImages = getSpcImages(app, 'species')
-            try:
-                seed_obj = Species.objects.get(pk=species.hybrid.seed_id.pid)
+        if species.hybrid.seed_id:
+            if species.hybrid.seed_id.type == 'species':
+
+                SpcImages = getSpcImages(app, 'species')
+                try:
+                    seed_obj = Species.objects.get(pk=species.hybrid.seed_id.pid)
+                    seedimg_list = get_parent_images(seed_obj, SpcImages)
+                except Species.DoesNotExist:
+                    seed_obj = ''
+            elif species.hybrid.seed_id.type == 'hybrid':
+                SpcImages = getSpcImages(app, 'hybrid')
+                if species.hybrid.seed_id and species.hybrid.seed_id.status != 'synonym':
+                    seed_obj = species.hybrid.seed_id.hybrid
+                else:
+                    seed_obj = species.hybrid.seed_id.getAccepted().hybrid
                 seedimg_list = get_parent_images(seed_obj, SpcImages)
-            except Species.DoesNotExist:
-                seed_obj = ''
 
-
-        elif species.hybrid.seed_id and species.hybrid.seed_id.type == 'hybrid':
-            SpcImages = getSpcImages(app, 'hybrid')
-            if species.hybrid.seed_id and species.hybrid.seed_id.status != 'synonym':
-                seed_obj = species.hybrid.seed_id.hybrid
-            else:
-                seed_obj = species.hybrid.seed_id.getAccepted().hybrid
-
-            seedimg_list = SpcImages.objects.filter(pid=seed_obj.pid).filter(rank__lt=7).filter(
-                rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
-
-            if isinstance(seed_obj, Hybrid):
+                # if isinstance(seed_obj, Hybrid):
                 if seed_obj.seed_id:
                     ss_type = seed_obj.seed_id.type
                     if ss_type == 'species':
                         SpcImages = getSpcImages(app, 'species')
                         ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                         if not ss_list and seed_obj.seed_id.status == 'synonym':
-                            ss_list = SpcImages.objects.filter(pid=ssacc_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                            ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
                     elif ss_type == 'hybrid':
                         SpcImages = getSpcImages(app, 'hybrid')
                         ss_list = SpcImages.objects.filter(pid=seed_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
@@ -203,58 +201,60 @@ def summary(request, app=None, pid=None):
                     elif sp_type == 'hybrid':
                         SpcImages = getSpcImages(app, 'hybrid')
                         sp_list = SpcImages.objects.filter(pid=seed_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).filter(rank__lt=7).order_by('-rank', 'quality', '?')[: 1]
+
+
         # Pollen
-        if species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'species':
-            seedimg_list = get_parent_images(species.hybrid.seed_id, SpcImages)
-            try:
-                pollen_obj = Species.objects.get(pk=species.hybrid.pollen_id.pid)
-            except Species.DoesNotExist:
-                pollen_obj = ''
-            SpcImages = getSpcImages(app, 'species')
-            if isinstance(pollen_obj, Species):
-                pollimg_list = get_parent_images(pollen_obj, SpcImages)
+        if species.hybrid.pollen_id:
+            if species.hybrid.pollen_id.type == 'species':
+                try:
+                    pollen_obj = Species.objects.get(pk=species.hybrid.pollen_id.pid)
+                except Species.DoesNotExist:
+                    pollen_obj = ''
+                SpcImages = getSpcImages(app, 'species')
+                if isinstance(pollen_obj, Species):
+                    pollimg_list = get_parent_images(pollen_obj, SpcImages)
 
             # pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid).filter(rank__lt=7).filter(rank__gt=0)
             # if not pollimg_list and pollen_obj.status == 'synonym':
             #     pollimg_list = SpcImages.objects.filter(pid=pollen_obj.getAcc()).filter(rank__lt=7).filter(rank__gt=0)
             # pollimg_list = pollimg_list.order_by('-rank', 'quality', '?')[0: 3]
-        elif species.hybrid.pollen_id and species.hybrid.pollen_id.type == 'hybrid':
-            SpcImages = getSpcImages(app, 'hybrid')
-            if species.hybrid.pollen_id and species.hybrid.pollen_id.status != 'synonym':
-                pollen_obj = species.hybrid.pollen_id.hybrid
             else:
-                pollen_obj = species.hybrid.pollen_id.getAccepted().hybrid
-            pollimg_list = get_parent_images(pollen_obj, SpcImages)
+                SpcImages = getSpcImages(app, 'hybrid')
+                if species.hybrid.pollen_id and species.hybrid.pollen_id.status != 'synonym':
+                    pollen_obj = species.hybrid.pollen_id.hybrid
+                else:
+                    pollen_obj = species.hybrid.pollen_id.getAccepted().hybrid
+                pollimg_list = get_parent_images(pollen_obj, SpcImages)
 
-            if isinstance(pollen_obj, Hybrid):
-                # pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
-                if pollen_obj.seed_id:
-                    ps_type = pollen_obj.seed_id.type
-                    if ps_type == 'species':
-                        SpcImages = getSpcImages(app, 'species')
-                        ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                        if not ps_list and pollen_obj.seed_id.status == 'synonym':
-                            ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                    elif ps_type == 'hybrid':
-                        SpcImages = getSpcImages(app, 'hybrid')
-                        ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                        if not ps_list and pollen_obj.seed_id.status == 'synonym':
-                            ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(
-                                rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                if isinstance(pollen_obj, Hybrid):
+                    # pollimg_list = SpcImages.objects.filter(pid=pollen_obj.pid.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[0: 3]
+                    if pollen_obj.seed_id:
+                        ps_type = pollen_obj.seed_id.type
+                        if ps_type == 'species':
+                            SpcImages = getSpcImages(app, 'species')
+                            ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                            if not ps_list and pollen_obj.seed_id.status == 'synonym':
+                                ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                        elif ps_type == 'hybrid':
+                            SpcImages = getSpcImages(app, 'hybrid')
+                            ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                            if not ps_list and pollen_obj.seed_id.status == 'synonym':
+                                ps_list = SpcImages.objects.filter(pid=pollen_obj.seed_id.getAccepted().pid).filter(rank__lt=7).filter(
+                                    rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
 
-                if pollen_obj.pollen_id:
-                    pp_type = pollen_obj.pollen_id.type
-                    if pp_type == 'species':
-                        SpcImages = getSpcImages(app, 'species')
-                        pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                        if not pp_list and pollen_obj.pollen_id.status == 'synonym':
-                            pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                    elif pp_type == 'hybrid':
-                        SpcImages = getSpcImages(app, 'hybrid')
-                        pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
-                        if not pp_list and pollen_obj.pollen_id.status == 'synonym':
-                            pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by(
-                                    '-rank', 'quality', '?')[: 1]
+                    if pollen_obj.pollen_id:
+                        pp_type = pollen_obj.pollen_id.type
+                        if pp_type == 'species':
+                            SpcImages = getSpcImages(app, 'species')
+                            pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                            if not pp_list and pollen_obj.pollen_id.status == 'synonym':
+                                pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                        elif pp_type == 'hybrid':
+                            SpcImages = getSpcImages(app, 'hybrid')
+                            pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.pid).filter(rank__lt=7).filter(rank__gt=0).order_by('-rank', 'quality', '?')[: 1]
+                            if not pp_list and pollen_obj.pollen_id.status == 'synonym':
+                                pp_list = SpcImages.objects.filter(pid=pollen_obj.pollen_id.getAccepted().pid).filter(rank__lt=7).filter(rank__gt=0).order_by(
+                                        '-rank', 'quality', '?')[: 1]
         species = tmpspecies
 
     # determine if synonyms tab is needed
