@@ -121,7 +121,7 @@ img{
                     </a>
                     </div>
                     <div class="imgcaption">
-                        {{x.name|safe}} ({{x.pct}}%)<br>
+                        {{x.name|safe}} ({{x.pct|default:0|floatformat:1}}%)<br>
                         (
                         {% if x.seed %}
                             <a href="{% url 'display:summary' app x.seed %}?role={{role}}">{{x.seed_name|safe}}</a>
