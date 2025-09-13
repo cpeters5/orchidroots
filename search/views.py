@@ -33,7 +33,6 @@ def autocomplete_species(request):
     return JsonResponse({'suggestions': suggestions})
 
 
-
 # Search scientific name
 def search(request, app=None):
     if not app:
@@ -104,7 +103,7 @@ def search(request, app=None):
         elif len(search_tail) > 3:
             matched_species = Species.objects.filter(species__icontains=search_tail).exclude(species=search_tail).exclude(binomial__istartswith=search_string).order_by('binomial')
     found_species = found_species1|found_species2
-    
+
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_species': matched_species, 'found_species': found_species,
                'matched_genus':matched_genus, 'exact_match': exact_match,
