@@ -1370,10 +1370,12 @@ def newcross(request, pid1, pid2):
     genus1 = species1.genus
     genus2 = species2.genus
     spc2 =species2.species
-
-    # Find nothogenus that have already been defined
-    genus = Hybrid.objects.filter(Q(seed_genus=genus1, pollen_genus=genus2) | Q(seed_genus=genus2, pollen_genus=genus1))
-    genus = genus.exclude(pid__status='synonym').filter(pid__source='RHS').first()
+    if genus1 == genus2:
+        genus = genus1
+    else:
+        # Find nothogenus that have already been defined
+        genus = Hybrid.objects.filter(Q(seed_genus=genus1, pollen_genus=genus2) | Q(seed_genus=genus2, pollen_genus=genus1))
+        genus = genus.exclude(pid__status='synonym').filter(pid__source='RHS').first()
     if genus:
         # Create new cross here
         # ------------------------------------------------
