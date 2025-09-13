@@ -119,6 +119,7 @@ td {
                                     {{species.getAccepted.binomial}} (syn)
                                 {% endif %}
                             {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
+                            {% elif species.common_name %}{{species.common_name}}
                             {% endif %}
                         </td>
                     </tr>
@@ -147,6 +148,7 @@ td {
                                     {{species.getAccepted.binomial_it|safe}} (syn)
                                 {% endif %}
                             {% elif species.type == 'hybrid' %}  {{species.hybrid.seed_id.name|safe}} x {{species.hybrid.pollen_id.name|safe}}
+                            {% elif species.common_name %}{{species.common_name}}
                             {% endif %}
                         </td>
                     </tr>
