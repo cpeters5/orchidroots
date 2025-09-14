@@ -132,7 +132,7 @@
                     </li>
                     {% if species.source != 'RHS' %}
                         <li class="nav-item">
-                            <a class="nav-link {{dist}}" href="/{{app}}/distribution/{{species.pid}}/?role={{role}}" data-nosnippet>Distribution</a>
+                            <a class="nav-link {{dist}}" href="{% url 'common:distribution' app species.pid %}?role={{role}}" data-nosnippet>Distribution</a>
                         </li>
                     {% endif %}
                 {% endif %}

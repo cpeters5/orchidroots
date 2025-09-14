@@ -16,7 +16,6 @@ from itertools import chain
 from fuzzywuzzy import fuzz, process
 from utils import config
 from utils.views import handle_bad_request, write_output, getRole, thumbdir, redirect_to_referrer
-from collections import defaultdict
 # from myproject import config
 import logging
 import random
@@ -672,47 +671,6 @@ def progenyimg(request, pid=None):
                'title': 'progenyimg', 'section': 'Public Area',
                }
     return render(request, 'orchidaceae/progenyimg.html', context)
-
-
-@login_required
-def distribution(request, pid):
-    role = getRole(request)
-    try:
-        species = Species.objects.get(pk=pid)
-    except Species.DoesNotExist:
-        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
-        return HttpResponse(message)
-
-    if species.status == 'synonym':
-        accid = species.synonym.acc_id
-    else:
-        accid = pid
-    dist_list = Distribution.objects.filter(pid=accid)
-    tuples = []
-    for x in dist_list:
-        region_name = ''
-        subregion_name = ''
-        if x.region_id:
-            region_name = x.region_id.name
-        if x.subregion_id:
-            subregion_name = x.subregion_id.name
-        if region_name or subregion_name:
-            tupl = (region_name, subregion_name)
-            tuples.append(tupl)
-
-    grouped = defaultdict(list)
-    for key, value in tuples:
-        grouped[key].append(value)
-
-    # Convert to a list of tuples for template compatibility
-    grouped_list = [(k, grouped[k]) for k in grouped]
-
-
-    context = {'grouped': grouped_list, 'species': species,'tab': 'dist', 'dist': 'active', 'role': role,
-               'title': 'distribution', 'app': 'orchidaceae',
-               }
-    write_output(request, species.binomial)
-    return render(request, 'orchidaceae/distribution.html', context)
 
 
 def valid_year(year):

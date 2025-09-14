@@ -12,8 +12,9 @@ urlpatterns = [
     path('species/<str:app>/', views.species, name='species'),
     path('species/', views.species, name='species'),
     path('synonym/<str:app>/<int:pid>/', views.synonym, name='synonym'),
-    
-    path('distribution/', views.distribution, name='distribution'),
+    path('distribution/<str:app>/<int:pid>/', views.distribution, name='distribution'),
+
+    # path('distribution/', views.distribution, name='distribution'),
     path('newbrowse/', views.newbrowse, name='newbrowse'),
     path('newbrowse/<str:app>/', views.newbrowse, name='newbrowse'),
     path('compare/<int:pid>/', views.compare, name='compare'),

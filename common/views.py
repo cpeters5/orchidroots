@@ -15,6 +15,8 @@ from django.urls import reverse, reverse_lazy, resolve
 from django.utils import timezone
 from itertools import chain
 import django.shortcuts
+from collections import defaultdict
+
 from django.apps import apps
 from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
@@ -401,6 +403,48 @@ def synonym(request, app, pid):
     return render(request, 'orchidaceae/synonym.html', context)
 
 
+def distribution(request, app, pid):
+    Species = apps.get_model(app, 'Species')
+    Distribution = apps.get_model(app, 'Distribution')
+    role = getRole(request)
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+
+    if species.status == 'synonym':
+        accid = species.synonym.acc_id
+    else:
+        accid = pid
+    dist_list = Distribution.objects.filter(pid=accid)
+    tuples = []
+    for x in dist_list:
+        region_name = ''
+        subregion_name = ''
+        if x.region_id:
+            region_name = x.region_id.name
+        if x.subregion_id:
+            subregion_name = x.subregion_id.name
+        if region_name or subregion_name:
+            tupl = (region_name, subregion_name)
+            tuples.append(tupl)
+
+    grouped = defaultdict(list)
+    for key, value in tuples:
+        grouped[key].append(value)
+
+    # Convert to a list of tuples for template compatibility
+    grouped_list = [(k, grouped[k]) for k in grouped]
+
+
+    context = {'grouped': grouped_list, 'species': species,'tab': 'dist', 'dist': 'active', 'role': role,
+               'title': 'distribution', 'app': app,
+               }
+    write_output(request, species.binomial)
+    return render(request, 'orchidaceae/distribution.html', context)
+
+
 def rank_update(rank, orid, SpcImages):
     try:
         image = SpcImages.objects.get(pk=orid)
@@ -543,7 +587,7 @@ def newbrowse(request, app=None):
     return render(request, 'common/newbrowse.html', context)
 
 
-def distribution(request):
+def xdistribution(request):
     # For non-orchids only
     alpha = ''
     distribution = ''
