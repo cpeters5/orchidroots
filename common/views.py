@@ -1346,41 +1346,31 @@ def newcross(request, pid1, pid2):
     import datetime
     # Assume both pids are accepted
     # Assume cross does not exist
-    role = getRole(request)
     app, family = get_application(request)
-    GenusRelation = apps.get_model(app, 'GenusRelation')
     Species = apps.get_model(app, 'Species')
     Hybrid = apps.get_model(app, 'Hybrid')
     species1 = Species.objects.get(pk=pid1)
     species2 = Species.objects.get(pk=pid2)
-    if app == 'orchidaceae' and species1.type == 'hybrid':
-        SpcImages = apps.get_model(app, 'HybImages')
-    else:
-        SpcImages = apps.get_model(app, 'SpcImages')
-    spcimg1_list = SpcImages.objects.filter(pid=pid1).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
-
-    if app == 'orchidaceae' and species2.type == 'hybrid':
-        SpcImages = apps.get_model(app, 'HybImages')
-    else:
-        SpcImages = apps.get_model(app, 'SpcImages')
-    spcimg2_list = SpcImages.objects.filter(pid=pid2).filter(rank__lt=7).order_by('-rank', 'quality', '?')[0: 2]
 
     #  Find if Nothogenus (genus1 x genus2) has been defined by checking in existing hybrids with same genus cross.
     #  If not, the cross cannot be created
     genus1 = species1.genus
     genus2 = species2.genus
     spc2 =species2.species
-    if genus1 == genus2:
-        genus = genus1
-    else:
-        # Find nothogenus that have already been defined
-        genus = Hybrid.objects.filter(Q(seed_genus=genus1, pollen_genus=genus2) | Q(seed_genus=genus2, pollen_genus=genus1))
-        genus = genus.exclude(pid__status='synonym').filter(pid__source='RHS').first()
+    genus = Hybrid.objects.filter(Q(seed_genus=genus1, pollen_genus=genus2) | Q(seed_genus=genus2, pollen_genus=genus1))
+    genus = genus.exclude(pid__status='synonym').filter(pid__source='RHS').first()
     if genus:
+        nothogenus = genus.pid.genus
+    elif genus1 == genus2:
+        nothogenus = genus1
+    else:
+        nothogenus = ''
+
+    if nothogenus:
         # Create new cross here
         # ------------------------------------------------
         spcobj = Species()
-        spcobj.genus = genus.pid.genus
+        spcobj.genus = nothogenus
         spcobj.species = species1.species + '-' + species2.species
         if species2.infraspe:
             spcobj.species = spcobj.species + '-' + species2.infraspe
@@ -1391,8 +1381,6 @@ def newcross(request, pid1, pid2):
         datetime_obj = datetime.datetime.now()
         spcobj.year = datetime_obj.year
         spcobj.save()
-        # spcobj = Species.objects.get(pk=spcobj.pid)
-        newspecies = Species.objects.get(pk=spcobj.pid)
 
         # Now create Hybrid instance
         hybobj = Hybrid()
@@ -1409,10 +1397,6 @@ def newcross(request, pid1, pid2):
         return HttpResponseRedirect("/display/summary/orchidaceae/" + str(spcobj.pid) + "/")
         # ---------------------------------------------
     else:
-        # Nothogenus has not been defined. No can do.
-        genus = ''
-        # Orthogenus not found
-        message = 'The nothogenus (' + genus1 + ' x ' + genus2 + ') is not defined'
         pid2 = None
         return HttpResponseRedirect("/common/compare/" + str(pid1) + "/?app=orchidaceae&pid=" + str(pid2) + "&failmsg=FAILGENUS&genus2=" + genus2 + "&species2=" + spc2)
 
