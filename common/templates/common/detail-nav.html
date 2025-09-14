@@ -82,7 +82,7 @@
                 {% endif %}
 
                 {% if synonyms > 0 %}
-                    <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'orchidaceae:synonym' species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Synonyms</a></li>
+                    <li class="nav-item"><a class="nav-link {{syn}}" href="{% url 'common:synonym' app species.pid %}?role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Synonyms</a></li>
                 {% endif %}
 
                 {% if infras %}

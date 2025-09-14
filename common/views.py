@@ -373,6 +373,34 @@ def hybrid(request, app):
     return HttpResponsePermanentRedirect(canonical_url)
 
 
+def synonym(request, app, pid):
+    role = getRole(request)
+    Species = apps.get_model(app, 'Species')
+    Synonym = apps.get_model(app, 'Synonym')
+
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        message = 'This hybrid does not exist! Use arrow key to go back to previous page.'
+        return HttpResponse(message)
+    #  If requested species is a synonym, convert it to accepted species
+    if species.status == 'synonym':
+        species = species.getAccepted()
+
+    write_output(request, species.binomial)
+    genus = species.genus
+    synonym_list = Synonym.objects.filter(acc_id=species.pid)
+
+    canonical_url = request.build_absolute_uri(f'/{app}/synonym/{pid}/').replace('www.orchidroots.com', 'orchidroots.com')
+
+    context = {'synonym_list': synonym_list, 'species': species,
+               'tab': 'syn', 'syn': 'active', 'genus': genus,
+               'role': role, 'app': app,
+               'canonical_url': canonical_url,
+               }
+    return render(request, 'orchidaceae/synonym.html', context)
+
+
 def rank_update(rank, orid, SpcImages):
     try:
         image = SpcImages.objects.get(pk=orid)

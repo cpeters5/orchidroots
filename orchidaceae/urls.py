@@ -26,7 +26,7 @@ urlpatterns = [
     path('section/', views.section, name='section'),
     path('subsection/', views.subsection, name='subsection'),
     path('series/', views.series, name='series'),
-    path('synonym/<int:pid>/', views.synonym, name='synonym'),
+    # path('synonym/<int:pid>/', views.synonym, name='synonym'),  # moved to common
     # path('browsegen/', views.browsegen, name='browsegen'),
 
     # Redirect to detail
