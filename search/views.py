@@ -104,7 +104,14 @@ def search(request, app=None):
             matched_species = Species.objects.filter(species__istartswith=search_tail).exclude(species=search_tail).exclude(binomial__istartswith=search_string).order_by('binomial')
         elif len(search_tail) > 3:
             matched_species = Species.objects.filter(species__icontains=search_tail).exclude(species=search_tail).exclude(binomial__istartswith=search_string).order_by('binomial')
-    found_species = found_species1|found_species2
+    if isinstance(found_species1, Species) and isinstance(found_species2, Species):
+        found_species = found_species1 | found_species2
+    elif isinstance(found_species1, Species):
+        found_species = found_species1
+    elif isinstance(found_species2, Species):
+        found_species = found_species2
+    else:
+        found_species = []
 
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_species': matched_species, 'found_species': found_species,
