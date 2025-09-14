@@ -35,6 +35,7 @@ def autocomplete_species(request):
 
 # Search scientific name
 def search(request, app=None):
+    from django.db.models.query import QuerySet
     if not app:
         # Legacy case, app may be given in query string
         app = request.GET.get('app', 'orchidaceae')  # handle legacy case
@@ -104,11 +105,11 @@ def search(request, app=None):
             matched_species = Species.objects.filter(species__istartswith=search_tail).exclude(species=search_tail).exclude(binomial__istartswith=search_string).order_by('binomial')
         elif len(search_tail) > 3:
             matched_species = Species.objects.filter(species__icontains=search_tail).exclude(species=search_tail).exclude(binomial__istartswith=search_string).order_by('binomial')
-    if isinstance(found_species1, Species) and isinstance(found_species2, Species):
+    if isinstance(found_species1, QuerySet) and isinstance(found_species2, QuerySet):
         found_species = found_species1 | found_species2
-    elif isinstance(found_species1, Species):
+    elif isinstance(found_species1, QuerySet):
         found_species = found_species1
-    elif isinstance(found_species2, Species):
+    elif isinstance(found_species2, QuerySet):
         found_species = found_species2
     else:
         found_species = []
