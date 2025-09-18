@@ -13,6 +13,7 @@ from accounts.models import User, Photographer
 from utils.views import write_output, getRole, clean_search_string, expand_genus_name, Replace, MultiReplace, RemoveSpaces, clean_query, clean_name
 from utils import config
 import unicodedata
+from django.db.models import Subquery
 
 applications = config.applications
 big_genera = config.big_genera
@@ -113,7 +114,8 @@ def search(request, app=None):
         found_species = found_species2
     else:
         found_species = []
-
+    # found_species = found_species.difference(matched_species)
+    found_species = found_species.exclude(pid__in=Subquery(matched_species.values('pid')))
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_species': matched_species, 'found_species': found_species,
                'matched_genus':matched_genus, 'exact_match': exact_match,
