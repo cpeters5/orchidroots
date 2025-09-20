@@ -416,7 +416,7 @@ a:hover {
                             </div>
                         {% endif %}
                         <div class="imgcaption">
-                            {{image.author.displayname}}
+                            {{image.get_displayname}}
                             {% include 'common/curate_links.html' %}
                         </div>
                     </div>
