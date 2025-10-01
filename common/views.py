@@ -23,7 +23,8 @@ from datetime import datetime, timedelta
 from utils import config
 from utils.views import write_output, getRole, get_author, get_reqauthor, getSuperGeneric, pathinfo, get_application
 from common.models import Family, Subfamily, Tribe, Subtribe, Region, SubRegion
-from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages
+from orchidaceae.models import Genus, Subgenus, Section, Subsection, Series, Intragen, HybImages, GenusStat
+
 from accounts.models import User, Photographer
 # import utils.config
 
@@ -48,11 +49,11 @@ def home(request):
     # Get sample images of orchids
     SpcImages = apps.get_model('orchidaceae', 'SpcImages')
     Genus = apps.get_model('orchidaceae', 'Genus')
-    genera = Genus.objects.order_by('?')
+    GenusStat = apps.get_model('orchidaceae', 'GenusStat')
+    genera = Genus.objects.filter(genusstat__best_image__isnull=False).select_related('genusstat').order_by('?')
     orcimage = []
     for x in genera:
-        if x.get_best_img():
-            orcimage = orcimage + [x.get_best_img()]
+        orcimage = orcimage + [x.get_best_img()]
         if len(orcimage) > 3:
             break
 
@@ -548,136 +549,26 @@ def newbrowse(request, app=None):
             if len(species) > 500:
                 species = species[0: 500]
             species_list = species
-            # species_list = []
-            # for x in species:
-            #     spcimage = x.get_best_img()
-            #     if spcimage:
-            #         species_list = species_list + [spcimage]
             context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list, 'type': type,}
             return render(request, 'common/newbrowse.html', context)
 
     elif family:
         # Browse genus image in the Family
-        if app == 'orchidaceae' and type == 'hybrid':
-            SpcImages = apps.get_model(app.lower(), 'HybImages')
-        else:
-            SpcImages = apps.get_model(app.lower(), 'SpcImages')
+        genlist = Genus.objects.filter(genusstat__best_image__isnull=False).select_related('genusstat')
+        if alpha:
+            genlist = genlist.filter(genus__istartswith=alpha)
+        genlist = genlist.order_by('genus')
+        genus_list = []
+        for gen in genlist:
+            if gen.get_best_img():
+                genus_list = genus_list + [gen.get_best_img()]
+        context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
+                   'alpha_list': alpha_list, 'app': app, 'type': type, }
+        return render(request, 'common/newbrowse.html', context)
 
-        # genera = Genus.objects.filter(family=family)
-        if app == 'orchidaceae':
-            genimg = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen', flat=True).distinct()
-        else:
-            genimg = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by('gen').values_list('gen', flat=True).distinct()
-
-        if genimg:
-            genus_list = []
-            genimg = set(genimg)
-            genlist = Genus.objects.filter(pid__in=genimg)
-            if alpha:
-                genlist = genlist.filter(genus__istartswith=alpha)
-            genlist = genlist.order_by('genus')
-            for gen in genlist:
-                if gen.get_best_img():
-                    genus_list = genus_list + [gen.get_best_img()]
-            context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
-                       'alpha_list': alpha_list, 'app': app, 'type': type,}
-            return render(request, 'common/newbrowse.html', context)
     context = {'genus_list': '', 'family': family, 'app': app, 'alpha': alpha,
                'alpha_list': alpha_list, 'type': type,}
     return render(request, 'common/newbrowse.html', context)
-
-
-def xdistribution(request):
-    # For non-orchids only
-    alpha = ''
-    distribution = ''
-    genus = ''
-    commonname = ''
-    family = ''
-    subfamily = ''
-    tribe = ''
-    subtribe = ''
-    crit = 0
-    role = request.GET.get('role', 'pub')
-    family = request.GET.get('family', None)
-    if family:
-        try:
-            family = Family.objects.get(family=family)
-            if family != '' and family.family != 'Orchidaceae':
-                crit = 1
-            app = family.application
-        except Family.DoesNotExist:
-            family = ''
-            app = None
-    else:
-        app = request.GET.get('app', None)
-        if not app:
-            return render(request, "common/distribution.html", {})
-    Genus = apps.get_model(app, 'Genus')
-    Species = apps.get_model(app, 'Species')
-    Distribution = apps.get_model(app, 'Distribution')
-
-    reqgenus = request.GET.get('genus', None)
-    if genus:
-        try:
-            genus = Genus.objects.get(genus=reqgenus)
-            crit = 1
-        except Genus.DoesNotExist:
-            genus = None
-
-    distribution = request.GET.get('distribution', '')
-    if distribution != '': crit = 1
-
-    species_list = []
-    if crit:
-        # initialize species_list if family is not orchidaceae
-        species_list = Species.objects.filter(family=family)
-
-        # filter species list if Genus is requested
-        if not genus:
-            genus = ''
-        if genus != '':
-            if species_list:
-                species_list = species_list.filter(genus=genus)
-            else:
-                # this is orchid case with a requested genus
-                species_list = Species.objects.filter(genus=genus)
-        if distribution:
-            # build distribution list
-            if family.family != 'Orchidaceae':
-                dist_list = Distribution.objects.filter(dist_id__dist__icontains=distribution).values_list('pid', flat=True)
-                species_list = Species.objects.filter(pid__in=dist_list)
-            else:
-                # Orchidaceae has a different Distribution class
-                # Build distribution list
-                dist_list = []
-                subreg_list = SubRegion.objects.filter(name__icontains=distribution).values_list('code', flat=True)
-                if len(subreg_list) > 0:
-                    dist_list = Distribution.objects.filter(subregion_id__in=subreg_list).values_list('pid', flat=True)
-                # requested distribution could elther be region or subregion
-                reg_list = Region.objects.filter(name__icontains=distribution).values_list('id', flat=True)
-                if len(reg_list) > 0:
-                    dist_list = dist_list + Distribution.objects.filter(region_id__in=reg_list).values_list('pid', flat=True)
-                dist_list = list(set(dist_list))
-
-                # Filter species list
-                if species_list:
-                    species_list = species_list.filter(pid__in=dist_list)
-                else:
-                    species_list = Species.objects.filter(pid__in=dist_list)
-
-        if species_list:
-            alpha = request.GET.get('alpha', '')
-            if alpha != '':
-                species_list = species_list.filter(species__istartswith=alpha)
-            species_list = species_list.order_by('species')
-        total = len(species_list)
-    context = {'species_list': species_list, 'distribution': distribution, 'commonname': commonname,
-               'family': family, 'genus': genus,
-               'role': role, 'app': 'other', 'alpha': alpha, 'alpha_list': alpha_list,
-               }
-    write_output(request, str(distribution))
-    return render(request, "common/distribution.html", context)
 
 
 def mypaginator(request, full_list, page_length, num_show):

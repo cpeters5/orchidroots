@@ -13,12 +13,24 @@
     width:90%;
     font-size: 13px;
 }
+.thumbnails {
+    object-fit: cover;
+    overflow: hidden;
+    height: 70px;
+    width : 70px;
+    margin:5px auto;
+}
 
 @media only screen and (max-width: 700px){
     .progen {
         width:95%;
         font-size: 11px;
     }
+    .thumbnails {
+       height: 80px;
+       width: 80px;
+    }
+
 }
 </style>
 
@@ -66,7 +78,9 @@
                     {{hybrid.pct|floatformat:0}}%
                 </td>
                 <td class="text-left" valign="middle">
-                    {% if hybrid.did.pid.speciesstat.num_image %}{{hybrid.did.pid.speciesstat.num_image}} {% endif %}
+                    {% if hybrid.did.pid.speciesstat.num_image %}
+                    <img class="thumbnails" alt="{{hybrid.pid.name|safe}}" src="/static/{{hybrid.did.pid.speciesstat.best_image}}">
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
