@@ -64,8 +64,6 @@ Distribution = apps.get_model('orchidaceae', 'Distribution')
 SpcImages = apps.get_model('orchidaceae', 'SpcImages')
 HybImages = apps.get_model('orchidaceae', 'HybImages')
 UploadFile = apps.get_model('orchidaceae', 'UploadFile')
-SpcImgHistory = apps.get_model('orchidaceae', 'SpcImgHistory')
-HybImgHistory = apps.get_model('orchidaceae', 'HybImgHistory')
 Photographer = apps.get_model('accounts', 'Photographer')
 AncestorDescendant = apps.get_model('orchidaceae', 'AncestorDescendant')
 ReidentifyHistory = apps.get_model('orchidaceae', 'ReidentifyHistory')
@@ -415,7 +413,7 @@ def curateinfospc(request, pid):
             spc.operator = request.user
             spc.save()
 
-            url = "%s?role=%s&family=%s" % (reverse('display:information', args=(species.pid,)), role, species.gen.family)
+            url = "%s?role=%s&family=%s" % (reverse('display:summary', args=(app,species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")
@@ -424,7 +422,7 @@ def curateinfospc(request, pid):
         form = AcceptedInfoForm(instance=accepted)
         context = {'form': form, 'genus': genus, 'species': species,
                    'title': 'curateinfo', 'tab': 'ins', tab: 'active', 'distribution_list': distribution_list,
-                   'role': role,}
+                   'role': role, 'app': app,}
         return render(request, 'detail/curateinfospc.html', context)
 
 
@@ -485,7 +483,7 @@ def curateinfohyb(request, pid):
             spcspc.save()
             spc.save()
             # url = "%s?role=%s&family=Orchidaceae" % (reverse('display:information', args=(pid,)), role)
-            url = "%s?role=%s&family=%s" % (reverse('display:information', args=(species.pid,)), role, species.gen.family)
+            url = "%s?role=%s&family=%s" % (reverse('display:summary', args=(app,species.pid,)), role, species.gen.family)
             return HttpResponseRedirect(url)
         else:
             return HttpResponse("POST: Somethign's wrong")
@@ -495,6 +493,7 @@ def curateinfohyb(request, pid):
 
         context = {'form': form, 'spcform': spcform, 'genus': genus, 'species': species,
                    'tab': 'inh', tab: 'active', 'title': 'curateinfo', 'role': role,
+                   'app': app,
                    }
         return render(request, 'detail/curateinfohyb.html', context)
 

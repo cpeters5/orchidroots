@@ -673,8 +673,12 @@ table.dataTable {
                         <a class="nav-link dropdown-toggle custom-find" href="#" role="button" data-toggle="dropdown"><span style="color:white">{{user}}&nbsp;</span></a>
                         <ul class="dropdown-menu">
                             {% if user.tier.tier > 2 %}
-                                {% if user.tier.tier == 15 %}
-                                    <li><a class="dropdown-item" href="{% url 'common:curate_newupload' %}?role=cur&family=Orchidaceae" rel="nofollow noreferrer noopener" data-nosnippet>Orchidroots</a></li>
+                                {% if user.tier.tier == 5 %}
+                                    {% if species.type == 'hybrid' %}
+                                        <li><a class="dropdown-item" href="/{{app}}/curateinfohyb/{{species.pid}}" rel="nofollow noreferrer noopener" data-nosnippet>Curateinfohyb</a></li>
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="/{{app}}/curateinfospc/{{species.pid}}" rel="nofollow noreferrer noopener" data-nosnippet>Curateinfohyb</a></li>
+                                    {% endif %}
                                     <li><a class="dropdown-item" href="{% url 'admin:index' %}" rel="nofollow noreferrer noopener" data-nosnippet>Admin</a></li>
                                     <li><a class="dropdown-item" href="{% url 'documents:maintenance' %}" rel="nofollow noreferrer noopener" data-nosnippet>Maintenance</a></li>
                                     <li><a class="dropdown-item" href="https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/realtime/rt-location/a128957305w207417477p200133280/">Google Analytics</a></li>
