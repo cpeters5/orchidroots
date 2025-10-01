@@ -115,7 +115,8 @@ def search(request, app=None):
     else:
         found_species = []
     # found_species = found_species.difference(matched_species)
-    found_species = found_species.exclude(pid__in=Subquery(matched_species.values('pid')))
+    if found_species:
+        found_species = found_species.exclude(pid__in=Subquery(matched_species.values('pid')))
     write_output(request, search_string)
     context = {'search_string': search_string, 'matched_species': matched_species, 'found_species': found_species,
                'matched_genus':matched_genus, 'exact_match': exact_match,
