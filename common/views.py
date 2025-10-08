@@ -53,9 +53,11 @@ def home(request):
     genera = Genus.objects.filter(genusstat__best_image__isnull=False).select_related('genusstat').order_by('?')
     orcimage = []
     for x in genera:
-        orcimage = orcimage + [x.get_best_img()]
-        if len(orcimage) > 3:
-            break
+        # TODO: Replace genus.get_best_img() method with stat best_img data.
+        if x.get_best_img():
+            orcimage = orcimage + [x.get_best_img()]
+            if len(orcimage) > 3:
+                break
 
     # Get random other families
     SpcImages = apps.get_model('other', 'SpcImages')
