@@ -12,6 +12,7 @@ urlpatterns = [
     path('photos/<str:app>/<int:pid>/', views.photos, name='photos'),
     path('photos/<int:pid>/', views.photos, name='photos_with_pid'),
     path('photos/', views.photos, name='photos_no_pid'),
+    path("photos/<int:pid>/flag/", views.flag_image, name="flag_image"), # Currently orchidaceae only
 
     path('videos/<int:pid>/', views.videos, name='videos'),
 

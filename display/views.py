@@ -4,9 +4,9 @@ import logging
 import random
 import json
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpRequest
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpRequest, JsonResponse
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 import django.shortcuts
 from itertools import chain
@@ -14,10 +14,11 @@ from django.apps import apps
 from utils.views import write_output, getRole, get_reqauthor, pathinfo, get_application, handle_bad_request
 from common.views import rank_update, quality_update
 from common.models import Family, Subfamily, Tribe, Subtribe
-from orchidaceae.models import Intragen, HybImages
+from orchidaceae.models import HybImages, ImageFlag
 from accounts.models import User, Photographer
 from urllib.parse import urlencode
 from utils import config
+from .forms import ImageFlagForm  # Adjust import
 
 # TODO: move thapp_name and applications to common.model
 applications = config.applications
@@ -404,7 +405,7 @@ def photos(request, app=None, pid=None):
                    'infras': infras, 'synonyms': synonyms, 'clones': clones,
                    'role': role,
                    'syn': syn,
-
+                   'form': ImageFlagForm(user=request.user),
                    }
         return render(request, 'display/photos.html', context)
 
@@ -449,8 +450,67 @@ def photos(request, app=None, pid=None):
                'canonical_url': canonical_url,
                'infras': infras, 'synonyms': synonyms, 'clones': clones,
                'owner': owner,
+               'form': ImageFlagForm(user=request.user),
                }
     return render(request, 'display/photos.html', context)
+
+
+def flag_image(request, pid):
+    app = 'orchidaceae'
+    print("In flag_image")
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Only POST requests are allowed.')
+    print("In flag_image")
+    Species = apps.get_model(app, 'Species')
+    species = get_object_or_404(Species, pid=pid)
+    form = ImageFlagForm(request.POST, user=request.user)
+
+    if form.is_valid():
+        flag = form.save(commit=False)
+        flag.pid = species
+
+        # Get image_id and type from POST
+        image_id = request.POST.get('image_id')
+        image_type = request.POST.get('image_type')  # 'spc' or 'hyb'
+        print("image id", image_id)
+        print("image_type id", image_type)
+        if image_type == 'spc':
+            flag.spc_image = get_object_or_404(SpcImages, id=image_id, pid=species)
+        elif image_type == 'hyb':
+            flag.hyb_image = get_object_or_404(HybImages, id=image_id, pid=species)
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'Invalid image type'}, status=400)
+            else:
+                messages.error(request, 'Invalid image type.')
+                return redirect('display:photos', pid=pid)
+
+        if request.user.is_authenticated:
+            flag.flagged_by = request.user
+            flag.name = None
+            flag.email = None
+        else:
+            flag.flagged_by = None
+
+        flag.save()
+
+        # Optionally update the flag field on the image
+        image = flag.image_obj()
+        if image:
+            image.flag = True
+            image.save()
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': 'Image flagged successfully.'})
+        else:
+            messages.success(request, 'Image flagged successfully.')
+            return redirect('display:photos', pid=pid)
+    else:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'error': form.errors.as_json()}, status=400)
+        else:
+            messages.error(request, 'Error flagging image. Please check the form.')
+            return redirect('display:photos', pid=pid)
 
 
 def videos(request, pid):

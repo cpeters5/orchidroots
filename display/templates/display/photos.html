@@ -19,7 +19,7 @@
 .imageitem {
     display:inline-block;
     margin:2px;
-    width : 17vw;
+    width : 16vw;
     height: 20vw;
     background-color: #f7f7f7;
     border:1px solid lightgrey;
@@ -29,7 +29,7 @@
     display:inline-block;
     margin:2px;
     width : 17vw;
-    height: 24vw;
+    height: 22vw;
     background-color: #f7f7f7;
     border:1px solid lightgrey;
     text-align:center;
@@ -99,6 +99,46 @@ div.text-bl a {
 .mybtn {
     font-size: 12px;
 }
+
+.form-check {
+    /*width: 1rem;         !* Larger checkbox size *!*/
+    /*height: 1rem;        !* Matching height *!*/
+   display: flex;          /* Ensure inline-flex or flex for alignment */
+    align-items: center;    /* Vertically center checkbox and label */
+    margin-left: 1.2rem;  /* Add some bottom spacing between checks */
+    padding: 0.25rem 0.15rem; /* Internal padding for the container */
+    background-color: #f8f9fa; /* Light gray background for visibility */
+    border-radius: 4px;     /* Rounded corners */
+    /*border: 1px solid #dee2e6; !* Subtle border *!*/
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Hover effect for the entire .form-check */
+.form-check:hover {
+    background-color: #e2e6ea; /* Slightly darker on hover */
+    cursor: pointer;           /* Pointer to indicate clickable */
+}
+
+/* Customize the checkbox input (.form-check-input) */
+.form-check-input {
+    width: 1rem;         /* Larger checkbox size */
+    height: 1rem;        /* Matching height */
+    margin-right: 0;   /* Space between checkbox and label */
+    border: 2px solid #b9cac8; /* Blue border (Bootstrap primary) */
+    border-radius: 4px;     /* Slightly rounded checkboxes */
+}
+
+
+
+.form-check-label {
+    /*font-size: 0.9rem;  !* Smaller font size *!*/
+    /*font-weight: 500;   !* Slightly bolder text *!*/
+    /*color: red;        !* Darker text color *!*/
+    /*cursor: pointer;    !* Ensure it shows a pointer on hover *!*/
+    padding: 0;  /* Add some left spacing from the checkbox */
+    white-space: wrap;
+}
+
 
 @media only screen and (max-width: 800px){
     .imageitem {
@@ -375,13 +415,23 @@ a:hover {
                         </a>
                     </div>
                     <div class="{% if role == 'cur' %}imgcaption-cur{% else %}imgcaption{% endif %}">
-                        <div style="width:100%;word-wrap: break-word;">
-                            {{image.imginfo|safe|default:''}}
-                            <br>
-                            {% if image.source_url %}
-                                <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
-                            {% else %}
-                                {{image.get_displayname }}
+                        <div class="caption-container">
+                            {% if app == 'orchidaceae' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input flag-checkbox"
+                                           id="flagCheck{{ image.id }}"
+                                           data-image-id="{{ image.id }}"
+                                           title="flag this image"
+                                           data-image-type="{% if species.type == 'species' %}spc{% else %}hyb{% endif %}">
+                                    <label class="form-check-label"  for="flagCheck{{ image.id }}" >
+                                        {{image.imginfo|safe|default:''}},
+                                        {% if image.source_url %}
+                                            <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
+                                        {% else %}
+                                            {{image.get_displayname }}
+                                        {% endif %}
+                                    </label>
+                                </div>
                             {% endif %}
                             {% if role == 'cur' %}
                                 {% include 'common/curate_links.html' %}
@@ -436,14 +486,108 @@ a:hover {
     </div>
 
 
+<!-- Modal Popup for flag-->
+<div class="modal fade" id="flagModal" tabindex="-1" aria-labelledby="flagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flagModalLabel">Flag Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="flagForm" method="post" action="{% url 'display:flag_image' species.pid %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}  <!-- Renders the form fields -->
+                    <!-- Hidden fields for image_id and type -->
+                    <input type="hidden" name="image_id" id="imageId">
+                    <input type="hidden" name="image_type" id="imageType">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitFlag">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     {% if msg %}
         <h6>{{msg|default:''}}</h6>
     {% endif %}
 
 </div>
 
+{% endblock %}
 
 
+{% block extra-scripts %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const flagCheckboxes = document.querySelectorAll('.flag-checkbox');
+        const modalElement = document.getElementById('flagModal');
+        const modal = new bootstrap.Modal(modalElement);
+        const form = document.getElementById('flagForm');
+        const imageIdInput = document.getElementById('imageId');
+        const imageTypeInput = document.getElementById('imageType');
+        const submitBtn = document.getElementById('submitFlag');
+        let activeCheckbox = null;  // Track the checkbox that opened the modal
+        let submitted = false;  // Flag to track if form was submitted
+
+        flagCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    activeCheckbox = this;
+                    imageIdInput.value = this.dataset.imageId;
+                    imageTypeInput.value = this.dataset.imageType;
+                    submitted = false;  // Reset submitted flag
+                    modal.show();
+                } else {
+                    // If unchecked manually, do nothing special
+                }
+            });
+        });
+
+        // On modal hide, uncheck the checkbox if not submitted
+        modalElement.addEventListener('hidden.bs.modal', function() {
+            if (activeCheckbox && !submitted) {
+                activeCheckbox.checked = false;
+            }
+            activeCheckbox = null;  // Reset
+        });
+
+        submitBtn.addEventListener('click', function() {
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    submitted = true;  // Mark as submitted so we don't uncheck on hide
+                    alert(data.message);  // Or update UI
+                    modal.hide();
+                    // Optionally, keep checked or disable checkbox to indicate flagged
+                    if (activeCheckbox) {
+                        activeCheckbox.disabled = true;  // Example: disable after flag
+                        activeCheckbox.checked = true;  // Keep checked
+                    }
+                    location.reload();  // Reload to reflect changes (e.g., image.flag)
+                } else {
+                    alert('Error: ' + JSON.stringify(data.error));
+                    // Don't uncheck yet; user can try again
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
 
 
 {% endblock %}

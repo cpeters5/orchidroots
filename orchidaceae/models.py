@@ -12,9 +12,9 @@ import re, os, shutil
 from django.core.files import File
 from django.db import models
 from django.db.models.signals import post_save
-from django.db.models import Manager, Q, Count
+from django.db.models import Manager, Q, Count, CheckConstraint, UniqueConstraint
 from django.conf import settings
-# from django.utils import timezone
+from django.utils import timezone
 
 from accounts.models import User, Photographer
 from common.models import Family, Subfamily, Tribe, Subtribe, Continent, Country, Region, SubRegion, LocalRegion
@@ -1223,6 +1223,66 @@ class HybImages(models.Model):
         return self.pid.binomial_it()
 
 
+class ImageFlag(models.Model):
+    REASON_CHOICES = [
+        ("unapproved", "Not approved"),
+        ("fraud", "Fraud"),
+        ("misidentified", "Misidentified"),
+        ("other", "Other"),
+    ]
+
+    pid = models.ForeignKey("Species", on_delete=models.CASCADE, related_name="flags")
+    # Link to exactly one of these:
+    spc_image = models.ForeignKey("SpcImages", on_delete=models.CASCADE, null=True, blank=True, related_name="flags")
+    hyb_image = models.ForeignKey("HybImages", on_delete=models.CASCADE, null=True, blank=True, related_name="flags")
+    # User info
+    flagged_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="image_flags")
+    name = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField(blank=True, null=True)   # <── new
+
+    # Flag content
+    title = models.CharField(max_length=20, choices=REASON_CHOICES)
+    description = models.TextField()                # <── renamed from "reason"
+
+    created_date = models.DateTimeField(default=timezone.now)
+    modified_date = models.DateTimeField(auto_now=True, null=True)
+
+    # Moderation lifecycle
+    resolved = models.BooleanField(default=False)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolution_notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            # Exactly one of spc_image or hyb_image
+            CheckConstraint(
+                check=(
+                    (Q(spc_image__isnull=False) & Q(hyb_image__isnull=True)) |
+                    (Q(spc_image__isnull=True) & Q(hyb_image__isnull=False))
+                ),
+                name="imageflag_exactly_one_fk",
+            ),
+            # Prevent duplicate open flags from same user on same image
+            UniqueConstraint(
+                fields=["flagged_by", "spc_image"],
+                condition=Q(resolved=False, spc_image__isnull=False),
+                name="uniq_open_flag_by_user_on_spc",
+            ),
+            UniqueConstraint(
+                fields=["flagged_by", "hyb_image"],
+                condition=Q(resolved=False, hyb_image__isnull=False),
+                name="uniq_open_flag_by_user_on_hyb",
+            ),
+        ]
+
+    def image_obj(self):
+        return self.spc_image or self.hyb_image
+
+    def __str__(self):
+        img = self.image_obj()
+        return f"Flag #{self.pk} on image {img.id if img else '?'} (pid {self.species_id})"
+
+
 class Video(models.Model):
     pid = models.ForeignKey(Species, null=False, db_column='pid', related_name='orcvideopid',on_delete=models.DO_NOTHING)
     binomial = models.CharField(max_length=200, null=True, blank=True)
@@ -1262,29 +1322,6 @@ class Video(models.Model):
             return self.author.user_id
         else:
             return None
-
-class HybImgHistory(models.Model):
-    pid = models.ForeignKey(Hybrid, db_column='pid', related_name='or1pid', on_delete=models.CASCADE)
-    img_id = models.IntegerField(null=True, blank=True)
-    user_id = models.ForeignKey(User, db_column='user_id', related_name='or2user_id', on_delete=models.CASCADE)
-    action = models.CharField(max_length=50,null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return '%s %s %s %s' % (self.pid, self.user_id, self.created_date, self.modified_date)
-
-
-class SpcImgHistory(models.Model):
-    pid = models.ForeignKey(Species, db_column='pid', related_name='or1pid', on_delete=models.CASCADE)
-    img_id = models.IntegerField(null=True, blank=True)
-    user_id = models.ForeignKey(User, db_column='user_id', related_name='or1user_id', on_delete=models.CASCADE)
-    action = models.CharField(max_length=50,null=True, blank=True)
-    created_date = models.DateTimeField(auto_now_add=True, null=True)
-    modified_date = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return '%s %s %s %s' % (self.pid, self.user_id, self.created_date, self.modified_date)
 
 
 class ReidentifyHistory(models.Model):
