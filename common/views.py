@@ -403,7 +403,7 @@ def synonym(request, app, pid):
                'role': role, 'app': app,
                'canonical_url': canonical_url,
                }
-    return render(request, 'orchidaceae/synonym.html', context)
+    return render(request, 'common/synonym.html', context)
 
 
 def distribution(request, app, pid):

@@ -15,12 +15,23 @@
     width:90%;
     font-size: 14px;
 }
+.thumbnails {
+    object-fit: cover;
+    overflow: hidden;
+    height: 70px;
+    width : 70px;
+    margin:5px auto;
+}
 
 
 @media only screen and (max-width: 700px){
     .progen {
         width:95%;
         font-size: 10px;
+    }
+    .thumbnails {
+       height: 80px;
+       margin:5px auto;
     }
 }
 
@@ -36,12 +47,17 @@
         <h1 class="hidden-h1">Synonyms of {{species.binomial}}</h1>
         <h5>Synonyms of {{species.binomial}}</h5>
         <br>
-        <table id="sortTable" class="table table-condensed table-sm table-hover">
+        <table id="sortTable" class="table table-condensed table-sm table-bordered">
             <thead style="background-color: #e3e3e3">
-                <th>Synonyms</th>
+                <th></th>
+                <th>Synonyms of {{species.binomial_it|safe}}</th>
             </thead>
             {% for synonym in synonym_list %}
             <tr style="text-align: left">
+                <td style="width: 20%">{% if synonym.spid.speciesstat.best_image %}
+                    <img class="thumbnails" alt="{{synonym.spid.speciesstat.best_image}}" src="{% static synonym.spid.speciesstat.best_image %}">
+                    {% endif %}
+                </td>
                 <td><a href="{% url 'display:photos' app synonym.spid_id %}?role={{role}}"><i>{{synonym.spid.binomial_it|safe}}</i></a></td>
             </tr>
             {% endfor %}
