@@ -222,9 +222,13 @@ $(document).ready(function(){
 
 document.getElementById('search').addEventListener('submit', function(event) {
     var input = document.getElementById('your-input-id').value;
-    if (!/^[\u0000-\u007F]*$/.test(input)) {
+
+    // Allow: ASCII, Latin-1 Supplement, Latin Extended-A/B, Greek
+    var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
+
+    if (!allowedPattern.test(input)) {
         event.preventDefault();
-        alert('Please use only supported characters.');
+        alert('Please use only supported characters (Latin or Greek alphabets).');
     }
 });
 

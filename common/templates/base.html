@@ -861,7 +861,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!input) return;
 
     form.addEventListener('submit', function (event) {
-        if (!/^[\u0000-\u007F]*$/.test(input.value)) {
+        var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
+
+        if (!allowedPattern.test(input.value)) {
             event.preventDefault();
             alert('Please use only supported characters.');
         }
