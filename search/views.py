@@ -154,7 +154,7 @@ def search_name(request, app=None):
 
     Species = apps.get_model(app, 'Species')
     if app == 'orchidaceae':
-        species_list = Species.objects.filter(species__icontains=search_string)
+        species_list = Species.objects.filter(common_name__icontains=search_string)
     else:
         species_list = Species.objects.filter(Q(accepted__common_name__icontains=search_string) | Q(accepted__common_name_search__icontains=search_string_clean))
 
