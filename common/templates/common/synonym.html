@@ -58,7 +58,7 @@
                     <img class="thumbnails" alt="{{synonym.spid.speciesstat.best_image}}" src="{% static synonym.spid.speciesstat.best_image %}">
                     {% endif %}
                 </td>
-                <td><a href="{% url 'display:photos' app synonym.spid_id %}?role={{role}}"><i>{{synonym.spid.binomial_it|safe}}</i></a></td>
+                <td><a href="{% url 'display:photos' app synonym.spid_id %}?role={{role}}">{{synonym.spid.binomial_it|safe}}</a></td>
             </tr>
             {% endfor %}
      </table>

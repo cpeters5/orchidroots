@@ -124,7 +124,7 @@
                                                     {% endif %}
                                                     {% if species.year %} ({{species.year}}) {% endif %}
                                                 {% else %}
-                                                    <a href="/display/summary/{{app}}/{{species.pid}}/"><i>{{species.binomial_it|safe}}</i></a>
+                                                    <a href="/display/summary/{{app}}/{{species.pid}}/">{{species.binomial_it|safe}}</a>
                                                     {% if user.tier.tier > 3 %} {{species.pid}} {% endif %}
                                                 {% endif %}
                                                 {{species.author|default:""}}
@@ -135,7 +135,7 @@
                                                 {% if species.type == 'hybrid' %}
                                                     <td class="d-none d-md-table-cell">
                                                     {% if species.status == 'synonym' %}
-                                                        <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/"><i>{{species.getAccepted.binomial_it|safe}}</i></a>
+                                                        <span style="color:#918f8f">Accepted:</span> <a href="/display/summary/{{app}}/{{species.getAccepted.pid}}/">{{species.getAccepted.binomial_it|safe}}</a>
                                                     {% elif species.type == 'hybrid' %}
                                                         {% if species.hybrid.seed_id.pid %}
                                                             <a href="{% url 'display:summary' app species.hybrid.seed_id.pid %}">{{species.hybrid.seed_id.name|default:'na'|safe}}</a>

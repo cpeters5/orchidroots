@@ -68,7 +68,7 @@ td {
                 {% for hybrid in prim_list %}
                 <tr style="text-align: left">
                     <td>
-                        <a href="{% url 'display:summary' app hybrid.pid.pid %}?role={{role}}"><i>{{hybrid.pid.binomial_it|safe}}</i></a>
+                        <a href="{% url 'display:summary' app hybrid.pid.pid %}?role={{role}}">{{hybrid.pid.binomial_it|safe}}</a>
                     </td>
                     <td >
                         {% if hybrid.seed_id.pid %}
