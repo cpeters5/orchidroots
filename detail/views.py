@@ -624,23 +624,19 @@ def uploadweb(request, pid, orid=None):
         species = Species.objects.get(pk=pid)
     except Species.DoesNotExist:
         return HttpResponse(redirect_message)
-
-    author = request.user.photographer
-
-    # The photo
-    # if species.status == 'synonym':
-    #     synonym = Synonym.objects.get(pk=pid)
-    #     pid = synonym.acc_id
-    #     species = Species.objects.get(pk=pid)
-
+    # request.user.photographer
     role = getRole(request)
 
     if request.method == 'POST':
+        author = request.POST.get('author', '')
+        if author:
+            author = Photographer.objects.get(pk=author)
+        else:
+            author = request.user.photographer
+
         if species.type == 'hybrid':
-            accepted = species
             form = UploadHybWebForm(request.POST)
         elif species.type == 'species':
-            accepted = species
             form = UploadSpcWebForm(request.POST)
         else:
             return HttpResponse("image id " + str(orid) + "does not exist")
@@ -648,11 +644,8 @@ def uploadweb(request, pid, orid=None):
         if form.is_valid():
             spc = form.save(commit=False)
             spc.user_id = request.user
-            if author:
-                spc.author = author
-            else:
-                spc.author = request.user.photographer
-            spc.pid = accepted
+            spc.author = author
+            spc.pid = species
             spc.text_data = spc.text_data.replace("\"", "\'\'")
             if orid and orid > 0:
                 spc.id = orid
@@ -705,9 +698,9 @@ def uploadweb(request, pid, orid=None):
             author = None
 
     context = {'form': form, 'img': img, 'sender': sender,
-               'species': species, 'loc': 'active', 'app': 'orchidaceae',
+               'species': species, 'loc': 'active',
                'family': species.gen.family, 'author': author,
-               'role': role, 'title': 'uploadweb'}
+               'role': role, 'title': 'uploadweb', 'app': app,}
     return render(request, 'detail/uploadweb.html', context)
 
 
