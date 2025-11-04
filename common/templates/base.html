@@ -836,41 +836,29 @@ table.dataTable {
   });
 
 })(jQuery);
-//
-// const elem = document.getElementById("my-id");
-// if (elem) {
-//     elem.addEventListener("click", function () {
-//
-//         document.getElementById('search').addEventListener('submit', function (event) {
-//             var input = document.getElementById('your-input-id').value;
-//             if (!/^[\u0000-\u007F]*$/.test(input)) {
-//                 event.preventDefault();
-//                 alert('Please use only supported characters.');
-//             }
-//         });
-//     });
-// }
-//
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Determine the correct form ID
-    let form = document.getElementById('search') || document.getElementById('search1');
-    if (!form) return;  // Exit if no form exists
+document.getElementById('search').addEventListener('submit', function(event) {
+    var input = document.getElementById('search_string').value;
 
-    let input = form.querySelector('input[name="search_string"]');
-    if (!input) return;
+    // Allow: ASCII, Latin-1 Supplement, Latin Extended-A/B, Greek
+    var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
 
-    form.addEventListener('submit', function (event) {
-        var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
-
-        if (!allowedPattern.test(input.value)) {
-            event.preventDefault();
-            alert('Please use only supported characters.');
-        }
-    });
+    if (!allowedPattern.test(input)) {
+        event.preventDefault();
+        alert('Please use only supported characters (Latin or Greek alphabets).');
+    }
 });
+document.getElementById('search1').addEventListener('submit', function(event) {
+    var input = document.getElementById('search_string').value;
 
+    // Allow: ASCII, Latin-1 Supplement, Latin Extended-A/B, Greek
+    var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
 
+    if (!allowedPattern.test(input)) {
+        event.preventDefault();
+        alert('Please use only supported characters (Latin or Greek alphabets).');
+    }
+});
 
 
 </script>
