@@ -562,7 +562,11 @@ def reidentify(request, orid, pid):
                     return HttpResponseRedirect(url)
                 if source_file_name:
                     new_img.source_file_name = source_file_name
-            new_img.author = old_img.author
+            if old_img.author:
+                new_img.author = old_img.author
+            else:
+                new_img.author = request.user.photographer
+
             new_img.pk = None
             new_img.source_url = old_img.source_url
             new_img.image_url = old_img.image_url
