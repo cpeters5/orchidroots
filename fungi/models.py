@@ -234,10 +234,16 @@ class Species(models.Model):
         return name
 
     def binomial_it(self):
-        if self.type == 'species':
-            return '<i>%s</i>' % (self.binomial)
+        if self.type == 'species' or self.is_hybrid:
+            name = '<i>%s %s</i>' % (self.genus, self.species)
+            if self.infraspr:
+                name = name + ' %s' % (self.infraspr)
+            if self.infraspe:
+                name = name + ' <i>%s</i>' % (self.infraspe)
         else:
-            return self.binomial
+            name = '<i>%s</i> %s' % (self.genus, self.species)
+            # Artficial hybrid
+        return name
 
     def speciesname(self):
         if self.type == 'species' or self.is_hybrid:
@@ -731,6 +737,9 @@ class SpcImages(models.Model):
     def get_userid(self):
         author = Photographer.objects.get(author=self.author_id)
         return author.user_id
+
+    def binomial_it(self):
+        return self.pid.binomial_it()
 
 
 class Video(models.Model):

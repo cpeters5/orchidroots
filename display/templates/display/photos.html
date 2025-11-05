@@ -432,6 +432,22 @@ a:hover {
                                         {% endif %}
                                     </label>
                                 </div>
+                            {% else %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input flag-checkbox"
+                                           id="flagCheck{{ image.id }}"
+                                           data-image-id="{{ image.id }}"
+                                           title="flag this image"
+                                           data-image-type="{% if species.type == 'species' %}spc{% else %}hyb{% endif %}">
+                                    <label class="form-check-label"  for="flagCheck{{ image.id }}" >
+                                        {{image.binomial_it|safe|default:''}},
+                                        {% if image.source_url %}
+                                            <a href="{{image.source_url}}" target="_blank">{{image.get_displayname }}</a>
+                                        {% else %}
+                                            {{image.get_displayname }}
+                                        {% endif %}
+                                    </label>
+                                </div>
                             {% endif %}
                             {% if role == 'cur' %}
                                 {% include 'common/curate_links.html' %}
