@@ -45,12 +45,24 @@
                     <div class="card-header border">
                         <h1 class="hidden-h1">List of species or hybrid of {{app}} category</h1>
                         <div class="card-title" style="margin-bottom: 0; color:green; font-size:24px;">
-                            List of {{app|title}}
-                               <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">
-                                    <input type="hidden" form="type" name="family" value="{{genus.family}}" >
-                                    <input type="hidden" form="type" name="genus" value="{{genus}}" >
-                                    <input class="searchbox border" form="type" value="{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">
-                                </form>
+                {% if type == 'species' %}
+                    {{genus|title}} species:
+                    {% if genus.genusstat.num_hybrid > 0 %}
+                        <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'common:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&species={{species}}">Show Hybrids</a>
+                    {% endif %}
+                {% else %}
+                    {{genus|title}} hybrid:
+                    {% if genus.genusstat.num_species > 0 %}
+                        <a class="btn btn-xs btn-primary p-1 m-1  border" href="{% url 'common:species' %}?role={{role}}&alpha={{alpha}}&genus={{genus}}&species={{species}}">Show Species</a>
+                    {% endif %}
+               {% endif %}
+
+<!--                            List of {{app|title}}-->
+<!--                               <form class="form-inline" id="type" action="?" style="display:inline-block; margin-top: 5px;">-->
+<!--                                    <input type="hidden" form="type" name="family" value="{{genus.family}}" >-->
+<!--                                    <input type="hidden" form="type" name="genus" value="{{genus}}" >-->
+<!--                                    <input class="searchbox border" form="type" value="xx{{type}}" type="text"  onchange="this.form.submit()" name="type" placeholder="species or hybrid" style="font-size: 16px;width:150px;text-align: center">-->
+<!--                                </form>-->
                             {% if app != 'orchidaceae' %}
                                 in the family
                                 <form class="form-inline" id="family" action="?" style="display:inline-block; margin-top: 5px;">
@@ -61,7 +73,7 @@
                                     <button class="my-hidden" form="family" style="height:27px;margin:0;background-color: #1d6c6c; color:white">Submit</button>
                                 </form>
                             {% else %}
-                                genus
+                                Select genus
                                 <form class="form-inline" id="genus" action="?" style="display:inline-block; margin-top: 5px;">
                                     <input type="hidden" form="genus" name="type" value="{{type}}" >
                                     <input class="searchbox border" form="genus" value="{{genus|default:''}}" type="text" name="genus"  pattern=".{3,}" placeholder="genus" style="font-size: 16px;width:150px;text-align: center">
