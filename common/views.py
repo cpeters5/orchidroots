@@ -1341,6 +1341,7 @@ def newcross(request, pid1, pid2):
             spcobj.species = spcobj.species + '-' + species2.infraspe
         spcobj.pid = Hybrid.objects.filter(pid__gt=900000000).filter(pid__lt=999999999).order_by('-pid')[0].pid_id + 1
         spcobj.source = 'INT'
+        spcobj.originator = request.user.username
         spcobj.type = 'hybrid'
         spcobj.status = 'nonregistered'
         datetime_obj = datetime.datetime.now()
