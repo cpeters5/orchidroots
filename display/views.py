@@ -487,8 +487,9 @@ def flag_image(request, pid):
 
         if request.user.is_authenticated:
             flag.flagged_by = request.user
-            flag.name = None
-            flag.email = None
+            if not flag.name:
+                flag.name = request.user.username
+            # flag.email = None
         else:
             flag.flagged_by = None
 
