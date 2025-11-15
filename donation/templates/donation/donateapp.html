@@ -137,9 +137,6 @@
 
                         <div class="btn-toolbar" role="toolbar" aria-label="toolbar" style="font-size: 11px;padding:2px; justify-content: left">
                           <div class="btn-group" role="group">
-                            <button type="button" class="btn amt btn-outline-primary" data-amt="100">$1</button>
-                          </div>
-                          <div class="btn-group" role="group">
                             <button type="button" class="btn amt btn-outline-primary" data-amt="500">$5</button>
                           </div>
                           <div class="btn-group" role="group">
@@ -160,6 +157,12 @@
                          <div class="btn-group" role="group">
                             <button type="button" class="btn amt btn-outline-primary" data-amt="10000">$200</button>
                           </div>
+                         <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="10000">$300</button>
+                          </div>
+                         <div class="btn-group" role="group">
+                            <button type="button" class="btn amt btn-outline-primary" data-amt="10000">$400</button>
+                          </div>
                         </div>
 
 
@@ -171,20 +174,18 @@
                         <h4 align="center">Thank you for your $<span id="selected-amount">0</span> contribution
                         </h4>
 
-                            <form align="middle" action="{% url 'donation:donate' donateamt %}" method="post" id="stripe-form">
-                                {% csrf_token %}
-                                <!-- Input for Donor's Display Name -->
-                                <input type="hidden" name="donor_display_name" id="added-donor-name">
-                                <!-- Stripe Checkout Button -->
-                                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                                    data-key="{{ key }}"
-                                    data-description="Donation Charge"
-                                    data-amount="{{donateamt}}"
-                                    data-locale="auto">
-                                </script>
-                            <!--    <input type="email" name="donor_email" placeholder="Your Email">-->
-                            </form>
+                       <form align="middle" action="{% url 'donation:donate' donateamt %}" method="post" id="stripe-form">
+                            {% csrf_token %}
+                <!--            <input type="hidden" name="donateamt" value="{{donateamt}}" >-->
+                           <input type="hidden" name="donor_display_name" id="added-donor-name">
+                            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                data-key="{{ key }}"
+                                data-description="Donation Charge"
+                                data-amount="{{donateamt}}"
+                                data-locale="auto">
+                            </script>
 
+                        </form>
                         <div id="paypal-button" class="paypal-buttons">
 
                         </div>
