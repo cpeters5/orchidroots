@@ -103,6 +103,8 @@
                                                 {% endif %}
                                                 {% if genus.subtribe %}subtribe
                                                     <a href="{% url 'common:genera' app %}?family={{family.family}}&subtribe={{genus.subtribe}}"><i>{{genus.subtribe|title}}</i></a>
+                                                {% else %}
+                                                    {{genus.description}}
                                                 {% endif %}
                                             </td>
         <!--                                            <td class="align-center d-none d-sm-block d-none d-sm-table-cell">{{genus.source}}</td>-->
