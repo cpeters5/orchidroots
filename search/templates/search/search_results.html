@@ -72,14 +72,14 @@ td {
             <tr>
                 {% for match in matched_genus %}
                 <td>
-                    {% if match.type == 'species' %}
-                        <a href="{% url 'common:species' %}?type=species&app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
+                    {% if match.type == 'species' or app != 'orchidaceae' %}
+                        <a href="{% url 'common:species' %}?type=species&app={{match.family.application}}&role={{role}}&app={{app}}&genus={{match}}"><i>{{match}}</i></a> {{matched_genus.author|default:''}} {{matched_genus.year|default:''}}
                         {% if matched_genus.status == 'synonym' %}<br>(syn.){% endif %}
                     {% else %}
-                         <a href="{% url 'common:species' %}?type=hybrid&app={{match.family.application}}&role={{role}}&family=Orchidaceae&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
+                         <a href="{% url 'common:species' %}?type=hybrid&app={{match.family.application}}&role={{role}}&app={{app}}&genus={{match}}"><i>{{match.genus}}</i></a>  {{matched_genus.author|default:''}} {% if matched_genus.status == 'synonym' %}(syn.){% endif %}
                     {% endif %}
                     {% if user.tier.tier > 3 %}
-                    {{match.pid|default:''}}
+                    {{match.pid|default:''}} - {{app}}
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -221,7 +221,7 @@ $(document).ready(function(){
 
 
 document.getElementById('search').addEventListener('submit', function(event) {
-    var input = document.getElementById('your-input-id').value;
+    var input = document.getElementById('search_string').value;
 
     // Allow: ASCII, Latin-1 Supplement, Latin Extended-A/B, Greek
     var allowedPattern = /^[\u0000-\u024F\u0370-\u03FF\s]*$/;
@@ -231,7 +231,6 @@ document.getElementById('search').addEventListener('submit', function(event) {
         alert('Please use only supported characters (Latin or Greek alphabets).');
     }
 });
-
 
 
 $(document).ready(function(){
