@@ -632,6 +632,51 @@ table.dataTable {
         display: inline-block;
     }
 }
+
+.fundraising-popup.hidden {
+    display: none;
+}
+
+.fundraising-popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 350px;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    font-size: 14px;
+}
+
+.fundraising-popup-inner {
+    position: relative;
+}
+
+.fundraising-close {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.fundraising-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #2e7d32;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+
 </style>
 <!--    Jquery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -869,6 +914,53 @@ document.getElementById('search1').addEventListener('submit', function(event) {
     <!-- Lightbox JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
+{% if fundraiser_enabled and fundraiser_campaign_id %}
+<div id="fundraising-popup" class="fundraising-popup hidden">
+    <div class="fundraising-popup-inner">
+        <button type="button" class="fundraising-close js-fundraising-close">×</button>
+
+        <h2>Help Keep OrchidRoots Online 🌱</h2>
+        <p>
+            It's fundraising time again. Your donation—any amount—helps maintain
+            public charity status and keeps the OrchidRoots website improving.
+        </p>
+
+        <a href="/donation/donate/" class="fundraising-button">Donate Now</a>
+    </div>
+</div>
+
+<script>
+(function () {
+    const campaignId = "{{ fundraiser_campaign_id|escapejs }}";
+    if (!campaignId) return;
+
+    const STORAGE_KEY = "fundraiser_seen_" + campaignId;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.localStorage && localStorage.getItem(STORAGE_KEY)) {
+            return;  // Already seen this campaign
+        }
+
+        const popup = document.getElementById("fundraising-popup");
+        if (!popup) return;
+
+        // Slight delay to feel smoother
+        setTimeout(() => popup.classList.remove("hidden"), 1000);
+
+        const closeBtn = popup.querySelector(".js-fundraising-close");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                popup.classList.add("hidden");
+                if (window.localStorage) {
+                    localStorage.setItem(STORAGE_KEY, "1");
+                }
+            });
+        }
+    });
+})();
+</script>
+{% endif %}
 
 </body>
 </html>

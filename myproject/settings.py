@@ -170,6 +170,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "common.context_processors.fundraising_campaign",
             ],
         },
     },
@@ -412,6 +413,40 @@ PAYPAL_CLIENT_ID = env('PAYPAL_CLIENT_ID', default='')
 PAYPAL_SECRET =  env('PAYPAL_SECRET', default='')
 
 ADS_GOOGLE_ADSENSE_CLIENT = None  # 'ca-pub-xxxxxxxxxxxxxxxx'
+
+# ============================================================
+# Fundraising popup settings  (Option 2.5: Django + localStorage)
+#
+# HOW TO RUN A FUNDRAISING CAMPAIGN
+#
+# 1. To START a campaign:
+#    - Set FUNDRAISER_ENABLED = True
+#    - Set FUNDRAISER_CAMPAIGN_ID to a new value.
+#      Suggested pattern: "fundraiser_YYYY_wN"
+#      Examples for 2025:
+#          "fundraiser_2025_w1"
+#          "fundraiser_2025_w2"
+#          "fundraiser_2025_w3"
+#
+# 2. To UPDATE the weekly message:
+#    - Change FUNDRAISER_CAMPAIGN_ID (w2, w3, …).
+#    - Update popup text/style in base.html if needed.
+#    - Each new ID forces browsers to show it again ONCE.
+#
+# 3. To END the campaign (Dec 31, etc.):
+#    - Set FUNDRAISER_ENABLED = False
+#
+# 4. To START AGAIN NEXT YEAR:
+#    - Use a new ID, e.g. "fundraiser_2026_w1"
+#    - Set FUNDRAISER_ENABLED = True
+#
+# Code lives in:
+#   - core/context_processors.py  → fundraising_campaign()
+#   - templates/base.html         → popup HTML + JS
+# ============================================================
+
+FUNDRAISER_ENABLED = True    # Set to False when the campaign is over
+FUNDRAISER_CAMPAIGN_ID = "fundraiser_2025_w1"
 
 # ADS_ZONES = {
 #     'header': {
