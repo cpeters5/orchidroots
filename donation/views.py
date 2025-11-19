@@ -173,7 +173,7 @@ def donate(request,donateamt=None): # new
                         f"Your support helps us continue our mission.\n\n"
                         "Best regards,\nThe Team"
                     ),
-                    from_email='noreply@orchidroots.com',  # Replace with your sender email
+                    from_email='noreply@bluenanta.com',  # Replace with your sender email
                     recipient_list=[donor_email],
                     fail_silently=False,
                 )
