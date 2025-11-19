@@ -71,6 +71,11 @@ def search(request, app=None):
     if ' ' not in search_string:
         # single word could be genus
         matched_genus = Genus.objects.filter(genus=search_string)
+        if not matched_genus:
+            matched_genus = Genus.objects.filter(abrev=search_genus)
+        else:
+            matched_genus = []
+
         #  Get exact matched species
         found_species = Species.objects.filter(species=search_string).order_by('binomial')
         # Get partial matched species (only if lenght > 2)
@@ -91,6 +96,10 @@ def search(request, app=None):
     words_tail = words[1:]
     search_tail = ' '.join(words_tail)
     matched_genus = Genus.objects.filter(genus=search_genus)
+    if not matched_genus:
+        matched_genus = Genus.objects.filter(abrev=search_genus)
+    else:
+        matched_genus = []
 
     # Find binomial matching entire string
     exact_match = Species.objects.filter(binomial__istartswith=search_string).order_by('binomial')
