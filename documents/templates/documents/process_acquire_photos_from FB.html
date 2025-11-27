@@ -1,0 +1,23 @@
+Do this daily after reviewing and accepting new uploads
+1. Got to FaceBook > Bluenanta group: https://www.facebook.com/groups/BlueNanta/?ref=br_rs
+2. Select a photo to upload: Clean image, high quality, (unless the orchid is not well represented in OR) and the post must contain the name of orchid.
+3. Find a match in orchidroots.  Then go to its detail page.
+4. select upload > upload from web
+5. Enter data
+    credit to: Name of individual/entioty who posted the photo
+    source url:  Click in the date-time of the post and copy the source url
+    image url: right clidk on the enlagred image and select image url
+    variety: And addition info such as
+    cultivar name:  If given
+    awards: If given
+
+Optional:  The following tasks will run automatically in cron on a daily basis
+6. Retrieve image files:
+    /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/retrieve_orchidaceae_images.py spc
+    /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/retrieve_orchidaceae_images.py hyb
+7: Generate thumbs:
+    /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/generate_thumbs.py species
+    /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/generate_thumbs.py hybrid
+8. Run update statistics:
+     /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_speciesstat.py image
+

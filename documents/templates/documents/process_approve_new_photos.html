@@ -9,4 +9,10 @@ Reviewing and acceptions new photos is a daily manual task.  Steps:
     - accept the new photo
     - assign appropriate quality
     - assign appropriate rank.
-4.  
+4.  Generate thumb images: run /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/generate_thumbs.py <species, hybrid, or other application>
+
+5.  Updfate statistics:
+    For orchid run  (Major update only) /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_speciesstat.py
+                    (run when there are several new upload images) /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_speciesstat.py image
+    For other run /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_otherstat.py <application>
+

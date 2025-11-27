@@ -1,6 +1,11 @@
 New families, genera or species/hybrids are added to the database by manual process or scripts (POWO/RHS).  After the addition perform post-processing tqask
 1.  carnonical url should have been inserteed intop sitemap_entries by a trigger.  Make sure the trigger is working (manage species > triggers)
-2.  run update sitemap  "/webapps/bluenanta/venv/bin/python /webapps/bluenanta/manage.py update_sitemap_by_section <application>"
-3.  If this is a major update (e.g. after running upload from RHSD) go to google search control and resubmit sitemap.
+2.  Updfate statistics:
+    For orchid run  (Major update only) /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_speciesstat.py
+                    (run when there are several new upload images) /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_speciesstat.py image
+    For other run /webapps/bluenanta/venv/bin/python /webapps/bluenanta/scripts/cron/update_otherstat.py <application>
+
+3.  run update sitemap  "/webapps/bluenanta/venv/bin/python /webapps/bluenanta/manage.py update_sitemap_by_section <application>"
+    If this is a major update (e.g. after running upload from RHS) go to google search control and resubmit sitemap.
 
     
