@@ -45,17 +45,17 @@
                     {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link {{loc}} {{web}} dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" data-nosnippet>
-                        {% if loc == 'active' %}Upload URL{% elif web == 'active' %}Upload a photo of {{species.binomial}}{% else %}Upload{% endif %}
+                        {% if loc == 'active' %}Upload URL{% elif web == 'active' %}Upload {% else %}Upload{% endif %}
                     </a>
                     <div class="nav2 dropdown-menu">
                     <span style="color:red">{{species.binomial}} ONLY</span>
                     {% if family.family == 'Orchidaceae' %}
                         {% if user.tier.tier > 1 %}
-                            <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload file from a device</a>
-                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">upload from url</a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadfile' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">from a device</a>
+                            <a class="dropdown-item" href="{% url 'detail:uploadweb' species.pid %}?app=orchidaceae&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">from url</a>
                         {% endif %}
                     {% else %}
-                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">Upload file from a device</a>
+                            <a class="dropdown-item" href="{% url 'common:uploadfile' species.pid %}?app={{app}}&role={{role}}" data-nosnippet rel="nofollow noreferrer noopener">from a device</a>
                         <!--                        Fix common.uploadfile to use family specific form -->
                         {% if app == 'animalia' %}
                             {% if user.tier.tier > 1 %}
