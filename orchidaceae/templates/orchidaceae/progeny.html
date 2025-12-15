@@ -57,7 +57,7 @@
             {% for hybrid in result_list %}
             <tr style="text-align: left">
                 <td>
-                    <a href="{% url 'display:summary' app hybrid.did.pid.pid %}?role={{role}}">{{hybrid.did.pid.binomial_it|safe}}</a>
+                    <a href="{% url 'display:summary' app hybrid.did.pid.pid %}?role={{role}}">{{hybrid.did.pid.binomial_it|safe}} ({{hybrid.did.pid.source}})</a>
                 </td>
                 <td >
                     {% if hybrid.did.seed_id.pid %}
@@ -118,13 +118,13 @@ $(document).ready(function() {
             var pageInfo = api.page.info();
 
             // Check if the total number of records is less than or equal to the page length
-            if (pageInfo.recordsDisplay <= pageInfo.length) {
-                // Hide the pagination, search filter, and info sections
-                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
-            } else {
-                // Show them if there are more records
-                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
-            }
+            // if (pageInfo.recordsDisplay <= pageInfo.length) {
+            //     // Hide the pagination, search filter, and info sections
+            //     $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
+            // } else {
+            //     // Show them if there are more records
+            //     $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
+            // }
         }
     });
 });

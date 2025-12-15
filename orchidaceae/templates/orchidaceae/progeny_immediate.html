@@ -68,7 +68,7 @@ td {
                 {% for hybrid in prim_list %}
                 <tr style="text-align: left">
                     <td>
-                        <a href="{% url 'display:summary' app hybrid.pid.pid %}?role={{role}}">{{hybrid.pid.binomial_it|safe}}</a>
+                        <a href="{% url 'display:summary' app hybrid.pid.pid %}?role={{role}}">{{hybrid.pid.binomial_it|safe}} ({{hybrid.pid.source}})</a>
                     </td>
                     <td >
                         {% if hybrid.seed_id.pid %}
@@ -131,11 +131,11 @@ $(document).ready(function() {
             var pageInfo = api.page.info();
 
             // Check if the total number of rows is less than or equal to the page length
-            if (pageInfo.recordsTotal <= pageInfo.length) {
-                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
-            } else {
-                $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
-            }
+            // if (pageInfo.recordsTotal <= pageInfo.length) {
+            //     $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').hide();
+            // } else {
+            //     $(api.table().container()).find('.dataTables_filter, .dataTables_info, .dataTables_paginate').show();
+            // }
         }
     });
 });
