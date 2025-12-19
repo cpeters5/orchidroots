@@ -212,7 +212,11 @@ a {
                         <ul style="display:inline-block;float:left;padding:0;margin:0 auto;">
                             <li style="display:inline-block;">
                                 <div style="margin:0 auto;">
-                                    <img class="thumbnails thumbnails2" alt="{{species.binomial}}" src="{% static species.img %}" >
+                                    {% if species.speciesstat.best_image != None %}
+                                        <img class="thumbnails thumbnails2" alt="{{species.binomial}}" src="{% static species.speciesstat.best_image %}" >
+                                    {% else %}
+                                        <img class="thumbnails thumbnails2" alt="{{species.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                    {% endif %}
                                     {{species.abrevname|safe}}<br>{{species.year|default:'<br>'}}
                                 </div>
                                 <ul>
@@ -220,7 +224,11 @@ a {
                                     <li>
                                         {% if s %}
                                             <a style="border:0; " href="{% if s.type != 'hybrid' %}{% url 'display:summary' app s.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{s.pid.pid}}&role={{role}}">
+                                            {% if s.img %}
                                                 <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static s.img %}" >
+                                            {% else %}
+                                                <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                            {% endif %}
                                             </a>
                                             <div class="imgcaption">
                                                 <a href="{% url 'display:summary' app s.pid.pid %}?role={{role}}">
@@ -235,7 +243,11 @@ a {
                                                 <li>
                                                     {% if ss %}
                                                         <a style="border:0;" href="{% if ss.type != 'hybrid' %}{% url 'display:summary' app ss.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{ss.pid.pid}}&role={{role}}">
-                                                                    <img class="thumbnails thumbnails3" alt="{{ss.pid.binomial}}" src="{% static ss.img %}" >
+                                                        {% if ss.img %}
+                                                            <img class="thumbnails thumbnails3" alt="{{ss.pid.binomial}}" src="{% static ss.img %}" >
+                                                        {% else %}
+                                                            <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                        {% endif %}
                                                         </a>
                                                         <div class="imgcaption">
                                                             <a href="{% url 'display:summary' app ss.pid.pid %}?role={{role}}">
@@ -250,7 +262,11 @@ a {
                                                             <li>
                                                                 {% if sss %}
                                                                     <a style="border:0;" href="{% if sss.type != 'hybrid' %}{% url 'display:summary' app sss.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{sss.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{sss.pid.binomial}}" src="{% static sss.img %}">
+                                                                    {% if sss.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{sss.pid.binomial}}" src="{% static sss.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app sss.pid.pid %}?role={{role}}">
@@ -264,7 +280,11 @@ a {
                                                             <li>
                                                                 {% if ssp %}
                                                                     <a style="border:0;" href="{% if ssp.type != 'hybrid' %}{% url 'display:summary' app ssp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{ssp.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{ssp.pid.binomial}}" src="{% static ssp.img %}">
+                                                                    {% if ssp.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{ssp.pid.binomial}}" src="{% static ssp.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app ssp.pid.pid %}?role={{role}}">
@@ -280,8 +300,12 @@ a {
                                                 </li>
                                                 <li>
                                                     {% if sp %}
-                                                        <a style="border:0; padding: 2px;" href="{% if sp.type != 'hybrid' %}{% url 'display:summary' app sp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{sp.pid.pid}}&role={{role}}">
-                                                                    <img class="thumbnails thumbnails3" alt="{{sp.pid.binomial}}" src="{% static sp.img %}">
+                                                        <a style="border:0;" href="{% if sp.type != 'hybrid' %}{% url 'display:summary' app sp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{sp.pid.pid}}&role={{role}}">
+                                                        {% if sp.img %}
+                                                             <img class="thumbnails thumbnails3" alt="{{sp.pid.binomial}}" src="{% static sp.img %}" >
+                                                        {% else %}
+                                                             <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                        {% endif %}
                                                         </a>
                                                         <div class="imgcaption">
                                                             <a href="{% url 'display:summary' app sp.pid.pid %}?role={{role}}">
@@ -296,7 +320,11 @@ a {
                                                             <li>
                                                                 {% if sps %}
                                                                     <a style="border:0;" href="{% if sps.type != 'hybrid' %}{% url 'display:summary' app sps.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{sps.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{sps.pid.binomial}}" src="{% static sps.img %}">
+                                                                    {% if sps.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{sps.pid.binomial}}" src="{% static sps.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app sps.pid.pid %}?role={{role}}">
@@ -310,7 +338,11 @@ a {
                                                             <li>
                                                                 {% if spp %}
                                                                     <a style="border:0;" href="{% if spp.type != 'hybrid' %}{% url 'display:summary' app spp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{spp.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{spp.pid.binomial}}" src="{% static spp.img %}">
+                                                                    {% if spp.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{spp.pid.binomial}}" src="{% static spp.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app spp.pid.pid %}?role={{role}}">
@@ -332,7 +364,11 @@ a {
                                     <li>
                                         {% if p %}
                                             <a style="border:0;" href="{% if p.type != 'hybrid' %}{% url 'display:summary' app p.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{p.pid.pid}}&role={{role}}">
+                                            {% if p.img %}
                                                 <img class="thumbnails thumbnails3" alt="{{p.pid.binomial}}" src="{% static p.img %}">
+                                            {% else %}
+                                                <img class="thumbnails thumbnails3" alt="{{p.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}">
+                                            {% endif %}
                                             </a>
                                             <div class="imgcaption">
                                                 <a href="{% url 'display:summary' app p.pid.pid %}?role={{role}}">
@@ -347,7 +383,11 @@ a {
                                                 <li>
                                                     {% if ps %}
                                                         <a style="border:0;" href="{% if ps.type != 'hybrid' %}{% url 'display:summary' app ps.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{ps.pid.pid}}&role={{role}}">
-                                                                    <img class="thumbnails thumbnails3" alt="{{ps.pid.binomial}}" src="{% static ps.img %}">
+                                                        {% if ps.img %}
+                                                             <img class="thumbnails thumbnails3" alt="{{ps.pid.binomial}}" src="{% static ps.img %}" >
+                                                        {% else %}
+                                                             <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                        {% endif %}
                                                         </a>
                                                         <div class="imgcaption">
                                                             <a href="{% url 'display:summary' app ps.pid.pid %}?role={{role}}">
@@ -362,7 +402,11 @@ a {
                                                             <li>
                                                                 {% if pss %}
                                                                     <a style="border:0;" href="{% if pss.type != 'hybrid' %}{% url 'display:summary' app pss.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{pss.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{pss.pid.binomial}}" src="{% static pss.img %}">
+                                                                    {% if pss.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{pss.pid.binomial}}" src="{% static pss.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app pss.pid.pid %}?role={{role}}">
@@ -377,7 +421,11 @@ a {
                                                             <li>
                                                                 {% if psp %}
                                                                     <a style="border:0;" href="{% if psp.type != 'hybrid' %}{% url 'display:summary' app psp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{psp.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{psp.pid.binomial}}" src="{% static psp.img %}" >
+                                                                    {% if psp.img %}
+                                                                         <img class="thumbnails thumbnails4" alt="{{psp.pid.binomial}}" src="{% static psp.img %}">
+                                                                    {% else %}
+                                                                         <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app psp.pid.pid %}?role={{role}}">
@@ -395,7 +443,11 @@ a {
                                                 <li>
                                                     {% if pp %}
                                                         <a style="border:0;" href="{% if pp.type != 'hybrid' %}{% url 'display:summary' app pp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{pp.pid.pid}}&role={{role}}">
-                                                                    <img class="thumbnails thumbnails3" alt="{{pp.pid.binomial}}" src="{% static pp.img %}">
+                                                        {% if pp.img %}
+                                                            <img class="thumbnails thumbnails3" alt="{{pp.pid.binomial}}" src="{% static pp.img %}" >
+                                                        {% else %}
+                                                            <img  class="thumbnails thumbnails3" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                        {% endif %}
                                                         </a>
                                                         <div class="imgcaption">
                                                             <a href="{% url 'display:summary' app pp.pid.pid %}?role={{role}}">
@@ -410,7 +462,11 @@ a {
                                                             <li>
                                                                 {% if pps %}
                                                                     <a style="border:0;" href="{% if pps.type != 'hybrid' %}{% url 'display:summary' app pps.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{pps.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{pps.pid.binomial}}" src="{% static pps.img %}">
+                                                                    {% if pps.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{pps.pid.binomial}}" src="{% static pps.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app pps.pid.pid %}?role={{role}}">
@@ -425,7 +481,11 @@ a {
                                                             <li>
                                                                 {% if ppp %}
                                                                     <a style="border:0;" href="{% if ppp.type != 'hybrid' %}{% url 'display:summary' app ppp.pid.pid %}{% else %}{% url 'orchidaceae:ancestrytree' %}{% endif %}?pid={{ppp.pid.pid}}&role={{role}}">
-                                                                                <img class="thumbnails thumbnails4" alt="{{ppp.pid.binomial}}" src="{% static ppp.img %}" >
+                                                                    {% if ppp.img %}
+                                                                        <img class="thumbnails thumbnails4" alt="{{ppp.pid.binomial}}" src="{% static ppp.img %}">
+                                                                    {% else %}
+                                                                        <img  class="thumbnails thumbnails4" alt="{{s.pid.binomial}}" src="{% static 'utils/images/noimage_light.jpg' %}" >
+                                                                    {% endif %}
                                                                     </a>
                                                                     <div class="imgcaption">
                                                                         <a href="{% url 'display:summary' app ppp.pid.pid %}?role={{role}}">
