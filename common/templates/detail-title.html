@@ -93,7 +93,7 @@
             {% elif species.type == 'hybrid' %}
             <h1 class="hidden-h1">{{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} × {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})</h1>
             {% else %}
-            <h1 class="hidden-h1">{{species.accepted.common_name|default:''}} ({{species.binomial}})</h1>
+            <h1 class="hidden-h1">{{species.common_name|default:''}} ({{species.binomial}})</h1>
             {% endif %}
             <h4>
                 {% if species.type == 'species' or species.is_hybrid %}<i>{{species.binomial}}</i>{% else %}{{species.binomial}}{% endif %},
@@ -107,8 +107,8 @@
             <div class="info">
                 {% if species.type == 'species' %}
                     {{species.binomial}} is a species in the <a href="{% url 'common:species' app %}?genus={{species.genus}}&type={{species.type}}&alpha={{species.species|firstletter|upper}}">{{ species.genus }}</a> genus.
-                    {% if species.accepted.common_name or species.common_name %}
-                        It is commonly known as <b>{% if species.common_name %}{{species.common_name}} {% elif species.accepted.common_name %}{{species.accepted.common_name}} {% endif %}</b>
+                    {% if species.common_name %}
+                        It is commonly known as <b>{{species.common_name}}</b>
                     {% endif %}
                     {% if species.status == 'synonym' %}
                         This name is a synonym of <a href="{% url 'display:summary' app species.getAcc %}?role={{role}}&syn=Y">{{species.getAccepted.name|safe}}</a>

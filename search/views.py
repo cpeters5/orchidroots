@@ -158,10 +158,7 @@ def search_name(request, app=None):
         search_string = request.GET.get('search_string', '').strip()
 
     Species = apps.get_model(app, 'Species')
-    if app == 'orchidaceae':
-        species_list = Species.objects.filter(common_name__icontains=search_string)
-    else:
-        species_list = Species.objects.filter(Q(accepted__common_name__icontains=search_string) | Q(accepted__common_name_search__icontains=search_string_clean))
+    species_list = Species.objects.filter(common_name__icontains=search_string)
 
     context = {'species_list': species_list,
                'search_string': req_search_string, 'app': app, 'role': role,}

@@ -4,7 +4,7 @@
     <link rel="canonical" href="{{ canonical_url }}">
     <title>{{species.binomial}} - orchidroots</title>
     {% if species.type == 'species' %}
-        <meta name='description' content="Images and information about {{species.accepted.common_name|default:''}}, {{species.binomial}} ">.
+        <meta name='description' content="Images and information about {{species.common_name|default:''}}, {{species.binomial}} ">.
     {% else %}
         <meta name='description' content="Explore the lineage, ancestors and their genetic contribution of the {{species.binomial}} ({{species.hybrid.registered_seed_name_long|default:'na'|safe}} x {{species.hybrid.registered_pollen_name_long|default:'na'|safe}})">.
     {% endif %}

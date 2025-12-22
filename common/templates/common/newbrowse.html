@@ -305,7 +305,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static 'utils/images/noimage_light.jpg' %}" >
                                 {% endif %}
                                     <div class="imgcaption">
-                                        {% if x.pid.accepted.common_name %}{{x.pid.accepted.common_name|default:''}}{% else %}{{x.binomial_it|safe}}{% endif %}
+                                        {% if x.pid.common_name %}{{x.pid.common_name|default:''}}{% else %}{{x.binomial_it|safe}}{% endif %}
                                     </div>
                             </div>
                         {% endfor %}
@@ -325,7 +325,7 @@ img{
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        {{x.pid.accepted.common_name|default:x.pid.pid.binomial_it|safe}}</p>
+                                        {{x.pid.common_name|default:x.pid.pid.binomial_it|safe}}</p>
                                     </div>
                                 {% else %}
                                     <a href="{% url 'display:summary' app x.pid.pid %}">
@@ -336,7 +336,7 @@ img{
                                         {% endif %}
                                     </a>
                                     <div class="imgcaption">
-                                        {% if x.pid.accepted.common_name %}{{x.pid.accepted.common_name|default:''}}<p>{% endif %} {{x.pid.binomial_it|safe}}
+                                        {{x.pid.common_name|default:''}}<p>{{x.binomial_it|safe}}
                                     </div>
                                 {% endif %}
                             </div>
@@ -352,7 +352,7 @@ img{
                                         <img class="thumbnails p-1" alt="" src="{% static x.thumb_dir %}{{x.speciesstat.best_image}}" >
                                     </a>
                                     <div class="imgcaption">
-                                        <p>{{x.pid.accepted.common_name|default:x.binomial_it|safe}}</p>
+                                        <p>{{x.binomial_it|safe}} {% if x.common_name %}({{x.common_name}}){% endif %}</p>
                                     </div>
                             </div>
                             {% endif %}

@@ -139,11 +139,7 @@ td {
                             {% endif %}
                             {% if species.status == 'synonym' %} (syn. {{species.acc.binomial}}){% endif %}
                         </td>
-                        {% if app == 'orchidaceae' %}
                         <td style="text-align: left;">{{species.common_name|default:''}}</td>
-                        {% else %}
-                        <td style="text-align: left;">{{species.accepted.common_name|default:''}}</td>
-                        {% endif %}
                         <td style="text-align: left;">{{species.accepted.distribution|default:''}}</td>
                     </tr>
 
