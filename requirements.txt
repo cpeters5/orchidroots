@@ -56,7 +56,7 @@ django-js-asset==1.2.2
 django-js-reverse==0.9.1
 django-mailbox==4.8.1
 django-mptt==0.16.0
-django-mysql==3.7.1
+django-mysql==4.15.0
 django-paging==0.2.5
 django-password-reset==2.0
 django-payments==0.13.0
@@ -77,6 +77,7 @@ django-static-fontawesome==5.15.4.0
 django-static-jquery==2.1.4
 django-static-jquery3==5.1.0
 django-stronghold==0.4.0
+django-tables2==2.7.5
 django-templatetag-sugar==1.0
 django-thumbnail==11.13
 django-thumbnails==0.6.0
