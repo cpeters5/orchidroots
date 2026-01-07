@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import environ
 import os
-import logging
+# import logging
 import logging.config
-# from django.utils.translation import gettext
-from django.utils.deprecation import MiddlewareMixin
-from utils.json_encoder import LazyJSONSerializer, LazyEncoder
+from django.utils.translation import gettext
+# from django.utils.deprecation import MiddlewareMixin
+# from utils.json_encoder import LazyJSONSerializer, LazyEncoder
 from utils.logging import RequestFormatter  # Import the custom formatter
 
 ROOT_DIR = environ.Path(__file__) - 2  # get root of the project
@@ -41,8 +41,10 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    'beta.bluenanta.com',
-    'www.beta.bluenanta.com',
+    # 'beta.bluenanta.com',
+    # 'www.beta.bluenanta.com',
+    'orchidroots.com',
+    'www.orchidroots.com',
 ]
 
 # Setup support for proxy headers
@@ -103,7 +105,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 AUTH_USER_MODEL = 'accounts.User'
-OPENAI_API_KEY = env.str('OPENAI_API_KEY', default='')
+# OPENAI_API_KEY = env.str('OPENAI_API_KEY', default='')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,9 +131,9 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # For signed cookies and other signing operations
 SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
-SERIALIZATION_MODULES = {
-    'json': 'path.to.your.json_encoder.LazyJSONSerializer'
-}
+# SERIALIZATION_MODULES = {
+#     'json': 'path.to.your.json_encoder.LazyJSONSerializer'
+# }
 
 # For signed cookies
 # from django.core import signing
