@@ -479,6 +479,7 @@ def newbrowse(request, app=None):
         app = request.GET.get('app', 'orchidaceae')
     if not app:
         app = 'orchidaceae'
+
     # handle request
     Family = apps.get_model('common', 'Family')
     family = request.GET.get('family', '')
@@ -501,9 +502,9 @@ def newbrowse(request, app=None):
     if app == 'orchidaceae' and not family and not genus:
         family = 'Orchidaceae'
 
-    type = request.GET.get('type','species')
+    type = request.GET.get('type', 'species')
     display = request.GET.get('display', 'checked')
-    alpha = request.GET.get('alpha','')
+    alpha = request.GET.get('alpha', '')
     role = request.GET.get('role', '')
     if alpha == 'ALL':
         alpha = ''
@@ -520,7 +521,7 @@ def newbrowse(request, app=None):
             if fam.get_best_img():
                 family_list = family_list + [fam.get_best_img()]
         context = {'family_list': family_list, 'app': app, 'alpha': alpha, 'alpha_list': alpha_list, 'role': role,
-                   'display': display, 'type': type,}
+                   'display': display, 'type': type, }
         return render(request, 'common/newbrowse.html', context)
 
     elif genus:
@@ -551,25 +552,45 @@ def newbrowse(request, app=None):
             if len(species) > 500:
                 species = species[0: 500]
             species_list = species
-            context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha, 'alpha_list': alpha_list, 'type': type,}
+            # species_list = []
+            # for x in species:
+            #     spcimage = x.get_best_img()
+            #     if spcimage:
+            #         species_list = species_list + [spcimage]
+            context = {'species_list': species_list, 'family': genus.family, 'app': app, 'genus': genus, 'alpha': alpha,
+                       'alpha_list': alpha_list, 'type': type, }
             return render(request, 'common/newbrowse.html', context)
 
     elif family:
         # Browse genus image in the Family
-        genlist = Genus.objects.filter(genusstat__best_image__isnull=False).select_related('genusstat')
-        if alpha:
-            genlist = genlist.filter(genus__istartswith=alpha)
-        genlist = genlist.order_by('genus')
-        genus_list = []
-        for gen in genlist:
-            if gen.get_best_img():
-                genus_list = genus_list + [gen.get_best_img()]
-        context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
-                   'alpha_list': alpha_list, 'app': app, 'type': type, }
-        return render(request, 'common/newbrowse.html', context)
+        if app == 'orchidaceae' and type == 'hybrid':
+            SpcImages = apps.get_model(app.lower(), 'HybImages')
+        else:
+            SpcImages = apps.get_model(app.lower(), 'SpcImages')
 
+        # genera = Genus.objects.filter(family=family)
+        if app == 'orchidaceae':
+            genimg = SpcImages.objects.filter(image_file__isnull=False).order_by('gen').values_list('gen',
+                                                                                                    flat=True).distinct()
+        else:
+            genimg = SpcImages.objects.filter(image_file__isnull=False).filter(family=family).order_by(
+                'gen').values_list('gen', flat=True).distinct()
+
+        if genimg:
+            genus_list = []
+            genimg = set(genimg)
+            genlist = Genus.objects.filter(pid__in=genimg)
+            if alpha:
+                genlist = genlist.filter(genus__istartswith=alpha)
+            genlist = genlist.order_by('genus')
+            for gen in genlist:
+                if gen.get_best_img():
+                    genus_list = genus_list + [gen.get_best_img()]
+            context = {'genus_list': genus_list, 'family': family, 'app': app, 'alpha': alpha,
+                       'alpha_list': alpha_list, 'app': app, 'type': type, }
+            return render(request, 'common/newbrowse.html', context)
     context = {'genus_list': '', 'family': family, 'app': app, 'alpha': alpha,
-               'alpha_list': alpha_list, 'type': type,}
+               'alpha_list': alpha_list, 'type': type, }
     return render(request, 'common/newbrowse.html', context)
 
 
