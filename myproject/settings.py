@@ -447,7 +447,7 @@ ADS_GOOGLE_ADSENSE_CLIENT = None  # 'ca-pub-xxxxxxxxxxxxxxxx'
 #   - templates/base.html         → popup HTML + JS
 # ============================================================
 
-FUNDRAISER_ENABLED = True    # Set to False when the campaign is over
+FUNDRAISER_ENABLED = False    # Set to False when the campaign is over
 FUNDRAISER_CAMPAIGN_ID = "fundraiser_2025_w1"
 
 # ADS_ZONES = {
