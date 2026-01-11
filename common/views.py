@@ -1390,7 +1390,6 @@ def newcross(request, pid1, pid2):
         pid2 = None
         return HttpResponseRedirect("/common/compare/" + str(pid1) + "/?app=orchidaceae&pid=" + str(pid2) + "&failmsg=FAILGENUS&genus2=" + genus2 + "&species2=" + spc2)
 
-
 @login_required
 def compare(request, pid):
     # TODO:  Use Species form instead
