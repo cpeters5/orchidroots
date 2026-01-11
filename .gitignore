@@ -10,7 +10,7 @@ log/
 .env*
 .idea/
 *.pyc
-myproject/.env
+myproject/settings.py
 *.sock
 run/
 *_test*
