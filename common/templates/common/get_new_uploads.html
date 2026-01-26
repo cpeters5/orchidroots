@@ -10,12 +10,13 @@
    padding:2px 1px 3px 1px;
 }
 
-
-
 </style>
+
 <div style="margin:0 auto; text-align: center;min-height:200px;">
     <br>
-    <h6>New Orchid Uploaded Photos</h6>
+    <h6>New Orchid Uploaded Photos
+        &nbsp;&nbsp;<a class="btn border btn-primary" style="font-size:13px;" href="{% url 'common:get_new_uploads' %}?alpha={{alpha}}&role={{role}}">refresh</a>
+    </h6>
     <br>
    <div>
     {% if orchidaceae_upl %}

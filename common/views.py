@@ -1295,34 +1295,36 @@ def uploadfile(request, pid):
         return render(request, app + '/uploadfile.html', context)
 
 
+@login_required
 def get_new_uploads(request):
     context = {}
     UploadFile = apps.get_model('orchidaceae', 'UploadFile')
-    orchidaceae_upl = UploadFile.objects.all()
+    orchidaceae_upl = UploadFile.objects.all().order_by('-created_date')[0:25]
     if len(orchidaceae_upl):
         context['orchidaceae_upl'] = orchidaceae_upl
 
     UploadFile = apps.get_model('animalia', 'UploadFile')
-    animalia_upl = UploadFile.objects.all()
+    animalia_upl = UploadFile.objects.all().order_by('-created_date')[0:25]
     if len(animalia_upl):
         context['animalia_upl'] = animalia_upl
 
     UploadFile = apps.get_model('aves', 'UploadFile')
-    aves_upl = UploadFile.objects.all()
+    aves_upl = UploadFile.objects.all().order_by('-created_date')[0:25]
     if len(aves_upl):
         context['aves_upl'] = aves_upl
 
     UploadFile = apps.get_model('fungi', 'UploadFile')
-    fungi_upl = UploadFile.objects.all()
+    fungi_upl = UploadFile.objects.all().order_by('-created_date')[0:25]
     if len(fungi_upl):
         context['fungi_upl'] = fungi_upl
 
     UploadFile = apps.get_model('other', 'UploadFile')
-    other_upl = UploadFile.objects.all()
+    other_upl = UploadFile.objects.all().order_by('-created_date')[0:25]
     if len(other_upl):
         context['other_upl'] = other_upl
 
     return render(request, 'common/get_new_uploads.html', context)
+
 
 @login_required
 def newcross(request, pid1, pid2):
@@ -1386,6 +1388,7 @@ def newcross(request, pid1, pid2):
     else:
         pid2 = None
         return HttpResponseRedirect("/common/compare/" + str(pid1) + "/?app=orchidaceae&pid=" + str(pid2) + "&failmsg=FAILGENUS&genus2=" + genus2 + "&species2=" + spc2)
+
 
 @login_required
 def compare(request, pid):
