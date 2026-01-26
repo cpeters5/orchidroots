@@ -18,7 +18,6 @@ import django.shortcuts
 from collections import defaultdict
 
 from django.apps import apps
-from fuzzywuzzy import fuzz, process
 from datetime import datetime, timedelta
 from utils import config
 from utils.views import write_output, getRole, get_author, get_reqauthor, getSuperGeneric, pathinfo, get_application
@@ -249,10 +248,10 @@ def genera(request, app=None):
     }
     return render(request, "common/genera.html", context)
 
-def get_regions(pid):
-    region_ids = Distribution.objects.filter(pid=pid).values_list('region_id', flat=True)
-    regions = Region.objects.filter(id__in=region_ids).values_list('name', flat=True)
-    return ', '.join(regions)
+# def get_regions(pid):
+#     region_ids = Distribution.objects.filter(pid=pid).values_list('region_id', flat=True)
+#     regions = Region.objects.filter(id__in=region_ids).values_list('name', flat=True)
+#     return ', '.join(regions)
 
 
 def species(request, app=None):
@@ -749,12 +748,14 @@ def deletewebphoto(request, pid):
     except Family.DoesNotExist:
         family = ''
         app = None
+
     if not family:
         app = request.GET.get('app', None)
         if app not in applications:
             app = None
+
     if not app:
-        url = "%s?role=%s" % (reverse('display:photos', args=(app, species.pid,)), role)
+        url = "%s?role=pri" % (reverse('display:photos', args=(app, pid,)))
         return HttpResponseRedirect(url)
         # return render(request, "display/photos.html", {})
 
@@ -902,8 +903,8 @@ def myphoto(request, pid):
         pid = synonym.acc_id
         species = Species.objects.get(pk=pid)
 
-    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species')
-    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid')
+    myspecies_list = Species.objects.exclude(status='synonym').filter(type='species').filter(author=author)
+    myhybrid_list = Species.objects.exclude(status='synonym').filter(type='hybrid').filter(author=author)
 
     my_upl_list = list(UploadFile.objects.filter(author=author).values_list('pid', flat=True).distinct())
     my_spc_list = list(SpcImages.objects.filter(author=author).values_list('pid', flat=True).distinct())

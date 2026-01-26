@@ -40,7 +40,6 @@
 </style>
 
     <div class="d-flex justify-content-center mynav" >
-        <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{mylist}}" href="{% url 'common:myphoto_list' %}?app={{app}}&role={{role}}">My List</a>
         <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myspc}}" href="{% url 'common:myphoto_browse_spc' %}?app={{app}}&role={{role}}">My Species</a>
         <a class="btn btn-xs btn-outline-primary m-1 mybtn1 {{myhyb}}" href="{% url 'common:myphoto_browse_hyb' %}?app={{app}}&role={{role}}">My Hybrids</a>
         {% if species %}

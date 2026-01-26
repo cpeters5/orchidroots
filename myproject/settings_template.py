@@ -41,10 +41,10 @@ DEBUG = True
 PYTHONUNBUFFERED=True
 
 ALLOWED_HOSTS = [
-    # 'beta.bluenanta.com',
-    # 'www.beta.bluenanta.com',
-    'orchidroots.com',
-    'www.orchidroots.com',
+    'beta.bluenanta.com',
+    'www.beta.bluenanta.com',
+    # 'orchidroots.com',
+    # 'www.orchidroots.com',
 ]
 
 # Setup support for proxy headers
@@ -128,6 +128,8 @@ INTERNAL_IPS = [
 # Session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+SESSION_COOKIE_AGE = 1209600  # 14 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # For signed cookies and other signing operations
 SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
