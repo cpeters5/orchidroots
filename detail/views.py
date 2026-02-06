@@ -547,11 +547,11 @@ def reidentify(request, orid, pid):
             else:
                 if old_img.image_file:
                     if new_species.type == 'species':
-                        new_img = SpcImages(pid=new_species.pid)
+                        new_img = SpcImages(pid=new_species)
                         from_path = "/webapps/static/utils/images/hybrid/" + old_img.image_file
                         to_path = "/webapps/static/utils/images/species/" + old_img.image_file
                     else:
-                        new_img = HybImages(pid=new_species.hybrid)
+                        new_img = HybImages(pid=new_species)
                         from_path = "/webapps/static/utils/images/species/" + old_img.image_file
                         to_path = "/webapps/static/utils/images/hybrid/" + old_img.image_file
                     hist = ReidentifyHistory(from_id=old_img.id, from_pid=old_species, to_pid=new_species,
