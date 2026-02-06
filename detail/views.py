@@ -566,7 +566,7 @@ def reidentify(request, orid, pid):
                 new_img.author = old_img.author
             else:
                 new_img.author = request.user.photographer
-
+            print("stuff")
             new_img.pk = None
             new_img.source_url = old_img.source_url
             new_img.image_url = old_img.image_url
