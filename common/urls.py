@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('deletephoto/<int:orid>/<int:pid>/', views.deletephoto, name='deletephoto'),
     path('deletephoto/<int:orid>/', views.deletephoto, name='deletephoto'),
+    path('refresh/<int:pid>/', views.refresh, name='refresh'),
     path('deletewebphoto/<int:pid>/', views.deletewebphoto, name='deletewebphoto'),
     path('approve_mediaphoto/<str:app>/<int:orid>/<int:pid>/', views.approve_mediaphoto, name='approve_mediaphoto'),
     path('uploadfile/<int:pid>/', views.uploadfile, name='uploadfile'),

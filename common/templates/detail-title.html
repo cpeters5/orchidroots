@@ -103,6 +103,9 @@
                 {% else %}
                 ({{species.source}})
                 {% endif %}
+            {% if user.tier.tier > 2 %}
+                <a type="button" class="btn btn-primary"  href="{% url 'common:refresh' species.pid %}?tribe={{species.gen.tribe}}&role={{role}}">refresh</a>
+            {%  endif %}
             </h4>
             <div class="info">
                 {% if species.type == 'species' %}

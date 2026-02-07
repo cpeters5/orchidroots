@@ -789,6 +789,44 @@ def deletewebphoto(request, pid):
 
 
 @login_required
+def refresh(request, pid):
+    # given a pid, reselect speciesstat.best_image
+    role = getRole(request)
+    app, family = get_application(request)
+    print(role, "app =", app, "family = ", family)
+    Species = apps.get_model(app, 'Species')
+    SpeciesStat = apps.get_model(app, 'SpeciesStat')
+    try:
+        species = Species.objects.get(pk=pid)
+    except Species.DoesNotExist:
+        species = None
+    if isinstance(species,Species):
+        stat = SpeciesStat.objects.get(pk=pid)
+        type = species.type
+        if type =='species':
+            Images = apps.get_model(app, 'SpcImages')
+        else:
+            Images = apps.get_model(app, 'HybImages')
+
+        best_image = Images.objects.filter(pid=pid, rank__lt=7, image_file__isnull=False).order_by('-rank', 'quality', '?')[0]
+        # best_image = best_image[0]
+        print(best_image.pid, best_image.image_file)
+        best_image = f"utils/thumbs/species/{best_image.image_file}"
+        stat.best_image = best_image
+        stat.save()
+
+        print(stat.best_image)
+
+
+
+
+
+    url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
+    write_output(request, str(family))
+    return HttpResponseRedirect(url)
+
+
+@login_required
 def approve_mediaphoto(request, app, pid, orid):
     from utils.views import regenerate_file
     role = getRole(request)
