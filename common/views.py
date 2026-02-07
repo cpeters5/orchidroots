@@ -793,7 +793,6 @@ def refresh(request, pid):
     # given a pid, reselect speciesstat.best_image
     role = getRole(request)
     app, family = get_application(request)
-    print(role, "app =", app, "family = ", family)
     Species = apps.get_model(app, 'Species')
     SpeciesStat = apps.get_model(app, 'SpeciesStat')
     try:
@@ -810,16 +809,9 @@ def refresh(request, pid):
 
         best_image = Images.objects.filter(pid=pid, rank__lt=7, image_file__isnull=False).order_by('-rank', 'quality', '?')[0]
         # best_image = best_image[0]
-        print(best_image.pid, best_image.image_file)
         best_image = f"utils/thumbs/species/{best_image.image_file}"
         stat.best_image = best_image
         stat.save()
-
-        print(stat.best_image)
-
-
-
-
 
     url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
     write_output(request, str(family))
