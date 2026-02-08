@@ -809,16 +809,17 @@ def refresh(request, pid):
         else:
             Images = apps.get_model(app, 'HybImages')
 
-        best_image = Images.objects.filter(pid=pid, rank__lt=7, image_file__isnull=False).order_by('-rank', 'quality', '?')[0]
-        # best_image = best_image[0]
-        best_image_rel = f"utils/thumbs/{type}/{best_image.image_file}"
-        best_image_path = os.path.join(settings.STATIC_ROOT, best_image_rel)
-        print(best_image_path)
-        if os.path.exists(best_image_path):
-            stat.best_image = best_image_rel
-        else:
-            stat.best_image = None
-        stat.save()
+        best_image = Images.objects.filter(pid=pid, rank__lt=7, image_file__isnull=False).order_by('-rank', 'quality', '?')
+        if best_image:
+            best_image = best_image[0]
+            best_image_rel = f"utils/thumbs/{type}/{best_image.image_file}"
+            best_image_path = os.path.join(settings.STATIC_ROOT, best_image_rel)
+            print(best_image_path)
+            if os.path.exists(best_image_path):
+                stat.best_image = best_image_rel
+            else:
+                stat.best_image = None
+            stat.save()
 
     url = "%s?role=%s" % (reverse('display:photos', args=(app, pid,)), role)
     write_output(request, str(family))
