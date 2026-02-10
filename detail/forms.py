@@ -14,8 +14,8 @@ CHOICES = (
     ('4', '4 Group of Flowers'),
     ('5', '5 Single Fl.'),
     # ('6', '6 Selected'),
-    ('7', '7 Closed up'),
-    ('8', '8 Information'),
+    # ('7', '7 Closed up'),
+    # ('8', '8 Information'),
 )
 
 QUALITY = (
