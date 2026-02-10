@@ -637,7 +637,6 @@ def uploadweb(request, pid, orid=None):
             author = Photographer.objects.get(pk=author)
         else:
             author = request.user.photographer
-
         if species.type == 'hybrid':
             form = UploadHybWebForm(request.POST)
         elif species.type == 'species':
@@ -674,10 +673,11 @@ def uploadweb(request, pid, orid=None):
             return HttpResponseRedirect(url)
 
     if not orid:  # upload, initialize author. Get image count
+        author = request.user.photographer.author_id
         if species.type == 'species':
-            form = UploadSpcWebForm(initial={'author': request.user.photographer.author_id})
+            form = UploadSpcWebForm(initial={'author': author})
         else:
-            form = UploadHybWebForm(initial={'author': request.user.photographer.author_id})
+            form = UploadHybWebForm(initial={'author': author})
         img = ''
     else:  # update. initialize the form iwht current image
         if species.type == 'species':
