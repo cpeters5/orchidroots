@@ -126,22 +126,22 @@
                         {% endif %}
                         {% if species.gen.subtribe %}
                             subtribe <a href="{% url 'common:genera' app %}?subtribe={{species.gen.subtribe}}&role={{role}}">{{species.gen.subtribe}}</a>,
-                        {% endif %}.
-                        {% if species.accepted.subgenus or species.accepted.section or species.accepted.subsection or species.accepted.series %}
-                            It is in the
-                            {% if species.accepted.subgenus %}
-                                subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>
-                            {% endif %}
-                            {% if species.accepted.section %}
-                                section: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>
-                            {% endif %}
-                            {% if species.accepted.subsection %}
-                                subsection: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>
-                            {% endif %}
-                            {% if species.accepted.series %}
-                                series: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>
-                            {% endif %}
                         {% endif %}
+{#                        {% if species.accepted.subgenus or species.accepted.section or species.accepted.subsection or species.accepted.series %}#}
+{#                            It is in the#}
+{#                            {% if species.accepted.subgenus %}#}
+{#                                subgenus <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subgenus={{species.accepted.subgenus}}&alpha=All">{{species.accepted.subgenus}}</a>#}
+{#                            {% endif %}#}
+{#                            {% if species.accepted.section %}#}
+{#                                section: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&section={{species.accepted.section}}&alpha=All">{{species.accepted.section}}</a>#}
+{#                            {% endif %}#}
+{#                            {% if species.accepted.subsection %}#}
+{#                                subsection: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&subsection={{species.accepted.subsection}}&alpha=All">{{species.accepted.subsection}}</a>#}
+{#                            {% endif %}#}
+{#                            {% if species.accepted.series %}#}
+{#                                series: <a href="{% url 'orchidaceae:species' %}?genus={{species.genus}}&role={{role}}&series={{species.accepted.series}}&alpha=All">{{species.accepted.series}}</a>#}
+{#                            {% endif %}#}
+{#                        {% endif %}#}
                         {% if species.accepted.distribution %}. This species is found in {{species.accepted.distribution }}.{% endif %}
                     {% endif %}
                 {% else %}
@@ -185,9 +185,9 @@
                 {% if species.hybrid.comment %}<br><b>NOTE:</b> {{species.hybrid.comment}} {% endif %}
 
                 {% endif %}
-                {% if species.accepted.comment %}
-                <div id="shrinkMe" class="shrinkable" style="width: 70%; margin: 0 auto; text-align: left;">
-                    {{species.accepted.comment|safe}}
+                {% if species.comment %}
+                <div id="shrinkMe" class="shrinkable" style="margin: 0 auto; text-align: left;">
+                    {{species.comment|truncatewords_html:50|safe}}
                 </div>
                 {% endif %}
 
