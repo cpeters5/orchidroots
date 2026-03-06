@@ -1,5 +1,5 @@
 <div style="width:100%;word-wrap: break-word;text-align:center;padding-left:5px;">
-    {% if user.tier.tier > 3 and role == 'cur' %}
+    {% if user.tier.tier > 2 and role == 'cur' %}
     Rank:
         {% if image.rank == 0 %}<span style="color:red">0</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="private" href='?rank=0&role={{role}}&id={{image.id}}&app={{app}}&related=ALL&syn=Y' rel="nofollow noreferrer noopener">0</a>{% endif %} |
         {% if image.rank == 1 %}<span style="color:red">1</span>{% else %}<a data-toggle="tooltip" data-placement="top" title="habitat" href='?rank=1&role={{role}}&id={{image.id}}&app={{app}}&related=ALL&syn=Y' rel="nofollow noreferrer noopener">1</a>{% endif %} |
