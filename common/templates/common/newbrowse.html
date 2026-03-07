@@ -266,7 +266,9 @@ img{
                     {% if genus %}
                         {% if genus.type == 'species' %}
                             <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=species">List {{genus}} species</a>
-                            <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=hybrid">List {{genus}} hybrid</a>
+                            {%  if genus.genusstat.num_hybrid > 0 %}
+                                <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=hybrid">List {{genus}} hybrid</a>
+                            {%  endif %}
                         {%  elif genus.type == 'hybrid' %}
                             <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=hybrid">List {{genus}} hybrid</a>
                         {%  endif %}
