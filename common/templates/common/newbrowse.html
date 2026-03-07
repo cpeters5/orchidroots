@@ -229,7 +229,7 @@ img{
                     <h1 class="hidden-h1">
                             <i>
                         {% if genus %}
-                                Species in <b>{{genus}}</b> genus
+                                Browse Images in <b>{{genus}}</b> genus
                         {% elif family %}
                                 {{app|title}} family <b>{{family.family}}</b>
                             {% if subfamily %}
@@ -247,7 +247,7 @@ img{
                     <span style="color:darkgreen; font-size:22px;font-weight:normal">
                             <i>
                         {% if genus %}
-                             Species in <b>{{genus}}</b> genus
+                             Browse Images in <b>{{genus}}</b> genus
                         {% elif family %}
                              {{app|title}} family <b>{{family.family}}</b>
                             {% if subfamily %}
@@ -264,7 +264,12 @@ img{
                     </span>
                         &nbsp;
                     {% if genus %}
-                    <a href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}">List {{genus}} species</a>
+                        {% if genus.type == 'species' %}
+                            <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=species">List {{genus}} species</a>
+                            <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=hybrid">List {{genus}} hybrid</a>
+                        {%  elif genus.type == 'hybrid' %}
+                            <a class="btn btn-primary" href="{% url 'common:species' app %}?family={{family}}&genus={{genus}}&type=hybrid">List {{genus}} hybrid</a>
+                        {%  endif %}
                     {% elif family %}
                     <a href="{% url 'common:genera' app %}?app={{family.application}}&family={{family}}">List {{family.family}} genera</a>
                     {% else %}
@@ -296,7 +301,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in family_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' app %}?family={{x.family.family}}&role={{role}}">{{x.family}}</a>
+                                <a href="{% url 'common:newbrowse' app %}?family={{x.family.family}}&role={{role}}&type={{ x.type}}">{{x.family}}</a>
                                 {% if x.pid_id %}
                                     <a href="{% url 'display:summary' app  x.pid_id %}">
                                         <img class="thumbnails p-1" alt="" src="{% static  x.thumb_dir %}{{ x.image_file}}" >
@@ -315,7 +320,7 @@ img{
                                 <div style="clear:left">{% include "common/alpha_list_browse.html" %}</div>
                         {% for x in genus_list %}
                             <div class="imageitem border ">
-                                <a href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{x.gen.genus}}&role={{role}}">{{x.gen.genus}}</a>
+                                <a href="{% url 'common:newbrowse' app %}?family={{family}}&genus={{x.gen.genus}}&role={{role}}&type={{ x.gen.type }}">{{x.gen.genus}}</a>
                                 {% if x.pid.pid.type == 'hybrid' and x.pid.pid.family.family == 'Orchidaceae' %}
                                     <a href="{% url 'display:summary' app x.pid.pid.pid %}">
                                         {% if x.image_file %}

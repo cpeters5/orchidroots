@@ -224,7 +224,7 @@ img{
                     {% for image in orcimage %}
                         <div class="imageitem">
                             <div class="imgtitle">
-                                <a href="{% url 'common:newbrowse' 'orchidaceae' %}?genus={{image.gen.genus}}&role={{role}}">{{image.pid.genus}}</a></div>
+                                <a href="{% url 'common:newbrowse' 'orchidaceae' %}?genus={{image.gen.genus}}&role={{role}}&type={{ image.gen.type }}">{{image.pid.genus}}</a></div>
                                 <a href="{% url 'display:summary' 'orchidaceae' image.pid_id %}">
                                     <div class="box">
                                         <img class="thumbnails" alt="{{image.pid.binomial}}" src="{% static image.thumb_dir %}{{image.image_file}}">
