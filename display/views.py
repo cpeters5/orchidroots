@@ -54,7 +54,7 @@ def get_clones(pid, SpcImages):
 def get_infraspecifics(species, Species):
     infras = []
     if species.type == 'species' or (species.type == 'hybrid' and species.source in ('POWO', 'Kew')):
-        infras = Species.objects.filter(base_pid=species.base_pid).order_by('infraspr', 'infraspe')
+        infras = Species.objects.filter(base_pid=species.base_pid).exclude(pid=species.pid).order_by('infraspr', 'infraspe')
     return infras
 
 def get_parent_images(parent_obj, SpcImages):
